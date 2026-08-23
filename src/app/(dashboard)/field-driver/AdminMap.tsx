@@ -96,14 +96,14 @@ export default function AdminMap() {
         center = firstUserPoints[firstUserPoints.length - 1];
     }
 
-    const colors = ['#FFD500', '#003875', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6'];
+    const colors = ['#FFD500', '#062B6F', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6'];
 
     return (
         <div className="w-full h-full relative flex flex-col md:flex-row">
             {/* Sidebar List */}
             <div className="w-full md:w-64 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-r border-gray-200 dark:border-white/10 z-[400] flex flex-col shrink-0">
                 <div className="p-4 border-b border-gray-200 dark:border-white/10">
-                    <h3 className="text-sm font-black text-[#003875] dark:text-[#FFD500] uppercase tracking-widest mb-3">Live Fleet Tracking</h3>
+                    <h3 className="text-sm font-black text-[#062B6F] dark:text-[#FFD500] uppercase tracking-widest mb-3">Live Fleet Tracking</h3>
                     <input 
                         type="date" 
                         value={dateStr}
@@ -147,8 +147,8 @@ export default function AdminMap() {
             {/* Map Area */}
             <div className="flex-1 h-full z-0 bg-gray-100 dark:bg-slate-800 relative">
                 {isLoading && (
-                    <div className="absolute top-4 right-4 z-[400] bg-white dark:bg-slate-900 px-4 py-2 rounded-full shadow-lg text-xs font-black tracking-widest text-[#003875] dark:text-[#FFD500] flex items-center gap-2">
-                        <div className="w-3 h-3 border-2 border-[#003875] border-t-transparent dark:border-[#FFD500] dark:border-t-transparent rounded-full animate-spin"></div>
+                    <div className="absolute top-4 right-4 z-[400] bg-white dark:bg-slate-900 px-4 py-2 rounded-full shadow-lg text-xs font-black tracking-widest text-[#062B6F] dark:text-[#FFD500] flex items-center gap-2">
+                        <div className="w-3 h-3 border-2 border-[#062B6F] border-t-transparent dark:border-[#FFD500] dark:border-t-transparent rounded-full animate-spin"></div>
                         Syncing...
                     </div>
                 )}

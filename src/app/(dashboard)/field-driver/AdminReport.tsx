@@ -88,12 +88,12 @@ export default function AdminReport() {
     };
 
     return (
-        <div className="flex flex-col h-full bg-white dark:bg-slate-900 rounded-[32px] overflow-hidden border border-gray-200 dark:border-white/10 shadow-2xl relative">
+        <div className="flex flex-col h-full bg-white dark:bg-slate-900 rounded-2xl overflow-hidden border border-gray-200/80 dark:border-white/10 shadow-sm relative">
             
             {/* Header / Filter */}
             <div className="p-6 border-b border-gray-200 dark:border-white/10 bg-gray-50/50 dark:bg-slate-800/50 flex flex-col md:flex-row items-center justify-between gap-4">
                 <div>
-                    <h2 className="text-lg font-black uppercase text-[#003875] dark:text-[#FFD500]">Monthly Field Report</h2>
+                    <h2 className="text-lg font-black uppercase text-[#062B6F] dark:text-[#FFD500]">Monthly Field Report</h2>
                     <p className="text-xs font-bold text-gray-500">Grid view of all active field drivers</p>
                 </div>
                 
@@ -120,7 +120,7 @@ export default function AdminReport() {
                     <button
                         onClick={handleExportCSV}
                         disabled={uniqueUsers.length === 0}
-                        className="flex items-center gap-2 px-4 py-2 bg-[#003875] dark:bg-[#FFD500] text-white dark:text-black rounded-xl text-xs font-black uppercase tracking-widest shadow-md hover:-translate-y-0.5 transition-transform disabled:opacity-50 disabled:hover:translate-y-0"
+                        className="flex items-center gap-2 px-4 py-2 bg-[#062B6F] dark:bg-[#FFD500] text-white dark:text-black rounded-xl text-xs font-black uppercase tracking-widest shadow-md hover:-translate-y-0.5 transition-transform disabled:opacity-50 disabled:hover:translate-y-0"
                     >
                         <ArrowDownTrayIcon className="w-4 h-4 stroke-2" /> Export
                     </button>

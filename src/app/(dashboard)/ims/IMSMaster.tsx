@@ -26,7 +26,8 @@ import {
   ChartBarIcon,
   CalendarIcon,
   DocumentTextIcon,
-  ArrowPathIcon
+  ArrowPathIcon,
+  CheckIcon
 } from "@heroicons/react/24/outline";
 import {
   PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis,
@@ -39,9 +40,20 @@ import TimeSeriesTable, { TimeBucket, Transaction } from "@/components/TimeSerie
 import DateFilterBar, { FilterPeriod } from "@/components/DateFilterBar";
 import SearchableMultiSelect from "@/components/SearchableMultiSelect";
 import { matchesCategoryItemFilters, matchesOptionSearch, normalizeFilterKey } from "@/lib/ims-filters";
-import { startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfQuarter, endOfQuarter, startOfYear, endOfYear, isWithinInterval } from "date-fns";
+import { getDatewiseTxKey, getTxSortTime } from "@/lib/ims-datewise-key";
+import { firstFloorOutRowsToGFloorInTxs } from "@/lib/ims-1st-to-g-transfer";
+import GFloorLedgerModals from "@/app/(dashboard)/ims/GFloorLedgerModals";
+import { FloorIMS } from "@/types/ims-floor";
+import { startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfQuarter, endOfQuarter, startOfYear, endOfYear } from "date-fns";
 
 const fetcher = (url: string) => fetch(url).then(res => res.json());
+
+const timeSeriesSwrOptions = {
+  revalidateOnFocus: false,
+  revalidateOnReconnect: false,
+  dedupingInterval: 120_000,
+  keepPreviousData: true,
+} as const;
 
 const formatDate = (dateString?: string) => {
   if (!dateString) return 'N/A';
@@ -52,6 +64,26 @@ const formatDate = (dateString?: string) => {
   const m = months[date.getMonth()];
   const y = date.getFullYear().toString().slice(-2);
   return `${d} ${m} ${y}`;
+};
+
+const formatTxSourceLabel = (source?: string) => {
+  if (source === "GFloor") return "G Floor";
+  if (source === "1stFloor") return "1st OUT";
+  if (source === "GRN") return "GRN";
+  return "O2D";
+};
+
+const getTxSourceBadgeClass = (source?: string) => {
+  if (source === "GFloor") {
+    return "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300";
+  }
+  if (source === "1stFloor") {
+    return "bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-300";
+  }
+  if (source === "GRN") {
+    return "bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300";
+  }
+  return "bg-orange-100 text-orange-700 dark:bg-orange-500/20 dark:text-orange-300";
 };
 
 const FloatingInput = ({
@@ -84,6 +116,26 @@ type EnrichedIMS = Omit<IMS, "live_stock" | "in_qty" | "out_qty" | "max_level" |
   lead_time: number;
   safety_factor: number;
   final_amount_num: number;
+  is_pending?: boolean;
+  source?: IMS["source"];
+};
+
+const isPendingItem = (item: { id?: string; is_pending?: boolean }) =>
+  item.is_pending || String(item.id || "").startsWith("pending-");
+
+const sourceBadgeClass = (source?: string) => {
+  switch (source) {
+    case "Details":
+      return "bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300";
+    case "GRN":
+      return "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300";
+    case "O2D":
+      return "bg-orange-100 text-orange-700 dark:bg-orange-500/20 dark:text-orange-300";
+    case "GRN, O2D":
+      return "bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-300";
+    default:
+      return "bg-gray-100 text-gray-600 dark:bg-gray-500/20 dark:text-gray-300";
+  }
 };
 
 type OutFormImportGroup = {
@@ -460,10 +512,88 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
     return 'Daily';
   }, [filterPeriod]);
 
-  const { data: timeSeriesData = [], isValidating: isTimeSeriesLoading } = useSWR<Transaction[]>(
+  const {
+    data: timeSeriesData = [],
+    isLoading: isTimeSeriesInitialLoading,
+  } = useSWR<Transaction[]>(
     "/api/ims/time-series",
-    fetcher
+    fetcher,
+    timeSeriesSwrOptions
   );
+
+  const { data: gFloorLedger = [] } = useSWR<FloorIMS[]>(
+    viewMode === "datewise" ? "/api/ims/floor?location=g&ledgerOnly=1" : null,
+    fetcher,
+    {
+      revalidateOnFocus: true,
+      dedupingInterval: 5_000,
+      keepPreviousData: true,
+    }
+  );
+
+  const { data: firstFloorLedger = [] } = useSWR<FloorIMS[]>(
+    viewMode === "datewise" ? "/api/ims/floor?location=1st&ledgerOnly=1" : null,
+    fetcher,
+    {
+      revalidateOnFocus: true,
+      dedupingInterval: 5_000,
+      keepPreviousData: true,
+    }
+  );
+
+  const mergedTimeSeriesData = useMemo(() => {
+    const txMap = new Map<string, Transaction>();
+
+    for (const tx of timeSeriesData) {
+      txMap.set(getDatewiseTxKey(tx), tx);
+    }
+
+    for (const row of gFloorLedger) {
+      const inQty = parseFloat(row.in_qty || "") || 0;
+      const outQty = parseFloat(row.out_qty || "") || 0;
+      if (inQty <= 0 && outQty <= 0) continue;
+
+      const tx: Transaction = {
+        item_name: (row.item_name || "").trim(),
+        category: row.category || "",
+        date: row.date || row.updated_at || "",
+        in_qty: inQty,
+        out_qty: outQty,
+        source: "GFloor",
+      };
+      // Ledger rows win over time-series so manual G Floor entries stay current
+      txMap.set(getDatewiseTxKey(tx), tx);
+    }
+
+    for (const tx of firstFloorOutRowsToGFloorInTxs(firstFloorLedger)) {
+      const existing = txMap.get(getDatewiseTxKey(tx));
+      if (!existing || existing.source !== "GFloor") {
+        txMap.set(getDatewiseTxKey(tx), tx);
+      }
+    }
+
+    return Array.from(txMap.values());
+  }, [timeSeriesData, gFloorLedger, firstFloorLedger]);
+
+  const showTimeSeriesLoading = isTimeSeriesInitialLoading && timeSeriesData.length === 0;
+
+  const { data: approvalData, mutate: mutateApprovals } = useSWR<{ keys: string[] }>(
+    viewMode === "datewise" ? "/api/ims/gfloor-approval" : null,
+    fetcher,
+    {
+      revalidateOnFocus: false,
+      dedupingInterval: 60_000,
+      keepPreviousData: true,
+    }
+  );
+
+  const approvedTxKeys = useMemo(
+    () => new Set(approvalData?.keys || []),
+    [approvalData]
+  );
+
+  const [selectedTxKeys, setSelectedTxKeys] = useState<Set<string>>(new Set());
+  const [isApproving, setIsApproving] = useState(false);
 
   const dateRange = useMemo(() => {
     let start, end;
@@ -501,7 +631,9 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
   }, [filterPeriod, filterDate, filterStartDate, filterEndDate]);
 
   const datewiseTransactions = useMemo(() => {
-    const sortedAll = [...timeSeriesData].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    const sortedAll = [...mergedTimeSeriesData].sort(
+      (a, b) => getTxSortTime(a.date) - getTxSortTime(b.date)
+    );
     const stockMap = new Map<string, number>();
     
     const itemsWithRunningStock = sortedAll.map(item => {
@@ -513,14 +645,25 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
       return { ...item, running_stock: current };
     });
 
-    itemsWithRunningStock.reverse();
+    const filteredByDate = !dateRange
+      ? itemsWithRunningStock
+      : itemsWithRunningStock.filter(item => {
+          const itemTime = getTxSortTime(item.date);
+          if (!itemTime) return false;
+          return itemTime >= dateRange.start.getTime() && itemTime <= dateRange.end.getTime();
+        });
 
-    if (!dateRange) return itemsWithRunningStock;
-    return itemsWithRunningStock.filter(item => {
-      const itemDate = new Date(item.date);
-      return isWithinInterval(itemDate, { start: dateRange.start, end: dateRange.end });
+    return filteredByDate.sort((a, b) => {
+      const dateDiff = getTxSortTime(b.date) - getTxSortTime(a.date);
+      if (dateDiff !== 0) return dateDiff;
+
+      const aPending = !approvedTxKeys.has(getDatewiseTxKey(a));
+      const bPending = !approvedTxKeys.has(getDatewiseTxKey(b));
+      if (aPending !== bPending) return aPending ? -1 : 1;
+
+      return (a.item_name || "").localeCompare(b.item_name || "");
     });
-  }, [timeSeriesData, dateRange]);
+  }, [mergedTimeSeriesData, dateRange, approvedTxKeys]);
 
   const filteredDatewiseTransactions = useMemo(() => {
     return datewiseTransactions.filter((item) =>
@@ -549,7 +692,9 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
       avg_daily_con: item.avg_daily_con || 0,
       lead_time: item.lead_time || 30,
       safety_factor: item.safety_factor || 1,
-      final_amount_num: parseFloat(item.final_amount) || 0
+      final_amount_num: parseFloat(item.final_amount) || 0,
+      is_pending: isPendingItem(item),
+      source: item.source || (isPendingItem(item) ? undefined : "Details"),
     })) as EnrichedIMS[];
   }, [rawItems]);
 
@@ -614,46 +759,6 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
     [uniqueItemNames]
   );
 
-  const catalogNameKeys = useMemo(
-    () => new Set(items.map((i) => normalizeFilterKey(i.item_name)).filter(Boolean)),
-    [items]
-  );
-
-  const movementOnlyItems = useMemo(() => {
-    const map = new Map<string, EnrichedIMS>();
-    for (const t of timeSeriesData) {
-      const key = normalizeFilterKey(t.item_name);
-      if (!key || catalogNameKeys.has(key)) continue;
-      const inQty = t.in_qty || 0;
-      const outQty = t.out_qty || 0;
-      const existing = map.get(key);
-      if (existing) {
-        existing.in_qty += inQty;
-        existing.out_qty += outQty;
-        existing.live_stock = existing.in_qty - existing.out_qty;
-      } else {
-        map.set(key, {
-          id: `tx-${key}`,
-          item_name: (t.item_name ?? "").trim(),
-          category: (t.category ?? "GENERAL").trim() || "GENERAL",
-          est_amount_item: "",
-          gst: "",
-          final_amount: "0",
-          in_qty: inQty,
-          out_qty: outQty,
-          live_stock: inQty - outQty,
-          max_level: 0,
-          sale_percent: 0,
-          avg_daily_con: 0,
-          lead_time: 30,
-          safety_factor: 1,
-          final_amount_num: 0,
-        });
-      }
-    }
-    return Array.from(map.values());
-  }, [timeSeriesData, catalogNameKeys]);
-
   const filteredItems = useMemo(() => {
     const matchesText = (item: { item_name?: string; id?: string }) =>
       !searchQuery ||
@@ -665,14 +770,6 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
       return matchesCategoryItemFilters(item, categoryFilters, itemNameFilters);
     });
 
-    if (searchQuery || itemNameFilters.length > 0) {
-      const extras = movementOnlyItems.filter((item) => {
-        if (!matchesText(item)) return false;
-        return matchesCategoryItemFilters(item, categoryFilters, itemNameFilters);
-      });
-      result = [...result, ...extras];
-    }
-
     if (legendFilter !== null) {
       result = result.filter(
         (item) => getLegendBucket(item.live_stock, item.max_level) === legendFilter
@@ -680,7 +777,7 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
     }
 
     return result;
-  }, [items, searchQuery, legendFilter, categoryFilters, itemNameFilters, movementOnlyItems]);
+  }, [items, searchQuery, legendFilter, categoryFilters, itemNameFilters]);
 
   const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
   const paginatedItems = useMemo(() => {
@@ -696,6 +793,7 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
 
   React.useEffect(() => {
     setCurrentPage(1);
+    setSelectedTxKeys(new Set());
   }, [searchQuery, legendFilter, categoryFilters, itemNameFilters, viewMode, filterPeriod, filterDate, filterStartDate, filterEndDate]);
 
   React.useEffect(() => {
@@ -757,16 +855,25 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
     }
 
     setSubmitting(true);
-    showStatus(editingItem ? "Updating Item..." : "Adding New Item...", "loading");
-    const isEdit = !!editingItem;
-    const method = isEdit ? "PUT" : "POST";
-    const url = "/api/ims";
+    const isPending = editingItem ? isPendingItem(editingItem) : false;
+    showStatus(isPending ? "Adding to Details sheet..." : editingItem ? "Updating Item..." : "Adding New Item...", "loading");
+    const method = isPending || !editingItem ? "POST" : "PUT";
+
+    const payload = isPending
+      ? {
+          item_name: itemForm.item_name,
+          est_amount_item: itemForm.est_amount_item,
+          gst: itemForm.gst,
+          final_amount: itemForm.final_amount,
+          category: itemForm.category || "",
+        }
+      : itemForm;
 
     try {
-      const res = await fetch(url, {
+      const res = await fetch("/api/ims", {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(itemForm)
+        body: JSON.stringify(payload),
       });
 
       if (res.ok) {
@@ -815,19 +922,96 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
   };
 
 
+  const paginatedDatewiseWithMeta = useMemo(() => {
+    return paginatedDatewiseTransactions.map((log) => {
+      const txKey = getDatewiseTxKey(log);
+      return { log, txKey, isApproved: approvedTxKeys.has(txKey) };
+    });
+  }, [paginatedDatewiseTransactions, approvedTxKeys]);
+
+  const pageSelectableKeys = useMemo(
+    () => paginatedDatewiseWithMeta.filter((row) => !row.isApproved).map((row) => row.txKey),
+    [paginatedDatewiseWithMeta]
+  );
+
+  const allPageSelected =
+    pageSelectableKeys.length > 0 && pageSelectableKeys.every((key) => selectedTxKeys.has(key));
+
+  const toggleTxSelection = (txKey: string, isApproved: boolean) => {
+    if (isApproved) return;
+    setSelectedTxKeys((prev) => {
+      const next = new Set(prev);
+      if (next.has(txKey)) next.delete(txKey);
+      else next.add(txKey);
+      return next;
+    });
+  };
+
+  const togglePageSelection = () => {
+    setSelectedTxKeys((prev) => {
+      const next = new Set(prev);
+      if (allPageSelected) pageSelectableKeys.forEach((key) => next.delete(key));
+      else pageSelectableKeys.forEach((key) => next.add(key));
+      return next;
+    });
+  };
+
+  const handleBulkApprove = async () => {
+    const toApprove = filteredDatewiseTransactions.filter((log) =>
+      selectedTxKeys.has(getDatewiseTxKey(log))
+    );
+    if (toApprove.length === 0) {
+      showStatus("Select rows to approve", "error");
+      return;
+    }
+
+    setIsApproving(true);
+    showStatus(`Approving ${toApprove.length} transaction(s)...`, "loading");
+    try {
+      const res = await fetch("/api/ims/gfloor-approval", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          transactions: toApprove.map((log) => ({
+            item_name: log.item_name,
+            category: log.category,
+            date: log.date,
+            in_qty: log.in_qty || 0,
+            out_qty: log.out_qty || 0,
+          })),
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to save approvals");
+
+      await mutateApprovals();
+      setSelectedTxKeys(new Set());
+      const skippedNote = data.skipped ? ` (${data.skipped} already approved)` : "";
+      showStatus(`Saved ${data.added} approved row(s)${skippedNote}`, "success");
+      setTimeout(() => setIsStatusModalOpen(false), 2000);
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : "Error saving approvals";
+      showStatus(message, "error");
+    } finally {
+      setIsApproving(false);
+    }
+  };
+
   const handleExport = () => {
     let headers: string[];
     let rows: any[][];
 
     if (viewMode === 'datewise') {
-      headers = ["Date", "Category", "Item Name", "In Qty", "Out Qty", "Live Stock"];
+      headers = ["Date", "Category", "Source", "Item Name", "In Qty", "Out Qty", "Live Stock", "Approval Status"];
       rows = filteredDatewiseTransactions.map((log: any) => [
         new Date(log.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: '2-digit' }),
         log.category,
+        formatTxSourceLabel(log.source),
         log.item_name,
         log.in_qty > 0 ? `+${log.in_qty}` : "-",
         log.out_qty > 0 ? `-${log.out_qty}` : "-",
-        log.running_stock
+        (log as any).running_stock,
+        approvedTxKeys.has(getDatewiseTxKey(log)) ? "Approved" : "Pending",
       ]);
     } else {
       headers = ["ID", "Item Name", "Est. Amount/Item", "GST", "Final Amount", "Category", "In Qty", "Out Qty", "Live Stock", "Sale %", "Avg Daily Con. (60d)", "Lead Time", "Safety Factor", "Max Level"];
@@ -912,92 +1096,124 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
         onClose={() => setIsStatusModalOpen(false)}
       />
 
-      {/* Top Header & Actions Row */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-4 shrink-0">
-          <div className="flex items-center gap-4">
+      {/* Row 1: Title + actions */}
+      <div className="flex flex-wrap items-center justify-between gap-2 shrink-0">
+          <div className="flex items-center gap-3 min-w-0">
             <button
               onClick={onBack}
-              className="p-2 bg-gray-100 hover:bg-gray-200 dark:bg-[#1f2937] dark:hover:bg-white/10 rounded-xl transition-colors shadow-sm"
+              className="p-1.5 bg-gray-100 hover:bg-gray-200 dark:bg-[#1f2937] dark:hover:bg-white/10 rounded-lg transition-colors shadow-sm shrink-0"
               title="Back to IMS Hub"
             >
-              <ArrowLeftIcon className="w-6 h-6 text-gray-700 dark:text-gray-300" />
+              <ArrowLeftIcon className="w-5 h-5 text-gray-700 dark:text-gray-300" />
             </button>
-            <div className="flex items-center gap-3">
-              <div className="p-2.5 bg-gradient-to-br from-blue-600 to-indigo-800 shadow-lg shadow-blue-900/20 rounded-xl">
-                <ClipboardDocumentListIcon className="w-7 h-7 text-white" />
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="p-2 bg-gradient-to-br from-blue-600 to-indigo-800 shadow-lg shadow-blue-900/20 rounded-lg shrink-0">
+                <ClipboardDocumentListIcon className="w-6 h-6 text-white" />
               </div>
-              <div>
-                <h1 className="text-2xl font-black text-blue-800 dark:text-blue-400 uppercase tracking-tight leading-none mb-1">Master IMS</h1>
-                <p className="text-[10px] font-black text-blue-600/70 dark:text-blue-400/70 uppercase tracking-widest">Main Warehouse & Operations</p>
+              <div className="min-w-0">
+                <h1 className="text-xl font-black text-blue-800 dark:text-blue-400 uppercase tracking-tight leading-none">IMS - G Floor</h1>
+                <p className="text-[9px] font-black text-blue-600/70 dark:text-blue-400/70 uppercase tracking-widest mt-0.5">Ground Floor Storage</p>
               </div>
             </div>
           </div>
 
-        <div className="flex items-center gap-2">
-          <div className="relative shrink-0">
-            <MagnifyingGlassIcon className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="flex items-center gap-0.5 bg-gray-100 dark:bg-white/5 p-0.5 rounded-lg shrink-0 h-[30px]">
+            <button
+              onClick={() => setViewMode('default')}
+              className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider transition-all h-full ${
+                viewMode === 'default'
+                  ? 'bg-white dark:bg-[#111827] text-blue-700 dark:text-blue-400 shadow-sm'
+                  : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
+              }`}
+            >
+              <TableCellsIcon className="w-3.5 h-3.5" /> Default
+            </button>
+            <button
+              onClick={() => setViewMode('timeseries')}
+              className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider transition-all h-full ${
+                viewMode === 'timeseries'
+                  ? 'bg-white dark:bg-[#111827] text-blue-700 dark:text-blue-400 shadow-sm'
+                  : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
+              }`}
+            >
+              <ChartBarIcon className="w-3.5 h-3.5" /> Time Series
+            </button>
+            <button
+              onClick={() => setViewMode('datewise')}
+              className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider transition-all h-full ${
+                viewMode === 'datewise'
+                  ? 'bg-white dark:bg-[#111827] text-blue-700 dark:text-blue-400 shadow-sm'
+                  : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
+              }`}
+            >
+              <CalendarIcon className="w-3.5 h-3.5" /> Date-Wise
+            </button>
+          </div>
+
+          <div className="flex items-center gap-1 shrink-0">
             <input
-              type="text"
-              placeholder="SEARCH ID / ITEM..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9 pr-4 py-2 bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 rounded-lg text-[11px] font-black uppercase tracking-wider outline-none focus:ring-2 focus:ring-[#003875] dark:text-white w-64 transition-all shadow-sm h-[32px]"
+              type="file"
+              ref={fileInputRef}
+              accept=".xlsx, .xls, .csv"
+              onChange={handleFileUpload}
+              className="hidden"
+            />
+            <button onClick={() => fileInputRef.current?.click()} disabled={isImporting || submitting} className="flex items-center gap-1 px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 dark:bg-blue-500/10 dark:hover:bg-blue-500/20 text-blue-700 dark:text-blue-400 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all border border-blue-200 dark:border-blue-500/20 shadow-sm disabled:opacity-50 h-[30px]">
+              <ArrowUpTrayIcon className="w-3.5 h-3.5" /> Import
+            </button>
+            <button onClick={handleExport} className="flex items-center gap-1 px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 dark:bg-blue-500/10 dark:hover:bg-blue-500/20 text-blue-700 dark:text-blue-400 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all border border-blue-200 dark:border-blue-500/20 shadow-sm h-[30px]">
+              <ArrowDownTrayIcon className="w-3.5 h-3.5" /> Export
+            </button>
+            <GFloorLedgerModals
+              stockItems={items}
+              showStatus={showStatus}
+              submitting={submitting}
+              setSubmitting={setSubmitting}
             />
           </div>
-          <input 
-            type="file" 
-            ref={fileInputRef} 
-            accept=".xlsx, .xls, .csv" 
-            onChange={handleFileUpload} 
-            className="hidden" 
-          />
-          <button onClick={() => fileInputRef.current?.click()} disabled={isImporting || submitting} className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 dark:bg-blue-500/10 dark:hover:bg-blue-500/20 text-blue-700 dark:text-blue-400 rounded-lg text-[11px] font-black uppercase tracking-wider transition-all border border-blue-200 dark:border-blue-500/20 shadow-sm disabled:opacity-50">
-            <ArrowUpTrayIcon className="w-4 h-4" /> Import Out Form
-          </button>
-          <button onClick={handleExport} className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 dark:bg-blue-500/10 dark:hover:bg-blue-500/20 text-blue-700 dark:text-blue-400 rounded-lg text-[11px] font-black uppercase tracking-wider transition-all border border-blue-200 dark:border-blue-500/20 shadow-sm">
-            <ArrowDownTrayIcon className="w-4 h-4" /> Export
-          </button>
+
           <button onClick={() => {
             setEditingItem(null);
             setItemForm({ item_name: "", est_amount_item: "", gst: "", final_amount: "", category: "" });
             setItemModalOpen(true);
-          }} className="flex items-center gap-1.5 px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-[11px] font-black uppercase tracking-wider transition-all shadow-sm">
-            <PlusIcon className="w-4 h-4 stroke-2" /> Add Item
+          }} className="flex items-center gap-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-[10px] font-black uppercase tracking-wider transition-all shadow-sm h-[30px]">
+            <PlusIcon className="w-3.5 h-3.5 stroke-2" /> Add Item
           </button>
         </div>
       </div>
 
-      <div className="flex flex-wrap items-stretch gap-2 shrink-0">
-        <DateFilterBar
-          period={filterPeriod}
-          setPeriod={setFilterPeriod}
-          currentDate={filterDate}
-          setCurrentDate={setFilterDate}
-          startDate={filterStartDate}
-          setStartDate={setFilterStartDate}
-          endDate={filterEndDate}
-          setEndDate={setFilterEndDate}
-          theme="blue"
-        />
+      {/* Row 2: Search + category/item filters + date filter */}
+      <div className="flex flex-wrap items-center gap-2 shrink-0 w-full">
+        <div className="relative shrink-0 w-[220px]">
+          <MagnifyingGlassIcon className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" />
+          <input
+            type="text"
+            placeholder="SEARCH ID / ITEM..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-8 pr-3 py-1.5 bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 rounded-lg text-[10px] font-black uppercase tracking-wider outline-none focus:ring-2 focus:ring-[#003875] dark:text-white transition-all shadow-sm h-[30px]"
+          />
+        </div>
 
-        <div className="flex flex-wrap items-end gap-2 flex-1 min-w-[280px] p-2 bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/5 rounded-xl shadow-sm">
-          <div className="flex-1 min-w-[140px]">
+        <div className="flex items-center gap-1.5 shrink-0 flex-1 min-w-[320px]">
+          <div className="flex-1 min-w-[160px] max-w-[220px]">
             <SearchableMultiSelect
               options={categoryOptions}
               value={categoryFilters}
               onChange={setCategoryFilters}
-              placeholder="All Categories"
-              className="bg-gray-50 dark:bg-[#0a0f1c] border border-gray-200 dark:border-white/10 py-2 px-3 rounded-lg"
+              placeholder="Categories"
+              className="bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 py-1.5 px-2 rounded-lg text-[10px]"
               accentClass="border-blue-500 ring-blue-500/20"
             />
           </div>
-          <div className="flex-1 min-w-[180px]">
+          <div className="flex-1 min-w-[180px] max-w-[260px]">
             <SearchableMultiSelect
               options={itemNameOptions}
               value={itemNameFilters}
               onChange={setItemNameFilters}
-              placeholder="All Items"
-              className="bg-gray-50 dark:bg-[#0a0f1c] border border-gray-200 dark:border-white/10 py-2 px-3 rounded-lg"
+              placeholder="Items"
+              className="bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 py-1.5 px-2 rounded-lg text-[10px]"
               accentClass="border-blue-500 ring-blue-500/20"
             />
           </div>
@@ -1007,64 +1223,76 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
                 setCategoryFilters([]);
                 setItemNameFilters([]);
               }}
-              className="mb-0.5 px-3 py-2.5 rounded-lg text-[10px] font-black uppercase tracking-wider text-blue-700 dark:text-blue-400 bg-blue-50 hover:bg-blue-100 dark:bg-blue-500/10 dark:hover:bg-blue-500/20 border border-blue-200 dark:border-blue-500/20 transition-colors shrink-0"
+              className="px-2 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-wider text-blue-700 dark:text-blue-400 bg-blue-50 hover:bg-blue-100 dark:bg-blue-500/10 dark:hover:bg-blue-500/20 border border-blue-200 dark:border-blue-500/20 transition-colors shrink-0 h-[30px]"
             >
               Clear
             </button>
           )}
         </div>
+
+        <DateFilterBar
+          variant="dropdown"
+          period={filterPeriod}
+          setPeriod={setFilterPeriod}
+          currentDate={filterDate}
+          setCurrentDate={setFilterDate}
+          startDate={filterStartDate}
+          setStartDate={setFilterStartDate}
+          endDate={filterEndDate}
+          setEndDate={setFilterEndDate}
+          theme="blue"
+          className="flex-1 min-w-[300px]"
+        />
       </div>
 
-      <div className="flex items-center gap-2 bg-gray-100 dark:bg-white/5 p-1 rounded-xl shrink-0 self-start lg:self-auto mb-2">
-        <button
-          onClick={() => setViewMode('default')}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-black uppercase tracking-wider transition-all ${
-            viewMode === 'default' 
-              ? 'bg-white dark:bg-[#111827] text-blue-700 dark:text-blue-400 shadow-sm' 
-              : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
-          }`}
-        >
-          <TableCellsIcon className="w-4 h-4" /> Default
-        </button>
-        <button
-          onClick={() => setViewMode('timeseries')}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-black uppercase tracking-wider transition-all ${
-            viewMode === 'timeseries' 
-              ? 'bg-white dark:bg-[#111827] text-blue-700 dark:text-blue-400 shadow-sm' 
-              : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
-          }`}
-        >
-          <ChartBarIcon className="w-4 h-4" /> Time Series
-        </button>
-        <button
-          onClick={() => setViewMode('datewise')}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-black uppercase tracking-wider transition-all ${
-            viewMode === 'datewise' 
-              ? 'bg-white dark:bg-[#111827] text-blue-700 dark:text-blue-400 shadow-sm' 
-              : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
-          }`}
-        >
-          <CalendarIcon className="w-4 h-4" /> Date-Wise
-        </button>
-      </div>
+      {/* Row 3: Color logic — default view only */}
+      {viewMode === 'default' && (
+        <div className="flex flex-wrap items-center gap-1.5 shrink-0 bg-white dark:bg-[#111827] px-2 py-1.5 rounded-xl border border-gray-200 dark:border-white/5">
+          <div className="flex items-center gap-1 shrink-0">
+            <ExclamationTriangleIcon className="w-3.5 h-3.5 text-gray-400" />
+            <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest">Color Logic:</span>
+          </div>
+          <div className="flex flex-wrap gap-1 text-[9px] font-black text-white text-center cursor-pointer">
+            <div onClick={() => setLegendFilter(legendFilter === 1 ? null : 1)} className={`px-2.5 py-0.5 rounded transition-transform hover:scale-105 ${legendFilter === 1 ? 'ring-2 ring-purple-600 ring-offset-1 bg-purple-600 shadow-md' : 'bg-purple-500'}`}> {'>'} 100% <sup className="font-bold opacity-80">{bucketCounts[1]}</sup></div>
+            <div onClick={() => setLegendFilter(legendFilter === 2 ? null : 2)} className={`px-2.5 py-0.5 rounded transition-transform hover:scale-105 ${legendFilter === 2 ? 'ring-2 ring-emerald-500 ring-offset-1 bg-emerald-500 shadow-md' : 'bg-emerald-400'}`}> 51-100% <sup className="font-bold opacity-80">{bucketCounts[2]}</sup></div>
+            <div onClick={() => setLegendFilter(legendFilter === 3 ? null : 3)} className={`text-black px-2.5 py-0.5 rounded transition-transform hover:scale-105 ${legendFilter === 3 ? 'ring-2 ring-amber-400 ring-offset-1 bg-amber-400 shadow-md' : 'bg-amber-300'}`}> 21-50% <sup className="font-bold opacity-80">{bucketCounts[3]}</sup></div>
+            <div onClick={() => setLegendFilter(legendFilter === 4 ? null : 4)} className={`px-2.5 py-0.5 rounded transition-transform hover:scale-105 ${legendFilter === 4 ? 'ring-2 ring-rose-500 ring-offset-1 bg-rose-500 shadow-md' : 'bg-rose-400'}`}> 1-20% <sup className="font-bold opacity-80">{bucketCounts[4]}</sup></div>
+            <div onClick={() => setLegendFilter(legendFilter === 5 ? null : 5)} className={`px-2.5 py-0.5 rounded transition-transform hover:scale-105 ${legendFilter === 5 ? 'ring-2 ring-black dark:ring-gray-700 ring-offset-1 bg-black dark:bg-gray-800 shadow-md' : 'bg-gray-800 dark:bg-gray-700'}`}> 0% <sup className="font-bold opacity-80">{bucketCounts[5]}</sup></div>
+            <div onClick={() => setLegendFilter(legendFilter === 6 ? null : 6)} className={`px-2.5 py-0.5 rounded transition-transform hover:scale-105 ${legendFilter === 6 ? 'ring-2 ring-gray-400 ring-offset-1 bg-gray-400 shadow-md' : 'bg-gray-300'}`}> {'<'} 0% <sup className="font-bold opacity-80">{bucketCounts[6]}</sup></div>
+          </div>
+          {legendFilter !== null && (
+            <button onClick={() => setLegendFilter(null)} className="px-1.5 py-0.5 bg-gray-100 dark:bg-white/10 text-gray-500 rounded text-[8px] uppercase font-black hover:bg-gray-200">Clear</button>
+          )}
+        </div>
+      )}
 
       {viewMode === 'timeseries' ? (
         <div className="flex flex-col gap-2 shrink-0 mb-2">
           <TimeSeriesTable 
             transactions={filteredTimeSeriesData}
             bucket={mappedTimeBucket}
-            isLoading={isTimeSeriesLoading}
+            isLoading={showTimeSeriesLoading}
             searchQuery={searchQuery}
           />
         </div>
       ) : viewMode === 'datewise' ? (
         <div className="flex-1 bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/5 rounded-xl overflow-hidden flex flex-col shadow-sm min-h-0 mt-2">
-          {filteredDatewiseTransactions.length > 0 && !isTimeSeriesLoading && (
-            <div className="py-2 px-4 border-b border-blue-200/50 dark:border-blue-500/10 flex items-center justify-between bg-blue-50/50 dark:bg-[#1f2937]/50 shrink-0">
+          {filteredDatewiseTransactions.length > 0 && !showTimeSeriesLoading && (
+            <div className="py-2 px-4 border-b border-blue-200/50 dark:border-blue-500/10 flex flex-wrap items-center justify-between gap-2 bg-blue-50/50 dark:bg-[#1f2937]/50 shrink-0">
               <p className="text-[10px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-widest">
                 Showing {Math.min((currentPage - 1) * itemsPerPage + 1, filteredDatewiseTransactions.length)} to {Math.min(currentPage * itemsPerPage, filteredDatewiseTransactions.length)} of {filteredDatewiseTransactions.length} transactions
               </p>
-              <div className="flex gap-1">
+              <div className="flex items-center gap-2">
+                {selectedTxKeys.size > 0 && (
+                  <button
+                    onClick={handleBulkApprove}
+                    disabled={isApproving}
+                    className="px-4 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-black uppercase tracking-widest shadow-sm disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-1.5"
+                  >
+                    <CheckIcon className="w-3.5 h-3.5" />
+                    Approve Selected ({selectedTxKeys.size})
+                  </button>
+                )}
                 <button
                   onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                   disabled={currentPage === 1}
@@ -1083,7 +1311,7 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
             </div>
           )}
           <div className="flex-1 overflow-auto custom-scrollbar relative">
-            {isTimeSeriesLoading ? (
+            {showTimeSeriesLoading ? (
               <div className="p-4 space-y-3">
                 {[1, 2, 3, 4].map(i => (
                   <div key={i} className="animate-pulse h-8 bg-gray-200 dark:bg-gray-700 rounded"></div>
@@ -1093,30 +1321,69 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
               <table className="w-full text-left border-collapse relative">
                 <thead className="bg-gray-100 dark:bg-[#1f2937] sticky top-0 z-20 shadow-sm">
                   <tr>
+                    <th className="py-2.5 px-3 text-center border-b border-gray-200 dark:border-white/10 w-10">
+                      <input
+                        type="checkbox"
+                        checked={allPageSelected}
+                        onChange={togglePageSelection}
+                        disabled={pageSelectableKeys.length === 0}
+                        className="w-3.5 h-3.5 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500 disabled:opacity-40 cursor-pointer"
+                        title="Select all on this page"
+                      />
+                    </th>
                     <th className="py-2.5 px-4 text-[10px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-widest border-b border-gray-200 dark:border-white/10">Date</th>
                     <th className="py-2.5 px-3 text-[10px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-widest border-b border-gray-200 dark:border-white/10">Category</th>
-                    <th className="py-2.5 px-3 text-[10px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-widest border-b border-gray-200 dark:border-white/10">Item Name</th>
+                    <th className="py-2.5 px-3 text-[10px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-widest border-b border-gray-200 dark:border-white/10">Source</th>
+                    <th className="py-2.5 px-3 text-[10px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-widest border-b border-gray-200 dark:border-white/10 min-w-[200px]">Item Name</th>
                     <th className="py-2.5 px-3 text-[10px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-widest border-b border-gray-200 dark:border-white/10 text-right">In</th>
                     <th className="py-2.5 px-3 text-[10px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-widest border-b border-gray-200 dark:border-white/10 text-right">Out</th>
                     <th className="py-2.5 px-4 text-[10px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-widest border-b border-gray-200 dark:border-white/10 text-right">Live Stock</th>
+                    <th className="py-2.5 px-3 text-[10px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-widest border-b border-gray-200 dark:border-white/10 text-center whitespace-nowrap">Approval</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100 dark:divide-white/5">
-                  {paginatedDatewiseTransactions.map((log, index) => (
-                    <tr key={index} className="hover:bg-blue-50/30 dark:hover:bg-white/[0.03] even:bg-gray-50/50 dark:even:bg-[#1f2937]/30 transition-colors group">
+                  {paginatedDatewiseWithMeta.map(({ log, txKey, isApproved }, index) => (
+                    <tr
+                      key={`${txKey}-${index}`}
+                      className={`hover:bg-blue-50/30 dark:hover:bg-white/[0.03] even:bg-gray-50/50 dark:even:bg-[#1f2937]/30 transition-colors group ${isApproved ? "bg-emerald-50/40 dark:bg-emerald-500/5" : ""}`}
+                    >
+                      <td className="py-2 px-3 text-center">
+                        <input
+                          type="checkbox"
+                          checked={isApproved || selectedTxKeys.has(txKey)}
+                          disabled={isApproved}
+                          onChange={() => toggleTxSelection(txKey, isApproved)}
+                          className="w-3.5 h-3.5 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500 disabled:opacity-60 cursor-pointer"
+                        />
+                      </td>
                       <td className="py-2 px-4 text-[11px] font-bold text-gray-500">
                         {new Date(log.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: '2-digit' })}
                       </td>
                       <td className="py-2 px-3 text-[11px] font-bold text-gray-500 uppercase">{log.category}</td>
-                      <td className="py-2 px-3 text-[11px] font-black text-gray-900 dark:text-white uppercase">{log.item_name}</td>
+                      <td className="py-2 px-3">
+                        <span className={`inline-flex px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-wider ${getTxSourceBadgeClass(log.source)}`}>
+                          {formatTxSourceLabel(log.source)}
+                        </span>
+                      </td>
+                      <td className="py-2 px-3 text-[11px] font-black text-gray-900 dark:text-white uppercase whitespace-normal break-words min-w-[200px] max-w-[320px] leading-snug">{log.item_name}</td>
                       <td className="py-2 px-3 text-[11px] font-black text-emerald-600 dark:text-emerald-400 text-right">{log.in_qty > 0 ? `+${log.in_qty}` : "-"}</td>
                       <td className="py-2 px-3 text-[11px] font-black text-rose-600 dark:text-rose-400 text-right">{log.out_qty > 0 ? `-${log.out_qty}` : "-"}</td>
                       <td className="py-2 px-4 text-[11px] font-black text-[#003875] dark:text-[#FFD500] text-right">{(log as any).running_stock}</td>
+                      <td className="py-2 px-3 text-center">
+                        {isApproved ? (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300 text-[9px] font-black uppercase tracking-wider">
+                            <CheckIcon className="w-3 h-3" />
+                            Approved
+                          </span>
+                        ) : (
+                          <span className="text-[9px] font-black uppercase tracking-wider text-gray-400">Pending</span>
+                        )}
+                      </td>
                     </tr>
                   ))}
                   {filteredDatewiseTransactions.length === 0 && (
                     <tr>
-                      <td colSpan={6} className="py-8 text-center text-gray-400 text-[11px] font-black uppercase">No items found</td>
+                      <td colSpan={9} className="py-8 text-center text-gray-400 text-[11px] font-black uppercase">No items found</td>
                     </tr>
                   )}
                 </tbody>
@@ -1126,27 +1393,6 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
         </div>
       ) : (
       <>
-      <div className="flex flex-wrap items-center gap-2 shrink-0">
-        <div className="flex items-center gap-2 overflow-x-auto bg-white dark:bg-[#111827] p-2 rounded-xl border border-gray-200 dark:border-white/5 flex-1 min-w-0">
-          <div className="flex items-center gap-1 px-2 shrink-0">
-            <ExclamationTriangleIcon className="w-4 h-4 text-gray-400" />
-            <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest mr-2">Color Logic:</span>
-          </div>
-          <div className="flex flex-wrap gap-2 text-[10px] font-black text-white text-center cursor-pointer">
-            <div onClick={() => setLegendFilter(legendFilter === 1 ? null : 1)} className={`px-4 py-1 rounded min-w-[80px] transition-transform hover:scale-105 ${legendFilter === 1 ? 'ring-2 ring-purple-600 ring-offset-1 bg-purple-600 shadow-md' : 'bg-purple-500'}`}> {'>'} 100% <sup className="font-bold opacity-80">{bucketCounts[1]}</sup></div>
-            <div onClick={() => setLegendFilter(legendFilter === 2 ? null : 2)} className={`px-4 py-1 rounded min-w-[120px] transition-transform hover:scale-105 ${legendFilter === 2 ? 'ring-2 ring-emerald-500 ring-offset-1 bg-emerald-500 shadow-md' : 'bg-emerald-400'}`}> 51 - 100% <sup className="font-bold opacity-80">{bucketCounts[2]}</sup></div>
-            <div onClick={() => setLegendFilter(legendFilter === 3 ? null : 3)} className={`text-black px-4 py-1 rounded min-w-[120px] transition-transform hover:scale-105 ${legendFilter === 3 ? 'ring-2 ring-amber-400 ring-offset-1 bg-amber-400 shadow-md' : 'bg-amber-300'}`}> 21 - 50% <sup className="font-bold opacity-80">{bucketCounts[3]}</sup></div>
-            <div onClick={() => setLegendFilter(legendFilter === 4 ? null : 4)} className={`px-4 py-1 rounded min-w-[120px] transition-transform hover:scale-105 ${legendFilter === 4 ? 'ring-2 ring-rose-500 ring-offset-1 bg-rose-500 shadow-md' : 'bg-rose-400'}`}> 1 - 20% <sup className="font-bold opacity-80">{bucketCounts[4]}</sup></div>
-            <div onClick={() => setLegendFilter(legendFilter === 5 ? null : 5)} className={`px-4 py-1 rounded min-w-[80px] transition-transform hover:scale-105 ${legendFilter === 5 ? 'ring-2 ring-black dark:ring-gray-700 ring-offset-1 bg-black dark:bg-gray-800 shadow-md' : 'bg-gray-800 dark:bg-gray-700'}`}> 0% <sup className="font-bold opacity-80">{bucketCounts[5]}</sup></div>
-            <div onClick={() => setLegendFilter(legendFilter === 6 ? null : 6)} className={`px-4 py-1 rounded min-w-[80px] transition-transform hover:scale-105 ${legendFilter === 6 ? 'ring-2 ring-gray-400 ring-offset-1 bg-gray-400 shadow-md' : 'bg-gray-300'}`}> {'<'} 0% <sup className="font-bold opacity-80">{bucketCounts[6]}</sup></div>
-          </div>
-          {legendFilter !== null && (
-            <button onClick={() => setLegendFilter(null)} className="ml-2 px-2 py-1 bg-gray-100 dark:bg-white/10 text-gray-500 rounded text-[9px] uppercase font-black hover:bg-gray-200">Clear</button>
-          )}
-        </div>
-
-      </div>
-
       <div className="flex-1 bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/5 rounded-xl overflow-hidden flex flex-col shadow-sm min-h-0">
         {!logsItem && (
           <>
@@ -1195,7 +1441,8 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
                         </th>
                         <th className="py-2.5 px-3 text-[10px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-widest border-b border-blue-200 dark:border-blue-500/20 whitespace-nowrap">ID</th>
                         <th className="py-2.5 px-3 text-[10px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-widest border-b border-blue-200 dark:border-blue-500/20 whitespace-nowrap">Category</th>
-                        <th className="py-2.5 px-3 text-[10px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-widest border-b border-blue-200 dark:border-blue-500/20 whitespace-nowrap">Item Name</th>
+                        <th className="py-2.5 px-3 text-[10px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-widest border-b border-blue-200 dark:border-blue-500/20 whitespace-nowrap">Source</th>
+                        <th className="py-2.5 px-3 text-[10px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-widest border-b border-blue-200 dark:border-blue-500/20 min-w-[200px]">Item Name</th>
                         <th className="py-2.5 px-3 text-[10px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-widest border-b border-blue-200 dark:border-blue-500/20 text-right">Est. Amt</th>
                         <th className="py-2.5 px-3 text-[10px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-widest border-b border-blue-200 dark:border-blue-500/20 text-right">GST</th>
                         <th className="py-2.5 px-3 text-[10px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-widest border-b border-blue-200 dark:border-blue-500/20 text-right">Final Amt</th>
@@ -1212,34 +1459,58 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
                     <tbody className="divide-y divide-blue-100 dark:divide-blue-500/10">
                       {paginatedItems.map((item, idx) => {
                         const health = getHealth(item.live_stock, item.max_level || 0);
+                        const pending = isPendingItem(item);
                         return (
                           <tr
-                            key={item.id}
-                            className="hover:bg-blue-50/50 dark:hover:bg-white/[0.03] transition-colors group"
+                            key={`${item.id}-${idx}`}
+                            className={`hover:bg-blue-50/50 dark:hover:bg-white/[0.03] transition-colors group ${pending ? "bg-amber-50/40 dark:bg-amber-500/5" : ""}`}
                           >
                             <td className="py-1 px-2 text-center sticky left-0 z-20 transition-colors border-r shadow-[1px_0_0_0_#bfdbfe] dark:shadow-[1px_0_0_0_rgba(59,130,246,0.2)] bg-white group-even:bg-blue-50/30 dark:bg-[#111827] dark:group-even:bg-[#182031] group-hover:bg-blue-50/50 dark:group-hover:bg-[#1a2335] border-blue-100 dark:border-blue-500/10">
                               <div className="flex items-center justify-center gap-2">
                                 <button onClick={() => { setLogsItem(item); setLogsModalOpen(true); }} className="text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:scale-110 transition-all" title="View Transaction Logs">
                                   <EyeIcon className="w-4 h-4" />
                                 </button>
-                                {!String(item.id).startsWith("tx-") && (
-                                  <>
-                                    <button onClick={() => { setEditingItem(item); setItemForm(item); setItemModalOpen(true); }} className="text-[#003875] dark:text-[#FFD500] hover:scale-110 transition-transform" title="Edit">
-                                      <PencilSquareIcon className="w-4 h-4" />
-                                    </button>
-                                    <button onClick={() => { confirmDelete(item.id.toString()); }} className="text-rose-500 hover:scale-110 transition-transform" title="Delete">
-                                      <TrashIcon className="w-4 h-4" />
-                                    </button>
-                                  </>
+                                <button
+                                  onClick={() => {
+                                    setEditingItem(item);
+                                    setItemForm({
+                                      item_name: item.item_name,
+                                      est_amount_item: item.est_amount_item || "",
+                                      gst: item.gst || "",
+                                      final_amount: item.final_amount || "",
+                                      category: item.category || "",
+                                    });
+                                    setItemModalOpen(true);
+                                  }}
+                                  className="text-[#003875] dark:text-[#FFD500] hover:scale-110 transition-transform"
+                                  title={pending ? "Add to Details sheet" : "Edit"}
+                                >
+                                  <PencilSquareIcon className="w-4 h-4" />
+                                </button>
+                                {!pending && (
+                                  <button onClick={() => { confirmDelete(item.id.toString()); }} className="text-rose-500 hover:scale-110 transition-transform" title="Delete">
+                                    <TrashIcon className="w-4 h-4" />
+                                  </button>
                                 )}
                               </div>
                             </td>
-                            <td className="py-2 px-3 text-[11px] font-black text-[#003875] dark:text-[#FFD500] whitespace-nowrap">{item.id}</td>
-                            <td className="py-2 px-3 text-[11px] font-bold text-gray-500 uppercase whitespace-nowrap">{item.category}</td>
-                            <td className="py-2 px-3 text-[11px] font-black text-gray-900 dark:text-white uppercase truncate max-w-[200px]" title={item.item_name}>{item.item_name}</td>
-                            <td className="py-2 px-3 text-[11px] font-bold text-gray-600 dark:text-gray-400 text-right">{item.est_amount_item}</td>
-                            <td className="py-2 px-3 text-[11px] font-bold text-gray-600 dark:text-gray-400 text-right">{item.gst}%</td>
-                            <td className="py-2 px-3 text-[11px] font-black text-gray-800 dark:text-gray-200 text-right">₹{item.final_amount_num.toFixed(2)}</td>
+                            <td className="py-2 px-3 text-[11px] font-black text-[#003875] dark:text-[#FFD500] whitespace-nowrap">
+                              {pending ? (
+                                <span className="text-[9px] font-black uppercase tracking-wider text-amber-600 dark:text-amber-400">Pending</span>
+                              ) : (
+                                item.id
+                              )}
+                            </td>
+                            <td className="py-2 px-3 text-[11px] font-bold text-gray-500 uppercase whitespace-nowrap">{item.category || (pending ? "—" : "")}</td>
+                            <td className="py-2 px-3 whitespace-nowrap">
+                              <span className={`inline-block px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider ${sourceBadgeClass(item.source)}`}>
+                                {item.source || "—"}
+                              </span>
+                            </td>
+                            <td className="py-2 px-3 text-[11px] font-black text-gray-900 dark:text-white uppercase whitespace-normal break-words min-w-[200px] max-w-[320px] leading-snug">{item.item_name}</td>
+                            <td className="py-2 px-3 text-[11px] font-bold text-gray-600 dark:text-gray-400 text-right">{pending && !item.est_amount_item ? "—" : item.est_amount_item}</td>
+                            <td className="py-2 px-3 text-[11px] font-bold text-gray-600 dark:text-gray-400 text-right">{pending && !item.gst ? "—" : item.gst ? `${item.gst}%` : ""}</td>
+                            <td className="py-2 px-3 text-[11px] font-black text-gray-800 dark:text-gray-200 text-right">{pending && !item.final_amount_num ? "—" : `₹${item.final_amount_num.toFixed(2)}`}</td>
                             <td className="py-2 px-3 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 text-right">{item.in_qty}</td>
                             <td className="py-2 px-3 text-[11px] font-bold text-rose-600 dark:text-rose-400 text-right">{item.out_qty}</td>
                             <td className="py-2 px-3 text-[11px] font-bold text-indigo-600 dark:text-indigo-400 text-right">{item.sale_percent}%</td>
@@ -1263,7 +1534,7 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
                       })}
                       {filteredItems.length === 0 && (
                         <tr>
-                          <td colSpan={15} className="py-8 text-center text-gray-400 text-[11px] font-black uppercase">No items found</td>
+                          <td colSpan={16} className="py-8 text-center text-gray-400 text-[11px] font-black uppercase">No items found</td>
                         </tr>
                       )}
                     </tbody>
@@ -1369,7 +1640,7 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
               <div className="flex items-center justify-between p-5 border-b border-blue-800/20 dark:border-white/5 bg-gradient-to-r from-[#003875] to-blue-800 dark:from-[#1f2937] dark:to-[#111827] text-white">
                 <h3 className="text-sm font-black uppercase tracking-widest flex items-center gap-2">
                   <ClipboardDocumentListIcon className="w-5 h-5 text-blue-200 dark:text-[#FFD500]" />
-                  {editingItem ? 'Edit IMS Record' : 'Create IMS Record'}
+                  {editingItem && isPendingItem(editingItem) ? 'Add to Details Sheet' : editingItem ? 'Edit IMS Record' : 'Create IMS Record'}
                 </h3>
                 <button onClick={() => setItemModalOpen(false)} className="p-1.5 text-white/70 hover:text-white bg-white/10 hover:bg-white/20 dark:bg-[#1f2937] rounded-lg shadow-sm transition-colors">
                   <XMarkIcon className="w-4 h-4" />
@@ -1381,7 +1652,13 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
                 <div className="hidden md:block"></div>
 
                 <div className="md:col-span-2">
-                  <FloatingInput label="Item Name *" name="item_name" value={itemForm.item_name || ''} onChange={(val) => handleInputChange("item_name", val)} />
+                  <FloatingInput
+                    label="Item Name *"
+                    name="item_name"
+                    value={itemForm.item_name || ''}
+                    onChange={(val) => handleInputChange("item_name", val)}
+                    disabled={!!editingItem && isPendingItem(editingItem)}
+                  />
                 </div>
 
                 <FloatingInput label="Est. Amount/Item *" name="est_amount_item" type="number" step="0.01" value={itemForm.est_amount_item || ''} onChange={(val) => handleInputChange("est_amount_item", val)} />

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { MagnifyingGlassIcon, ChevronDownIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { matchesOptionSearch } from "@/lib/ims-filters";
 
@@ -65,6 +65,26 @@ export default function SearchableMultiSelect({
 
   const clearAll = () => onChange([]);
 
+  const updateDropdownPos = useCallback(() => {
+    if (!triggerRef.current) return;
+    const rect = triggerRef.current.getBoundingClientRect();
+    setDropdownPos({
+      top: rect.bottom + 8,
+      left: rect.left,
+      width: Math.max(rect.width, 260),
+    });
+  }, []);
+
+  const openDropdown = () => {
+    updateDropdownPos();
+    setIsOpen(true);
+  };
+
+  const closeDropdown = () => {
+    setIsOpen(false);
+    setSearchTerm("");
+  };
+
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (
@@ -73,7 +93,7 @@ export default function SearchableMultiSelect({
         triggerRef.current &&
         !triggerRef.current.contains(event.target as Node)
       ) {
-        setIsOpen(false);
+        closeDropdown();
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -81,15 +101,15 @@ export default function SearchableMultiSelect({
   }, []);
 
   useEffect(() => {
-    if (isOpen && triggerRef.current) {
-      const rect = triggerRef.current.getBoundingClientRect();
-      setDropdownPos({
-        top: rect.bottom + 8,
-        left: rect.left,
-        width: Math.max(rect.width, 260),
-      });
-    }
-  }, [isOpen]);
+    if (!isOpen) return;
+    updateDropdownPos();
+    window.addEventListener("scroll", updateDropdownPos, true);
+    window.addEventListener("resize", updateDropdownPos);
+    return () => {
+      window.removeEventListener("scroll", updateDropdownPos, true);
+      window.removeEventListener("resize", updateDropdownPos);
+    };
+  }, [isOpen, updateDropdownPos]);
 
   return (
     <div className="w-full" ref={triggerRef}>
@@ -100,7 +120,7 @@ export default function SearchableMultiSelect({
       )}
 
       <div
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => (isOpen ? closeDropdown() : openDropdown())}
         className={`w-full p-3 rounded-xl cursor-pointer flex justify-between items-center gap-2 transition-all ${
           className || "bg-gray-50 dark:bg-slate-900 border border-gray-100 dark:border-white/5"
         } ${isOpen ? `ring-1 ${accentClass}` : ""}`}
@@ -133,10 +153,10 @@ export default function SearchableMultiSelect({
         </div>
       </div>
 
-      {isOpen && (
+      {isOpen && dropdownPos.width > 0 && (
         <div
           ref={dropdownRef}
-          className="fixed z-[11000] bg-white dark:bg-slate-900 border border-gray-200 dark:border-white/10 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+          className="fixed z-[11000] bg-white dark:bg-slate-900 border border-gray-200 dark:border-white/10 rounded-2xl shadow-2xl overflow-hidden"
           style={{
             top: `${dropdownPos.top}px`,
             left: `${dropdownPos.left}px`,

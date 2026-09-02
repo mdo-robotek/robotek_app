@@ -7,7 +7,6 @@ import {
   ArrowTrendingUpIcon, 
   ArrowTrendingDownIcon, 
   ScaleIcon,
-  BuildingOfficeIcon,
   BuildingStorefrontIcon,
   CubeIcon,
   InformationCircleIcon,
@@ -19,52 +18,99 @@ import IMSFinal from "./IMSFinal";
 
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
-type ImsLocation = "master" | "1st" | "g" | "final";
+type ImsLocation = "master" | "1st" | "final";
 
-const IMS_CALC_INFO: Record<ImsLocation, {
+type CalcSource = { label: string; detail: string };
+
+type ImsCalcInfo = {
   title: string;
   formula: string;
-  inSource: string;
-  inHow: string;
-  outSource: string;
-  outHow: string;
+  inSources: CalcSource[];
+  outSources: CalcSource[];
   liveHow: string;
-}> = {
+  approvalHow?: string;
+};
+
+const IMS_CALC_INFO: Record<ImsLocation, ImsCalcInfo> = {
   master: {
-    title: "Master IMS",
+    title: "IMS - G Floor",
     formula: "Live Stock = IN − OUT",
-    inSource: "GRN Sheet (Goods Receipt Note)",
-    inHow: "Sum of GRN Qty for items that match the Master IMS catalog (item name match). Cancelled and Rejected GRN rows are excluded.",
-    outSource: "O2D Out Form sheet",
-    outHow: "Sum of Out Form quantities for line items whose names match the Master IMS catalog.",
-    liveHow: "For each catalog item: IN − OUT, then summed across all Master items.",
+    inSources: [
+      {
+        label: "GRN Sheet (Goods Receipt Note)",
+        detail:
+          "Sum of GRN Qty for items matching the G Floor catalog. Cancelled and Rejected GRN rows are excluded.",
+      },
+      {
+        label: "IMS-G Floor Sheet (in_qty)",
+        detail:
+          "Manual Production IN entries and Physical Check IN adjustments logged on the G Floor ledger sheet.",
+      },
+      {
+        label: "1st Floor OUT → G Floor IN (auto transfer)",
+        detail:
+          "Every OUT qty recorded on IMS-1st Floor is treated as an IN transfer to G Floor. No manual Production IN needed for floor-to-floor movement.",
+      },
+    ],
+    outSources: [
+      {
+        label: "O2D Out Form Sheet",
+        detail:
+          "Sum of Out Form line-item quantities whose item names match the G Floor catalog.",
+      },
+      {
+        label: "IMS-G Floor Sheet (out_qty)",
+        detail:
+          "Physical Check OUT adjustments logged on the G Floor ledger sheet when physical count is lower than live stock.",
+      },
+    ],
+    liveHow:
+      "For each catalog item (and pending GRN/O2D orphans): total IN minus total OUT. Orphan items from movement only also appear in the table.",
+    approvalHow:
+      "Date-Wise tab lists all IN/OUT movements (newest date first). Select rows and Approve Selected to save them to the IMS-G Floor Approval sheet. Sources shown: GRN, O2D, G Floor, 1st OUT.",
   },
   "1st": {
     title: "IMS - 1st Floor",
     formula: "Live Stock = IN − OUT",
-    inSource: "IMS-1st Floor Google Sheet (in_qty column)",
-    inHow: "Sum of every row’s in_qty from the 1st Floor IMS sheet.",
-    outSource: "IMS-1st Floor Google Sheet (out_qty column)",
-    outHow: "Sum of every row’s out_qty from the 1st Floor IMS sheet.",
-    liveHow: "For each sheet row: in_qty − out_qty, then summed across all rows.",
-  },
-  g: {
-    title: "IMS - G Floor",
-    formula: "Live Stock = IN − OUT",
-    inSource: "IMS-G Floor Google Sheet (in_qty column)",
-    inHow: "Sum of every row’s in_qty from the G Floor IMS sheet.",
-    outSource: "IMS-G Floor sheet (out_qty) + O2D Out Form",
-    outHow: "Sum of sheet out_qty, plus all Out Form line-item quantities (appended on top of sheet OUT).",
-    liveHow: "Floor (IN − OUT from sheet), then minus the Out Form total added to OUT.",
+    inSources: [
+      {
+        label: "IMS-1st Floor Sheet (in_qty)",
+        detail: "Sum of every in_qty row from manual bulk entry or Physical Check IN adjustments.",
+      },
+    ],
+    outSources: [
+      {
+        label: "IMS-1st Floor Sheet (out_qty)",
+        detail:
+          "Sum of every out_qty row from manual bulk entry or Physical Check OUT adjustments. Each OUT also creates a pending IN on G Floor.",
+      },
+    ],
+    liveHow: "For each ledger row: in_qty − out_qty, aggregated per item name across all rows.",
   },
   final: {
     title: "Final IMS",
-    formula: "Total of Master + 1st Floor + G Floor",
-    inSource: "Combined from Master, 1st Floor, and G Floor",
-    inHow: "Master IN + 1st Floor IN + G Floor IN.",
-    outSource: "Combined from Master, 1st Floor, and G Floor",
-    outHow: "Master OUT + 1st Floor OUT + G Floor OUT.",
-    liveHow: "Master Live Stock + 1st Floor Live Stock + G Floor Live Stock.",
+    formula: "G Floor totals + 1st Floor totals",
+    inSources: [
+      {
+        label: "IMS - G Floor IN",
+        detail: "GRN + G Floor ledger IN + 1st Floor OUT transfers.",
+      },
+      {
+        label: "IMS - 1st Floor IN",
+        detail: "All in_qty from the 1st Floor ledger sheet.",
+      },
+    ],
+    outSources: [
+      {
+        label: "IMS - G Floor OUT",
+        detail: "O2D Out Form + G Floor ledger OUT.",
+      },
+      {
+        label: "IMS - 1st Floor OUT",
+        detail: "All out_qty from the 1st Floor ledger sheet.",
+      },
+    ],
+    liveHow: "G Floor Live Stock + 1st Floor Live Stock.",
   },
 };
 
@@ -97,7 +143,7 @@ export default function IMSHub() {
     return <IMSMaster onBack={() => setActiveLocation(null)} />;
   }
 
-  if (activeLocation === "1st" || activeLocation === "g") {
+  if (activeLocation === "1st") {
     return <IMSFloor location={activeLocation} onBack={() => setActiveLocation(null)} />;
   }
 
@@ -106,9 +152,9 @@ export default function IMSHub() {
   }
 
   const finalData = summary ? {
-    liveStock: (summary.main?.liveStock || 0) + (summary.first?.liveStock || 0) + (summary.g?.liveStock || 0),
-    totalIn: (summary.main?.totalIn || 0) + (summary.first?.totalIn || 0) + (summary.g?.totalIn || 0),
-    totalOut: (summary.main?.totalOut || 0) + (summary.first?.totalOut || 0) + (summary.g?.totalOut || 0),
+    liveStock: (summary.main?.liveStock || 0) + (summary.first?.liveStock || 0),
+    totalIn: (summary.main?.totalIn || 0) + (summary.first?.totalIn || 0),
+    totalOut: (summary.main?.totalOut || 0) + (summary.first?.totalOut || 0),
   } : undefined;
 
   const renderTile = (
@@ -231,11 +277,11 @@ export default function IMSHub() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {renderTile(
             "master", 
-            "Master IMS", 
-            "Main Warehouse & Operations", 
+            "IMS - G Floor", 
+            "Ground Floor Storage", 
             <CubeIcon />, 
             summary?.main,
             "bg-gradient-to-br from-blue-600 to-indigo-800",
@@ -249,15 +295,6 @@ export default function IMSHub() {
             summary?.first,
             "bg-gradient-to-br from-purple-600 to-fuchsia-800",
             "shadow-purple-900/20"
-          )}
-          {renderTile(
-            "g", 
-            "IMS - G Floor", 
-            "Ground Floor Storage", 
-            <BuildingOfficeIcon />, 
-            summary?.g,
-            "bg-gradient-to-br from-emerald-600 to-teal-800",
-            "shadow-emerald-900/20"
           )}
           {renderTile(
             "final",
@@ -276,7 +313,7 @@ export default function IMSHub() {
             onClick={() => setInfoLocation(null)}
           >
             <div
-              className="w-full max-w-lg bg-white dark:bg-[#1C1C1E] rounded-3xl shadow-2xl border border-gray-200 dark:border-white/10 overflow-hidden"
+              className="w-full max-w-lg max-h-[90vh] bg-white dark:bg-[#1C1C1E] rounded-3xl shadow-2xl border border-gray-200 dark:border-white/10 overflow-hidden flex flex-col"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 dark:border-white/10 bg-[#003875]">
@@ -295,7 +332,7 @@ export default function IMSHub() {
                 </button>
               </div>
 
-              <div className="p-5 space-y-4">
+              <div className="p-5 space-y-4 overflow-y-auto custom-scrollbar">
                 <div className="rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 px-4 py-3">
                   <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Formula</p>
                   <p className="text-sm font-black text-[#003875] dark:text-[#FFD500]">{IMS_CALC_INFO[infoLocation].formula}</p>
@@ -303,25 +340,37 @@ export default function IMSHub() {
 
                 <div className="space-y-3">
                   <div className="rounded-2xl border border-emerald-100 dark:border-emerald-500/20 bg-emerald-50/60 dark:bg-emerald-900/10 p-4">
-                    <div className="flex items-center gap-2 mb-2">
+                    <div className="flex items-center gap-2 mb-3">
                       <ArrowTrendingUpIcon className="w-4 h-4 text-emerald-600" />
                       <p className="text-[11px] font-black text-emerald-700 dark:text-emerald-400 uppercase tracking-widest">IN</p>
                     </div>
-                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Data Source</p>
-                    <p className="text-xs font-bold text-gray-800 dark:text-gray-200 mb-2">{IMS_CALC_INFO[infoLocation].inSource}</p>
-                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">How Calculated</p>
-                    <p className="text-xs font-medium text-gray-600 dark:text-gray-300 leading-relaxed">{IMS_CALC_INFO[infoLocation].inHow}</p>
+                    <ul className="space-y-3">
+                      {IMS_CALC_INFO[infoLocation].inSources.map((source) => (
+                        <li key={source.label} className="border-t border-emerald-100/80 dark:border-emerald-500/10 pt-3 first:border-t-0 first:pt-0">
+                          <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Data Source</p>
+                          <p className="text-xs font-bold text-gray-800 dark:text-gray-200 mb-1.5">{source.label}</p>
+                          <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">How Calculated</p>
+                          <p className="text-xs font-medium text-gray-600 dark:text-gray-300 leading-relaxed">{source.detail}</p>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
 
                   <div className="rounded-2xl border border-rose-100 dark:border-rose-500/20 bg-rose-50/60 dark:bg-rose-900/10 p-4">
-                    <div className="flex items-center gap-2 mb-2">
+                    <div className="flex items-center gap-2 mb-3">
                       <ArrowTrendingDownIcon className="w-4 h-4 text-rose-600" />
                       <p className="text-[11px] font-black text-rose-700 dark:text-rose-400 uppercase tracking-widest">OUT</p>
                     </div>
-                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Data Source</p>
-                    <p className="text-xs font-bold text-gray-800 dark:text-gray-200 mb-2">{IMS_CALC_INFO[infoLocation].outSource}</p>
-                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">How Calculated</p>
-                    <p className="text-xs font-medium text-gray-600 dark:text-gray-300 leading-relaxed">{IMS_CALC_INFO[infoLocation].outHow}</p>
+                    <ul className="space-y-3">
+                      {IMS_CALC_INFO[infoLocation].outSources.map((source) => (
+                        <li key={source.label} className="border-t border-rose-100/80 dark:border-rose-500/10 pt-3 first:border-t-0 first:pt-0">
+                          <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Data Source</p>
+                          <p className="text-xs font-bold text-gray-800 dark:text-gray-200 mb-1.5">{source.label}</p>
+                          <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">How Calculated</p>
+                          <p className="text-xs font-medium text-gray-600 dark:text-gray-300 leading-relaxed">{source.detail}</p>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
 
                   <div className="rounded-2xl border border-blue-100 dark:border-blue-500/20 bg-blue-50/60 dark:bg-blue-900/10 p-4">
@@ -331,6 +380,13 @@ export default function IMSHub() {
                     </div>
                     <p className="text-xs font-medium text-gray-600 dark:text-gray-300 leading-relaxed">{IMS_CALC_INFO[infoLocation].liveHow}</p>
                   </div>
+
+                  {IMS_CALC_INFO[infoLocation].approvalHow && (
+                    <div className="rounded-2xl border border-amber-100 dark:border-amber-500/20 bg-amber-50/60 dark:bg-amber-900/10 p-4">
+                      <p className="text-[11px] font-black text-amber-700 dark:text-amber-400 uppercase tracking-widest mb-2">Date-Wise Approval</p>
+                      <p className="text-xs font-medium text-gray-600 dark:text-gray-300 leading-relaxed">{IMS_CALC_INFO[infoLocation].approvalHow}</p>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

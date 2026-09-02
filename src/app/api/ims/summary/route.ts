@@ -1,62 +1,21 @@
 import { NextResponse } from "next/server";
 import { getIMSItems } from "@/lib/ims-sheets";
 import { getFloorIMSItems } from "@/lib/ims-floor-sheets";
+import { buildIMSMovementMaps, summarizeIMSMovement } from "@/lib/ims-enrich";
 
 export const dynamic = "force-dynamic";
 
-// Helper to fetch main IMS data (similar to /api/ims logic)
 async function getMainIMSData() {
-  const [items, grns, outForm] = await Promise.all([
-    require("@/lib/ims-sheets").getIMSItems(),
+  const [items, grns, outForm, gFloorLedger, firstFloorLedger] = await Promise.all([
+    getIMSItems(),
     require("@/lib/grn-sheets").getGRNItems(),
-    require("@/lib/o2d-sheets").getOutFormData()
+    require("@/lib/o2d-sheets").getOutFormData(),
+    getFloorIMSItems("g"),
+    getFloorIMSItems("1st"),
   ]);
 
-  const inQtyMap: Record<string, number> = {};
-  grns.forEach((grn: any) => {
-    if (grn.Item_Name && !grn.cancelled && grn.status_1 !== "Rejected") {
-      const qty = parseFloat(grn.Qty) || 0;
-      const name = grn.Item_Name.trim().toLowerCase();
-      inQtyMap[name] = (inQtyMap[name] || 0) + qty;
-    }
-  });
-
-  const outQtyMap: Record<string, number> = {};
-  outForm.forEach((row: any) => {
-    const addQty = (desc: string, qty: number) => {
-      outQtyMap[desc] = (outQtyMap[desc] || 0) + qty;
-    };
-
-    if (row.description && row.description.trim().startsWith("[") && row.description.trim().endsWith("]")) {
-      try {
-        const lineItems = JSON.parse(row.description);
-        lineItems.forEach((item: any) => {
-          const desc = (item.Description || item.description || "").trim().toLowerCase();
-          const qty = parseFloat(item.Qty || item.qty) || 0;
-          if (desc) addQty(desc, qty);
-        });
-      } catch (e) {}
-    } else if (row.description) {
-      const desc = row.description.trim().toLowerCase();
-      const qty = parseFloat(row.qty) || 0;
-      addQty(desc, qty);
-    }
-  });
-
-  let totalIn = 0;
-  let totalOut = 0;
-  let liveStock = 0;
-
-  items.forEach((item: any) => {
-    const name = (item.item_name || "").trim().toLowerCase();
-    const in_qty = inQtyMap[name] || 0;
-    const out_qty = outQtyMap[name] || 0;
-    totalIn += in_qty;
-    totalOut += out_qty;
-    liveStock += (in_qty - out_qty);
-  });
-
-  return { totalIn, totalOut, liveStock };
+  const maps = buildIMSMovementMaps(grns, outForm, gFloorLedger, firstFloorLedger);
+  return summarizeIMSMovement(items, maps);
 }
 
 export async function GET() {

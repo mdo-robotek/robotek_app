@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getFloorIMSItems, addFloorIMSItem, updateFloorIMSItem, deleteFloorIMSItem, markFloorIMSItemsChecked } from "@/lib/ims-floor-sheets";
+import { getFloorIMSItems, addFloorIMSItem, addFloorIMSItems, updateFloorIMSItem, deleteFloorIMSItem, markFloorIMSItemsChecked } from "@/lib/ims-floor-sheets";
 import { FloorIMS } from "@/types/ims-floor";
 
 export const dynamic = "force-dynamic";
@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
 
     const items = await getFloorIMSItems(location);
 
-    if (location === "g") {
+    if (location === "g" && searchParams.get("ledgerOnly") !== "1") {
       const { getOutFormData } = await import("@/lib/o2d-sheets");
       const outForm = await getOutFormData();
       
@@ -64,6 +64,23 @@ export async function POST(request: NextRequest) {
     }
 
     const data = await request.json();
+
+    if (Array.isArray(data)) {
+      const result = await addFloorIMSItems(location, data);
+      if (!result.success) {
+        return NextResponse.json({ error: "Failed to add Floor IMS items" }, { status: 500 });
+      }
+      return NextResponse.json({ success: true, added: result.added });
+    }
+
+    if (Array.isArray(data?.items)) {
+      const result = await addFloorIMSItems(location, data.items);
+      if (!result.success) {
+        return NextResponse.json({ error: "Failed to add Floor IMS items" }, { status: 500 });
+      }
+      return NextResponse.json({ success: true, added: result.added });
+    }
+
     const success = await addFloorIMSItem(location, data);
     
     if (!success) {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { MagnifyingGlassIcon, ChevronDownIcon, XMarkIcon } from "@heroicons/react/24/outline";
 
 interface Option {
@@ -37,11 +37,31 @@ export default function SearchableSelect({
     (opt.label || "").toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const updateDropdownPos = useCallback(() => {
+    if (!triggerRef.current) return;
+    const rect = triggerRef.current.getBoundingClientRect();
+    setDropdownPos({
+      top: rect.bottom + 8,
+      left: rect.left,
+      width: rect.width,
+    });
+  }, []);
+
+  const openDropdown = () => {
+    updateDropdownPos();
+    setIsOpen(true);
+  };
+
+  const closeDropdown = () => {
+    setIsOpen(false);
+    setSearchTerm("");
+  };
+
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node) &&
           triggerRef.current && !triggerRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
+        closeDropdown();
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -49,15 +69,15 @@ export default function SearchableSelect({
   }, []);
 
   useEffect(() => {
-    if (isOpen && triggerRef.current) {
-      const rect = triggerRef.current.getBoundingClientRect();
-      setDropdownPos({
-        top: rect.bottom + 8,
-        left: rect.left,
-        width: rect.width
-      });
-    }
-  }, [isOpen]);
+    if (!isOpen) return;
+    updateDropdownPos();
+    window.addEventListener("scroll", updateDropdownPos, true);
+    window.addEventListener("resize", updateDropdownPos);
+    return () => {
+      window.removeEventListener("scroll", updateDropdownPos, true);
+      window.removeEventListener("resize", updateDropdownPos);
+    };
+  }, [isOpen, updateDropdownPos]);
 
   return (
     <div className="w-full" ref={triggerRef}>
@@ -68,7 +88,7 @@ export default function SearchableSelect({
       )}
       
       <div 
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => (isOpen ? closeDropdown() : openDropdown())}
         className={`w-full p-3 rounded-xl cursor-pointer flex justify-between items-center transition-all ${className || 'bg-gray-50 dark:bg-slate-900 border border-gray-100 dark:border-white/5'} ${isOpen ? 'border-[#FFD500] ring-1 ring-[#FFD500]/10' : ''}`}
       >
         <span className={`text-[10px] font-bold ${selectedOption ? 'text-gray-900 dark:text-white' : 'text-gray-400'}`}>
@@ -77,10 +97,10 @@ export default function SearchableSelect({
         <ChevronDownIcon className={`w-3.5 h-3.5 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </div>
 
-      {isOpen && (
+      {isOpen && dropdownPos.width > 0 && (
         <div
           ref={dropdownRef}
-          className="fixed z-[11000] bg-white dark:bg-slate-900 border border-gray-200 dark:border-white/10 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+          className="fixed z-[11000] bg-white dark:bg-slate-900 border border-gray-200 dark:border-white/10 rounded-2xl shadow-2xl overflow-hidden"
           style={{
             top: `${dropdownPos.top}px`,
             left: `${dropdownPos.left}px`,
@@ -112,8 +132,7 @@ export default function SearchableSelect({
                   key={opt.id}
                   onClick={() => {
                     onChange(String(opt.id));
-                    setIsOpen(false);
-                    setSearchTerm("");
+                    closeDropdown();
                   }}
                   className={`p-2.5 rounded-lg text-[10px] font-bold cursor-pointer transition-colors ${
                     String(opt.id) === String(value)

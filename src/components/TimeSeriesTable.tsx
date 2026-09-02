@@ -13,6 +13,7 @@ export interface Transaction {
   date: string; // ISO or YYYY-MM-DD
   in_qty: number;
   out_qty: number;
+  source?: 'GRN' | 'O2D' | 'GFloor' | '1stFloor';
 }
 
 interface TimeSeriesTableProps {

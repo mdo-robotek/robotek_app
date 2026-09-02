@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { getGRNItems } from "@/lib/grn-sheets";
 import { getOutFormData } from "@/lib/o2d-sheets";
 import { getIMSItems } from "@/lib/ims-sheets";
+import { getFloorIMSItems } from "@/lib/ims-floor-sheets";
+import { firstFloorOutRowsToGFloorInTxs } from "@/lib/ims-1st-to-g-transfer";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -23,10 +25,12 @@ function parseDateStr(dStr: string) {
 
 export async function GET() {
   try {
-    const [items, grns, outForm] = await Promise.all([
+    const [items, grns, outForm, gFloorLedger, firstFloorLedger] = await Promise.all([
       getIMSItems(),
       getGRNItems(),
-      getOutFormData()
+      getOutFormData(),
+      getFloorIMSItems("g"),
+      getFloorIMSItems("1st"),
     ]);
 
     const categoryMap: Record<string, string> = {};
@@ -54,7 +58,8 @@ export async function GET() {
           category: categoryMap[lowerName] || 'GENERAL',
           date: txDate,
           in_qty: qty,
-          out_qty: 0
+          out_qty: 0,
+          source: 'GRN',
         });
       }
     });
@@ -72,7 +77,8 @@ export async function GET() {
           category: categoryMap[lowerDesc] || 'GENERAL',
           date: txDate,
           in_qty: 0,
-          out_qty: qty
+          out_qty: qty,
+          source: 'O2D',
         });
       };
 
@@ -93,6 +99,43 @@ export async function GET() {
         if (desc) addQty(desc, qty);
       }
     });
+
+    // G Floor ledger (Production IN + physical adjustments)
+    gFloorLedger.forEach((row) => {
+      const name = (row.item_name || "").trim();
+      if (!name) return;
+
+      let txDate = row.date || row.updated_at || "";
+      const ts = parseDateStr(txDate);
+      if (ts > 0) txDate = new Date(ts).toISOString();
+
+      const inQty = parseFloat(row.in_qty || "") || 0;
+      const outQty = parseFloat(row.out_qty || "") || 0;
+      const lowerName = name.toLowerCase();
+
+      if (inQty > 0) {
+        transactions.push({
+          item_name: name,
+          category: categoryMap[lowerName] || row.category || "GENERAL",
+          date: txDate,
+          in_qty: inQty,
+          out_qty: 0,
+          source: 'GFloor',
+        });
+      }
+      if (outQty > 0) {
+        transactions.push({
+          item_name: name,
+          category: categoryMap[lowerName] || row.category || "GENERAL",
+          date: txDate,
+          in_qty: 0,
+          out_qty: outQty,
+          source: 'GFloor',
+        });
+      }
+    });
+
+    transactions.push(...firstFloorOutRowsToGFloorInTxs(firstFloorLedger, categoryMap));
 
     return NextResponse.json(transactions, {
       headers: { 'Cache-Control': 'no-store, max-age=0' },

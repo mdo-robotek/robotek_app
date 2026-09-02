@@ -107,6 +107,41 @@ export async function addFloorIMSItem(location: string, data: Partial<FloorIMS>)
     }));
 }
 
+export async function addFloorIMSItems(
+  location: string,
+  dataList: Partial<FloorIMS>[]
+): Promise<{ success: boolean; added: number }> {
+  const service = getService(location);
+  return (locks[location] = locks[location]
+    .then(async () => {
+      if (dataList.length === 0) return { success: true, added: 0 };
+
+      let nextId = await service.getNextNumericalId();
+      const now = new Date().toISOString();
+      const items: FloorIMS[] = dataList.map((data) => {
+        const id = data.id || String(nextId++);
+        return {
+          id,
+          item_name: data.item_name || "",
+          category: data.category || "",
+          in_qty: data.in_qty ?? "0",
+          out_qty: data.out_qty ?? "0",
+          date: data.date || "",
+          packed_status: data.packed_status,
+          checked_status: data.checked_status,
+          updated_at: data.updated_at || now,
+        } as FloorIMS;
+      });
+
+      const ok = await service.addMany(items);
+      return { success: ok, added: ok ? items.length : 0 };
+    })
+    .catch((err) => {
+      console.error(`Error in addFloorIMSItems lock (${location}):`, err);
+      return { success: false, added: 0 };
+    })) as Promise<{ success: boolean; added: number }>;
+}
+
 export async function updateFloorIMSItem(location: string, id: string, data: FloorIMS): Promise<boolean> {
   const service = getService(location);
   return service.update(id, data);

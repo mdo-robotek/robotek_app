@@ -16,9 +16,7 @@ import {
   EyeIcon,
   TableCellsIcon,
   ChartBarIcon,
-  FolderIcon,
   HashtagIcon,
-  CalendarDaysIcon,
   ClipboardDocumentCheckIcon,
   CheckIcon
 } from "@heroicons/react/24/outline";
@@ -66,6 +64,14 @@ const computeAuditDiff = (physicalQty: number, liveStock: number) => {
     diff_type: diff > 0 ? ('IN' as const) : ('OUT' as const),
   };
 };
+
+const tableInputClass =
+  "w-full px-2 py-1.5 text-[11px] font-bold text-gray-900 dark:text-white bg-white dark:bg-[#0a0f1c] border border-gray-200 dark:border-white/10 rounded-md outline-none focus:ring-1 focus:ring-[#003875] dark:focus:ring-[#FFD500] uppercase";
+
+const thClass =
+  "py-2 px-2 text-[9px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest text-left whitespace-nowrap bg-gray-50 dark:bg-[#1f2937] border-b border-gray-200 dark:border-white/10";
+
+const tdClass = "py-1.5 px-2 align-middle border-b border-gray-100 dark:border-white/5";
 
 const isItemChecked = (item: { checked_status?: string }) =>
   String(item.checked_status || '').trim().toUpperCase() === 'CHECKED';
@@ -452,24 +458,25 @@ function parseDateStr(dStr: string) {
     try {
       const today = new Date().toISOString().split('T')[0];
 
-      // Send a POST request for EVERY row to append to ledger
-      for (const row of bulkRows) {
+      const items: Partial<FloorIMS>[] = bulkRows.map((row) => {
         const qty = parseFloat(row.qty) || 0;
-        const newItem: Partial<FloorIMS> = {
+        return {
           item_name: row.item_name.trim(),
           category: row.category,
           in_qty: row.type === 'IN' ? qty.toString() : "0",
           out_qty: row.type === 'OUT' ? qty.toString() : "0",
           date: row.date || today,
           packed_status: row.packed_status || "",
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
         };
-        await fetch(`/api/ims/floor?location=${location}`, {
-          method: 'POST',
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(newItem)
-        });
-      }
+      });
+
+      const res = await fetch(`/api/ims/floor?location=${location}`, {
+        method: 'POST',
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ items }),
+      });
+      if (!res.ok) throw new Error("Save failed");
       mutate();
       setItemModalOpen(false);
       setBulkRows([]);
@@ -648,21 +655,21 @@ function parseDateStr(dStr: string) {
     try {
       const today = new Date().toISOString().split('T')[0];
 
-      for (const row of validRows) {
-        const newItem: Partial<FloorIMS> = {
-          item_name: row.item_name.trim(),
-          category: row.category,
-          in_qty: row.diff_type === 'IN' ? String(roundQty(row.diff_qty)) : "0",
-          out_qty: row.diff_type === 'OUT' ? String(roundQty(row.diff_qty)) : "0",
-          date: today,
-          updated_at: new Date().toISOString()
-        };
-        await fetch(`/api/ims/floor?location=${location}`, {
-          method: 'POST',
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(newItem)
-        });
-      }
+      const items: Partial<FloorIMS>[] = validRows.map((row) => ({
+        item_name: row.item_name.trim(),
+        category: row.category,
+        in_qty: row.diff_type === 'IN' ? String(roundQty(row.diff_qty)) : "0",
+        out_qty: row.diff_type === 'OUT' ? String(roundQty(row.diff_qty)) : "0",
+        date: today,
+        updated_at: new Date().toISOString(),
+      }));
+
+      const res = await fetch(`/api/ims/floor?location=${location}`, {
+        method: 'POST',
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ items }),
+      });
+      if (!res.ok) throw new Error("Save failed");
       mutate();
       setIsAuditModalOpen(false);
       setAuditRows([]);
@@ -1383,94 +1390,115 @@ function parseDateStr(dStr: string) {
                 </button>
               </div>
 
-              <div className="p-6 overflow-y-auto custom-scrollbar bg-white dark:bg-[#111827]">
-                <div className="space-y-4">
-                  <button 
-                    onClick={addBulkRow}
-                    className="flex items-center gap-2 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-[#003875] dark:text-[#FFD500] hover:bg-blue-50 dark:hover:bg-[#FFD500]/10 rounded-xl transition-colors border border-dashed border-[#003875]/30 dark:border-[#FFD500]/30 w-full justify-center"
-                  >
-                    <PlusIcon className="w-4 h-4" /> Add Another Row
-                  </button>
-                  {bulkRows.map((row, index) => (
-                    <div key={row.id} className="flex flex-col md:flex-row items-start md:items-center gap-3 p-4 bg-gray-50 dark:bg-white/[0.02] border border-gray-200 dark:border-white/5 rounded-xl relative group">
-                      <div className="flex-1 min-w-[200px] w-full">
-                        <SearchableSelect
-                          label="Item Name *"
-                          options={masterItemOptions}
-                          value={row.item_name}
-                          onChange={(val) => handleBulkRowChange(row.id, "item_name", val)}
-                          placeholder="Select item..."
-                          className="bg-white dark:bg-[#111827] border-2 border-gray-200 dark:border-white/10 rounded-lg"
-                        />
-                      </div>
-                      <div className="w-full md:w-40">
-                        <FloatingInput 
-                          label="Category" 
-                          name={`category_${row.id}`} 
-                          list="category-list" 
-                          value={row.category} 
-                          icon={FolderIcon}
-                          onChange={(val) => handleBulkRowChange(row.id, "category", val)} 
-                        />
-                      </div>
-                      <div className="flex items-center gap-2 w-full md:w-auto">
-                        <div className="flex bg-gray-200 dark:bg-gray-800 p-1 rounded-lg">
-                          <button 
-                            onClick={() => handleBulkRowChange(row.id, "type", "IN")}
-                            className={`px-3 py-1.5 rounded-md text-[10px] font-black uppercase tracking-wider transition-all ${row.type === 'IN' ? 'bg-emerald-500 text-white shadow-sm' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
-                          >
-                            IN
-                          </button>
-                          <button 
-                            onClick={() => handleBulkRowChange(row.id, "type", "OUT")}
-                            className={`px-3 py-1.5 rounded-md text-[10px] font-black uppercase tracking-wider transition-all ${row.type === 'OUT' ? 'bg-rose-500 text-white shadow-sm' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
-                          >
-                            OUT
-                          </button>
-                        </div>
-                        {location === '1st' && (
-                          <div className="flex bg-gray-200 dark:bg-gray-800 p-1 rounded-lg shrink-0">
-                            <button 
-                              onClick={() => handleBulkRowChange(row.id, "packed_status", "PACKED")}
-                              className={`px-2 py-1.5 rounded-md text-[10px] font-black uppercase tracking-wider transition-all ${row.packed_status === 'PACKED' ? 'bg-purple-500 text-white shadow-sm' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
-                            >
-                              PACKED
-                            </button>
-                            <button 
-                              onClick={() => handleBulkRowChange(row.id, "packed_status", "UNPACKED")}
-                              className={`px-2 py-1.5 rounded-md text-[10px] font-black uppercase tracking-wider transition-all ${row.packed_status === 'UNPACKED' ? 'bg-gray-400 text-white shadow-sm dark:bg-gray-600' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
-                            >
-                              UNPACKED
-                            </button>
-                          </div>
+              <div className="p-4 overflow-y-auto custom-scrollbar bg-white dark:bg-[#111827] flex-1 min-h-0">
+                <button 
+                  onClick={addBulkRow}
+                  className="mb-3 flex items-center gap-2 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-[#003875] dark:text-[#FFD500] hover:bg-blue-50 dark:hover:bg-[#FFD500]/10 rounded-lg transition-colors border border-dashed border-[#003875]/30 dark:border-[#FFD500]/30"
+                >
+                  <PlusIcon className="w-3.5 h-3.5" /> Add Row
+                </button>
+                <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-white/10">
+                  <table className="w-full text-left border-collapse min-w-[860px]">
+                    <thead>
+                      <tr>
+                        <th className={thClass}>Item Name *</th>
+                        <th className={`${thClass} w-32`}>Category</th>
+                        <th className={`${thClass} w-28 text-center`}>Type</th>
+                        {location === "1st" && (
+                          <th className={`${thClass} w-36 text-center`}>Packed</th>
                         )}
-                        <div className="w-24">
-                          <FloatingInput 
-                            label="Qty *" 
-                            type="number" 
-                            step="0.01" 
-                            name={`qty_${row.id}`} 
-                            value={row.qty} 
-                            icon={HashtagIcon}
-                            onChange={(val) => handleBulkRowChange(row.id, "qty", val)} 
-                          />
-                        </div>
-                        <div className="w-40">
-                          <FloatingInput 
-                            label="Date" 
-                            type="date" 
-                            name={`date_${row.id}`} 
-                            value={row.date || ''} 
-                            icon={CalendarDaysIcon}
-                            onChange={(val) => handleBulkRowChange(row.id, "date", val)} 
-                          />
-                        </div>
-                        <button onClick={() => removeBulkRow(row.id)} className="p-2 text-gray-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-xl transition-colors shrink-0">
-                          <TrashIcon className="w-5 h-5" />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
+                        <th className={`${thClass} w-24 text-right`}>Qty *</th>
+                        <th className={`${thClass} w-36`}>Date</th>
+                        <th className={`${thClass} w-10 text-center`}></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {bulkRows.map((row) => (
+                        <tr key={row.id} className="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]">
+                          <td className={tdClass}>
+                            <SearchableSelect
+                              label=""
+                              options={masterItemOptions}
+                              value={row.item_name}
+                              onChange={(val) => handleBulkRowChange(row.id, "item_name", val)}
+                              placeholder="Select item..."
+                              className="bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 py-1.5 px-2 rounded-md text-[11px] min-h-[34px]"
+                            />
+                          </td>
+                          <td className={tdClass}>
+                            <input
+                              type="text"
+                              list="category-list"
+                              value={row.category}
+                              onChange={(e) => handleBulkRowChange(row.id, "category", e.target.value)}
+                              className={tableInputClass}
+                            />
+                          </td>
+                          <td className={`${tdClass} text-center`}>
+                            <div className="flex bg-gray-100 dark:bg-gray-800 p-0.5 rounded-md justify-center">
+                              <button
+                                onClick={() => handleBulkRowChange(row.id, "type", "IN")}
+                                className={`px-2 py-1 rounded text-[9px] font-black uppercase tracking-wider transition-all ${row.type === "IN" ? "bg-emerald-500 text-white shadow-sm" : "text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"}`}
+                              >
+                                IN
+                              </button>
+                              <button
+                                onClick={() => handleBulkRowChange(row.id, "type", "OUT")}
+                                className={`px-2 py-1 rounded text-[9px] font-black uppercase tracking-wider transition-all ${row.type === "OUT" ? "bg-rose-500 text-white shadow-sm" : "text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"}`}
+                              >
+                                OUT
+                              </button>
+                            </div>
+                          </td>
+                          {location === "1st" && (
+                            <td className={`${tdClass} text-center`}>
+                              <div className="flex bg-gray-100 dark:bg-gray-800 p-0.5 rounded-md justify-center">
+                                <button
+                                  onClick={() => handleBulkRowChange(row.id, "packed_status", "PACKED")}
+                                  className={`px-2 py-1 rounded text-[9px] font-black uppercase tracking-wider transition-all ${row.packed_status === "PACKED" ? "bg-purple-500 text-white shadow-sm" : "text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"}`}
+                                >
+                                  PACKED
+                                </button>
+                                <button
+                                  onClick={() => handleBulkRowChange(row.id, "packed_status", "UNPACKED")}
+                                  className={`px-2 py-1 rounded text-[9px] font-black uppercase tracking-wider transition-all ${row.packed_status === "UNPACKED" ? "bg-gray-500 text-white shadow-sm dark:bg-gray-600" : "text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"}`}
+                                >
+                                  UNPACKED
+                                </button>
+                              </div>
+                            </td>
+                          )}
+                          <td className={tdClass}>
+                            <input
+                              type="number"
+                              step="0.01"
+                              min="0"
+                              value={row.qty}
+                              onChange={(e) => handleBulkRowChange(row.id, "qty", e.target.value)}
+                              className={`${tableInputClass} text-right`}
+                            />
+                          </td>
+                          <td className={tdClass}>
+                            <input
+                              type="date"
+                              value={row.date || ""}
+                              onChange={(e) => handleBulkRowChange(row.id, "date", e.target.value)}
+                              className={tableInputClass}
+                            />
+                          </td>
+                          <td className={`${tdClass} text-center`}>
+                            <button
+                              onClick={() => removeBulkRow(row.id)}
+                              className="p-1.5 text-gray-400 hover:text-rose-500 rounded-md hover:bg-rose-50 dark:hover:bg-rose-500/10"
+                              title="Remove row"
+                            >
+                              <TrashIcon className="w-4 h-4" />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               </div>
 
@@ -1513,134 +1541,129 @@ function parseDateStr(dStr: string) {
                 </button>
               </div>
 
-              <div className="p-6 overflow-y-auto custom-scrollbar bg-white dark:bg-[#111827]">
-                <div className="space-y-4">
-                  <div className={`p-4 rounded-xl border border-dashed ${
-                    location === '1st'
-                      ? 'border-purple-300 dark:border-purple-500/30 bg-purple-50/50 dark:bg-purple-500/5'
-                      : 'border-emerald-300 dark:border-emerald-500/30 bg-emerald-50/50 dark:bg-emerald-500/5'
-                  }`}>
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
-                      <div>
-                        <p className={`text-[11px] font-black uppercase tracking-widest ${
-                          location === '1st' ? 'text-purple-700 dark:text-purple-300' : 'text-emerald-700 dark:text-emerald-300'
-                        }`}>
-                          Paste Item & Qty
-                        </p>
-                        <p className="text-[10px] font-bold text-gray-400 mt-1">
-                          Paste two columns: Item Name · Physical Qty (tab-separated from Excel)
-                        </p>
-                      </div>
-                      <button
-                        onClick={handleAuditPaste}
-                        className={`shrink-0 px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest text-white transition-all shadow-sm ${
-                          location === '1st' ? 'bg-purple-600 hover:bg-purple-700' : 'bg-emerald-600 hover:bg-emerald-700'
-                        }`}
-                      >
-                        Load Pasted Data
-                      </button>
-                    </div>
+              <div className="p-4 overflow-y-auto custom-scrollbar bg-white dark:bg-[#111827] flex-1 min-h-0 space-y-3">
+                <div className={`p-3 rounded-lg border border-dashed ${
+                  location === '1st'
+                    ? 'border-purple-300 dark:border-purple-500/30 bg-purple-50/50 dark:bg-purple-500/5'
+                    : 'border-emerald-300 dark:border-emerald-500/30 bg-emerald-50/50 dark:bg-emerald-500/5'
+                }`}>
+                  <div className="flex flex-wrap gap-2 items-start">
                     <textarea
                       value={auditPasteText}
                       onChange={(e) => setAuditPasteText(e.target.value)}
-                      rows={5}
+                      rows={3}
                       placeholder={"Item Name\tPhysical Qty\n10 LITE HONOR...\t10\nANS DC W\t25"}
-                      className="w-full rounded-xl border-2 border-gray-200 dark:border-white/10 bg-white dark:bg-[#111827] px-3 py-2.5 text-[11px] font-bold text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:border-[#003875] dark:focus:border-[#FFD500] custom-scrollbar font-mono"
+                      className="flex-1 min-w-[200px] rounded-lg border border-gray-200 dark:border-white/10 bg-white dark:bg-[#111827] px-3 py-2 text-[11px] font-mono font-bold text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:border-[#003875] dark:focus:border-[#FFD500] custom-scrollbar"
                     />
+                    <button
+                      onClick={handleAuditPaste}
+                      className={`shrink-0 px-4 py-2 h-fit rounded-lg text-[10px] font-black uppercase tracking-widest text-white transition-all shadow-sm ${
+                        location === '1st' ? 'bg-purple-600 hover:bg-purple-700' : 'bg-emerald-600 hover:bg-emerald-700'
+                      }`}
+                    >
+                      Load Paste
+                    </button>
                   </div>
+                </div>
 
-                  <button 
-                    onClick={addAuditRow}
-                    className={`flex items-center gap-2 px-4 py-2 text-[11px] font-black uppercase tracking-widest hover:bg-opacity-10 rounded-xl transition-colors border border-dashed w-full justify-center ${
-                      location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-300 dark:border-purple-500/30 hover:bg-purple-50 dark:hover:bg-purple-500/10' : 'text-emerald-600 dark:text-emerald-400 border-emerald-300 dark:border-emerald-500/30 hover:bg-emerald-50 dark:hover:bg-emerald-500/10'
-                    }`}
-                  >
-                    <PlusIcon className="w-4 h-4" /> Add Item to Audit
-                  </button>
-                  {auditRows.map((row) => (
-                    <div key={row.id} className="flex flex-col md:flex-row items-start md:items-center gap-3 p-4 bg-gray-50 dark:bg-white/[0.02] border border-gray-200 dark:border-white/5 rounded-xl relative group">
-                      <div className="flex-1 min-w-[200px] w-full">
-                        {row.fromPaste ? (
-                          <div className="px-3 py-2.5 rounded-lg border-2 border-gray-200 dark:border-white/10 bg-white dark:bg-[#111827]">
-                            <p className="text-[9px] font-black uppercase tracking-widest text-gray-400 mb-1">Item Name *</p>
-                            <p className="text-[11px] font-black text-gray-900 dark:text-white uppercase truncate" title={row.item_name}>
-                              {row.item_name}
-                            </p>
-                            {row.category && (
-                              <p className="text-[9px] font-bold text-gray-500 uppercase mt-1 truncate" title={row.category}>
-                                {row.category}
-                              </p>
+                <button 
+                  onClick={addAuditRow}
+                  className={`px-3 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-lg transition-colors border border-dashed ${
+                    location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-300 dark:border-purple-500/30 hover:bg-purple-50 dark:hover:bg-purple-500/10' : 'text-emerald-600 dark:text-emerald-400 border-emerald-300 dark:border-emerald-500/30 hover:bg-emerald-50 dark:hover:bg-emerald-500/10'
+                  }`}
+                >
+                  <PlusIcon className="w-3.5 h-3.5 inline mr-1" /> Add Row
+                </button>
+
+                <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-white/10">
+                  <table className="w-full text-left border-collapse min-w-[720px]">
+                    <thead>
+                      <tr>
+                        <th className={thClass}>Item Name *</th>
+                        <th className={`${thClass} w-24 text-right`}>Live Stock</th>
+                        <th className={`${thClass} w-28 text-right`}>Physical Qty *</th>
+                        <th className={`${thClass} w-32 text-center`}>Adjustment</th>
+                        <th className={`${thClass} w-10 text-center`}></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {auditRows.map((row) => (
+                        <tr key={row.id} className="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]">
+                          <td className={tdClass}>
+                            {row.fromPaste ? (
+                              <div className="px-2 py-1.5 rounded-md border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-[#0a0f1c]">
+                                <p className="text-[11px] font-black text-gray-900 dark:text-white uppercase leading-snug break-words" title={row.item_name}>
+                                  {row.item_name}
+                                </p>
+                                {row.category && (
+                                  <p className="text-[9px] font-bold text-gray-500 uppercase mt-0.5 truncate" title={row.category}>
+                                    {row.category}
+                                  </p>
+                                )}
+                              </div>
+                            ) : (
+                              <SearchableSelect
+                                label=""
+                                options={masterItemOptions}
+                                value={row.item_name}
+                                onChange={(val) => handleAuditRowChange(row.id, "item_name", val)}
+                                placeholder="Select item..."
+                                className="bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 py-1.5 px-2 rounded-md text-[11px] min-h-[34px]"
+                              />
                             )}
-                          </div>
-                        ) : (
-                          <SearchableSelect
-                            label="Item Name *"
-                            options={masterItemOptions}
-                            value={row.item_name}
-                            onChange={(val) => handleAuditRowChange(row.id, "item_name", val)}
-                            placeholder="Select item..."
-                            className="bg-white dark:bg-[#111827] border-2 border-gray-200 dark:border-white/10 rounded-lg"
-                          />
-                        )}
-                      </div>
-                      
-                      <div className="flex flex-col md:flex-row items-center gap-3 w-full md:w-auto">
-                        <div className="flex items-center gap-2 w-full md:w-auto shrink-0 mt-2 md:mt-0 px-3 py-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">
-                          <span className="text-[9px] font-black uppercase tracking-widest text-gray-400">Live Stock</span>
-                          <span className={`text-sm font-black ${getHealthColors(row.live_stock).text}`}>{formatQty(row.live_stock)}</span>
-                        </div>
-                        
-                        <div className="w-24 shrink-0">
-                          {row.fromPaste ? (
-                            <div className="flex flex-col items-center justify-center h-[42px] px-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
-                              <span className="text-[9px] font-black uppercase tracking-widest text-gray-400 leading-none mb-1">Physical</span>
-                              <span className="text-xs font-black text-gray-900 dark:text-white leading-none">
-                                {row.physical_qty ? formatQty(row.physical_qty) : '-'}
+                          </td>
+                          <td className={`${tdClass} text-right`}>
+                            <span className={`text-[11px] font-black ${getHealthColors(row.live_stock).text}`}>
+                              {formatQty(row.live_stock)}
+                            </span>
+                          </td>
+                          <td className={tdClass}>
+                            {row.fromPaste ? (
+                              <span className="block text-right text-[11px] font-black text-gray-900 dark:text-white px-2">
+                                {row.physical_qty ? formatQty(row.physical_qty) : "-"}
                               </span>
-                            </div>
-                          ) : (
-                            <FloatingInput 
-                              label="Physical Qty *" 
-                              type="number" 
-                              step="0.01" 
-                              name={`phys_qty_${row.id}`} 
-                              value={row.physical_qty} 
-                              icon={HashtagIcon}
-                              onChange={(val) => handleAuditRowChange(row.id, "physical_qty", val)} 
-                            />
-                          )}
-                        </div>
-
-                        <div className="flex flex-col items-center justify-center w-28 shrink-0 h-10 px-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
-                          <span className="text-[9px] font-black uppercase tracking-widest text-gray-400 leading-none mb-1">Difference</span>
-                          {row.diff_type === 'IN' && (
-                            <span className="text-emerald-600 dark:text-emerald-400 text-xs font-black uppercase tracking-wider leading-none">
-                              +{formatQty(row.diff_qty)} (ADD)
-                            </span>
-                          )}
-                          {row.diff_type === 'OUT' && (
-                            <span className="text-rose-600 dark:text-rose-400 text-xs font-black uppercase tracking-wider leading-none">
-                              -{formatQty(row.diff_qty)} (OUT)
-                            </span>
-                          )}
-                          {row.diff_type === 'NONE' && row.physical_qty && row.item_name && (
-                            <span className="text-gray-500 dark:text-gray-400 text-xs font-black uppercase tracking-wider leading-none">
-                              MATCHED
-                            </span>
-                          )}
-                          {(!row.physical_qty && !row.fromPaste) || !row.item_name ? (
-                            <span className="text-gray-300 dark:text-gray-600 text-xs font-black uppercase tracking-wider leading-none">
-                              -
-                            </span>
-                          ) : null}
-                        </div>
-
-                        <button onClick={() => removeAuditRow(row.id)} className="p-2 text-gray-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-xl transition-colors shrink-0 self-end md:self-center">
-                          <TrashIcon className="w-5 h-5" />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
+                            ) : (
+                              <input
+                                type="number"
+                                step="0.01"
+                                min="0"
+                                value={row.physical_qty}
+                                onChange={(e) => handleAuditRowChange(row.id, "physical_qty", e.target.value)}
+                                className={`${tableInputClass} text-right`}
+                              />
+                            )}
+                          </td>
+                          <td className={`${tdClass} text-center`}>
+                            {row.diff_type === "IN" && (
+                              <span className="text-[10px] font-black uppercase text-emerald-600 dark:text-emerald-400">
+                                IN {formatQty(row.diff_qty)}
+                              </span>
+                            )}
+                            {row.diff_type === "OUT" && (
+                              <span className="text-[10px] font-black uppercase text-rose-600 dark:text-rose-400">
+                                OUT {formatQty(row.diff_qty)}
+                              </span>
+                            )}
+                            {row.diff_type === "NONE" && row.physical_qty && row.item_name && (
+                              <span className="text-[10px] font-black uppercase text-gray-500">Matched</span>
+                            )}
+                            {row.diff_type === "NONE" && (!row.physical_qty || !row.item_name) && (
+                              <span className="text-[10px] font-bold text-gray-400">—</span>
+                            )}
+                          </td>
+                          <td className={`${tdClass} text-center`}>
+                            <button
+                              onClick={() => removeAuditRow(row.id)}
+                              className="p-1.5 text-gray-400 hover:text-rose-500 rounded-md hover:bg-rose-50 dark:hover:bg-rose-500/10"
+                              title="Remove row"
+                            >
+                              <TrashIcon className="w-4 h-4" />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               </div>
 

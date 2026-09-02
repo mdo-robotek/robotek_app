@@ -46,14 +46,13 @@ export default function IMSFinal({ onBack }: { onBack: () => void }) {
 
   const { data: masterItems = [], isLoading: isLoadingMaster } = useSWR("/api/ims", fetcher);
   const { data: firstItems = [], isLoading: isLoadingFirst } = useSWR("/api/ims/floor?location=1st", fetcher);
-  const { data: gItems = [], isLoading: isLoadingG } = useSWR("/api/ims/floor?location=g", fetcher);
 
   const { data: timeSeriesData = [], isValidating: isTimeSeriesLoading } = useSWR<Transaction[]>(
     viewMode === 'timeseries' ? '/api/ims/time-series' : null,
     fetcher
   );
 
-  const isLoading = isLoadingMaster || isLoadingFirst || isLoadingG;
+  const isLoading = isLoadingMaster || isLoadingFirst;
 
   const aggregatedItems = useMemo(() => {
     const map = new Map<string, any>();
@@ -84,12 +83,11 @@ export default function IMSFinal({ onBack }: { onBack: () => void }) {
       }
     };
 
-    masterItems.forEach(addToMap('Master IMS'));
+    masterItems.forEach(addToMap('IMS - G Floor'));
     firstItems.forEach(addToMap('1st Floor IMS'));
-    gItems.forEach(addToMap('G Floor IMS'));
 
     return Array.from(map.values()).sort((a, b) => a.item_name.localeCompare(b.item_name));
-  }, [masterItems, firstItems, gItems]);
+  }, [masterItems, firstItems]);
 
   const uniqueCategories = useMemo(() => {
     return Array.from(
@@ -177,7 +175,7 @@ export default function IMSFinal({ onBack }: { onBack: () => void }) {
   const combinedTransactions = useMemo(() => {
     const masterTxs = (timeSeriesData || []).map((item: any) => ({
       ...item,
-      source: 'Master IMS'
+      source: 'IMS - G Floor'
     }));
     
     const floorMapper = (sourceName: string) => (item: any): Transaction & { source: string } => ({
@@ -190,10 +188,9 @@ export default function IMSFinal({ onBack }: { onBack: () => void }) {
     });
 
     const firstTxs = (firstItems || []).map(floorMapper('1st Floor IMS'));
-    const gTxs = (gItems || []).map(floorMapper('G Floor IMS'));
 
-    return [...masterTxs, ...firstTxs, ...gTxs];
-  }, [timeSeriesData, firstItems, gItems]);
+    return [...masterTxs, ...firstTxs];
+  }, [timeSeriesData, firstItems]);
 
   const dateRange = useMemo(() => {
     let start, end;
@@ -432,9 +429,8 @@ export default function IMSFinal({ onBack }: { onBack: () => void }) {
                       </td>
                       <td className="py-2 px-3 text-[11px] font-black uppercase">
                         <span className={`inline-block px-2 py-0.5 rounded border text-[10px] font-black uppercase tracking-wider ${
-                          log.source === 'Master IMS' ? 'border-blue-200 dark:border-blue-500/20 bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400' :
-                          log.source === '1st Floor IMS' ? 'border-purple-200 dark:border-purple-500/20 bg-purple-50 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400' :
-                          'border-emerald-200 dark:border-emerald-500/20 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
+                          log.source === 'IMS - G Floor' ? 'border-blue-200 dark:border-blue-500/20 bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400' :
+                          'border-purple-200 dark:border-purple-500/20 bg-purple-50 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400'
                         }`}>
                           {log.source}
                         </span>
@@ -531,9 +527,8 @@ export default function IMSFinal({ onBack }: { onBack: () => void }) {
                         </td>
                         <td className="py-1 px-3">
                           <span className={`inline-block px-2 py-0.5 rounded border text-[10px] font-black uppercase tracking-wider ${
-                            item.source === 'Master IMS' ? 'border-blue-200 dark:border-blue-500/20 bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400' :
-                            item.source === '1st Floor IMS' ? 'border-purple-200 dark:border-purple-500/20 bg-purple-50 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400' :
-                            'border-emerald-200 dark:border-emerald-500/20 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
+                            item.source === 'IMS - G Floor' ? 'border-blue-200 dark:border-blue-500/20 bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400' :
+                            'border-purple-200 dark:border-purple-500/20 bg-purple-50 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400'
                           }`}>
                             {item.source}
                           </span>

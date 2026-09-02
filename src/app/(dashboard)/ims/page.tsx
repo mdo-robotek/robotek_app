@@ -127,10 +127,10 @@ const getLiveStockFontClass = (value: number) => {
 
 const getInOutFontClass = (value: number) => {
   const length = formatMetric(value).length;
-  if (length > 12) return "text-[10px] sm:text-xs";
-  if (length > 10) return "text-xs sm:text-sm";
-  if (length > 8) return "text-sm sm:text-base";
-  return "text-lg sm:text-xl";
+  if (length > 12) return "text-sm sm:text-base";
+  if (length > 10) return "text-base sm:text-lg";
+  if (length > 8) return "text-lg sm:text-xl";
+  return "text-xl sm:text-2xl";
 };
 
 export default function IMSHub() {
@@ -233,8 +233,8 @@ export default function IMSHub() {
             <div className="grid grid-cols-2 gap-3 min-w-0">
               <div className="bg-white/10 backdrop-blur-md rounded-2xl p-3 sm:p-4 border border-white/20 transition-colors min-w-0">
                 <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-[10px] font-black text-white/80 uppercase tracking-widest flex items-center gap-1.5">
-                    <ArrowTrendingUpIcon className="w-3.5 h-3.5 shrink-0"/> In
+                  <span className="text-xs sm:text-sm font-black text-white/80 uppercase tracking-widest flex items-center gap-1.5">
+                    <ArrowTrendingUpIcon className="w-4 h-4 shrink-0"/> In
                   </span>
                 </div>
                 <div
@@ -246,8 +246,8 @@ export default function IMSHub() {
               </div>
               <div className="bg-white/10 backdrop-blur-md rounded-2xl p-3 sm:p-4 border border-white/20 transition-colors min-w-0">
                 <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-[10px] font-black text-white/80 uppercase tracking-widest flex items-center gap-1.5">
-                    <ArrowTrendingDownIcon className="w-3.5 h-3.5 shrink-0"/> Out
+                  <span className="text-xs sm:text-sm font-black text-white/80 uppercase tracking-widest flex items-center gap-1.5">
+                    <ArrowTrendingDownIcon className="w-4 h-4 shrink-0"/> Out
                   </span>
                 </div>
                 <div

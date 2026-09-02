@@ -288,7 +288,7 @@ export default function GFloorLedgerModals({
       <button
         onClick={openAudit}
         disabled={submitting}
-        className="flex items-center gap-1 px-2.5 py-1.5 bg-teal-50 hover:bg-teal-100 dark:bg-teal-500/10 dark:hover:bg-teal-500/20 text-teal-700 dark:text-teal-400 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all border border-teal-200 dark:border-teal-500/20 shadow-sm disabled:opacity-50 h-[30px]"
+        className="flex items-center gap-1 px-2.5 py-1.5 bg-violet-50 hover:bg-violet-100 dark:bg-violet-500/10 dark:hover:bg-violet-500/20 text-violet-700 dark:text-violet-300 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all border border-violet-300 dark:border-violet-500/30 shadow-sm disabled:opacity-50 h-[30px]"
       >
         <ClipboardDocumentCheckIcon className="w-3.5 h-3.5" /> Physical Check
       </button>

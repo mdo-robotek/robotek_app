@@ -343,23 +343,24 @@ const renderTaskTile = (task: any) => {
   );
 };
 
-const renderCategoryStatusSections = (tasks: any[], title: string, Icon: any, colorClass: string) => {
-  const now = new Date();
+const renderCategoryStatusSections = (tasks: any[], title: string, Icon: any, colorClass: string, options?: { hideDelayed?: boolean }) => {
+  const hideDelayed = options?.hideDelayed === true;
   
-  const pendingTasks = tasks.filter(t => !t.actualDate);
+  const pendingTasks = tasks.filter(t => !t.actualDate && !t.isCompleted);
   
-  const completedTasks = tasks.filter(t => {
-    const delay = getTaskDelayMs(t);
-    // Even 1ms late is late for the filter
-    return t.actualDate && delay <= 0;
-  });
+  const completedTasks = hideDelayed
+    ? tasks.filter(t => !!(t.actualDate || t.isCompleted))
+    : tasks.filter(t => {
+        const delay = getTaskDelayMs(t);
+        return t.actualDate && delay <= 0;
+      });
   
-  const delayedTasks = tasks.filter(t => {
+  const delayedTasks = hideDelayed ? [] : tasks.filter(t => {
     if (t.actualDate) {
       const delay = getTaskDelayMs(t);
       return delay > 0;
     }
-    return false; // Pending late items are in the Pending column
+    return false;
   });
 
 
@@ -377,12 +378,15 @@ const renderCategoryStatusSections = (tasks: any[], title: string, Icon: any, co
          <div className="ml-auto flex items-center gap-3">
             <span className="px-3 py-1 bg-amber-50 dark:bg-amber-950/30 text-amber-600 dark:text-amber-400 rounded-xl text-xs font-black border border-amber-100">{pendingTasks.length} PEND</span>
             <span className="px-3 py-1 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 rounded-xl text-xs font-black border border-emerald-100">{completedTasks.length} DONE</span>
-            <span className="px-3 py-1 bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400 rounded-xl text-xs font-black border border-rose-100">{delayedTasks.length} LATE</span>
+            {!hideDelayed && (
+              <span className="px-3 py-1 bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400 rounded-xl text-xs font-black border border-rose-100">{delayedTasks.length} LATE</span>
+            )}
+            <span className="px-3 py-1 bg-slate-50 dark:bg-navy-900 text-slate-600 dark:text-slate-300 rounded-xl text-xs font-black border border-slate-200 dark:border-navy-700">{tasks.length} TOTAL</span>
          </div>
       </div>
 
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+      <div className={`grid grid-cols-1 ${hideDelayed ? "lg:grid-cols-2" : "lg:grid-cols-3"} gap-6 items-start`}>
         {/* PENDING COLUMN */}
         <div 
           style={{ backgroundColor: 'var(--panel-card)', borderColor: 'var(--panel-border)' }}
@@ -393,11 +397,11 @@ const renderCategoryStatusSections = (tasks: any[], title: string, Icon: any, co
             className="flex items-center gap-2 mb-4 border-b-2 pb-2"
           >
             <ArrowPathIcon className="w-4 h-4 text-amber-500" />
-            <span className="text-[11px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest">Pending Task</span>
+            <span className="text-[11px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest">Pending</span>
           </div>
           <div className="grid grid-cols-1 gap-3">
             {pendingTasks.length === 0 ? (
-              <p className="text-[10px] text-gray-400 font-bold text-center py-6 italic uppercase">No Pending Tasks</p>
+              <p className="text-[10px] text-gray-400 font-bold text-center py-6 italic uppercase">No Pending</p>
             ) : pendingTasks.map((t, idx) => (
               <div key={idx}>{renderTaskTile(t)}</div>
             ))}
@@ -414,11 +418,11 @@ const renderCategoryStatusSections = (tasks: any[], title: string, Icon: any, co
             className="flex items-center gap-2 mb-4 border-b-2 pb-2"
           >
             <CheckCircleIcon className="w-4 h-4 text-emerald-500" />
-            <span className="text-[11px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest">Completed Task</span>
+            <span className="text-[11px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest">Completed</span>
           </div>
           <div className="grid grid-cols-1 gap-3">
              {completedTasks.length === 0 ? (
-                <p className="text-[10px] text-gray-400 font-bold text-center py-6 italic uppercase">No On-Time Completions</p>
+                <p className="text-[10px] text-gray-400 font-bold text-center py-6 italic uppercase">No Completions</p>
              ) : completedTasks.map((t, idx) => (
                 <div key={idx}>{renderTaskTile(t)}</div>
              ))}
@@ -426,6 +430,7 @@ const renderCategoryStatusSections = (tasks: any[], title: string, Icon: any, co
         </div>
 
         {/* DELAYED COLUMN */}
+        {!hideDelayed && (
         <div 
           style={{ backgroundColor: 'var(--panel-card)', borderColor: 'var(--panel-border)' }}
           className="rounded-[2.2rem] p-5 border-[3px] h-full flex flex-col min-h-[200px]"
@@ -442,6 +447,7 @@ const renderCategoryStatusSections = (tasks: any[], title: string, Icon: any, co
              ))}
           </div>
         </div>
+        )}
       </div>
     </div>
   );
@@ -582,7 +588,7 @@ const PDFHiddenReport = ({ user, dateRange, userTrendData, isNegativeMode, calcu
                  <span className="text-[7px] font-black uppercase text-[#003875] -translate-y-2">Efficiency %</span>
               </div>
               <div className="w-24 flex flex-col items-center">
-                 <SemiCircleGauge value={user.onTimeRate} isNegative={isNegativeMode} total={user.completed} />
+                 <SemiCircleGauge value={user.onTimeRate} isNegative={isNegativeMode} total={user.taskCompleted ?? user.completed} />
                  <span className="text-[7px] font-black uppercase text-[#003875] -translate-y-2">Accuracy %</span>
               </div>
            </div>
@@ -597,16 +603,24 @@ const PDFHiddenReport = ({ user, dateRange, userTrendData, isNegativeMode, calcu
                   { label: 'Delegations', stats: user.delegationStats, color: 'text-orange-500', icon: DocumentTextIcon },
                   { label: 'Checklists', stats: user.checklistStats, color: 'text-emerald-500', icon: ClipboardDocumentListIcon },
                   { label: 'O2D FMS Jobs', stats: user.o2dStats, color: 'text-blue-500', icon: ShoppingBagIcon },
-                  { label: 'Scot Tracking', stats: user.scotStats, color: 'text-purple-500', icon: PhoneIcon }
-                ].map((cat, i) => (
+                  { label: 'Scot Tracking', stats: user.scotStats, color: 'text-purple-500', icon: PhoneIcon },
+                  ...(user.leaveStats ? [{ label: 'Leave', stats: user.leaveStats, color: 'text-violet-500', icon: CalendarDaysIcon, isLeave: true }] : []),
+                ].map((cat: any, i) => (
                   <div key={i} className="flex flex-col items-center gap-1">
                      <div className="flex items-center gap-1.5">
                         <cat.icon className={`w-4 h-4 ${cat.color}`} />
                         <span className="text-[8px] font-black text-gray-700 uppercase">{cat.label}</span>
                      </div>
-                     <span className={`text-lg font-black ${cat.stats.score >= 80 ? 'text-emerald-500' : 'text-amber-500'}`}>
-                        {cat.stats.total === 0 ? "—" : (isNegativeMode ? cat.stats.score - 100 : cat.stats.score) + "%"}
-                     </span>
+                     {cat.isLeave ? (
+                       <span className="text-sm font-black text-slate-700">
+                         {cat.stats.completed}/{cat.stats.total}
+                         <span className="text-amber-600 ml-1">({cat.stats.pending}p)</span>
+                       </span>
+                     ) : (
+                       <span className={`text-lg font-black ${cat.stats.score >= 80 ? 'text-emerald-500' : 'text-amber-500'}`}>
+                          {cat.stats.total === 0 ? "—" : (isNegativeMode ? cat.stats.score - 100 : cat.stats.score) + "%"}
+                       </span>
+                     )}
                   </div>
                 ))}
               </div>
@@ -811,7 +825,7 @@ const UserDrilldownContent = ({ user, dateRange, chartGranularity, onGranularity
                 </div>
              </div>
              <div className="w-36 md:w-44 flex flex-col items-center group">
-                <SemiCircleGauge value={user.onTimeRate} isNegative={isNegativeMode} total={user.completed} />
+                <SemiCircleGauge value={user.onTimeRate} isNegative={isNegativeMode} total={user.taskCompleted ?? user.completed} />
                 <div 
                   style={{ backgroundColor: 'var(--panel-card)', borderColor: 'var(--panel-border)' }}
                   className="px-4 py-2 rounded-xl border-2 text-[11px] font-black text-[#003875] dark:text-[#FFD500] shadow-sm uppercase tracking-widest mt-0 relative z-10 -translate-y-2"
@@ -846,8 +860,8 @@ const UserDrilldownContent = ({ user, dateRange, chartGranularity, onGranularity
                       className="border-b-2 text-[10px] font-black text-gray-400 uppercase tracking-widest"
                     >
                       <th className="pb-3 text-left">Category</th>
-                      <th className="pb-3 text-center">Score %</th>
-                      <th className="pb-3 text-center">On-Time %</th>
+                      <th className="pb-3 text-center">{user.leaveStats ? "Score / Total" : "Score %"}</th>
+                      <th className="pb-3 text-center">{user.leaveStats ? "On-Time / Pend" : "On-Time %"}</th>
                     </tr>
                   </thead>
                   <tbody 
@@ -890,6 +904,23 @@ const UserDrilldownContent = ({ user, dateRange, chartGranularity, onGranularity
                         {user.scotStats?.completed === 0 ? "—" : (isNegativeMode ? user.scotStats?.onTimeRate - 100 : user.scotStats?.onTimeRate || 0) + "%"}
                       </td>
                     </tr>
+                    {user.leaveStats && (
+                      <tr>
+                        <td className="py-2.5 flex items-center gap-2 font-black text-[10px] sm:text-xs uppercase text-gray-900 dark:text-white">
+                          <CalendarDaysIcon className="w-5 h-5 text-violet-500 shrink-0"/> Leave
+                        </td>
+                        <td className="py-2.5 text-center font-black text-slate-700 dark:text-slate-200">
+                          <span className="text-emerald-600">{user.leaveStats.completed}</span>
+                          <span className="text-gray-400 mx-0.5">/</span>
+                          <span>{user.leaveStats.total}</span>
+                          <div className="text-[8px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">Done / Total</div>
+                        </td>
+                        <td className={`py-2.5 text-center font-black ${user.leaveStats.pending > 0 ? "text-amber-600" : "text-emerald-500"}`}>
+                          {user.leaveStats.pending}
+                          <div className="text-[8px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">Pending</div>
+                        </td>
+                      </tr>
+                    )}
                   </tbody>
                 </table>
              </div>
@@ -1075,6 +1106,18 @@ const UserDrilldownContent = ({ user, dateRange, chartGranularity, onGranularity
               "text-purple-600"
             )}
           </div>
+
+          {user.leaveStats && (
+            <div data-pdf-section="history-leave">
+              {renderCategoryStatusSections(
+                user.leaveStats?.items || [],
+                "Leave History",
+                CalendarDaysIcon,
+                "text-violet-600",
+                { hideDelayed: true }
+              )}
+            </div>
+          )}
        </div>
     </div>
   );
@@ -2172,7 +2215,7 @@ function ScorePageContent() {
                             </h4>
                             <div className="space-y-0.5">
                                <ScoreRow label="Completed / Total" completed={item.completed} total={item.total} percentage={item.score} isNegative={isNegativeMode} />
-                               <ScoreRow label="On Time / Completed" completed={item.onTime} total={item.completed} percentage={item.onTimeRate} isNegative={isNegativeMode} />
+                               <ScoreRow label="On Time / Completed" completed={item.onTime} total={item.taskCompleted ?? item.completed} percentage={item.onTimeRate} isNegative={isNegativeMode} />
                             </div>
                          </section>
                       </div>

@@ -4,6 +4,8 @@ import { getChecklists } from "@/lib/checklist-sheets";
 import { getO2Ds, getO2DStepConfig } from "@/lib/o2d-sheets";
 import { getFollowUpData, getCallData } from "@/lib/scot-sheets";
 import { getUsers } from "@/lib/google-sheets";
+import { leaveRequestService } from "@/lib/leave-sheets";
+import { ownsLeaveFollowUp } from "@/lib/leave-access";
 import { auth } from "@/auth";
 
 export const dynamic = 'force-dynamic';
@@ -98,15 +100,51 @@ export async function GET(request: Request) {
 
   try {
     const baseUrl = new URL(request.url).origin;
-    const [delegations, checklists, o2ds, stepConfigs, users, followUps, allCalls] = await Promise.all([
+    const [delegations, checklists, o2ds, stepConfigs, users, followUps, allCalls, leaves] = await Promise.all([
       getDelegations(),
       getChecklists(),
       getO2Ds(),
       getO2DStepConfig(),
       getUsers(),
       getFollowUpData(),
-      getCallData()
+      getCallData(),
+      leaveRequestService.getAll(),
     ]);
+
+    const leaveItems = leaves.map((l) => {
+      const status = (l.status || "").toLowerCase();
+      const isCompleted = status === "approved" || status === "rejected";
+      const planned = parseDate(l.startDate) || parseDate(l.createdAt);
+      const actual = isCompleted ? parseDate(l.updatedAt) || planned : null;
+      return {
+        category: "leave",
+        title: `${l.userName || "User"} — ${l.leaveType || "Leave"}${l.reason ? `: ${l.reason}` : ""}`,
+        plannedDate: planned,
+        actualDate: actual,
+        isCompleted,
+        isLate: false, // leave has no on-time tracking
+        id: l.id,
+        status: l.status,
+      };
+    });
+
+    // Pending always in scope (PC follow-up backlog); completed filtered by date range
+    const leaveInScope = leaveItems.filter((t) => {
+      if (!t.isCompleted) return true;
+      return isDateInRange(t.plannedDate, from, to) || (t.actualDate && isDateInRange(t.actualDate, from, to));
+    });
+    const leavePending = leaveInScope.filter((t) => !t.isCompleted).length;
+    const leaveCompleted = leaveInScope.filter((t) => t.isCompleted).length;
+    const leaveTotal = leaveInScope.length;
+    const leaveStatsBase = {
+      total: leaveTotal,
+      completed: leaveCompleted,
+      pending: leavePending,
+      score: leaveTotal > 0 ? Math.round((leaveCompleted / leaveTotal) * 100) : 0,
+      onTime: 0,
+      onTimeRate: 0,
+      items: leaveInScope.map(minimizeTask),
+    };
 
     const latestFollowUps = followUps.reduce((acc: any, curr: any) => {
       const existing = acc[curr.partyName];
@@ -301,7 +339,17 @@ export async function GET(request: Request) {
         }
         return t.user === u.username;
       });
-      const metrics = calculateMetrics(userTasks, from, to);
+      const taskMetrics = calculateMetrics(userTasks, from, to);
+      const metrics = { ...taskMetrics };
+      const isLeaveOwner = ownsLeaveFollowUp(u);
+
+      // Fold leave into Completed/Total for PC (on-time stays task-only)
+      if (isLeaveOwner && leaveTotal > 0) {
+        metrics.total += leaveTotal;
+        metrics.completed += leaveCompleted;
+        metrics.score = metrics.total > 0 ? Math.round((metrics.completed / metrics.total) * 100) : 0;
+        metrics.finalScore = Math.round((metrics.score + metrics.onTimeRate) / 2);
+      }
       
       const delegation = calculateMetrics(userTasks.filter(t => t.category === 'delegation'), from, to);
       const checklist = calculateMetrics(userTasks.filter(t => t.category === 'checklist'), from, to);
@@ -324,6 +372,8 @@ export async function GET(request: Request) {
           department: u.department
         },
         ...metrics,
+        taskCompleted: taskMetrics.completed,
+        ...(isLeaveOwner ? { leaveStats: leaveStatsBase } : {}),
         delegationStats: { ...delegation, items: userTasks.filter(t => t.category === 'delegation' && (isDateInRange(t.plannedDate, from, to) || (t.actualDate && isDateInRange(t.actualDate, from, to)))).map(minimizeTask) },
         checklistStats: { ...checklist, items: userTasks.filter(t => t.category === 'checklist' && (isDateInRange(t.plannedDate, from, to) || (t.actualDate && isDateInRange(t.actualDate, from, to)))).map(minimizeTask) },
         o2dStats: { ...o2d, items: userTasks.filter(t => t.category === 'o2d' && (isDateInRange(t.plannedDate, from, to) || (t.actualDate && isDateInRange(t.actualDate, from, to)))).map(minimizeTask) },

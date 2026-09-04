@@ -14,6 +14,10 @@ export interface Transaction {
   in_qty: number;
   out_qty: number;
   source?: 'GRN' | 'O2D' | 'GFloor' | '1stFloor';
+  /** IMS-G Floor ledger row id (only for source GFloor) */
+  floor_id?: string;
+  /** Checked Status from IMS-G Floor sheet */
+  checked_status?: string;
 }
 
 interface TimeSeriesTableProps {

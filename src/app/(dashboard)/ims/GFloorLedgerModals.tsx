@@ -54,7 +54,6 @@ async function refreshIMSData() {
     globalMutate("/api/ims/time-series"),
     globalMutate("/api/ims/summary"),
     globalMutate("/api/ims/gfloor-approval"),
-    globalMutate("/api/ims/floor?location=g&ledgerOnly=1"),
   ]);
 }
 

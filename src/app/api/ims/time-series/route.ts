@@ -112,6 +112,10 @@ export async function GET() {
       const inQty = parseFloat(row.in_qty || "") || 0;
       const outQty = parseFloat(row.out_qty || "") || 0;
       const lowerName = name.toLowerCase();
+      const floorMeta = {
+        floor_id: row.id ? String(row.id) : undefined,
+        checked_status: row.checked_status || "",
+      };
 
       if (inQty > 0) {
         transactions.push({
@@ -121,6 +125,7 @@ export async function GET() {
           in_qty: inQty,
           out_qty: 0,
           source: 'GFloor',
+          ...floorMeta,
         });
       }
       if (outQty > 0) {
@@ -131,6 +136,7 @@ export async function GET() {
           in_qty: 0,
           out_qty: outQty,
           source: 'GFloor',
+          ...floorMeta,
         });
       }
     });

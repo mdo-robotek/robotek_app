@@ -957,6 +957,7 @@ export async function appendOutFormData(
       },
     });
 
+    globalCache.delete(`${GOOGLE_SHEET_ID}_out_form`);
     return true;
   } catch (error) {
     console.error("Error appending to Out Form:", error);
@@ -965,6 +966,10 @@ export async function appendOutFormData(
 }
 
 export async function getOutFormData(): Promise<any[]> {
+  const cacheKey = `${GOOGLE_SHEET_ID}_out_form`;
+  const cached = globalCache.get<any[]>(cacheKey);
+  if (cached) return cached;
+
   try {
     const sheets = await (o2dService as any).getSheetsClient();
     const response = await sheets.spreadsheets.values.get({
@@ -984,9 +989,12 @@ export async function getOutFormData(): Promise<any[]> {
         orderNo: row[1] || "",
         partyName: row[2] || "",
         description: row[3] || "", // Items (JSON)
+        qty: row[4] || "",
+        updated_at: row[0] || "",
       });
     }
 
+    globalCache.set(cacheKey, data, 60_000); // 60s — matches other sheet caches
     return data;
   } catch (error) {
     console.error("Error fetching Out Form data:", error);

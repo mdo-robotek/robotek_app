@@ -4,6 +4,7 @@ import { leaveRequestService, leaveRemarkService, type LeaveRequest, type LeaveR
 import { globalCache } from "@/lib/cache";
 import { invalidateLeavePendingCache, invalidateDashboardCache } from "@/lib/sheet-cache-keys";
 import { sendLeaveNotification } from "@/lib/leave-notifications";
+import { ownsLeaveFollowUp } from "@/lib/leave-access";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -18,6 +19,8 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const userId = searchParams.get('userId');
     const role = searchParams.get('role');
+    const username = searchParams.get('username');
+    const designation = searchParams.get('designation');
     const type = searchParams.get('type');
     const leaveId = searchParams.get('leaveId');
 
@@ -44,8 +47,10 @@ export async function GET(req: NextRequest) {
 
     const roleUpper = (role || '').toUpperCase();
     const isAdminOrEA = roleUpper === 'ADMIN' || roleUpper === 'EA';
+    const isLeavePC = ownsLeaveFollowUp({ username, role, designation });
 
-    if (!isAdminOrEA && userId) {
+    // Admin / EA / PC (e.g. Vandana on User role) see all org leaves
+    if (!isAdminOrEA && !isLeavePC && userId) {
       leaves = allLeaves.filter((l) => 
         String(l.userId) === String(userId) || 
         String(l.responsibility1) === String(userId) ||

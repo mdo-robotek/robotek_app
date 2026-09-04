@@ -8,6 +8,7 @@ import CustomDateTimePicker from '@/components/CustomDateTimePicker';
 // SearchableSelect removed from this page — using native datalist inputs instead
 import ConfirmModal from '@/components/ConfirmModal';
 import { formatDateMMM } from '@/lib/dateUtils';
+import { ownsLeaveFollowUp } from '@/lib/leave-access';
 import { 
     CalendarIcon as CalendarBtnIcon, 
     ChevronLeftIcon,
@@ -123,6 +124,17 @@ export default function LeavePage() {
     const highlightLeaveRef = useRef<HTMLDivElement>(null);
     const [showInfoModal, setShowInfoModal] = useState(false);
 
+    const myMasterUser = masterData?.users?.find(
+      (u: any) => String(u.id) === String(user?.id) || String(u.username || '').toLowerCase() === String(user?.username || '').toLowerCase()
+    );
+    const isLeavePC = ownsLeaveFollowUp({
+      username: user?.username,
+      role: user?.role,
+      designation: myMasterUser?.designation,
+    });
+    // PC (e.g. Vandana on User role) sees all org leaves for follow-up
+    const canViewAllLeaves = isAdminOrEA || isLeavePC;
+
     useEffect(() => {
         const init = async () => {
             const sid = ensureSessionId();
@@ -132,7 +144,7 @@ export default function LeavePage() {
                 if (session?.user) {
                     setUser(session.user);
                     await Promise.all([
-                        fetchLeaves(session.user.id, session.user.role),
+                        fetchLeaves(session.user),
                         fetchMasterData()
                     ]);
                 }
@@ -144,7 +156,7 @@ export default function LeavePage() {
         };
         init();
         const interval = setInterval(() => {
-            if (user) fetchLeaves(user.id, user.role);
+            if (user) fetchLeaves(user);
         }, 120000);
         return () => clearInterval(interval);
     }, []);
@@ -196,9 +208,15 @@ export default function LeavePage() {
         });
     }, [leaveForm, masterData]);
 
-    async function fetchLeaves(userId: string, role: string) {
+    async function fetchLeaves(sessionUser: any, designation?: string) {
         try {
-            const res = await fetch(`/api/leave?userId=${userId}&role=${role}`);
+            const params = new URLSearchParams({
+                userId: String(sessionUser?.id || ''),
+                role: String(sessionUser?.role || ''),
+                username: String(sessionUser?.username || ''),
+            });
+            if (designation) params.set('designation', designation);
+            const res = await fetch(`/api/leave?${params.toString()}`);
             const data = await res.json();
             if (data.leaves) {
                 setLeaves(data.leaves.sort((a: any, b: any) => {
@@ -229,6 +247,13 @@ export default function LeavePage() {
             console.error(e);
         }
     }
+
+    // If PC is identified via designation (not only username), refresh full org leave list
+    useEffect(() => {
+        if (!user || !myMasterUser?.designation) return;
+        if (!ownsLeaveFollowUp({ username: user.username, role: user.role, designation: myMasterUser.designation })) return;
+        fetchLeaves(user, myMasterUser.designation);
+    }, [user?.id, myMasterUser?.designation]);
 
     const handleLeaveSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -262,7 +287,7 @@ export default function LeavePage() {
             setLeaveForm(emptyForm);
             setEditingLeave(null);
             setShowLeaveModal(false);
-            await fetchLeaves(user.id, user.role);
+            await fetchLeaves(user);
             success(editingLeave ? 'Leave updated!' : 'Leave request submitted!');
         } catch (e) {
             error('Failed to process leave');
@@ -283,7 +308,7 @@ export default function LeavePage() {
         try {
             const res = await fetch(`/api/leave?leaveId=${pendingDeleteId}`, { method: 'DELETE' });
             if (!res.ok) throw new Error('Failed');
-            await fetchLeaves(user.id, user.role);
+            await fetchLeaves(user);
             success('Leave deleted successfully');
         } catch (e) {
             error('Failed to delete leave');
@@ -306,7 +331,7 @@ export default function LeavePage() {
                 body: JSON.stringify(payload)
             });
             if (!res.ok) throw new Error('Failed');
-            await fetchLeaves(user.id, user.role);
+            await fetchLeaves(user);
             success('You have accepted responsibility for this leave');
         } catch (e) {
             error('Failed to accept responsibility');
@@ -327,7 +352,7 @@ export default function LeavePage() {
             });
             if (!res.ok) throw new Error('Failed');
 
-            await fetchLeaves(user.id, user.role);
+            await fetchLeaves(user);
             if (selectedLeave) setSelectedLeave(null);
             success(`Leave request ${status}`);
         } catch (e) {
@@ -401,7 +426,9 @@ export default function LeavePage() {
                             <div>
                                 <h1 className="text-xl font-black text-gray-900 dark:text-white tracking-tight uppercase">Leave Management</h1>
                                 <p className="text-xs font-black text-gray-500 dark:text-gray-400 uppercase tracking-[0.35em] mt-1">
-                                    {isAdminOrEA ? 'Manage Org Leaves' : 'My Leave Requests'}
+                                    {canViewAllLeaves
+                                      ? (isLeavePC && !isAdminOrEA ? 'PC Leave Follow-up — All Org Leaves' : 'Manage Org Leaves')
+                                      : 'My Leave Requests'}
                                 </p>
                             </div>
                         </div>

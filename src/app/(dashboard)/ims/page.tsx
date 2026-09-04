@@ -67,7 +67,7 @@ const IMS_CALC_INFO: Record<ImsLocation, ImsCalcInfo> = {
     liveHow:
       "For each catalog item (and pending GRN/O2D orphans): total IN minus total OUT. Orphan items from movement only also appear in the table.",
     approvalHow:
-      "Date-Wise tab lists all IN/OUT movements (newest date first). Select rows and Approve Selected to save them to the IMS-G Floor Approval sheet. Sources shown: GRN, O2D, G Floor, 1st OUT.",
+      "Date-Wise tab lists all IN/OUT movements (newest date first). Select rows to Approve (IMS-G Floor Approval sheet) and/or Mark Checked (Checked Status on IMS-G Floor ledger for G Floor source rows). Sources: GRN, O2D, G Floor, 1st OUT.",
   },
   "1st": {
     title: "IMS - 1st Floor",
@@ -246,8 +246,9 @@ export default function IMSHub() {
               </div>
               <div className="bg-white/10 backdrop-blur-md rounded-2xl p-3 sm:p-4 border border-white/20 transition-colors min-w-0">
                 <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-xs sm:text-sm font-black text-white/80 uppercase tracking-widest flex items-center gap-1.5">
-                    <ArrowTrendingDownIcon className="w-4 h-4 shrink-0"/> Out
+                  <span className={`font-black text-white/80 uppercase tracking-widest flex items-center gap-1.5 leading-tight ${id === "1st" ? "text-[10px] sm:text-xs" : "text-xs sm:text-sm"}`}>
+                    <ArrowTrendingDownIcon className="w-4 h-4 shrink-0"/>
+                    {id === "1st" ? "Transfer to G Floor" : "Out"}
                   </span>
                 </div>
                 <div

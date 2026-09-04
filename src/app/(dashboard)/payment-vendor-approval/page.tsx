@@ -643,7 +643,7 @@ export default function PaymentVendorApprovalPage() {
             </div>
           ) : (
             <div className="overflow-x-auto overflow-y-auto flex-1 min-h-0">
-              <table className="w-full text-left border-collapse min-w-[1180px]">
+              <table className="w-full text-left border-collapse min-w-[1240px]">
                 <thead className="sticky top-0 z-10">
                   <tr className="bg-gradient-to-r from-[#003875] via-blue-600 to-indigo-600 text-white">
                     <th className="px-3 py-3 text-[10px] font-black uppercase tracking-wider w-10">#</th>
@@ -651,6 +651,7 @@ export default function PaymentVendorApprovalPage() {
                     <th className="px-3 py-3 text-[10px] font-black uppercase tracking-wider">Dates</th>
                     <th className="px-3 py-3 text-[10px] font-black uppercase tracking-wider">Vendor</th>
                     <th className="px-3 py-3 text-[10px] font-black uppercase tracking-wider">Item</th>
+                    <th className="px-3 py-3 text-[10px] font-black uppercase tracking-wider text-right">Qty</th>
                     <th className="px-3 py-3 text-[10px] font-black uppercase tracking-wider">Terms</th>
                     <th className="px-3 py-3 text-[10px] font-black uppercase tracking-wider text-center">Qty Check</th>
                     <th className="px-3 py-3 text-[10px] font-black uppercase tracking-wider text-center">Quality Check</th>
@@ -701,6 +702,11 @@ export default function PaymentVendorApprovalPage() {
                             <p className="text-xs font-semibold text-slate-700 dark:text-slate-200 truncate" title={item.Item_Name}>{item.Item_Name}</p>
                             <p className="text-[10px] text-slate-400 truncate">{item.Category} · {item.Country || "—"}</p>
                           </div>
+                        </td>
+                        <td className="px-3 py-3 text-right">
+                          <span className="text-xs font-black text-slate-800 dark:text-white tabular-nums">
+                            {item.Qty != null && String(item.Qty).trim() !== "" ? item.Qty : "—"}
+                          </span>
                         </td>
                         <td className="px-3 py-3 text-xs font-bold text-slate-700 dark:text-slate-200 whitespace-nowrap">
                           {item.Payment_Terms_In_days ? `${item.Payment_Terms_In_days} Days` : "—"}
@@ -759,7 +765,7 @@ export default function PaymentVendorApprovalPage() {
                   })}
                   {paginatedItems.length === 0 && (
                     <tr>
-                      <td colSpan={11} className="py-16 text-center text-xs font-black text-slate-400 uppercase tracking-widest">
+                      <td colSpan={12} className="py-16 text-center text-xs font-black text-slate-400 uppercase tracking-widest">
                         No records match your filters
                       </td>
                     </tr>
@@ -810,7 +816,7 @@ export default function PaymentVendorApprovalPage() {
             <ul className="space-y-2 text-[11px] text-slate-600 dark:text-slate-300">
               <li>• New / edited GRN → MD Sir (9899444530)</li>
               <li>• MD approval → Himanshi (8766272040)</li>
-              <li>• Includes quantity & quality check status</li>
+              <li>• Includes GRN Qty, quantity & quality check status</li>
             </ul>
           </div>
           <div className="rounded-2xl border border-violet-200/60 dark:border-violet-500/20 bg-gradient-to-br from-violet-50/80 via-white to-purple-50/60 dark:from-violet-950/30 dark:via-slate-900 dark:to-purple-950/20 p-4 shadow-md shadow-violet-500/5">

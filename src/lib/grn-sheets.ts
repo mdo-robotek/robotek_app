@@ -1,9 +1,13 @@
 import { BaseSheetsService } from "./sheets/base-service";
 import { GRN, GRNStepConfig } from "@/types/grn";
 import { globalCache } from "./cache";
+import { calculatePlannedTimeIST } from "./workingHours";
 
 const GOOGLE_SHEET_ID = "170_kSzQKoO5N7euODaLz1kaJVXN7QRlRqHdnBn0kdos";
 const SHEET_NAME = "GRN";
+
+/** Company work day: 9:30 AM – 6:30 PM IST = 9 hours (Sundays off) */
+const WORK_DAY_HOURS = 9;
 
 class GRNService extends BaseSheetsService<GRN> {
   protected spreadsheetId = GOOGLE_SHEET_ID;
@@ -77,10 +81,16 @@ class GRNService extends BaseSheetsService<GRN> {
     return row;
   }
 
-  async getStepConfig(): Promise<GRNStepConfig[]> {
-    const cacheKey = `${this.spreadsheetId}_grn_step_config`;
-    const cached = globalCache.get<GRNStepConfig[]>(cacheKey);
-    if (cached) return cached;
+  async getStepConfig(options?: { forceRefresh?: boolean }): Promise<GRNStepConfig[]> {
+    const cacheKey = `${this.spreadsheetId}_grn_step_config_v2`;
+    // Drop legacy long-lived cache key if present
+    globalCache.delete(`${this.spreadsheetId}_grn_step_config`);
+    if (options?.forceRefresh) {
+      globalCache.delete(cacheKey);
+    } else {
+      const cached = globalCache.get<GRNStepConfig[]>(cacheKey);
+      if (cached) return cached;
+    }
 
     try {
       const sheets = await this.getSheetsClient();
@@ -88,13 +98,16 @@ class GRNService extends BaseSheetsService<GRN> {
         spreadsheetId: this.spreadsheetId,
         range: `GRN Step Configuration!A2:C`,
       });
-      const data: GRNStepConfig[] = response.data.values?.map(row => ({
-        step_name: row[0] || "",
-        tat: row[1] || "",
-        responsible_person: row[2] || ""
-      })) || [];
+      const data: GRNStepConfig[] = (response.data.values || [])
+        .map(row => ({
+          step_name: String(row[0] || "").trim(),
+          tat: String(row[1] || "").trim(),
+          responsible_person: String(row[2] || "").trim(),
+        }))
+        .filter(row => row.step_name);
 
-      globalCache.set(cacheKey, data, 60 * 60 * 1000);
+      // Short TTL — TAT changes must apply to new POs quickly
+      globalCache.set(cacheKey, data, 30 * 1000);
       return data;
     } catch (error) {
       console.error("Error fetching GRN step config:", error);
@@ -113,6 +126,7 @@ class GRNService extends BaseSheetsService<GRN> {
         requestBody: { values },
       });
       globalCache.delete(`${this.spreadsheetId}_grn_step_config`);
+      globalCache.delete(`${this.spreadsheetId}_grn_step_config_v2`);
       return true;
     } catch (error) {
       console.error("Error updating GRN step config:", error);
@@ -199,51 +213,18 @@ class GRNService extends BaseSheetsService<GRN> {
   }
 }
 
+function parseTatToWorkingHours(tat: string): number {
+  const raw = String(tat || "").trim();
+  const val = parseFloat(raw);
+  if (!Number.isFinite(val) || val <= 0) return 24; // safe default
+  const isDay = /day/i.test(raw);
+  return isDay ? val * WORK_DAY_HOURS : val;
+}
+
 function calculateGRNPlannedDate(base: Date | string, tat: string): string {
-  let date = new Date(base);
+  const date = new Date(base);
   if (isNaN(date.getTime())) return "";
-  
-  const val = parseFloat(tat) || 0;
-  const unit = (tat.toLowerCase().includes("day") || tat.toLowerCase().includes("days")) ? "day" : "hr";
-  
-  // Working hours: 9:30 AM to 7:30 PM (10 hours)
-  let mins = unit === "day" ? val * 10 * 60 : val * 60;
-  
-  while (mins > 0) {
-    // If Sunday, skip to Monday 9:30 AM
-    if (date.getDay() === 0) {
-      date.setDate(date.getDate() + 1);
-      date.setHours(9, 30, 0, 0);
-      continue;
-    }
-    
-    const curHour = date.getHours() + date.getMinutes() / 60;
-    
-    // If after 7:30 PM, skip to tomorrow 9:30 AM
-    if (curHour >= 19.5) {
-      date.setDate(date.getDate() + 1);
-      date.setHours(9, 30, 0, 0);
-      continue;
-    }
-    
-    // If before 9:30 AM, jump to 9:30 AM
-    if (curHour < 9.5) {
-      date.setHours(9, 30, 0, 0);
-    }
-    
-    const remainingTodayMins = (19.5 - (date.getHours() + date.getMinutes() / 60)) * 60;
-    
-    if (mins <= remainingTodayMins) {
-      date.setMinutes(date.getMinutes() + mins);
-      mins = 0;
-    } else {
-      mins -= remainingTodayMins;
-      date.setDate(date.getDate() + 1);
-      date.setHours(9, 30, 0, 0);
-    }
-  }
-  
-  return date.toISOString();
+  return calculatePlannedTimeIST(date, parseTatToWorkingHours(tat)).toISOString();
 }
 
 export const grnService = new GRNService();
@@ -277,14 +258,16 @@ export async function addGRNEntry(data: Partial<GRN>): Promise<string> {
 
   await grnService.ensureColumns(headers);
 
-  // Initialize Step 1 only
-  const stepConfig = await grnService.getStepConfig();
-  if (stepConfig.length > 0) {
-    const config = stepConfig[0];
-    if (config) {
-      data.planned_1 = calculateGRNPlannedDate(now, config.tat || "24 Hrs");
-      data.status_1 = "Pending";
-    }
+  // Initialize Step 1 only — always read fresh TAT from sheet (avoid stale cache)
+  const stepConfig = await grnService.getStepConfig({ forceRefresh: true });
+  const config =
+    stepConfig.find(c => c.step_name.toLowerCase() === "quantity check") ||
+    stepConfig[0];
+  if (config) {
+    const tat = config.tat || "24 Hrs";
+    console.log(`[GRN] planned_1 TAT="${tat}" for step "${config.step_name}"`);
+    data.planned_1 = calculateGRNPlannedDate(now, tat);
+    data.status_1 = "Pending";
   }
 
   const success = await grnService.add(data as GRN);
@@ -303,7 +286,7 @@ export async function updateGRNItem(id: string, updates: Partial<GRN>): Promise<
   const merged = { ...existing, ...updates };
 
   // Trigger next step planned date if a step was just completed
-  const stepConfig = await grnService.getStepConfig();
+  const stepConfig = await grnService.getStepConfig({ forceRefresh: true });
   for (let i = 1; i < 9; i++) {
     const actKey = `actual_${i}` as keyof GRN;
     const statusKey = `status_${i}` as keyof GRN;

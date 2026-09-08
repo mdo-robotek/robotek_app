@@ -8,7 +8,7 @@ const SHEET_NAME = "IMS-G Floor Approval";
 class IMSGFloorApprovalService extends BaseSheetsService<IMSGFloorApproval> {
   protected spreadsheetId = GOOGLE_SHEET_ID;
   protected sheetName = SHEET_NAME;
-  protected range = "A:G";
+  protected range = "A:Z";
   protected idColumnIndex = 0;
 
   mapRowToItem(row: unknown[]): IMSGFloorApproval {
@@ -25,11 +25,13 @@ class IMSGFloorApprovalService extends BaseSheetsService<IMSGFloorApproval> {
       out_qty: String(get("out qty") || ""),
       date: get("date"),
       approval_status: get("approval status"),
+      checked_status: get("checked status"),
+      updated_at: get("updated_at"),
     };
   }
 
   mapItemToRow(item: IMSGFloorApproval): unknown[] {
-    const maxIdx = Math.max(...Object.values(this.hMap), 6);
+    const maxIdx = Math.max(...Object.values(this.hMap), IMS_GFLOOR_APPROVAL_HEADERS.length - 1);
     const row: unknown[] = new Array(maxIdx + 1).fill("");
     const set = (h: string, val: unknown) => {
       const idx = this.hMap[h.toLowerCase()];
@@ -42,7 +44,9 @@ class IMSGFloorApprovalService extends BaseSheetsService<IMSGFloorApproval> {
     set("in qty", item.in_qty);
     set("out qty", item.out_qty ?? "");
     set("date", item.date);
-    set("approval status", item.approval_status);
+    set("approval status", item.approval_status || "");
+    set("checked status", item.checked_status || "");
+    set("updated_at", item.updated_at || "");
 
     return row;
   }
@@ -53,15 +57,25 @@ class IMSGFloorApprovalService extends BaseSheetsService<IMSGFloorApproval> {
     return numericIds.length > 0 ? Math.max(...numericIds) + 1 : 1;
   }
 
-  async getApprovalKeySet(): Promise<Set<string>> {
+  async getStatusKeySets(): Promise<{ approvedKeys: Set<string>; checkedKeys: Set<string> }> {
     const rows = await this.getAll();
-    const keys = new Set<string>();
+    const approvedKeys = new Set<string>();
+    const checkedKeys = new Set<string>();
     rows.forEach((row) => {
+      const key = approvalToTxKey(row);
       if ((row.approval_status || "").toLowerCase() === "approved") {
-        keys.add(approvalToTxKey(row));
+        approvedKeys.add(key);
+      }
+      if ((row.checked_status || "").trim().toUpperCase() === "CHECKED") {
+        checkedKeys.add(key);
       }
     });
-    return keys;
+    return { approvedKeys, checkedKeys };
+  }
+
+  async getApprovalKeySet(): Promise<Set<string>> {
+    const { approvedKeys } = await this.getStatusKeySets();
+    return approvedKeys;
   }
 }
 
@@ -75,6 +89,17 @@ export async function getIMSGFloorApprovalKeys(): Promise<Set<string>> {
   return imsGfloorApprovalService.getApprovalKeySet();
 }
 
+export async function getIMSGFloorStatusKeys(): Promise<{
+  approvedKeys: string[];
+  checkedKeys: string[];
+}> {
+  const { approvedKeys, checkedKeys } = await imsGfloorApprovalService.getStatusKeySets();
+  return {
+    approvedKeys: Array.from(approvedKeys),
+    checkedKeys: Array.from(checkedKeys),
+  };
+}
+
 let approvalLock: Promise<unknown> = Promise.resolve();
 
 export type ApprovalInput = {
@@ -85,17 +110,39 @@ export type ApprovalInput = {
   out_qty?: number;
 };
 
-export async function addIMSGFloorApprovals(
-  transactions: ApprovalInput[]
-): Promise<{ added: number; skipped: number }> {
+function toDateOnly(dateStr: string) {
+  const ts = Date.parse(dateStr);
+  if (isNaN(ts)) return dateStr;
+  return new Date(ts).toISOString().slice(0, 10);
+}
+
+/**
+ * Upsert rows on IMS-G Floor Approval.
+ * Same tx key can be Approved and/or Checked independently.
+ */
+export async function upsertIMSGFloorStatuses(
+  transactions: ApprovalInput[],
+  flags: { approve?: boolean; check?: boolean }
+): Promise<{ added: number; updated: number; skipped: number }> {
+  if (!flags.approve && !flags.check) {
+    return { added: 0, updated: 0, skipped: 0 };
+  }
+
   return (approvalLock = approvalLock
     .then(async () => {
       await imsGfloorApprovalService.ensureColumns([...IMS_GFLOOR_APPROVAL_HEADERS]);
 
-      const existingKeys = await imsGfloorApprovalService.getApprovalKeySet();
+      const existingRows = await imsGfloorApprovalService.getAll();
+      const byKey = new Map<string, IMSGFloorApproval>();
+      existingRows.forEach((row) => {
+        byKey.set(approvalToTxKey(row), row);
+      });
+
       const toAdd: IMSGFloorApproval[] = [];
+      let updated = 0;
       let skipped = 0;
       let nextId = await imsGfloorApprovalService.getNextNumericalId();
+      const now = new Date().toISOString();
 
       for (const tx of transactions) {
         const candidate: ApprovalInput = {
@@ -111,38 +158,75 @@ export async function addIMSGFloorApprovals(
           out_qty: candidate.out_qty,
         });
 
-        if (existingKeys.has(key)) {
-          skipped++;
+        const existing = byKey.get(key);
+        if (existing) {
+          let changed = false;
+          const next: IMSGFloorApproval = { ...existing };
+
+          if (flags.approve) {
+            if ((existing.approval_status || "").toLowerCase() === "approved") {
+              // already approved for this action
+            } else {
+              next.approval_status = "Approved";
+              changed = true;
+            }
+          }
+
+          if (flags.check) {
+            if ((existing.checked_status || "").trim().toUpperCase() === "CHECKED") {
+              // already checked
+            } else {
+              next.checked_status = "CHECKED";
+              changed = true;
+            }
+          }
+
+          if (!changed) {
+            skipped++;
+            continue;
+          }
+
+          next.updated_at = now;
+          const ok = await imsGfloorApprovalService.update(existing.id, next);
+          if (!ok) throw new Error("Failed to update approval/check status");
+          byKey.set(key, next);
+          updated++;
           continue;
         }
 
-        const dateOnly = (() => {
-          const ts = Date.parse(candidate.date);
-          if (isNaN(ts)) return candidate.date;
-          return new Date(ts).toISOString().slice(0, 10);
-        })();
-
-        toAdd.push({
+        // New row — only set fields requested
+        const row: IMSGFloorApproval = {
           id: String(nextId++),
           item_name: candidate.item_name.trim(),
           category: (candidate.category || "").trim(),
           in_qty: String(candidate.in_qty || 0),
           out_qty: String(candidate.out_qty || 0),
-          date: dateOnly,
-          approval_status: "Approved",
-        });
-        existingKeys.add(key);
+          date: toDateOnly(candidate.date),
+          approval_status: flags.approve ? "Approved" : "",
+          checked_status: flags.check ? "CHECKED" : "",
+          updated_at: now,
+        };
+        toAdd.push(row);
+        byKey.set(key, row);
       }
 
       if (toAdd.length > 0) {
         const ok = await imsGfloorApprovalService.addMany(toAdd);
-        if (!ok) throw new Error("Failed to save approvals");
+        if (!ok) throw new Error("Failed to save approval/check status");
       }
 
-      return { added: toAdd.length, skipped };
+      return { added: toAdd.length, updated, skipped };
     })
     .catch((err) => {
-      console.error("Error in addIMSGFloorApprovals:", err);
+      console.error("Error in upsertIMSGFloorStatuses:", err);
       throw err;
-    })) as Promise<{ added: number; skipped: number }>;
+    })) as Promise<{ added: number; updated: number; skipped: number }>;
+}
+
+/** @deprecated Prefer upsertIMSGFloorStatuses({ approve: true }) */
+export async function addIMSGFloorApprovals(
+  transactions: ApprovalInput[]
+): Promise<{ added: number; skipped: number }> {
+  const result = await upsertIMSGFloorStatuses(transactions, { approve: true });
+  return { added: result.added + result.updated, skipped: result.skipped };
 }

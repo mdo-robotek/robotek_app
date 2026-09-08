@@ -144,12 +144,17 @@ export async function addFloorIMSItems(
 
 export async function updateFloorIMSItem(location: string, id: string, data: FloorIMS): Promise<boolean> {
   const service = getService(location);
-  return service.update(id, data);
+  const ok = await service.update(id, data);
+  // Bust cache so Date-Wise / summary reads see the new qty immediately
+  service.invalidateCache();
+  return ok;
 }
 
 export async function deleteFloorIMSItem(location: string, id: string): Promise<boolean> {
   const service = getService(location);
-  return service.delete(id);
+  const ok = await service.delete(id);
+  service.invalidateCache();
+  return ok;
 }
 
 export async function markFloorIMSItemsChecked(

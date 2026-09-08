@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import {
-  addIMSGFloorApprovals,
   getIMSGFloorApprovals,
+  upsertIMSGFloorStatuses,
   type ApprovalInput,
 } from "@/lib/ims-gfloor-approval-sheets";
 import { approvalToTxKey } from "@/lib/ims-datewise-key";
@@ -12,13 +12,19 @@ export const revalidate = 0;
 export async function GET() {
   try {
     const rows = await getIMSGFloorApprovals();
-    const keys = rows
-      .filter((r) => (r.approval_status || "").toLowerCase() === "approved")
-      .map((r) => approvalToTxKey(r));
+    const keys: string[] = [];
+    const checkedKeys: string[] = [];
 
-    return NextResponse.json({ rows, keys }, {
-      headers: { "Cache-Control": "no-store, max-age=0" },
+    rows.forEach((r) => {
+      const key = approvalToTxKey(r);
+      if ((r.approval_status || "").toLowerCase() === "approved") keys.push(key);
+      if ((r.checked_status || "").trim().toUpperCase() === "CHECKED") checkedKeys.push(key);
     });
+
+    return NextResponse.json(
+      { rows, keys, checkedKeys },
+      { headers: { "Cache-Control": "no-store, max-age=0" } }
+    );
   } catch (error) {
     console.error("Error fetching G Floor approvals:", error);
     return NextResponse.json({ error: "Failed to fetch approvals" }, { status: 500 });
@@ -31,20 +37,29 @@ export async function POST(request: NextRequest) {
     const transactions: ApprovalInput[] = Array.isArray(body?.transactions)
       ? body.transactions
       : [];
+    const action = String(body?.action || "approve").toLowerCase();
 
     if (transactions.length === 0) {
-      return NextResponse.json({ error: "No transactions to approve" }, { status: 400 });
+      return NextResponse.json({ error: "No transactions provided" }, { status: 400 });
     }
 
-    const result = await addIMSGFloorApprovals(transactions);
+    if (action !== "approve" && action !== "check") {
+      return NextResponse.json({ error: "action must be approve or check" }, { status: 400 });
+    }
+
+    const result = await upsertIMSGFloorStatuses(transactions, {
+      approve: action === "approve",
+      check: action === "check",
+    });
 
     return NextResponse.json({
       success: true,
       added: result.added,
+      updated: result.updated,
       skipped: result.skipped,
     });
   } catch (error) {
-    console.error("Error saving G Floor approvals:", error);
-    return NextResponse.json({ error: "Failed to save approvals" }, { status: 500 });
+    console.error("Error saving G Floor approval/check:", error);
+    return NextResponse.json({ error: "Failed to save status" }, { status: 500 });
   }
 }

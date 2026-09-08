@@ -25,15 +25,17 @@ import {
   CalendarIcon,
   DocumentTextIcon,
   ArrowPathIcon,
-  CheckIcon
+  CheckIcon,
+  ChevronUpIcon,
+  ChevronDownIcon,
 } from "@heroicons/react/24/outline";
 import { IMS } from "@/types/ims";
 import * as XLSX from "xlsx";
 import TimeSeriesTable, { TimeBucket, Transaction } from "@/components/TimeSeriesTable";
 import DateFilterBar, { FilterPeriod } from "@/components/DateFilterBar";
 import SearchableMultiSelect from "@/components/SearchableMultiSelect";
-import { matchesCategoryItemFilters, matchesOptionSearch, normalizeFilterKey } from "@/lib/ims-filters";
-import { getDatewiseTxKey, getTxSortTime } from "@/lib/ims-datewise-key";
+import { matchesCategoryItemFilters, matchesExactFilterValue, matchesOptionSearch, normalizeFilterKey } from "@/lib/ims-filters";
+import { getDatewiseTxKey, getTxSortTime, normalizeTxDate } from "@/lib/ims-datewise-key";
 import GFloorLedgerModals from "@/app/(dashboard)/ims/GFloorLedgerModals";
 import { startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfQuarter, endOfQuarter, startOfYear, endOfYear } from "date-fns";
 
@@ -117,8 +119,76 @@ const isPendingItem = (item: { id?: string; is_pending?: boolean }) =>
 const isTxChecked = (log: { checked_status?: string }) =>
   String(log.checked_status || "").trim().toUpperCase() === "CHECKED";
 
-const canCheckTx = (log: { floor_id?: string; checked_status?: string; source?: string }) =>
-  Boolean(log.floor_id) && log.source === "GFloor" && !isTxChecked(log);
+const isLedgerChecked = (log: { checked_status?: string; source?: string }) =>
+  log.source === "GFloor" && isTxChecked(log);
+
+type DefaultSortKey =
+  | "id"
+  | "category"
+  | "source"
+  | "item_name"
+  | "est_amount_item"
+  | "gst"
+  | "final_amount_num"
+  | "in_qty"
+  | "out_qty"
+  | "sale_percent"
+  | "avg_daily_con"
+  | "lead_time"
+  | "safety_factor"
+  | "max_level"
+  | "live_stock";
+
+type DatewiseSortKey =
+  | "date"
+  | "category"
+  | "source"
+  | "item_name"
+  | "in_qty"
+  | "out_qty"
+  | "running_stock"
+  | "checked"
+  | "approval";
+
+const getDefaultSortValue = (item: EnrichedIMS, key: DefaultSortKey): string | number => {
+  switch (key) {
+    case "id": {
+      if (isPendingItem(item)) return Number.POSITIVE_INFINITY;
+      const n = parseFloat(String(item.id));
+      return Number.isFinite(n) ? n : String(item.id || "");
+    }
+    case "category":
+      return (item.category || "").toLowerCase();
+    case "source":
+      return (item.source || "").toLowerCase();
+    case "item_name":
+      return (item.item_name || "").toLowerCase();
+    case "est_amount_item":
+      return parseFloat(item.est_amount_item) || 0;
+    case "gst":
+      return parseFloat(item.gst) || 0;
+    case "final_amount_num":
+      return item.final_amount_num || 0;
+    case "in_qty":
+      return item.in_qty || 0;
+    case "out_qty":
+      return item.out_qty || 0;
+    case "sale_percent":
+      return item.sale_percent || 0;
+    case "avg_daily_con":
+      return item.avg_daily_con || 0;
+    case "lead_time":
+      return item.lead_time || 0;
+    case "safety_factor":
+      return item.safety_factor || 0;
+    case "max_level":
+      return item.max_level || 0;
+    case "live_stock":
+      return item.live_stock || 0;
+    default:
+      return "";
+  }
+};
 
 const sourceBadgeClass = (source?: string) => {
   switch (source) {
@@ -260,6 +330,11 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilters, setCategoryFilters] = useState<string[]>([]);
   const [itemNameFilters, setItemNameFilters] = useState<string[]>([]);
+  const [sourceFilters, setSourceFilters] = useState<string[]>([]);
+  const [sortKey, setSortKey] = useState<DefaultSortKey | null>(null);
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
+  const [datewiseSortKey, setDatewiseSortKey] = useState<DatewiseSortKey | null>(null);
+  const [datewiseSortDir, setDatewiseSortDir] = useState<"asc" | "desc">("asc");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 50;
   const [legendFilter, setLegendFilter] = useState<number | null>(null);
@@ -492,6 +567,18 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
   const [editingItem, setEditingItem] = useState<IMS | null>(null);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
+  const [pendingDeleteKind, setPendingDeleteKind] = useState<"catalog" | "gfloor">("catalog");
+
+  const [isFloorEditOpen, setIsFloorEditOpen] = useState(false);
+  const [editingFloorTx, setEditingFloorTx] = useState<{
+    floor_id: string;
+    item_name: string;
+    category: string;
+    date: string;
+    checked_status?: string;
+    type: "IN" | "OUT";
+    qty: string;
+  } | null>(null);
 
   // Form states
   const [itemForm, setItemForm] = useState<Partial<IMS>>({});
@@ -521,7 +608,10 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
 
   const showTimeSeriesLoading = isTimeSeriesInitialLoading && timeSeriesData.length === 0;
 
-  const { data: approvalData, mutate: mutateApprovals } = useSWR<{ keys: string[] }>(
+  const { data: approvalData, mutate: mutateApprovals } = useSWR<{
+    keys: string[];
+    checkedKeys?: string[];
+  }>(
     viewMode === "datewise" ? "/api/ims/gfloor-approval" : null,
     fetcher,
     {
@@ -533,6 +623,11 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
 
   const approvedTxKeys = useMemo(
     () => new Set(approvalData?.keys || []),
+    [approvalData]
+  );
+
+  const checkedTxKeys = useMemo(
+    () => new Set(approvalData?.checkedKeys || []),
     [approvalData]
   );
 
@@ -607,26 +702,67 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
     return filteredByDate.sort((a, b) => {
       const dateDiff = b._sortTime - a._sortTime;
       if (dateDiff !== 0) return dateDiff;
-
-      const aPending = !approvedTxKeys.has(a._txKey);
-      const bPending = !approvedTxKeys.has(b._txKey);
-      if (aPending !== bPending) return aPending ? -1 : 1;
-
       return (a.item_name || "").localeCompare(b.item_name || "");
     });
-  }, [viewMode, timeSeriesData, dateRange, approvedTxKeys]);
+  }, [viewMode, timeSeriesData, dateRange]);
 
   const filteredDatewiseTransactions = useMemo(() => {
-    return datewiseTransactions.filter((item) =>
-      matchesCategoryItemFilters(item, categoryFilters, itemNameFilters)
-    );
-  }, [datewiseTransactions, categoryFilters, itemNameFilters]);
+    let result = datewiseTransactions.filter((item) => {
+      if (!matchesCategoryItemFilters(item, categoryFilters, itemNameFilters)) return false;
+      if (!matchesExactFilterValue(item.source || "", sourceFilters)) return false;
+      return true;
+    });
+
+    if (datewiseSortKey) {
+      const dir = datewiseSortDir === "asc" ? 1 : -1;
+      result = [...result].sort((a, b) => {
+        const getVal = (row: typeof a): string | number => {
+          switch (datewiseSortKey) {
+            case "date":
+              return getTxSortTime(row.date);
+            case "category":
+              return (row.category || "").toLowerCase();
+            case "source":
+              return formatTxSourceLabel(row.source).toLowerCase();
+            case "item_name":
+              return (row.item_name || "").toLowerCase();
+            case "in_qty":
+              return row.in_qty || 0;
+            case "out_qty":
+              return row.out_qty || 0;
+            case "running_stock":
+              return (row as { running_stock?: number }).running_stock || 0;
+            case "checked": {
+              const key = getDatewiseTxKey(row);
+              const checked = checkedTxKeys.has(key) || isLedgerChecked(row);
+              return checked ? 1 : 0;
+            }
+            case "approval":
+              return approvedTxKeys.has(getDatewiseTxKey(row)) ? 1 : 0;
+            default:
+              return "";
+          }
+        };
+        const av = getVal(a);
+        const bv = getVal(b);
+        if (typeof av === "number" && typeof bv === "number") {
+          if (av === bv) return 0;
+          return av < bv ? -dir : dir;
+        }
+        return String(av).localeCompare(String(bv)) * dir;
+      });
+    }
+
+    return result;
+  }, [datewiseTransactions, categoryFilters, itemNameFilters, sourceFilters, datewiseSortKey, datewiseSortDir, approvedTxKeys, checkedTxKeys]);
 
   const filteredTimeSeriesData = useMemo(() => {
-    return timeSeriesData.filter((item) =>
-      matchesCategoryItemFilters(item, categoryFilters, itemNameFilters)
-    );
-  }, [timeSeriesData, categoryFilters, itemNameFilters]);
+    return timeSeriesData.filter((item) => {
+      if (!matchesCategoryItemFilters(item, categoryFilters, itemNameFilters)) return false;
+      if (!matchesExactFilterValue(item.source || "", sourceFilters)) return false;
+      return true;
+    });
+  }, [timeSeriesData, categoryFilters, itemNameFilters, sourceFilters]);
 
   const { data: rawItems = [], mutate: mutateMaster, isLoading: masterLoading } = useSWR<IMS[]>("/api/ims", fetcher);
 
@@ -701,6 +837,49 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
     [uniqueItemNames]
   );
 
+  const uniqueSources = useMemo(() => {
+    if (viewMode === "datewise" || viewMode === "timeseries") {
+      const sources = timeSeriesData
+        .map((i) => (i.source || "").trim())
+        .filter(Boolean);
+      return Array.from(new Set(sources)).sort((a, b) => a.localeCompare(b));
+    }
+    const sources = items
+      .map((i) => (i.source || "").trim())
+      .filter(Boolean);
+    return Array.from(new Set(sources)).sort((a, b) => a.localeCompare(b));
+  }, [items, timeSeriesData, viewMode]);
+
+  const sourceOptions = useMemo(
+    () =>
+      uniqueSources.map((src) => ({
+        id: src,
+        label:
+          viewMode === "datewise" || viewMode === "timeseries"
+            ? formatTxSourceLabel(src)
+            : src,
+      })),
+    [uniqueSources, viewMode]
+  );
+
+  const toggleSort = (key: DefaultSortKey) => {
+    if (sortKey === key) {
+      setSortDir((prev) => (prev === "asc" ? "desc" : "asc"));
+    } else {
+      setSortKey(key);
+      setSortDir("asc");
+    }
+  };
+
+  const toggleDatewiseSort = (key: DatewiseSortKey) => {
+    if (datewiseSortKey === key) {
+      setDatewiseSortDir((prev) => (prev === "asc" ? "desc" : "asc"));
+    } else {
+      setDatewiseSortKey(key);
+      setDatewiseSortDir("asc");
+    }
+  };
+
   const filteredItems = useMemo(() => {
     const matchesText = (item: { item_name?: string; id?: string }) =>
       !searchQuery ||
@@ -709,7 +888,9 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
 
     let result = items.filter((item) => {
       if (!matchesText(item)) return false;
-      return matchesCategoryItemFilters(item, categoryFilters, itemNameFilters);
+      if (!matchesCategoryItemFilters(item, categoryFilters, itemNameFilters)) return false;
+      if (!matchesExactFilterValue(item.source || "", sourceFilters)) return false;
+      return true;
     });
 
     if (legendFilter !== null) {
@@ -718,8 +899,21 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
       );
     }
 
+    if (sortKey) {
+      const dir = sortDir === "asc" ? 1 : -1;
+      result = [...result].sort((a, b) => {
+        const av = getDefaultSortValue(a, sortKey);
+        const bv = getDefaultSortValue(b, sortKey);
+        if (typeof av === "number" && typeof bv === "number") {
+          if (av === bv) return 0;
+          return av < bv ? -dir : dir;
+        }
+        return String(av).localeCompare(String(bv)) * dir;
+      });
+    }
+
     return result;
-  }, [items, searchQuery, legendFilter, categoryFilters, itemNameFilters]);
+  }, [items, searchQuery, legendFilter, categoryFilters, itemNameFilters, sourceFilters, sortKey, sortDir]);
 
   const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
   const paginatedItems = useMemo(() => {
@@ -736,7 +930,11 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
   React.useEffect(() => {
     setCurrentPage(1);
     setSelectedTxKeys(new Set());
-  }, [searchQuery, legendFilter, categoryFilters, itemNameFilters, viewMode, filterPeriod, filterDate, filterStartDate, filterEndDate]);
+  }, [searchQuery, legendFilter, categoryFilters, itemNameFilters, sourceFilters, viewMode, filterPeriod, filterDate, filterStartDate, filterEndDate, datewiseSortKey, datewiseSortDir]);
+
+  React.useEffect(() => {
+    setSourceFilters([]);
+  }, [viewMode]);
 
   React.useEffect(() => {
     setItemNameFilters((prev) => {
@@ -829,7 +1027,8 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
     }
   };
 
-  const confirmDelete = (id: string) => {
+  const confirmDelete = (id: string, kind: "catalog" | "gfloor" = "catalog") => {
+    setPendingDeleteKind(kind);
     setPendingDeleteId(id);
     setIsConfirmOpen(true);
   };
@@ -837,23 +1036,130 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
   const performDelete = async () => {
     if (!pendingDeleteId) return;
     setSubmitting(true);
-    showStatus(`Deleting item...`, "loading");
+    const isFloor = pendingDeleteKind === "gfloor";
+    showStatus(isFloor ? "Deleting G Floor entry..." : "Deleting item...", "loading");
     try {
-      const res = await fetch(`/api/ims?id=${pendingDeleteId}`, {
-        method: "DELETE",
-      });
+      const res = await fetch(
+        isFloor
+          ? `/api/ims/floor?location=g&id=${encodeURIComponent(pendingDeleteId)}`
+          : `/api/ims?id=${pendingDeleteId}`,
+        { method: "DELETE" }
+      );
       if (res.ok) {
-        mutateMaster();
-        showStatus("Item Deleted Successfully!", "success");
+        if (isFloor) {
+          const floorId = String(pendingDeleteId);
+          await Promise.all([
+            mutateTimeSeries(
+              (current) =>
+                current?.filter(
+                  (tx) => !(tx.source === "GFloor" && String(tx.floor_id) === floorId)
+                ),
+              { revalidate: true }
+            ),
+            globalMutate("/api/ims"),
+            globalMutate("/api/ims/summary"),
+          ]);
+        } else {
+          mutateMaster();
+        }
+        showStatus(isFloor ? "G Floor entry deleted!" : "Item Deleted Successfully!", "success");
         setTimeout(() => setIsStatusModalOpen(false), 1500);
       } else {
         throw new Error("Failed to delete");
       }
     } catch (e) {
-      showStatus("Error deleting item.", "error");
+      showStatus(isFloor ? "Error deleting G Floor entry." : "Error deleting item.", "error");
     } finally {
       setSubmitting(false);
       setPendingDeleteId(null);
+      setPendingDeleteKind("catalog");
+      setIsConfirmOpen(false);
+    }
+  };
+
+  const openFloorEdit = (log: Transaction) => {
+    if (log.source !== "GFloor" || !log.floor_id) return;
+    const outQty = log.out_qty || 0;
+    const inQty = log.in_qty || 0;
+    setEditingFloorTx({
+      floor_id: log.floor_id,
+      item_name: log.item_name,
+      category: log.category || "",
+      date: log.date,
+      checked_status: log.checked_status,
+      type: outQty > 0 ? "OUT" : "IN",
+      qty: String(outQty > 0 ? outQty : inQty),
+    });
+    setIsFloorEditOpen(true);
+  };
+
+  const handleSaveFloorEdit = async () => {
+    if (!editingFloorTx) return;
+    const qty = parseFloat(editingFloorTx.qty);
+    if (!editingFloorTx.qty || isNaN(qty) || qty <= 0) {
+      showStatus("Please enter a valid quantity greater than 0", "error");
+      return;
+    }
+
+    setSubmitting(true);
+    showStatus("Updating G Floor entry...", "loading");
+    try {
+      const dateOnly = normalizeTxDate(editingFloorTx.date) || editingFloorTx.date;
+      const newIn = editingFloorTx.type === "IN" ? qty : 0;
+      const newOut = editingFloorTx.type === "OUT" ? qty : 0;
+      const payload = {
+        id: editingFloorTx.floor_id,
+        item_name: editingFloorTx.item_name,
+        category: editingFloorTx.category,
+        date: dateOnly,
+        checked_status: editingFloorTx.checked_status || "",
+        in_qty: String(newIn),
+        out_qty: String(newOut),
+        updated_at: new Date().toISOString(),
+      };
+      const res = await fetch("/api/ims/floor?location=g", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error("Failed to update");
+
+      const floorId = String(editingFloorTx.floor_id);
+      await Promise.all([
+        mutateTimeSeries(
+          (current) => {
+            if (!current) return current;
+            const others = current.filter(
+              (tx) => !(tx.source === "GFloor" && String(tx.floor_id) === floorId)
+            );
+            const sample = current.find(
+              (tx) => tx.source === "GFloor" && String(tx.floor_id) === floorId
+            );
+            const nextTx: Transaction = {
+              item_name: editingFloorTx.item_name,
+              category: editingFloorTx.category,
+              date: dateOnly,
+              in_qty: newIn,
+              out_qty: newOut,
+              source: "GFloor",
+              floor_id: floorId,
+              checked_status: editingFloorTx.checked_status || sample?.checked_status,
+            };
+            return [...others, nextTx];
+          },
+          { revalidate: true }
+        ),
+        globalMutate("/api/ims"),
+        globalMutate("/api/ims/summary"),
+      ]);
+      setIsFloorEditOpen(false);
+      setEditingFloorTx(null);
+      showStatus("G Floor entry updated!", "success");
+      setTimeout(() => setIsStatusModalOpen(false), 1500);
+    } catch (e) {
+      showStatus("Error updating G Floor entry.", "error");
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -862,8 +1168,8 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
     return paginatedDatewiseTransactions.map((log) => {
       const txKey = getDatewiseTxKey(log);
       const isApproved = approvedTxKeys.has(txKey);
-      const isChecked = isTxChecked(log);
-      const canCheck = canCheckTx(log);
+      const isChecked = checkedTxKeys.has(txKey) || isLedgerChecked(log);
+      const canCheck = !isChecked;
       const canApprove = !isApproved;
       return {
         log,
@@ -875,7 +1181,7 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
         selectable: canApprove || canCheck,
       };
     });
-  }, [paginatedDatewiseTransactions, approvedTxKeys]);
+  }, [paginatedDatewiseTransactions, approvedTxKeys, checkedTxKeys]);
 
   const pageSelectableKeys = useMemo(
     () => paginatedDatewiseWithMeta.filter((row) => row.selectable).map((row) => row.txKey),
@@ -886,10 +1192,12 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
     pageSelectableKeys.length > 0 && pageSelectableKeys.every((key) => selectedTxKeys.has(key));
 
   const selectedCheckableCount = useMemo(() => {
-    return filteredDatewiseTransactions.filter(
-      (log) => selectedTxKeys.has(getDatewiseTxKey(log)) && canCheckTx(log)
-    ).length;
-  }, [filteredDatewiseTransactions, selectedTxKeys]);
+    return filteredDatewiseTransactions.filter((log) => {
+      const key = getDatewiseTxKey(log);
+      if (!selectedTxKeys.has(key)) return false;
+      return !(checkedTxKeys.has(key) || isLedgerChecked(log));
+    }).length;
+  }, [filteredDatewiseTransactions, selectedTxKeys, checkedTxKeys]);
 
   const selectedApprovableCount = useMemo(() => {
     return filteredDatewiseTransactions.filter((log) => {
@@ -934,6 +1242,7 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          action: "approve",
           transactions: toApprove.map((log) => ({
             item_name: log.item_name,
             category: log.category,
@@ -948,8 +1257,9 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
 
       await mutateApprovals();
       setSelectedTxKeys(new Set());
+      const saved = (data.added || 0) + (data.updated || 0);
       const skippedNote = data.skipped ? ` (${data.skipped} already approved)` : "";
-      showStatus(`Saved ${data.added} approved row(s)${skippedNote}`, "success");
+      showStatus(`Saved ${saved} approved row(s)${skippedNote}`, "success");
       setTimeout(() => setIsStatusModalOpen(false), 2000);
     } catch (e: unknown) {
       const message = e instanceof Error ? e.message : "Error saving approvals";
@@ -960,32 +1270,42 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
   };
 
   const handleBulkMarkChecked = async () => {
-    const toCheck = filteredDatewiseTransactions.filter(
-      (log) => selectedTxKeys.has(getDatewiseTxKey(log)) && canCheckTx(log)
-    );
-    const ids = Array.from(
-      new Set(toCheck.map((log) => String(log.floor_id)).filter(Boolean))
-    );
+    const toCheck = filteredDatewiseTransactions.filter((log) => {
+      const key = getDatewiseTxKey(log);
+      if (!selectedTxKeys.has(key)) return false;
+      return !(checkedTxKeys.has(key) || isLedgerChecked(log));
+    });
 
-    if (ids.length === 0) {
-      showStatus("Select unchecked G Floor ledger rows to mark as checked", "error");
+    if (toCheck.length === 0) {
+      showStatus("Select unchecked rows to mark as checked", "error");
       return;
     }
 
     setIsChecking(true);
-    showStatus(`Marking ${ids.length} entr${ids.length === 1 ? "y" : "ies"} as checked...`, "loading");
+    showStatus(`Marking ${toCheck.length} entr${toCheck.length === 1 ? "y" : "ies"} as checked...`, "loading");
     try {
-      const res = await fetch("/api/ims/floor?location=g", {
-        method: "PATCH",
+      const res = await fetch("/api/ims/gfloor-approval", {
+        method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ids }),
+        body: JSON.stringify({
+          action: "check",
+          transactions: toCheck.map((log) => ({
+            item_name: log.item_name,
+            category: log.category,
+            date: log.date,
+            in_qty: log.in_qty || 0,
+            out_qty: log.out_qty || 0,
+          })),
+        }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to mark checked");
 
-      await mutateTimeSeries();
+      await mutateApprovals();
       setSelectedTxKeys(new Set());
-      showStatus(`Marked ${data.updated || ids.length} as checked`, "success");
+      const saved = (data.added || 0) + (data.updated || 0);
+      const skippedNote = data.skipped ? ` (${data.skipped} already checked)` : "";
+      showStatus(`Marked ${saved} as checked${skippedNote}`, "success");
       setTimeout(() => setIsStatusModalOpen(false), 2000);
     } catch (e: unknown) {
       const message = e instanceof Error ? e.message : "Error marking checked";
@@ -1009,7 +1329,7 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
         log.in_qty > 0 ? `+${log.in_qty}` : "-",
         log.out_qty > 0 ? `-${log.out_qty}` : "-",
         (log as any).running_stock,
-        log.source === "GFloor" ? (isTxChecked(log) ? "CHECKED" : "Pending") : "-",
+        checkedTxKeys.has(getDatewiseTxKey(log)) || isLedgerChecked(log) ? "CHECKED" : "Pending",
         approvedTxKeys.has(getDatewiseTxKey(log)) ? "Approved" : "Pending",
       ]);
     } else {
@@ -1046,6 +1366,68 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  };
+
+  const sortableTh = (
+    label: string,
+    column: DefaultSortKey,
+    opts?: { align?: "left" | "right"; className?: string }
+  ) => {
+    const active = sortKey === column;
+    const align = opts?.align || "left";
+    return (
+      <th
+        onClick={() => toggleSort(column)}
+        title={`Sort by ${label}`}
+        className={`py-2.5 px-3 text-[10px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-widest border-b border-blue-200 dark:border-blue-500/20 whitespace-nowrap cursor-pointer select-none hover:bg-blue-100/70 dark:hover:bg-blue-500/10 transition-colors ${
+          align === "right" ? "text-right" : "text-left"
+        } ${opts?.className || ""}`}
+      >
+        <span className={`inline-flex items-center gap-0.5 ${align === "right" ? "justify-end w-full" : ""}`}>
+          {label}
+          {active ? (
+            sortDir === "asc" ? (
+              <ChevronUpIcon className="w-3 h-3 shrink-0" />
+            ) : (
+              <ChevronDownIcon className="w-3 h-3 shrink-0" />
+            )
+          ) : (
+            <ChevronDownIcon className="w-3 h-3 shrink-0 opacity-25" />
+          )}
+        </span>
+      </th>
+    );
+  };
+
+  const datewiseSortableTh = (
+    label: string,
+    column: DatewiseSortKey,
+    opts?: { align?: "left" | "right" | "center"; className?: string }
+  ) => {
+    const active = datewiseSortKey === column;
+    const align = opts?.align || "left";
+    return (
+      <th
+        onClick={() => toggleDatewiseSort(column)}
+        title={`Sort by ${label}`}
+        className={`py-2.5 px-3 text-[10px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-widest border-b border-gray-200 dark:border-white/10 whitespace-nowrap cursor-pointer select-none hover:bg-blue-50 dark:hover:bg-white/5 transition-colors ${
+          align === "right" ? "text-right" : align === "center" ? "text-center" : "text-left"
+        } ${opts?.className || ""}`}
+      >
+        <span className={`inline-flex items-center gap-0.5 ${align === "right" ? "justify-end w-full" : align === "center" ? "justify-center w-full" : ""}`}>
+          {label}
+          {active ? (
+            datewiseSortDir === "asc" ? (
+              <ChevronUpIcon className="w-3 h-3 shrink-0" />
+            ) : (
+              <ChevronDownIcon className="w-3 h-3 shrink-0" />
+            )
+          ) : (
+            <ChevronDownIcon className="w-3 h-3 shrink-0 opacity-25" />
+          )}
+        </span>
+      </th>
+    );
   };
 
   return (
@@ -1158,7 +1540,7 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
         </div>
 
         <div className="flex items-center gap-1.5 shrink-0 flex-1 min-w-[320px]">
-          <div className="flex-1 min-w-[160px] max-w-[220px]">
+          <div className="flex-1 min-w-[140px] max-w-[200px]">
             <SearchableMultiSelect
               options={categoryOptions}
               value={categoryFilters}
@@ -1168,7 +1550,17 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
               accentClass="border-blue-500 ring-blue-500/20"
             />
           </div>
-          <div className="flex-1 min-w-[180px] max-w-[260px]">
+          <div className="flex-1 min-w-[140px] max-w-[200px]">
+            <SearchableMultiSelect
+              options={sourceOptions}
+              value={sourceFilters}
+              onChange={setSourceFilters}
+              placeholder="Source"
+              className="bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 py-1.5 px-2 rounded-lg text-[10px]"
+              accentClass="border-blue-500 ring-blue-500/20"
+            />
+          </div>
+          <div className="flex-1 min-w-[160px] max-w-[240px]">
             <SearchableMultiSelect
               options={itemNameOptions}
               value={itemNameFilters}
@@ -1178,11 +1570,12 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
               accentClass="border-blue-500 ring-blue-500/20"
             />
           </div>
-          {(categoryFilters.length > 0 || itemNameFilters.length > 0) && (
+          {(categoryFilters.length > 0 || itemNameFilters.length > 0 || sourceFilters.length > 0) && (
             <button
               onClick={() => {
                 setCategoryFilters([]);
                 setItemNameFilters([]);
+                setSourceFilters([]);
               }}
               className="px-2 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-wider text-blue-700 dark:text-blue-400 bg-blue-50 hover:bg-blue-100 dark:bg-blue-500/10 dark:hover:bg-blue-500/20 border border-blue-200 dark:border-blue-500/20 transition-colors shrink-0 h-[30px]"
             >
@@ -1329,19 +1722,24 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
                         title="Select all on this page"
                       />
                     </th>
-                    <th className="py-2.5 px-4 text-[10px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-widest border-b border-gray-200 dark:border-white/10">Date</th>
-                    <th className="py-2.5 px-3 text-[10px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-widest border-b border-gray-200 dark:border-white/10">Category</th>
-                    <th className="py-2.5 px-3 text-[10px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-widest border-b border-gray-200 dark:border-white/10">Source</th>
-                    <th className="py-2.5 px-3 text-[10px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-widest border-b border-gray-200 dark:border-white/10 min-w-[200px]">Item Name</th>
-                    <th className="py-2.5 px-3 text-[10px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-widest border-b border-gray-200 dark:border-white/10 text-right">In</th>
-                    <th className="py-2.5 px-3 text-[10px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-widest border-b border-gray-200 dark:border-white/10 text-right">Out</th>
-                    <th className="py-2.5 px-4 text-[10px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-widest border-b border-gray-200 dark:border-white/10 text-right">Live Stock</th>
-                    <th className="py-2.5 px-3 text-[10px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-widest border-b border-gray-200 dark:border-white/10 text-center whitespace-nowrap">Checked</th>
-                    <th className="py-2.5 px-3 text-[10px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-widest border-b border-gray-200 dark:border-white/10 text-center whitespace-nowrap">Approval</th>
+                    <th className="py-2.5 px-2 text-[10px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-widest border-b border-gray-200 dark:border-white/10 text-center w-20">
+                      Acts
+                    </th>
+                    {datewiseSortableTh("Date", "date", { className: "px-4" })}
+                    {datewiseSortableTh("Category", "category")}
+                    {datewiseSortableTh("Source", "source")}
+                    {datewiseSortableTh("Item Name", "item_name", { className: "min-w-[200px]" })}
+                    {datewiseSortableTh("In", "in_qty", { align: "right" })}
+                    {datewiseSortableTh("Out", "out_qty", { align: "right" })}
+                    {datewiseSortableTh("Live Stock", "running_stock", { align: "right", className: "px-4" })}
+                    {datewiseSortableTh("Checked", "checked", { align: "center" })}
+                    {datewiseSortableTh("Approval", "approval", { align: "center" })}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100 dark:divide-white/5">
-                  {paginatedDatewiseWithMeta.map(({ log, txKey, isApproved, isChecked, selectable }, index) => (
+                  {paginatedDatewiseWithMeta.map(({ log, txKey, isApproved, isChecked, selectable }, index) => {
+                    const canEditFloor = log.source === "GFloor" && Boolean(log.floor_id);
+                    return (
                     <tr
                       key={`${txKey}-${index}`}
                       className={`hover:bg-blue-50/30 dark:hover:bg-white/[0.03] even:bg-gray-50/50 dark:even:bg-[#1f2937]/30 transition-colors group ${
@@ -1357,6 +1755,30 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
                           className="w-3.5 h-3.5 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500 disabled:opacity-60 cursor-pointer"
                         />
                       </td>
+                      <td className="py-2 px-2 text-center">
+                        {canEditFloor ? (
+                          <div className="flex items-center justify-center gap-2">
+                            <button
+                              type="button"
+                              onClick={() => openFloorEdit(log)}
+                              className="text-blue-600 dark:text-blue-400 hover:scale-110 transition-transform"
+                              title="Edit G Floor entry"
+                            >
+                              <PencilSquareIcon className="w-4 h-4" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => confirmDelete(String(log.floor_id), "gfloor")}
+                              className="text-rose-500 hover:scale-110 transition-transform"
+                              title="Delete G Floor entry"
+                            >
+                              <TrashIcon className="w-4 h-4" />
+                            </button>
+                          </div>
+                        ) : (
+                          <span className="text-[9px] font-black text-gray-300 dark:text-gray-600">—</span>
+                        )}
+                      </td>
                       <td className="py-2 px-4 text-[11px] font-bold text-gray-500">
                         {new Date(log.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: '2-digit' })}
                       </td>
@@ -1371,17 +1793,13 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
                       <td className="py-2 px-3 text-[11px] font-black text-rose-600 dark:text-rose-400 text-right">{log.out_qty > 0 ? `-${log.out_qty}` : "-"}</td>
                       <td className="py-2 px-4 text-[11px] font-black text-[#003875] dark:text-[#FFD500] text-right">{(log as any).running_stock}</td>
                       <td className="py-2 px-3 text-center">
-                        {log.source === "GFloor" ? (
-                          isChecked ? (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300 text-[9px] font-black uppercase tracking-wider">
-                              <CheckIcon className="w-3 h-3" />
-                              Checked
-                            </span>
-                          ) : (
-                            <span className="text-[9px] font-black uppercase tracking-wider text-amber-600 dark:text-amber-400">Pending</span>
-                          )
+                        {isChecked ? (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300 text-[9px] font-black uppercase tracking-wider">
+                            <CheckIcon className="w-3 h-3" />
+                            Checked
+                          </span>
                         ) : (
-                          <span className="text-[9px] font-black uppercase tracking-wider text-gray-300 dark:text-gray-600">—</span>
+                          <span className="text-[9px] font-black uppercase tracking-wider text-amber-600 dark:text-amber-400">Pending</span>
                         )}
                       </td>
                       <td className="py-2 px-3 text-center">
@@ -1395,10 +1813,11 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
                         )}
                       </td>
                     </tr>
-                  ))}
+                    );
+                  })}
                   {filteredDatewiseTransactions.length === 0 && (
                     <tr>
-                      <td colSpan={10} className="py-8 text-center text-gray-400 text-[11px] font-black uppercase">No items found</td>
+                      <td colSpan={11} className="py-8 text-center text-gray-400 text-[11px] font-black uppercase">No items found</td>
                     </tr>
                   )}
                 </tbody>
@@ -1454,21 +1873,23 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
                         <th className="py-2.5 px-3 border-b border-blue-200 dark:border-blue-500/20 text-center sticky left-0 bg-blue-50 dark:bg-blue-900/20 z-30 shadow-[1px_0_0_0_#bfdbfe] dark:shadow-[1px_0_0_0_rgba(59,130,246,0.2)] w-24">
                           <span className="text-[10px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-widest">Acts</span>
                         </th>
-                        <th className="py-2.5 px-3 text-[10px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-widest border-b border-blue-200 dark:border-blue-500/20 whitespace-nowrap">ID</th>
-                        <th className="py-2.5 px-3 text-[10px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-widest border-b border-blue-200 dark:border-blue-500/20 whitespace-nowrap">Category</th>
-                        <th className="py-2.5 px-3 text-[10px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-widest border-b border-blue-200 dark:border-blue-500/20 whitespace-nowrap">Source</th>
-                        <th className="py-2.5 px-3 text-[10px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-widest border-b border-blue-200 dark:border-blue-500/20 min-w-[200px]">Item Name</th>
-                        <th className="py-2.5 px-3 text-[10px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-widest border-b border-blue-200 dark:border-blue-500/20 text-right">Est. Amt</th>
-                        <th className="py-2.5 px-3 text-[10px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-widest border-b border-blue-200 dark:border-blue-500/20 text-right">GST</th>
-                        <th className="py-2.5 px-3 text-[10px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-widest border-b border-blue-200 dark:border-blue-500/20 text-right">Final Amt</th>
-                        <th className="py-2.5 px-3 text-[10px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-widest border-b border-blue-200 dark:border-blue-500/20 text-right">In Qty</th>
-                        <th className="py-2.5 px-3 text-[10px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-widest border-b border-blue-200 dark:border-blue-500/20 text-right">Out Qty</th>
-                        <th className="py-2.5 px-3 text-[10px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-widest border-b border-blue-200 dark:border-blue-500/20 text-right">Sale %</th>
-                        <th className="py-2.5 px-3 text-[10px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-widest border-b border-blue-200 dark:border-blue-500/20 text-right">Avg Con</th>
-                        <th className="py-2.5 px-3 text-[10px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-widest border-b border-blue-200 dark:border-blue-500/20 text-right">Lead</th>
-                        <th className="py-2.5 px-3 text-[10px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-widest border-b border-blue-200 dark:border-blue-500/20 text-right">SF</th>
-                        <th className="py-2.5 px-3 text-[10px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-widest border-b border-blue-200 dark:border-blue-500/20 text-right">Max</th>
-                        <th className="py-2.5 px-4 text-[10px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-widest border-b border-blue-200 dark:border-blue-500/20 text-left bg-blue-100/50 dark:bg-blue-500/10 w-56">Stock Health</th>
+                        {sortableTh("ID", "id")}
+                        {sortableTh("Category", "category")}
+                        {sortableTh("Source", "source")}
+                        {sortableTh("Item Name", "item_name", { className: "min-w-[200px]" })}
+                        {sortableTh("Est. Amt", "est_amount_item", { align: "right" })}
+                        {sortableTh("GST", "gst", { align: "right" })}
+                        {sortableTh("Final Amt", "final_amount_num", { align: "right" })}
+                        {sortableTh("In Qty", "in_qty", { align: "right" })}
+                        {sortableTh("Out Qty", "out_qty", { align: "right" })}
+                        {sortableTh("Sale %", "sale_percent", { align: "right" })}
+                        {sortableTh("Avg Con", "avg_daily_con", { align: "right" })}
+                        {sortableTh("Lead", "lead_time", { align: "right" })}
+                        {sortableTh("SF", "safety_factor", { align: "right" })}
+                        {sortableTh("Max", "max_level", { align: "right" })}
+                        {sortableTh("Stock Health", "live_stock", {
+                          className: "text-left bg-blue-100/50 dark:bg-blue-500/10 w-56",
+                        })}
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-blue-100 dark:divide-blue-500/10">
@@ -1697,13 +2118,115 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
         onClose={() => {
           setIsConfirmOpen(false);
           setPendingDeleteId(null);
+          setPendingDeleteKind("catalog");
         }}
         onConfirm={performDelete}
-        title="Delete Item"
-        message={`Are you sure you want to completely remove this item from the system? This action cannot be undone.`}
+        title={pendingDeleteKind === "gfloor" ? "Delete G Floor Entry" : "Delete Item"}
+        message={
+          pendingDeleteKind === "gfloor"
+            ? "Are you sure you want to delete this entry from the IMS-G Floor sheet? This cannot be undone."
+            : "Are you sure you want to completely remove this item from the system? This action cannot be undone."
+        }
         confirmLabel="Delete"
         type="danger"
       />
+
+      <AnimatePresence>
+        {isFloorEditOpen && editingFloorTx && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 10 }}
+              className="bg-white dark:bg-[#111827] rounded-2xl shadow-[0_0_40px_rgba(0,0,0,0.2)] w-full max-w-md overflow-hidden border border-gray-200 dark:border-white/10"
+            >
+              <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-white/5 shrink-0 bg-blue-50 dark:bg-blue-900/20">
+                <h3 className="text-sm font-black uppercase tracking-widest flex items-center gap-2 text-gray-900 dark:text-white">
+                  <PencilSquareIcon className="w-5 h-5 text-blue-600" />
+                  Edit G Floor Entry
+                </h3>
+                <button
+                  onClick={() => {
+                    setIsFloorEditOpen(false);
+                    setEditingFloorTx(null);
+                  }}
+                  className="p-1.5 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white rounded-lg transition-colors"
+                >
+                  <XMarkIcon className="w-4 h-4" />
+                </button>
+              </div>
+
+              <div className="p-6 space-y-4 bg-white dark:bg-[#111827]">
+                <div className="p-3 rounded-xl bg-gray-50 dark:bg-white/[0.02] border border-gray-100 dark:border-white/5 space-y-1">
+                  <p className="text-[9px] font-black uppercase tracking-widest text-gray-400">Item</p>
+                  <p className="text-[11px] font-black text-gray-900 dark:text-white uppercase">{editingFloorTx.item_name}</p>
+                  <p className="text-[10px] font-bold text-gray-500 uppercase">
+                    {editingFloorTx.category} · {formatDate(editingFloorTx.date)}
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <div className="flex bg-gray-200 dark:bg-gray-800 p-1 rounded-lg">
+                    <button
+                      type="button"
+                      onClick={() => setEditingFloorTx((prev) => (prev ? { ...prev, type: "IN" } : prev))}
+                      className={`px-4 py-2 rounded-md text-[10px] font-black uppercase tracking-wider transition-all ${
+                        editingFloorTx.type === "IN"
+                          ? "bg-emerald-500 text-white shadow-sm"
+                          : "text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+                      }`}
+                    >
+                      IN
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setEditingFloorTx((prev) => (prev ? { ...prev, type: "OUT" } : prev))}
+                      className={`px-4 py-2 rounded-md text-[10px] font-black uppercase tracking-wider transition-all ${
+                        editingFloorTx.type === "OUT"
+                          ? "bg-rose-500 text-white shadow-sm"
+                          : "text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+                      }`}
+                    >
+                      OUT
+                    </button>
+                  </div>
+                  <div className="flex-1">
+                    <FloatingInput
+                      label="Qty *"
+                      name="floor_edit_qty"
+                      type="number"
+                      step="0.01"
+                      value={editingFloorTx.qty}
+                      onChange={(val) => setEditingFloorTx((prev) => (prev ? { ...prev, qty: val } : prev))}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-4 border-t border-gray-100 dark:border-white/5 flex justify-end gap-3 bg-gray-50/50 dark:bg-[#1f2937]/50">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsFloorEditOpen(false);
+                    setEditingFloorTx(null);
+                  }}
+                  className="px-5 py-2 rounded-xl text-xs font-black text-gray-500 uppercase tracking-widest hover:bg-white dark:hover:bg-[#111827] shadow-sm border border-gray-200 dark:border-white/10 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSaveFloorEdit}
+                  disabled={submitting}
+                  className="px-6 py-2 rounded-xl text-xs font-black text-white uppercase tracking-widest bg-gradient-to-r from-blue-600 to-indigo-700 hover:brightness-110 shadow-lg shadow-blue-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {submitting ? "Saving..." : "Save Changes"}
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       {importPreview && (
         <div className="fixed inset-0 z-[220] bg-black/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 overflow-y-auto">

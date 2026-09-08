@@ -67,7 +67,7 @@ const IMS_CALC_INFO: Record<ImsLocation, ImsCalcInfo> = {
     liveHow:
       "For each catalog item (and pending GRN/O2D orphans): total IN minus total OUT. Orphan items from movement only also appear in the table.",
     approvalHow:
-      "Date-Wise tab lists all IN/OUT movements (newest date first). Select rows to Approve (IMS-G Floor Approval sheet) and/or Mark Checked (Checked Status on IMS-G Floor ledger for G Floor source rows). Sources: GRN, O2D, G Floor, 1st OUT.",
+      "Date-Wise tab lists all IN/OUT movements (newest date first). Select rows to Mark Checked and/or Approve — both save to the IMS-G Floor Approval sheet (Checked Status + Approval Status). Works for GRN, O2D, G Floor, and 1st OUT virtual entries.",
   },
   "1st": {
     title: "IMS - 1st Floor",

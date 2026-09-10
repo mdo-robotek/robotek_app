@@ -17,6 +17,7 @@ import {
   ArchiveBoxIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
+  ChevronDownIcon,
   ExclamationCircleIcon,
   CheckCircleIcon,
   ArrowPathIcon,
@@ -149,7 +150,7 @@ export default function MetrixPage() {
   });
   const [forecastType, setForecastType] = useState("category");
   const [forecastTarget, setForecastTarget] = useState("");
-  const [granularity, setGranularity] = useState("month");
+  const [granularity, setGranularity] = useState("all");
   const [dateOffset, setDateOffset] = useState(0);
   const [isManualDate, setIsManualDate] = useState(false);
   const [isExportingPDF, setIsExportingPDF] = useState(false);
@@ -210,6 +211,11 @@ export default function MetrixPage() {
   useEffect(() => {
     if (isManualDate) return;
 
+    if (granularity === "all") {
+      setDateRange({ startDate: "", endDate: "" });
+      return;
+    }
+
     let start = new Date();
     start.setHours(0, 0, 0, 0);
     let end = new Date();
@@ -245,6 +251,7 @@ export default function MetrixPage() {
   }, [granularity, dateOffset, isManualDate]);
 
   const getGranularityLabel = () => {
+    if (granularity === "all" && !isManualDate) return "All Time";
     if (isManualDate || !dateRange.startDate) return "Custom";
     const d = new Date(dateRange.startDate);
     const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -402,38 +409,59 @@ export default function MetrixPage() {
             </div>
 
             <div className="flex flex-wrap items-center gap-3">
-            <div className="flex flex-wrap items-center gap-2">
-              {[
-                { id: 'day', label: 'Day', activeClass: 'bg-gradient-to-r from-rose-500 to-rose-600 text-white shadow-md shadow-rose-900/20 scale-105' },
-                { id: 'week', label: 'Week', activeClass: 'bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-md shadow-amber-900/20 scale-105' },
-                { id: 'month', label: 'Month', activeClass: 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-md shadow-emerald-900/20 scale-105' },
-                { id: 'quarter', label: 'Quarterly', activeClass: 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-md shadow-indigo-900/20 scale-105' },
-                { id: 'year', label: 'Yearly', activeClass: 'bg-gradient-to-r from-violet-500 to-violet-600 text-white shadow-md shadow-violet-900/20 scale-105' }
-              ].map(g => (
-                <button
-                  key={g.id}
-                  onClick={() => { setGranularity(g.id); setDateOffset(0); setIsManualDate(false); }}
-                  className={`px-3 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all shadow-sm ${granularity === g.id && !isManualDate
-                    ? g.activeClass
-                    : 'bg-white dark:bg-navy-800 text-gray-600 dark:text-gray-300 hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-navy-700 hover:scale-105'
-                    }`}
-                >
-                  {g.label}
-                </button>
-              ))}
+            <div className="relative">
+              <select
+                value={isManualDate ? "custom" : granularity}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value === "custom") return;
+                  setGranularity(value);
+                  setDateOffset(0);
+                  setIsManualDate(false);
+                  if (value === "all") {
+                    setDateRange({ startDate: "", endDate: "" });
+                  }
+                }}
+                className="appearance-none pl-3 pr-8 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-white dark:bg-navy-800 text-[#003875] dark:text-[#FFD500] border border-gray-200 dark:border-white/10 shadow-sm outline-none focus:ring-2 focus:ring-[#003875]/30 dark:focus:ring-[#FFD500]/30 cursor-pointer min-w-[130px]"
+              >
+                <option value="all">All Time</option>
+                <option value="day">Day</option>
+                <option value="week">Week</option>
+                <option value="month">Month</option>
+                <option value="quarter">Quarterly</option>
+                <option value="year">Yearly</option>
+                {isManualDate && <option value="custom">Custom Range</option>}
+              </select>
+              <ChevronDownIcon className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
             </div>
 
+            {granularity !== "all" || isManualDate ? (
             <div className="flex items-center gap-1 bg-white dark:bg-navy-800 rounded-xl p-1 shadow-sm border border-gray-100 dark:border-white/5">
-              <button onClick={() => { setDateOffset(prev => prev - 1); setIsManualDate(false); }} className="p-1.5 hover:bg-gray-100 dark:hover:bg-white/10 rounded-lg">
+              <button
+                onClick={() => { setDateOffset(prev => prev - 1); setIsManualDate(false); }}
+                disabled={granularity === "all"}
+                className="p-1.5 hover:bg-gray-100 dark:hover:bg-white/10 rounded-lg disabled:opacity-40 disabled:cursor-not-allowed"
+              >
                 <ChevronLeftIcon className="w-4 h-4 text-gray-600 dark:text-gray-300" />
               </button>
               <div className="px-3 text-[10px] font-black text-[#003875] dark:text-[#FFD500] uppercase tracking-widest min-w-[140px] text-center">
                 {getGranularityLabel()}
               </div>
-              <button onClick={() => { setDateOffset(prev => prev + 1); setIsManualDate(false); }} className="p-1.5 hover:bg-gray-100 dark:hover:bg-white/10 rounded-lg">
+              <button
+                onClick={() => { setDateOffset(prev => prev + 1); setIsManualDate(false); }}
+                disabled={granularity === "all"}
+                className="p-1.5 hover:bg-gray-100 dark:hover:bg-white/10 rounded-lg disabled:opacity-40 disabled:cursor-not-allowed"
+              >
                 <ChevronRightIcon className="w-4 h-4 text-gray-600 dark:text-gray-300" />
               </button>
             </div>
+            ) : (
+              <div className="flex items-center gap-1 bg-white dark:bg-navy-800 rounded-xl px-3 py-2 shadow-sm border border-gray-100 dark:border-white/5">
+                <div className="text-[10px] font-black text-[#003875] dark:text-[#FFD500] uppercase tracking-widest min-w-[140px] text-center">
+                  All Time
+                </div>
+              </div>
+            )}
 
             <div className="flex items-center gap-2 bg-gray-50 dark:bg-navy-900 p-1.5 rounded-xl border border-gray-100 dark:border-white/5">
               <CalendarIcon className="w-3.5 h-3.5 text-gray-400" />
@@ -451,7 +479,15 @@ export default function MetrixPage() {
                 className="bg-transparent border-none text-[9px] font-black text-gray-600 dark:text-gray-300 outline-none w-24"
               />
               {(dateRange.startDate || dateRange.endDate) && (
-                <button onClick={() => setDateRange({ startDate: "", endDate: "" })} className="p-1 hover:bg-gray-200 dark:hover:bg-white/10 rounded-full">
+                <button
+                  onClick={() => {
+                    setDateRange({ startDate: "", endDate: "" });
+                    setGranularity("all");
+                    setDateOffset(0);
+                    setIsManualDate(false);
+                  }}
+                  className="p-1 hover:bg-gray-200 dark:hover:bg-white/10 rounded-full"
+                >
                   <XMarkIcon className="w-3 h-3 text-gray-400" />
                 </button>
               )}
@@ -913,7 +949,7 @@ export default function MetrixPage() {
                     <div>
                       <h2 className="text-xl font-black text-gray-900 dark:text-white uppercase tracking-tight">Department Performance</h2>
                       <p className="text-gray-500 text-[10px] font-bold mt-1 uppercase tracking-widest">
-                        {granularity} Report • {dateRange.startDate ? format(new Date(dateRange.startDate), 'dd MMM yyyy') : ''} to {dateRange.endDate ? format(new Date(dateRange.endDate), 'dd MMM yyyy') : ''}
+                        {granularity === "all" ? "All Time" : granularity} Report • {dateRange.startDate && dateRange.endDate ? `${format(new Date(dateRange.startDate), 'dd MMM yyyy')} to ${format(new Date(dateRange.endDate), 'dd MMM yyyy')}` : "All Time"}
                       </p>
                     </div>
                     <button 

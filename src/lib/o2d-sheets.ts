@@ -5,13 +5,19 @@ import { globalCache } from "./cache";
 
 const GOOGLE_SHEET_ID = "1T0vSzAgHoO21DifCUcPMRLR4yOy-kFteJ2bv6pG-UTc";
 const SHEET_NAME = "O2D";
+const ARCHIVED_SHEET_NAME = "O2D Archived";
 const CONFIG_SHEET_NAME = "Step Configuration";
 
 class O2DService extends BaseSheetsService<O2D> {
   protected spreadsheetId = GOOGLE_SHEET_ID;
-  protected sheetName = SHEET_NAME;
+  protected sheetName: string;
   protected range = "A:ZZ";
   protected idColumnIndex = 0;
+
+  constructor(sheetName: string = SHEET_NAME) {
+    super();
+    this.sheetName = sheetName;
+  }
 
   mapRowToItem(row: any[]): O2D {
     const get = (h: string) => {
@@ -544,7 +550,52 @@ class O2DService extends BaseSheetsService<O2D> {
   }
 }
 
-export const o2dService = new O2DService();
+export const o2dService = new O2DService(SHEET_NAME);
+export const o2dArchivedService = new O2DService(ARCHIVED_SHEET_NAME);
+
+/** Live O2D + O2D Archived combined for analytics/metrix (prefer live row on same id). */
+export async function getAllO2DsForAnalytics(): Promise<O2D[]> {
+  const [live, archived] = await Promise.all([
+    o2dService.getAll(),
+    o2dArchivedService.getAll().catch((err) => {
+      console.error("Error fetching O2D Archived sheet:", err);
+      return [] as O2D[];
+    }),
+  ]);
+
+  const byKey = new Map<string, O2D>();
+  const noKeyRows: O2D[] = [];
+
+  const rowKey = (row: O2D) => {
+    const id = String(row.id || "").trim();
+    if (id) return `id:${id}`;
+    const orderNo = String(row.order_no || "").trim().toLowerCase();
+    const item = String(row.item_name || "").trim().toLowerCase();
+    const created = String(row.created_at || "").trim();
+    if (orderNo || item || created) return `row:${orderNo}|${item}|${created}`;
+    return "";
+  };
+
+  // Archived first, then live overwrites duplicates
+  archived.forEach((row) => {
+    const key = rowKey(row);
+    if (!key) {
+      noKeyRows.push(row);
+      return;
+    }
+    byKey.set(key, row);
+  });
+  live.forEach((row) => {
+    const key = rowKey(row);
+    if (!key) {
+      noKeyRows.push(row);
+      return;
+    }
+    byKey.set(key, row);
+  });
+
+  return [...byKey.values(), ...noKeyRows];
+}
 
 // Helper: Get pending step index for an order
 function getPendingStepIdx(orderItems: O2D[]): number {
@@ -621,9 +672,12 @@ export async function getO2DsPaginated(
   filterStartDate: string = "",
   filterEndDate: string = "",
   currentUser: string = "",
-  userRole: string = ""
+  userRole: string = "",
+  includeArchived: boolean = false
 ) {
-  const allO2Ds = await o2dService.getAll();
+  const allO2Ds = includeArchived
+    ? await getAllO2DsForAnalytics()
+    : await o2dService.getAll();
 
   // Fetch step configs once for user-role filtering (cached)
   const stepConfigs = (userRole.toUpperCase() === "USER" && currentUser)
@@ -833,7 +887,7 @@ export async function getO2DStepConfig() { return o2dService.getStepConfig(); }
 export async function getO2DDetails() { return o2dService.getDetails(); }
 
 export async function getScotDashboardMetrics() {
-  const o2dData = await o2dService.getAll();
+  const o2dData = await getAllO2DsForAnalytics();
   const now = new Date();
   const thisMonth = now.getMonth();
   const thisYear = now.getFullYear();

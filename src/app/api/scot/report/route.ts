@@ -6,7 +6,7 @@ import {
   getFollowUpData,
   getActivePartyData
 } from "@/lib/scot-sheets";
-import { o2dService } from "@/lib/o2d-sheets";
+import { getAllO2DsForAnalytics } from "@/lib/o2d-sheets";
 import { o2dkbService } from "@/lib/o2dkb-sheets";
 import { getDataFeeder } from "@/lib/data-feeder-sheets";
 
@@ -104,7 +104,7 @@ export async function GET(req: NextRequest) {
       const [scotFeederResult, followUpResult, allO2DsResult, activePartyResult] = await Promise.all([
         getScotData(),
         getFollowUpData("scot"),
-        o2dService.getAll(),
+        getAllO2DsForAnalytics(),
         getActivePartyData("scot"),
       ]);
       scotFeeder = scotFeederResult;

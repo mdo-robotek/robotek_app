@@ -32,14 +32,14 @@ export async function GET(req: NextRequest) {
       getItemReceivePackingItems().catch(() => [])
     ]);
 
-    let start: Date;
-    let end: Date;
+    let start: Date | null = null;
+    let end: Date | null = null;
 
     if (startDateParam && endDateParam) {
       start = new Date(startDateParam);
       end = new Date(endDateParam);
       end.setHours(23, 59, 59, 999);
-    } else {
+    } else if (granularity !== "all") {
       // Fallback to granularity-based filtering relative to today
       const now = new Date();
       end = new Date(now);
@@ -55,15 +55,16 @@ export async function GET(req: NextRequest) {
         start.setHours(0, 0, 0, 0);
       } else if (granularity === 'month') {
         start.setDate(1);
-      } else if (granularity === 'quarterly') {
+      } else if (granularity === 'quarter' || granularity === 'quarterly') {
         const quarter = Math.floor(start.getMonth() / 3);
         start.setMonth(quarter * 3, 1);
-      } else if (granularity === 'yearly') {
+      } else if (granularity === 'year' || granularity === 'yearly') {
         start.setMonth(0, 1);
       }
     }
 
     const filterByDate = (items: any[], dateField: string = "created_at") => {
+      if (!start || !end) return items;
       return items.filter(item => {
         const dateVal = item[dateField];
         if (!dateVal) return false;
@@ -78,7 +79,7 @@ export async function GET(req: NextRequest) {
               }
             }
         }
-        return d >= start && d <= end;
+        return d >= start! && d <= end!;
       });
     };
 

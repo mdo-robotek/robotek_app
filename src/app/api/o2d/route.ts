@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getO2DsPaginated, addO2Ds, addItem, getO2Ds, o2dService } from "@/lib/o2d-sheets";
+import { getO2DsPaginated, addO2Ds, addItem, getO2Ds, o2dService, o2dArchivedService, getAllO2DsForAnalytics } from "@/lib/o2d-sheets";
 import { uploadFileToDrive, O2D_UPLOADS_FOLDER_ID } from "@/lib/google-drive";
 import { auth } from "@/auth";
 import { sendO2DRemarkNotification } from "@/lib/o2d-notifications";
@@ -15,8 +15,10 @@ export async function GET(req: NextRequest) {
 
     const { searchParams } = new URL(req.url);
     const refresh = searchParams.get("refresh") === "true";
+    const includeArchived = searchParams.get("includeArchived") === "true";
     if (refresh) {
       o2dService.invalidateCache();
+      if (includeArchived) o2dArchivedService.invalidateCache();
     }
     
     const type = searchParams.get("type");
@@ -34,7 +36,7 @@ export async function GET(req: NextRequest) {
     }
 
     if (type === "scotDashboard") {
-      const allO2Ds = await o2dService.getAll();
+      const allO2Ds = await getAllO2DsForAnalytics();
       const currentMonthStr = `${new Date().getFullYear()}-${new Date().getMonth()}`;
       
       const dashboardOrderCounts: Record<string, number> = {};
@@ -100,7 +102,8 @@ export async function GET(req: NextRequest) {
       startDate,
       endDate,
       currentUser,
-      userRole
+      userRole,
+      includeArchived
     );
 
     return NextResponse.json(result);

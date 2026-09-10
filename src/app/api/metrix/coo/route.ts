@@ -3,7 +3,7 @@ import { getAttendanceRecords, getLeaveRequests } from "@/lib/sheets/attendance-
 import { getDelegations } from "@/lib/delegation-sheets";
 import { getChecklists } from "@/lib/checklist-sheets";
 import { getUsers } from "@/lib/google-sheets";
-import { o2dService } from "@/lib/o2d-sheets";
+import { getAllO2DsForAnalytics } from "@/lib/o2d-sheets";
 import { getIMSItems } from "@/lib/ims-sheets";
 import { auth } from "@/auth";
 import { getWorkingHoursGapMs } from "@/lib/workingHours";
@@ -54,7 +54,7 @@ export async function GET(request: Request) {
 
     // ── Parallel fetch all data sources ──
     const [allO2Ds, allLeaves, allDelegations, allChecklists, allUsers, allAttendance, allIMS] = await Promise.all([
-      o2dService.getAll(),
+      getAllO2DsForAnalytics(),
       getLeaveRequests(),
       getDelegations(),
       getChecklists(),

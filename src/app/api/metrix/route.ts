@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { o2dService } from "@/lib/o2d-sheets";
+import { getAllO2DsForAnalytics } from "@/lib/o2d-sheets";
 import { imsService } from "@/lib/ims-sheets";
 import { auth } from "@/auth";
 import { getWorkingHoursGapMs } from "@/lib/workingHours";
@@ -61,7 +61,7 @@ export async function GET(req: NextRequest) {
 
     // 1. Fetch all data
     const [allO2Ds, allIMS] = await Promise.all([
-      o2dService.getAll(),
+      getAllO2DsForAnalytics(),
       imsService.getAll()
     ]);
 
@@ -173,8 +173,8 @@ export async function GET(req: NextRequest) {
       else if (diffDays <= 365) trendGrouping = 'month';
       else trendGrouping = 'year';
     } else {
-      trendGrouping = granularity;
       filteredOrders = orders;
+      trendGrouping = granularity === "all" ? "year" : granularity;
     }
 
     // Determine endDate for lookback

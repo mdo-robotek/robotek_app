@@ -37,7 +37,7 @@ export default function ScotPage() {
   const toast = useToast();
 
   const { data: o2dDataRes, isValidating: isO2DLoading } = useSWR(
-    `/api/o2d?limit=-1`,
+    `/api/o2d?limit=-1&includeArchived=true`,
     fetcher
   );
 

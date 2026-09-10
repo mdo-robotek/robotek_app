@@ -9,7 +9,7 @@ import {
   updateCallData,
   appendScotData
 } from "@/lib/scot-sheets";
-import { o2dService } from "@/lib/o2d-sheets";
+import { getAllO2DsForAnalytics } from "@/lib/o2d-sheets";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -28,7 +28,7 @@ export async function GET(req: NextRequest) {
       const [allCalls, allFollowUps, allO2Ds] = await Promise.all([
         getCallData(),
         getFollowUpData(),
-        skipO2D ? Promise.resolve([]) : o2dService.getAll()
+        skipO2D ? Promise.resolve([]) : getAllO2DsForAnalytics()
       ]);
 
       const latestFollowUps = allFollowUps.reduce((acc: any, curr: any) => {

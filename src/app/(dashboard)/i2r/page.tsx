@@ -38,7 +38,8 @@ import {
   QueueListIcon,
   HashtagIcon,
   PaperClipIcon,
-  LinkIcon
+  LinkIcon,
+  ArchiveBoxIcon
 } from "@heroicons/react/24/outline";
 import ActionStatusModal from "@/components/ActionStatusModal";
 import ConfirmModal from "@/components/ConfirmModal";
@@ -250,7 +251,8 @@ export default function I2RPage() {
     Item_Name: "",
     Category: "",
     filled_by: "",
-    indent_id: ""
+    indent_id: "",
+    Packed_Unpacked: ""
   });
   const [poFile, setPoFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -712,7 +714,8 @@ export default function I2RPage() {
       Item_Name: item.item_name || "",
       Category: item.category || "",
       filled_by: currentUser,
-      indent_id: item.id
+      indent_id: item.id,
+      Packed_Unpacked: ""
     });
     setPoFile(null);
     setIsPOModalOpen(true);
@@ -1551,7 +1554,7 @@ export default function I2RPage() {
                         <CubeIcon className="w-3 h-3" />
                         Item Name
                       </label>
-                      <input type="text" value={poFormData.Item_Name} readOnly className="w-full px-4 py-2.5 bg-[#FFFBF0] dark:bg-zinc-900 border border-orange-100/50 dark:border-zinc-800 rounded-xl font-bold text-xs text-slate-500 cursor-not-allowed outline-none" />
+                      <input type="text" value={poFormData.Item_Name} onChange={e => setPoFormData({...poFormData, Item_Name: e.target.value})} placeholder="Enter Item Name" className="w-full px-4 py-2.5 bg-[#FFFBF0] dark:bg-zinc-900 border border-orange-100/50 dark:border-zinc-800 rounded-xl font-bold text-xs text-gray-900 dark:text-white outline-none focus:border-[#FFD500] focus:bg-[#FFFBF0] dark:focus:bg-zinc-900 transition-all shadow-sm" />
                     </div>
                     <div className="space-y-1">
                       <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
@@ -1610,16 +1613,29 @@ export default function I2RPage() {
                     </div>
                   </div>
 
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
-                      <CheckBadgeIcon className="w-3 h-3" />
-                      Payment Completed
-                    </label>
-                    <select value={poFormData.Payment_Completed} onChange={e => setPoFormData({...poFormData, Payment_Completed: e.target.value})} className="w-full px-4 py-3 bg-[#FFFBF0] dark:bg-zinc-900 border border-orange-100/50 dark:border-zinc-800 rounded-xl font-bold text-sm text-gray-900 dark:text-white outline-none focus:border-[#FFD500] focus:bg-[#FFFBF0] dark:focus:bg-zinc-900 transition-all shadow-sm cursor-pointer">
-                      <option value="No">No</option>
-                      <option value="Yes">Yes</option>
-                      <option value="Partial">Partial</option>
-                    </select>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
+                        <CheckBadgeIcon className="w-3 h-3" />
+                        Payment Completed
+                      </label>
+                      <select value={poFormData.Payment_Completed} onChange={e => setPoFormData({...poFormData, Payment_Completed: e.target.value})} className="w-full px-4 py-3 bg-[#FFFBF0] dark:bg-zinc-900 border border-orange-100/50 dark:border-zinc-800 rounded-xl font-bold text-sm text-gray-900 dark:text-white outline-none focus:border-[#FFD500] focus:bg-[#FFFBF0] dark:focus:bg-zinc-900 transition-all shadow-sm cursor-pointer">
+                        <option value="No">No</option>
+                        <option value="Yes">Yes</option>
+                        <option value="Partial">Partial</option>
+                      </select>
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
+                        <ArchiveBoxIcon className="w-3 h-3" />
+                        Packed / Unpacked
+                      </label>
+                      <select value={poFormData.Packed_Unpacked} onChange={e => setPoFormData({...poFormData, Packed_Unpacked: e.target.value})} className="w-full px-4 py-3 bg-[#FFFBF0] dark:bg-zinc-900 border border-orange-100/50 dark:border-zinc-800 rounded-xl font-bold text-sm text-gray-900 dark:text-white outline-none focus:border-[#FFD500] focus:bg-[#FFFBF0] dark:focus:bg-zinc-900 transition-all shadow-sm cursor-pointer">
+                        <option value="">Select</option>
+                        <option value="Packed">Packed</option>
+                        <option value="Unpacked">Unpacked</option>
+                      </select>
+                    </div>
                   </div>
 
                   <div className="space-y-1.5">

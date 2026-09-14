@@ -9,6 +9,7 @@ import {
   ScaleIcon,
   BuildingStorefrontIcon,
   CubeIcon,
+  CubeTransparentIcon,
   InformationCircleIcon,
   XMarkIcon
 } from "@heroicons/react/24/outline";
@@ -18,7 +19,7 @@ import IMSFinal from "./IMSFinal";
 
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
-type ImsLocation = "master" | "1st" | "final";
+type ImsLocation = "sfg" | "master" | "1st" | "final";
 
 type CalcSource = { label: string; detail: string };
 
@@ -37,14 +38,19 @@ const IMS_CALC_INFO: Record<ImsLocation, ImsCalcInfo> = {
     formula: "Live Stock = IN − OUT",
     inSources: [
       {
-        label: "GRN Sheet (Goods Receipt Note)",
+        label: "GRN Sheet — Packed items",
         detail:
-          "Sum of GRN Qty for items matching the G Floor catalog. Cancelled and Rejected GRN rows are excluded.",
+          "Sum of GRN Qty for Packed items (and older GRN rows with no Packed/Unpacked value). Unpacked GRN is counted on SFG IMS instead. Cancelled and Rejected GRN rows are excluded.",
       },
       {
         label: "IMS-G Floor Sheet (in_qty)",
         detail:
           "Manual Production IN entries and Physical Check IN adjustments logged on the G Floor ledger sheet.",
+      },
+      {
+        label: "SFG IMS OUT → G Floor IN (auto transfer)",
+        detail:
+          "When packed stock is manually booked OUT from SFG IMS, that qty is treated as IN on G Floor. No manual Production IN is needed for this transfer.",
       },
       {
         label: "1st Floor OUT → G Floor IN (auto transfer)",
@@ -67,7 +73,7 @@ const IMS_CALC_INFO: Record<ImsLocation, ImsCalcInfo> = {
     liveHow:
       "For each catalog item (and pending GRN/O2D orphans): total IN minus total OUT. Orphan items from movement only also appear in the table.",
     approvalHow:
-      "Date-Wise tab lists all IN/OUT movements (newest date first). Select rows to Mark Checked and/or Approve — both save to the IMS-G Floor Approval sheet (Checked Status + Approval Status). Works for GRN, O2D, G Floor, and 1st OUT virtual entries.",
+      "Date-Wise tab lists all IN/OUT movements (newest date first). Select rows to Mark Checked and/or Approve — both save to the IMS-G Floor Approval sheet (Checked Status + Approval Status). Works for GRN, O2D, G Floor, SFG OUT, and 1st OUT virtual entries.",
   },
   "1st": {
     title: "IMS - 1st Floor",
@@ -87,13 +93,36 @@ const IMS_CALC_INFO: Record<ImsLocation, ImsCalcInfo> = {
     ],
     liveHow: "For each ledger row: in_qty − out_qty, aggregated per item name across all rows.",
   },
+  sfg: {
+    title: "SFG IMS",
+    formula: "Live Stock = IN − OUT",
+    inSources: [
+      {
+        label: "GRN Sheet — Unpacked items",
+        detail:
+          "Unpacked GRN qty is auto-IN on SFG IMS. There is no manual IN. Check and verify Date-Wise rows only.",
+      },
+    ],
+    outSources: [
+      {
+        label: "IMS-SFG Floor Sheet (out_qty)",
+        detail:
+          "Manual packed OUT. Each OUT transfers the same qty as IN on G Floor IMS.",
+      },
+    ],
+    liveHow: "Unpacked GRN IN minus packed transfers OUT to G Floor, aggregated per item.",
+  },
   final: {
     title: "Final IMS",
-    formula: "G Floor totals + 1st Floor totals",
+    formula: "G Floor totals + SFG totals + 1st Floor totals",
     inSources: [
       {
         label: "IMS - G Floor IN",
-        detail: "GRN + G Floor ledger IN + 1st Floor OUT transfers.",
+        detail: "Packed GRN + G Floor ledger IN + SFG OUT transfers + 1st Floor OUT transfers.",
+      },
+      {
+        label: "SFG IMS IN",
+        detail: "Unpacked GRN auto-IN.",
       },
       {
         label: "IMS - 1st Floor IN",
@@ -109,8 +138,12 @@ const IMS_CALC_INFO: Record<ImsLocation, ImsCalcInfo> = {
         label: "IMS - 1st Floor OUT",
         detail: "All out_qty from the 1st Floor ledger sheet.",
       },
+      {
+        label: "SFG IMS OUT",
+        detail: "Packed transfers from SFG to G Floor.",
+      },
     ],
-    liveHow: "G Floor Live Stock + 1st Floor Live Stock.",
+    liveHow: "G Floor Live Stock + SFG Live Stock + 1st Floor Live Stock.",
   },
 };
 
@@ -127,10 +160,10 @@ const getLiveStockFontClass = (value: number) => {
 
 const getInOutFontClass = (value: number) => {
   const length = formatMetric(value).length;
-  if (length > 12) return "text-sm sm:text-base";
-  if (length > 10) return "text-base sm:text-lg";
-  if (length > 8) return "text-lg sm:text-xl";
-  return "text-xl sm:text-2xl";
+  if (length > 11) return "text-xs sm:text-sm";
+  if (length > 9) return "text-sm sm:text-base";
+  if (length > 7) return "text-base";
+  return "text-lg";
 };
 
 export default function IMSHub() {
@@ -143,6 +176,10 @@ export default function IMSHub() {
     return <IMSMaster onBack={() => setActiveLocation(null)} />;
   }
 
+  if (activeLocation === "sfg") {
+    return <IMSFloor location={activeLocation} onBack={() => setActiveLocation(null)} />;
+  }
+
   if (activeLocation === "1st") {
     return <IMSFloor location={activeLocation} onBack={() => setActiveLocation(null)} />;
   }
@@ -152,9 +189,9 @@ export default function IMSHub() {
   }
 
   const finalData = summary ? {
-    liveStock: (summary.main?.liveStock || 0) + (summary.first?.liveStock || 0),
-    totalIn: (summary.main?.totalIn || 0) + (summary.first?.totalIn || 0),
-    totalOut: (summary.main?.totalOut || 0) + (summary.first?.totalOut || 0),
+    liveStock: (summary.main?.liveStock || 0) + (summary.sfg?.liveStock || 0) + (summary.first?.liveStock || 0),
+    totalIn: (summary.main?.totalIn || 0) + (summary.sfg?.totalIn || 0) + (summary.first?.totalIn || 0),
+    totalOut: (summary.main?.totalOut || 0) + (summary.sfg?.totalOut || 0) + (summary.first?.totalOut || 0),
   } : undefined;
 
   const renderTile = (
@@ -238,7 +275,7 @@ export default function IMSHub() {
                   </span>
                 </div>
                 <div
-                  className={`${getInOutFontClass(data.totalIn)} font-black text-white leading-none break-words [overflow-wrap:anywhere]`}
+                  className={`${getInOutFontClass(data.totalIn)} font-black text-white leading-none whitespace-nowrap tabular-nums`}
                   title={formatMetric(data.totalIn)}
                 >
                   {formatMetric(data.totalIn)}
@@ -246,13 +283,13 @@ export default function IMSHub() {
               </div>
               <div className="bg-white/10 backdrop-blur-md rounded-2xl p-3 sm:p-4 border border-white/20 transition-colors min-w-0">
                 <div className="flex items-center justify-between mb-1.5">
-                  <span className={`font-black text-white/80 uppercase tracking-widest flex items-center gap-1.5 leading-tight ${id === "1st" ? "text-[10px] sm:text-xs" : "text-xs sm:text-sm"}`}>
+                  <span className={`font-black text-white/80 uppercase tracking-widest flex items-center gap-1.5 leading-tight ${id === "1st" || id === "sfg" ? "text-[10px] sm:text-xs" : "text-xs sm:text-sm"}`}>
                     <ArrowTrendingDownIcon className="w-4 h-4 shrink-0"/>
-                    {id === "1st" ? "Transfer to G Floor" : "Out"}
+                    {id === "1st" || id === "sfg" ? "Transfer to G Floor" : "Out"}
                   </span>
                 </div>
                 <div
-                  className={`${getInOutFontClass(data.totalOut)} font-black text-white leading-none break-words [overflow-wrap:anywhere]`}
+                  className={`${getInOutFontClass(data.totalOut)} font-black text-white leading-none whitespace-nowrap tabular-nums`}
                   title={formatMetric(data.totalOut)}
                 >
                   {formatMetric(data.totalOut)}
@@ -278,7 +315,16 @@ export default function IMSHub() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+          {renderTile(
+            "sfg",
+            "SFG IMS",
+            "Semi Finished Goods",
+            <CubeTransparentIcon />,
+            summary?.sfg,
+            "bg-gradient-to-br from-teal-500 to-cyan-800",
+            "shadow-teal-900/20"
+          )}
           {renderTile(
             "master", 
             "IMS - G Floor", 

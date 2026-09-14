@@ -36,7 +36,8 @@ import {
   HashtagIcon,
   PaperClipIcon,
   ArrowTopRightOnSquareIcon,
-  XCircleIcon
+  XCircleIcon,
+  ArchiveBoxIcon
 } from "@heroicons/react/24/outline";
 import ActionStatusModal from "@/components/ActionStatusModal";
 import ConfirmModal from "@/components/ConfirmModal";
@@ -730,6 +731,11 @@ export default function GRNDashboard() {
                                 <span className="flex items-center gap-1.5 text-[10px] font-black text-blue-500 uppercase"><CubeIcon className="w-3.5 h-3.5" /> Qty: {item.Qty}</span>
                                 <span className="flex items-center gap-1.5 text-[10px] font-black text-purple-500 uppercase"><TagIcon className="w-3.5 h-3.5" /> {item.Category}</span>
                                 <span className="flex items-center gap-1.5 text-[10px] font-black text-slate-400 uppercase"><UserIcon className="w-3.5 h-3.5" /> {item.filled_by}</span>
+                                {item.Packed_Unpacked && (
+                                  <span className={`flex items-center gap-1.5 text-[10px] font-black uppercase ${item.Packed_Unpacked.toLowerCase() === "packed" ? "text-emerald-600" : "text-slate-500"}`}>
+                                    <ArchiveBoxIcon className="w-3.5 h-3.5" /> {item.Packed_Unpacked}
+                                  </span>
+                                )}
                                 <span className="flex items-center gap-1.5 text-[10px] font-black text-slate-400 uppercase"><CalendarIcon className="w-3.5 h-3.5" /> {fmtDt(item.updated_at)}</span>
                               </div>
                             </div>
@@ -883,6 +889,7 @@ export default function GRNDashboard() {
                       <th className="p-4 whitespace-nowrap">QUANTITY</th>
                       <th className="p-4 whitespace-nowrap">PO NUMBER</th>
                       <th className="p-4 whitespace-nowrap">COUNTRY</th>
+                      <th className="p-4 whitespace-nowrap">PACKED / UNPACKED</th>
                       <th className="p-4 whitespace-nowrap">FILLED BY</th>
                       <th className="p-4 whitespace-nowrap">UPDATED AT</th>
                       {GRN_STEP_SHORT.map((s, i) => <th key={i} className="p-4 whitespace-nowrap border-l border-white/10 min-w-[200px]">STEP {i+1} — {s.toUpperCase()}</th>)}
@@ -913,6 +920,7 @@ export default function GRNDashboard() {
                         <td className="p-4 font-bold text-slate-500">{it.Qty}</td>
                         <td className="p-4 font-black text-orange-600">{it.PO_Number}</td>
                         <td className="p-4 font-bold text-slate-400 uppercase">{it.Country}</td>
+                        <td className="p-4 font-black uppercase">{it.Packed_Unpacked || "—"}</td>
                         <td className="p-4 font-bold text-slate-500">{it.filled_by}</td>
                         <td className="p-4 whitespace-nowrap text-slate-400">{fmtDt(it.updated_at)}</td>
                         {Array.from({ length: 9 }).map((_, i) => {
@@ -1120,6 +1128,15 @@ export default function GRNDashboard() {
                            <option value="Partial">Partial</option>
                         </select>
                      </div>
+                  </div>
+
+                  <div className="space-y-1.5">
+                     <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-1.5"><ArchiveBoxIcon className="w-3 h-3 text-[#FFD500]" /> Packed / Unpacked</label>
+                     <select value={formData.Packed_Unpacked || ""} onChange={e => setFormData({...formData, Packed_Unpacked: e.target.value})} className="w-full px-4 py-3 bg-[#FFFBF0] dark:bg-navy-900 border border-orange-100/50 dark:border-navy-800 rounded-xl font-bold text-sm text-gray-900 dark:text-white outline-none focus:border-[#003875] dark:focus:border-[#FFD500] transition-all cursor-pointer shadow-sm">
+                        <option value="">Select</option>
+                        <option value="Packed">Packed</option>
+                        <option value="Unpacked">Unpacked</option>
+                     </select>
                   </div>
 
                   <div className="space-y-1.5">

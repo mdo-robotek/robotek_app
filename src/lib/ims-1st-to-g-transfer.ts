@@ -8,14 +8,16 @@ export type FloorLedgerRow = {
   updated_at?: string;
 };
 
-export type FirstFloorToGFloorTx = {
+export type FloorToGFloorTx = {
   item_name: string;
   category: string;
   date: string;
   in_qty: number;
   out_qty: number;
-  source: "1stFloor";
+  source: "1stFloor" | "SFG";
 };
+
+export type FirstFloorToGFloorTx = FloorToGFloorTx;
 
 function parseDateStr(dStr: string) {
   if (!dStr) return 0;
@@ -39,14 +41,15 @@ function normalizeTxDate(row: FloorLedgerRow): string {
   return txDate;
 }
 
-/** Each 1st Floor OUT row becomes a G Floor IN transfer transaction. */
-export function firstFloorOutRowsToGFloorInTxs(
-  firstFloorLedger: FloorLedgerRow[],
-  categoryMap: Record<string, string> = {}
-): FirstFloorToGFloorTx[] {
-  const transactions: FirstFloorToGFloorTx[] = [];
+/** Each floor OUT row becomes a G Floor IN transfer transaction. */
+export function floorOutRowsToGFloorInTxs(
+  ledger: FloorLedgerRow[],
+  categoryMap: Record<string, string> = {},
+  source: "1stFloor" | "SFG" = "1stFloor"
+): FloorToGFloorTx[] {
+  const transactions: FloorToGFloorTx[] = [];
 
-  firstFloorLedger.forEach((row) => {
+  ledger.forEach((row) => {
     const name = (row.item_name || "").trim();
     if (!name) return;
 
@@ -60,11 +63,35 @@ export function firstFloorOutRowsToGFloorInTxs(
       date: normalizeTxDate(row),
       in_qty: outQty,
       out_qty: 0,
-      source: "1stFloor",
+      source,
     });
   });
 
   return transactions;
+}
+
+/** Each 1st Floor OUT row becomes a G Floor IN transfer transaction. */
+export function firstFloorOutRowsToGFloorInTxs(
+  firstFloorLedger: FloorLedgerRow[],
+  categoryMap: Record<string, string> = {}
+): FirstFloorToGFloorTx[] {
+  return floorOutRowsToGFloorInTxs(firstFloorLedger, categoryMap, "1stFloor");
+}
+
+/** Add floor OUT quantities into a G Floor IN quantity map. */
+export function applyFloorOutToGFloorInMap(
+  ledger: FloorLedgerRow[],
+  inQtyMap: Record<string, number>,
+  rememberName: (raw: string) => string
+) {
+  ledger.forEach((row) => {
+    if (!row.item_name) return;
+    const outQ = parseFloat(String(row.out_qty ?? 0)) || 0;
+    if (outQ <= 0) return;
+    const key = rememberName(row.item_name);
+    if (!key) return;
+    inQtyMap[key] = (inQtyMap[key] || 0) + outQ;
+  });
 }
 
 /** Add 1st Floor OUT quantities into a G Floor IN quantity map. */
@@ -73,12 +100,5 @@ export function applyFirstFloorOutToGFloorInMap(
   inQtyMap: Record<string, number>,
   rememberName: (raw: string) => string
 ) {
-  firstFloorLedger.forEach((row) => {
-    if (!row.item_name) return;
-    const outQ = parseFloat(String(row.out_qty ?? 0)) || 0;
-    if (outQ <= 0) return;
-    const key = rememberName(row.item_name);
-    if (!key) return;
-    inQtyMap[key] = (inQtyMap[key] || 0) + outQ;
-  });
+  applyFloorOutToGFloorInMap(firstFloorLedger, inQtyMap, rememberName);
 }

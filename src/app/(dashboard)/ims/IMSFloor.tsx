@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import useSWR from "swr";
+import useSWR, { mutate as globalMutate } from "swr";
 import { motion, AnimatePresence } from "framer-motion";
 import ActionStatusModal from "@/components/ActionStatusModal";
 import ConfirmModal from "@/components/ConfirmModal";
@@ -21,6 +21,7 @@ import {
   CheckIcon
 } from "@heroicons/react/24/outline";
 import { FloorIMS } from "@/types/ims-floor";
+import { isSfgVirtualGrnId } from "@/lib/grn-packed";
 import TimeSeriesTable, { TimeBucket } from "@/components/TimeSeriesTable";
 import DateFilterBar, { FilterPeriod } from "@/components/DateFilterBar";
 import SearchableMultiSelect from "@/components/SearchableMultiSelect";
@@ -120,7 +121,10 @@ interface AuditRow {
   fromPaste?: boolean;
 }
 
-export default function IMSFloor({ location, onBack }: { location: "1st" | "g", onBack: () => void }) {
+export default function IMSFloor({ location, onBack }: { location: "1st" | "g" | "sfg", onBack: () => void }) {
+  const showPacked = location === "1st" || location === "sfg";
+  const allowManualIn = location !== "sfg";
+  const isSfg = location === "sfg";
   const [submitting, setSubmitting] = useState(false);
   const [statusMessage, setStatusMessage] = useState("");
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
@@ -433,7 +437,7 @@ function parseDateStr(dStr: string) {
   };
 
   const addBulkRow = () => {
-    setBulkRows(prev => [...prev, { id: Date.now().toString(), item_name: '', category: '', type: 'IN', qty: '', date: '', packed_status: '' }]);
+    setBulkRows(prev => [...prev, { id: Date.now().toString(), item_name: '', category: '', type: allowManualIn ? 'IN' : 'OUT', qty: '', date: '', packed_status: isSfg ? 'PACKED' : '' }]);
   };
 
   const removeBulkRow = (id: string) => {
@@ -466,7 +470,7 @@ function parseDateStr(dStr: string) {
           in_qty: row.type === 'IN' ? qty.toString() : "0",
           out_qty: row.type === 'OUT' ? qty.toString() : "0",
           date: row.date || today,
-          packed_status: row.packed_status || "",
+          packed_status: isSfg ? (row.packed_status || "PACKED") : (row.packed_status || ""),
           updated_at: new Date().toISOString(),
         };
       });
@@ -478,6 +482,9 @@ function parseDateStr(dStr: string) {
       });
       if (!res.ok) throw new Error("Save failed");
       mutate();
+      globalMutate("/api/ims");
+      globalMutate("/api/ims/summary");
+      globalMutate("/api/ims/time-series");
       setItemModalOpen(false);
       setBulkRows([]);
       showStatus("Records Saved Successfully!", "success");
@@ -684,6 +691,8 @@ function parseDateStr(dStr: string) {
   };
 
   const isStoredFloorLog = (id: string | number) => !String(id).startsWith("outform-");
+  const canEditDeleteLog = (id: string | number) => isStoredFloorLog(id) && !isSfgVirtualGrnId(id);
+  const canVerifyLog = (id: string | number) => isStoredFloorLog(id);
 
   const toggleVerifySelection = (id: string) => {
     setSelectedVerifyIds((prev) =>
@@ -694,7 +703,7 @@ function parseDateStr(dStr: string) {
   const handleMarkChecked = async () => {
     const ids = selectedVerifyIds.filter((id) => {
       const item = rawItems.find((i) => String(i.id) === id);
-      return item && isStoredFloorLog(id) && !isItemChecked(item);
+      return item && canVerifyLog(id) && !isItemChecked(item);
     });
 
     if (ids.length === 0) {
@@ -849,7 +858,7 @@ function parseDateStr(dStr: string) {
     document.body.removeChild(link);
   };
 
-  const title = location === "1st" ? "IMS - 1st Floor" : "IMS - G Floor";
+  const title = location === "sfg" ? "SFG IMS" : location === "1st" ? "IMS - 1st Floor" : "IMS - G Floor";
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-[#0a0f1c] flex flex-col h-[calc(100vh-4rem)] p-2 gap-2">
@@ -922,6 +931,7 @@ function parseDateStr(dStr: string) {
           }`}>
             <ArrowDownTrayIcon className="w-4 h-4" /> Export
           </button>
+          {!isSfg && (
           <button onClick={() => {
             setAuditRows([]);
             setAuditPasteText("");
@@ -934,16 +944,17 @@ function parseDateStr(dStr: string) {
           }`}>
             <ClipboardDocumentCheckIcon className="w-4 h-4" /> Physical Check
           </button>
+          )}
           <button
             onClick={() => {
-              setBulkRows([{ id: Date.now().toString(), item_name: '', category: '', type: 'IN', qty: '', date: '', packed_status: '' }]);
+              setBulkRows([{ id: Date.now().toString(), item_name: '', category: '', type: allowManualIn ? 'IN' : 'OUT', qty: '', date: '', packed_status: isSfg ? 'PACKED' : '' }]);
               setItemModalOpen(true);
             }}
             className={`flex items-center gap-2 px-4 py-2 text-white rounded-lg text-[11px] font-black uppercase tracking-widest transition-all shadow-md hover:-translate-y-0.5 whitespace-nowrap ${
               location === '1st' ? 'bg-purple-600 hover:bg-purple-700' : 'bg-emerald-600 hover:bg-emerald-700'
             }`}
           >
-            <PlusIcon className="w-4 h-4 stroke-2" /> Add Log
+            <PlusIcon className="w-4 h-4 stroke-2" /> {isSfg ? "Transfer to G Floor" : "Add Log"}
           </button>
         </div>
       </div>
@@ -984,7 +995,7 @@ function parseDateStr(dStr: string) {
               accentClass={location === '1st' ? 'border-purple-500 ring-purple-500/20' : 'border-emerald-500 ring-emerald-500/20'}
             />
           </div>
-          {location === '1st' && (
+          {showPacked && (
             <select
               value={packedFilter}
               onChange={(e) => setPackedFilter(e.target.value as 'ALL' | 'PACKED' | 'UNPACKED')}
@@ -1084,7 +1095,7 @@ function parseDateStr(dStr: string) {
                     <th className={`py-2.5 px-3 text-[10px] font-black uppercase tracking-widest border-b text-right ${location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20' : 'text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'}`}>In</th>
                     <th className={`py-2.5 px-3 text-[10px] font-black uppercase tracking-widest border-b text-right ${location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20' : 'text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'}`}>Out</th>
                     <th className={`py-2.5 px-3 text-[10px] font-black uppercase tracking-widest border-b text-right ${location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20' : 'text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'}`}>Live Stock</th>
-                    {location === '1st' && (
+                    {showPacked && (
                       <th className="py-2.5 px-3 text-[10px] font-black uppercase tracking-widest border-b text-center text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20">Status</th>
                     )}
                     <th className={`py-2.5 px-3 text-[10px] font-black uppercase tracking-widest border-b text-center ${location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20' : 'text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'}`}>Checked</th>
@@ -1094,7 +1105,7 @@ function parseDateStr(dStr: string) {
                 <tbody className={`divide-y ${location === '1st' ? 'divide-purple-100 dark:divide-purple-500/10' : 'divide-emerald-100 dark:divide-emerald-500/10'}`}>
                   {paginatedDatewiseItems.map((log) => {
                     const checked = isItemChecked(log);
-                    const canVerify = isStoredFloorLog(log.id);
+                    const canVerify = canVerifyLog(log.id);
                     const isSelected = selectedVerifyIds.includes(String(log.id));
                     return (
                     <tr
@@ -1127,7 +1138,7 @@ function parseDateStr(dStr: string) {
                       <td className="py-2 px-3 text-[11px] font-black text-emerald-600 dark:text-emerald-400 text-right">{log.in_qty !== "0" && log.in_qty !== "" ? `+${log.in_qty}` : "-"}</td>
                       <td className="py-2 px-3 text-[11px] font-black text-rose-600 dark:text-rose-400 text-right">{log.out_qty !== "0" && log.out_qty !== "" ? `-${log.out_qty}` : "-"}</td>
                       <td className="py-2 px-3 text-[11px] font-black text-[#003875] dark:text-[#FFD500] text-right">{(log as any).running_stock}</td>
-                      {location === '1st' && (
+                      {showPacked && (
                         <td className="py-2 px-3 text-center">
                           {log.packed_status === 'PACKED' ? (
                             <span className="px-2 py-0.5 bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400 rounded-md text-[9px] font-black uppercase">Packed</span>
@@ -1153,7 +1164,7 @@ function parseDateStr(dStr: string) {
                         )}
                       </td>
                       <td className="py-2 px-4 text-center">
-                        {isStoredFloorLog(log.id) ? (
+                        {canEditDeleteLog(log.id) ? (
                           <div className="flex items-center justify-center gap-2">
                             <button
                               onClick={() => openEditLog(log)}
@@ -1179,7 +1190,7 @@ function parseDateStr(dStr: string) {
                   })}
                   {filteredDatewiseItems.length === 0 && (
                     <tr>
-                      <td colSpan={location === '1st' ? 10 : 9} className="py-8 text-center text-gray-400 text-[11px] font-black uppercase">No items found</td>
+                      <td colSpan={showPacked ? 10 : 9} className="py-8 text-center text-gray-400 text-[11px] font-black uppercase">No items found</td>
                     </tr>
                   )}
                 </tbody>
@@ -1245,7 +1256,7 @@ function parseDateStr(dStr: string) {
                   <th className={`py-2.5 px-3 text-[10px] font-black uppercase tracking-widest border-b text-right ${location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20' : 'text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'}`}>Total In</th>
                   <th className={`py-2.5 px-3 text-[10px] font-black uppercase tracking-widest border-b text-right ${location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20' : 'text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'}`}>Total Out</th>
                   <th className={`py-2.5 px-4 text-[10px] font-black uppercase tracking-widest border-b text-right w-32 ${location === '1st' ? 'text-purple-700 dark:text-purple-400 border-purple-200 dark:border-purple-500/20 bg-purple-100/50 dark:bg-purple-500/10' : 'text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20 bg-emerald-100/50 dark:bg-emerald-500/10'}`}>Live Stock</th>
-                  {location === '1st' && (
+                  {showPacked && (
                     <th className="py-2.5 px-4 text-[10px] font-black uppercase tracking-widest border-b text-center text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20 w-24">Status</th>
                   )}
                 </tr>
@@ -1282,7 +1293,7 @@ function parseDateStr(dStr: string) {
                           <span className="text-[9px] font-bold text-gray-400 uppercase">{health.label}</span>
                         </div>
                       </td>
-                      {location === '1st' && (
+                      {showPacked && (
                         <td className="py-2 px-4 text-center">
                           {item.packed_status === 'PACKED' ? (
                             <span className="px-2 py-0.5 bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400 rounded-md text-[9px] font-black uppercase">Packed</span>
@@ -1296,7 +1307,7 @@ function parseDateStr(dStr: string) {
                 })}
                 {filteredItems.length === 0 && (
                   <tr>
-                    <td colSpan={6} className="py-8 text-center text-gray-400 text-[11px] font-black uppercase">No items found</td>
+                    <td colSpan={showPacked ? 7 : 6} className="py-8 text-center text-gray-400 text-[11px] font-black uppercase">No items found</td>
                   </tr>
                 )}
               </tbody>
@@ -1383,7 +1394,7 @@ function parseDateStr(dStr: string) {
               <div className="flex items-center justify-between p-5 border-b border-blue-800/20 dark:border-white/5 bg-gradient-to-r from-[#003875] to-blue-800 dark:from-[#1f2937] dark:to-[#111827] text-white shrink-0">
                 <h3 className="text-sm font-black uppercase tracking-widest flex items-center gap-2">
                   <ClipboardDocumentListIcon className="w-5 h-5 text-blue-200 dark:text-[#FFD500]" />
-                  Add Multiple Items - {title}
+                  {isSfg ? "Transfer Packed Stock to G Floor" : `Add Multiple Items - ${title}`}
                 </h3>
                 <button onClick={() => setItemModalOpen(false)} className="p-1.5 text-white/70 hover:text-white bg-white/10 hover:bg-white/20 dark:bg-[#1f2937] rounded-lg shadow-sm transition-colors">
                   <XMarkIcon className="w-4 h-4" />
@@ -1404,7 +1415,7 @@ function parseDateStr(dStr: string) {
                         <th className={thClass}>Item Name *</th>
                         <th className={`${thClass} w-32`}>Category</th>
                         <th className={`${thClass} w-28 text-center`}>Type</th>
-                        {location === "1st" && (
+                        {showPacked && (
                           <th className={`${thClass} w-36 text-center`}>Packed</th>
                         )}
                         <th className={`${thClass} w-24 text-right`}>Qty *</th>
@@ -1436,21 +1447,23 @@ function parseDateStr(dStr: string) {
                           </td>
                           <td className={`${tdClass} text-center`}>
                             <div className="flex bg-gray-100 dark:bg-gray-800 p-0.5 rounded-md justify-center">
+                              {allowManualIn && (
                               <button
                                 onClick={() => handleBulkRowChange(row.id, "type", "IN")}
                                 className={`px-2 py-1 rounded text-[9px] font-black uppercase tracking-wider transition-all ${row.type === "IN" ? "bg-emerald-500 text-white shadow-sm" : "text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"}`}
                               >
                                 IN
                               </button>
+                              )}
                               <button
                                 onClick={() => handleBulkRowChange(row.id, "type", "OUT")}
                                 className={`px-2 py-1 rounded text-[9px] font-black uppercase tracking-wider transition-all ${row.type === "OUT" ? "bg-rose-500 text-white shadow-sm" : "text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"}`}
                               >
-                                OUT
+                                {isSfg ? "TO G FLOOR" : "OUT"}
                               </button>
                             </div>
                           </td>
-                          {location === "1st" && (
+                          {showPacked && (
                             <td className={`${tdClass} text-center`}>
                               <div className="flex bg-gray-100 dark:bg-gray-800 p-0.5 rounded-md justify-center">
                                 <button
@@ -1716,17 +1729,19 @@ function parseDateStr(dStr: string) {
 
                 <div className="flex items-center gap-3">
                   <div className="flex bg-gray-200 dark:bg-gray-800 p-1 rounded-lg">
+                    {allowManualIn && (
                     <button
                       onClick={() => setEditForm(prev => ({ ...prev, type: 'IN' }))}
                       className={`px-4 py-2 rounded-md text-[10px] font-black uppercase tracking-wider transition-all ${editForm.type === 'IN' ? 'bg-emerald-500 text-white shadow-sm' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
                     >
                       IN
                     </button>
+                    )}
                     <button
                       onClick={() => setEditForm(prev => ({ ...prev, type: 'OUT' }))}
                       className={`px-4 py-2 rounded-md text-[10px] font-black uppercase tracking-wider transition-all ${editForm.type === 'OUT' ? 'bg-rose-500 text-white shadow-sm' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
                     >
-                      OUT
+                      {isSfg ? "To G Floor" : "OUT"}
                     </button>
                   </div>
                   <div className="flex-1">

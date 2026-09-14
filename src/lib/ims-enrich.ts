@@ -1,5 +1,6 @@
 import type { IMS } from "@/types/ims";
-import { applyFirstFloorOutToGFloorInMap, type FloorLedgerRow } from "./ims-1st-to-g-transfer";
+import { applyFloorOutToGFloorInMap, type FloorLedgerRow } from "./ims-1st-to-g-transfer";
+import { isGrnForGFloor } from "./grn-packed";
 
 function parseDateStr(dStr: string) {
   if (!dStr) return 0;
@@ -39,10 +40,11 @@ function resolveMovementSource(
 }
 
 export function buildIMSMovementMaps(
-  grns: { Item_Name?: string; Qty?: string; cancelled?: string | boolean; status_1?: string }[],
+  grns: { Item_Name?: string; Qty?: string; cancelled?: string | boolean; status_1?: string; Packed_Unpacked?: string }[],
   outForm: { description?: string; qty?: string; date?: string; updated_at?: string }[],
   gFloorLedger: FloorLedgerRow[] = [],
-  firstFloorLedger: FloorLedgerRow[] = []
+  firstFloorLedger: FloorLedgerRow[] = [],
+  sfgFloorLedger: FloorLedgerRow[] = []
 ): IMSMovementMaps {
   const inQtyMap: Record<string, number> = {};
   const outQtyMap: Record<string, number> = {};
@@ -59,7 +61,7 @@ export function buildIMSMovementMaps(
   };
 
   grns.forEach((grn) => {
-    if (grn.Item_Name && !grn.cancelled && grn.status_1 !== "Rejected") {
+    if (grn.Item_Name && !grn.cancelled && grn.status_1 !== "Rejected" && isGrnForGFloor(grn)) {
       const qty = parseFloat(grn.Qty || "") || 0;
       const key = rememberName(grn.Item_Name);
       if (key) {
@@ -124,7 +126,8 @@ export function buildIMSMovementMaps(
     }
   });
 
-  applyFirstFloorOutToGFloorInMap(firstFloorLedger, inQtyMap, rememberName);
+  applyFloorOutToGFloorInMap(firstFloorLedger, inQtyMap, rememberName);
+  applyFloorOutToGFloorInMap(sfgFloorLedger, inQtyMap, rememberName);
 
   return { inQtyMap, outQtyMap, outQty60DaysMap, displayNameMap, grnKeys, o2dKeys };
 }

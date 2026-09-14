@@ -3,7 +3,8 @@ import { getGRNItems } from "@/lib/grn-sheets";
 import { getOutFormData } from "@/lib/o2d-sheets";
 import { getIMSItems } from "@/lib/ims-sheets";
 import { getFloorIMSItems } from "@/lib/ims-floor-sheets";
-import { firstFloorOutRowsToGFloorInTxs } from "@/lib/ims-1st-to-g-transfer";
+import { firstFloorOutRowsToGFloorInTxs, floorOutRowsToGFloorInTxs } from "@/lib/ims-1st-to-g-transfer";
+import { isGrnForGFloor } from "@/lib/grn-packed";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -25,12 +26,13 @@ function parseDateStr(dStr: string) {
 
 export async function GET() {
   try {
-    const [items, grns, outForm, gFloorLedger, firstFloorLedger] = await Promise.all([
+    const [items, grns, outForm, gFloorLedger, firstFloorLedger, sfgFloorLedger] = await Promise.all([
       getIMSItems(),
       getGRNItems(),
       getOutFormData(),
       getFloorIMSItems("g"),
       getFloorIMSItems("1st"),
+      getFloorIMSItems("sfg"),
     ]);
 
     const categoryMap: Record<string, string> = {};
@@ -44,7 +46,7 @@ export async function GET() {
 
     // GRN (Inward)
     grns.forEach(grn => {
-      if (grn.Item_Name && !grn.cancelled && grn.status_1 !== "Rejected") {
+      if (grn.Item_Name && !grn.cancelled && grn.status_1 !== "Rejected" && isGrnForGFloor(grn)) {
         const qty = parseFloat(grn.Qty) || 0;
         const name = grn.Item_Name.trim();
         const lowerName = name.toLowerCase();
@@ -142,6 +144,7 @@ export async function GET() {
     });
 
     transactions.push(...firstFloorOutRowsToGFloorInTxs(firstFloorLedger, categoryMap));
+    transactions.push(...floorOutRowsToGFloorInTxs(sfgFloorLedger, categoryMap, "SFG"));
 
     return NextResponse.json(transactions, {
       headers: { 'Cache-Control': 'no-store, max-age=0' },

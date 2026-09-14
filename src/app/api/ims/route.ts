@@ -11,15 +11,16 @@ export const revalidate = 0;
 
 export async function GET() {
   try {
-    const [items, grns, outForm, gFloorLedger, firstFloorLedger] = await Promise.all([
+    const [items, grns, outForm, gFloorLedger, firstFloorLedger, sfgFloorLedger] = await Promise.all([
       getIMSItems(),
       getGRNItems(),
       getOutFormData(),
       getFloorIMSItems("g"),
       getFloorIMSItems("1st"),
+      getFloorIMSItems("sfg"),
     ]);
 
-    const maps = buildIMSMovementMaps(grns, outForm, gFloorLedger, firstFloorLedger);
+    const maps = buildIMSMovementMaps(grns, outForm, gFloorLedger, firstFloorLedger, sfgFloorLedger);
     const enrichedItems = enrichIMSItems(items, maps);
 
     return NextResponse.json(enrichedItems, {

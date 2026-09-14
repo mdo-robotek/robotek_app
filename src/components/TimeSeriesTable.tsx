@@ -13,7 +13,7 @@ export interface Transaction {
   date: string; // ISO or YYYY-MM-DD
   in_qty: number;
   out_qty: number;
-  source?: 'GRN' | 'O2D' | 'GFloor' | '1stFloor';
+  source?: 'GRN' | 'O2D' | 'GFloor' | '1stFloor' | 'SFG';
   /** IMS-G Floor ledger row id (only for source GFloor) */
   floor_id?: string;
   /** Checked Status from IMS-G Floor sheet */

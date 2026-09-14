@@ -29,6 +29,7 @@ class GRNService extends BaseSheetsService<GRN> {
       Payment_Terms_In_days: get("payment_terms_(in_days)") || get("payment_terms_in_days"),
       Payment_Completed: get("payment_completed"),
       filled_by: get("filled_by"),
+      Packed_Unpacked: get("packed/unpacked") || get("packed_unpacked") || get("packed unpacked"),
       updated_at: get("updated_at"),
       indent_id: get("indent_id"),
       cancelled: get("cancelled"),
@@ -65,6 +66,8 @@ class GRNService extends BaseSheetsService<GRN> {
     set("payment_terms_(in_days)", item.Payment_Terms_In_days);
     set("payment_completed", item.Payment_Completed);
     set("filled_by", item.filled_by);
+    set("packed/unpacked", item.Packed_Unpacked);
+    set("packed_unpacked", item.Packed_Unpacked);
     set("updated_at", item.updated_at);
     set("indent_id", item.indent_id);
     set("cancelled", item.cancelled);
@@ -201,6 +204,16 @@ class GRNService extends BaseSheetsService<GRN> {
     }
   }
 
+  hasColumn(name: string): boolean {
+    return this.hMap[name.toLowerCase()] !== undefined;
+  }
+
+  async refreshHeaders(): Promise<void> {
+    globalCache.delete(`${this.spreadsheetId}_${this.sheetName}_headers`);
+    this.hMap = {};
+    await this.ensureHeaders();
+  }
+
   private getColLetter(colIndex: number): string {
     let temp, letter = "";
     let col = colIndex + 1;
@@ -243,7 +256,7 @@ export async function addGRNEntry(data: Partial<GRN>): Promise<string> {
   // Final column list for GRN
   const headers = [
     "id", "GRN_No", "PO_Number", "Item_Name", "Category", "Qty", "Country", "Attach_Bill", 
-    "Payment_Terms_(In_days)", "Payment_Completed", "filled_by", "Cancelled",
+    "Payment_Terms_(In_days)", "Payment_Completed", "filled_by", "Packed/Unpacked", "Cancelled",
     "Planned_1", "Actual_1", "Status_1", "Remarks_1",
     "Planned_2", "Actual_2", "Status_2",
     "Planned_3", "Actual_3", "Status_3", "Remarks_3",
@@ -256,6 +269,10 @@ export async function addGRNEntry(data: Partial<GRN>): Promise<string> {
     "updated_at", "indent_id"
   ];
 
+  await grnService.ensureHeaders();
+  if (!grnService.hasColumn("packed/unpacked") && !grnService.hasColumn("packed_unpacked")) {
+    await grnService.refreshHeaders();
+  }
   await grnService.ensureColumns(headers);
 
   // Initialize Step 1 only — always read fresh TAT from sheet (avoid stale cache)

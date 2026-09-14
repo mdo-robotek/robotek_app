@@ -1,5 +1,6 @@
 import { BaseSheetsService } from "./sheets/base-service";
 import { FloorIMS } from "@/types/ims-floor";
+import { isSfgVirtualGrnId } from "./grn-packed";
 
 const SPREADSHEET_ID = "12lk8GV7ZBpm6J-bA5TBWfHQ1qY0eEHIrwOICSnsuceE";
 
@@ -70,16 +71,26 @@ class FloorIMSService extends BaseSheetsService<FloorIMS> {
 
 export const ims1stFloorService = new FloorIMSService("IMS-1st Floor");
 export const imsGFloorService = new FloorIMSService("IMS-G Floor");
+export const imsSfgFloorService = new FloorIMSService("IMS-SFG Floor");
+
+export const FLOOR_LOCATIONS = ["1st", "g", "sfg"] as const;
+export type FloorLocation = (typeof FLOOR_LOCATIONS)[number];
 
 let locks: Record<string, Promise<any>> = {
   "1st": Promise.resolve(),
-  "g": Promise.resolve()
+  "g": Promise.resolve(),
+  sfg: Promise.resolve(),
 };
 
 function getService(location: string) {
   if (location === "1st") return ims1stFloorService;
   if (location === "g") return imsGFloorService;
+  if (location === "sfg") return imsSfgFloorService;
   throw new Error("Invalid location");
+}
+
+export function isValidFloorLocation(location: string | null): location is FloorLocation {
+  return !!location && (FLOOR_LOCATIONS as readonly string[]).includes(location);
 }
 
 export async function getFloorIMSItems(location: string): Promise<FloorIMS[]> {
@@ -164,17 +175,42 @@ export async function markFloorIMSItemsChecked(
   const service = getService(location);
   const allItems = await service.getAll();
   let updated = 0;
+  let grns: { id: string; Item_Name?: string; Category?: string; updated_at?: string }[] | null = null;
 
   for (const id of ids) {
     const item = allItems.find((i) => String(i.id).trim() === String(id).trim());
-    if (!item) continue;
-    if (String(item.checked_status || "").trim().toUpperCase() === "CHECKED") continue;
+    if (item) {
+      if (String(item.checked_status || "").trim().toUpperCase() === "CHECKED") continue;
 
-    const success = await service.update(id, {
-      ...item,
-      checked_status: "CHECKED",
-    });
-    if (success) updated++;
+      const success = await service.update(id, {
+        ...item,
+        checked_status: "CHECKED",
+      });
+      if (success) updated++;
+      continue;
+    }
+
+    if (location === "sfg" && isSfgVirtualGrnId(id)) {
+      if (!grns) {
+        const { getGRNItems } = await import("./grn-sheets");
+        grns = await getGRNItems();
+      }
+      const grnId = String(id).slice(4);
+      const grn = grns.find((g) => String(g.id) === grnId);
+      if (!grn) continue;
+      const ok = await addFloorIMSItem(location, {
+        id,
+        item_name: grn.Item_Name || "",
+        category: grn.Category || "",
+        in_qty: "0",
+        out_qty: "0",
+        date: grn.updated_at || new Date().toISOString().slice(0, 10),
+        packed_status: "UNPACKED",
+        checked_status: "CHECKED",
+        updated_at: new Date().toISOString(),
+      } as FloorIMS);
+      if (ok) updated++;
+    }
   }
 
   return { success: updated > 0, updated };

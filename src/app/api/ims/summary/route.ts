@@ -4,6 +4,7 @@ import { getFloorIMSItems } from "@/lib/ims-floor-sheets";
 import { getGRNItems } from "@/lib/grn-sheets";
 import { getOutFormData } from "@/lib/o2d-sheets";
 import { buildIMSMovementMaps, summarizeIMSMovement } from "@/lib/ims-enrich";
+import { isGrnUnpacked } from "@/lib/grn-packed";
 
 export const dynamic = "force-dynamic";
 
@@ -24,15 +25,16 @@ function summarizeFloor(items: { in_qty?: string; out_qty?: string }[]) {
 export async function GET() {
   try {
     // Single parallel sheet fetch — avoids duplicate Out Form / floor reads
-    const [items, grns, outForm, gFloorLedger, firstFloorLedger] = await Promise.all([
+    const [items, grns, outForm, gFloorLedger, firstFloorLedger, sfgFloorLedger] = await Promise.all([
       getIMSItems(),
       getGRNItems(),
       getOutFormData(),
       getFloorIMSItems("g"),
       getFloorIMSItems("1st"),
+      getFloorIMSItems("sfg"),
     ]);
 
-    const maps = buildIMSMovementMaps(grns, outForm, gFloorLedger, firstFloorLedger);
+    const maps = buildIMSMovementMaps(grns, outForm, gFloorLedger, firstFloorLedger, sfgFloorLedger);
     const main = summarizeIMSMovement(items, maps);
 
     const gSummary = summarizeFloor(gFloorLedger);
@@ -65,10 +67,27 @@ export async function GET() {
     gSummary.totalIn += gInFrom1st;
     gSummary.liveStock += gInFrom1st;
 
+    let gInFromSfg = 0;
+    sfgFloorLedger.forEach((row) => {
+      gInFromSfg += parseFloat(String(row.out_qty || 0)) || 0;
+    });
+    gSummary.totalIn += gInFromSfg;
+    gSummary.liveStock += gInFromSfg;
+
+    const sfgSummary = summarizeFloor(sfgFloorLedger);
+    grns.forEach((grn) => {
+      if (grn.Item_Name && !grn.cancelled && grn.status_1 !== "Rejected" && isGrnUnpacked(grn)) {
+        const qty = parseFloat(grn.Qty || "") || 0;
+        sfgSummary.totalIn += qty;
+        sfgSummary.liveStock += qty;
+      }
+    });
+
     return NextResponse.json(
       {
         main,
         first: summarizeFloor(firstFloorLedger),
+        sfg: sfgSummary,
         g: gSummary,
       },
       {

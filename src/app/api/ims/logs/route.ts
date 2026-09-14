@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getGRNItems } from "@/lib/grn-sheets";
 import { getOutFormData } from "@/lib/o2d-sheets";
+import { getFloorIMSItems } from "@/lib/ims-floor-sheets";
+import { isGrnForGFloor } from "@/lib/grn-packed";
 
 export const dynamic = "force-dynamic";
 
@@ -30,16 +32,17 @@ export async function GET(request: NextRequest) {
 
     const queryName = itemName.trim().toLowerCase();
 
-    const [grns, outForm] = await Promise.all([
+    const [grns, outForm, sfgLedger] = await Promise.all([
       getGRNItems(),
-      getOutFormData()
+      getOutFormData(),
+      getFloorIMSItems("sfg"),
     ]);
 
     const logs: any[] = [];
 
     // Process GRN (IN)
     grns.forEach(grn => {
-      if (grn.Item_Name && grn.Item_Name.trim().toLowerCase() === queryName && !grn.cancelled && grn.status_1 !== "Rejected") {
+      if (grn.Item_Name && grn.Item_Name.trim().toLowerCase() === queryName && !grn.cancelled && grn.status_1 !== "Rejected" && isGrnForGFloor(grn)) {
         const qty = parseFloat(grn.Qty) || 0;
         if (qty > 0) {
           logs.push({
@@ -51,6 +54,19 @@ export async function GET(request: NextRequest) {
           });
         }
       }
+    });
+
+    sfgLedger.forEach((row) => {
+      if ((row.item_name || "").trim().toLowerCase() !== queryName) return;
+      const qty = parseFloat(String(row.out_qty || 0)) || 0;
+      if (qty <= 0) return;
+      logs.push({
+        date: row.date || row.updated_at || "",
+        timestamp: parseDateStr(row.date || row.updated_at || ""),
+        type: "IN",
+        qty,
+        remarks: "SFG IMS packed transfer",
+      });
     });
 
     // Process Out Form (OUT)

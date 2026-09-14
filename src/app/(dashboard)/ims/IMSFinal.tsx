@@ -55,6 +55,7 @@ type FinalIMSRow = {
   in_qty: number;
   out_qty: number;
   g_floor_stock: number;
+  sfg_stock: number;
   first_floor_stock: number;
   live_stock: number;
   sale_percent: number;
@@ -87,13 +88,14 @@ export default function IMSFinal({ onBack }: { onBack: () => void }) {
 
   const { data: masterItems = [], isLoading: isLoadingMaster } = useSWR("/api/ims", fetcher);
   const { data: firstItems = [], isLoading: isLoadingFirst } = useSWR("/api/ims/floor?location=1st", fetcher);
+  const { data: sfgItems = [], isLoading: isLoadingSfg } = useSWR("/api/ims/floor?location=sfg", fetcher);
 
   const { data: timeSeriesData = [], isValidating: isTimeSeriesLoading } = useSWR<Transaction[]>(
     viewMode === 'timeseries' ? '/api/ims/time-series' : null,
     fetcher
   );
 
-  const isLoading = isLoadingMaster || isLoadingFirst;
+  const isLoading = isLoadingMaster || isLoadingFirst || isLoadingSfg;
 
   /** One row per item: combined IN/OUT + G Floor + 1st Floor stock + health metrics */
   const aggregatedItems = useMemo(() => {
@@ -110,6 +112,7 @@ export default function IMSFinal({ onBack }: { onBack: () => void }) {
           in_qty: 0,
           out_qty: 0,
           g_floor_stock: 0,
+          sfg_stock: 0,
           first_floor_stock: 0,
           live_stock: 0,
           sale_percent: 0,
@@ -140,6 +143,17 @@ export default function IMSFinal({ onBack }: { onBack: () => void }) {
       if (item.safety_factor != null) row.safety_factor = parseFloat(item.safety_factor) || DEFAULT_SF;
     });
 
+    (sfgItems || []).forEach((item: any) => {
+      const row = ensure(item.item_name, item.category);
+      if (!row) return;
+      const inVal = parseFloat(item.in_qty) || 0;
+      const outVal = parseFloat(item.out_qty) || 0;
+      const live = parseFloat(item.live_stock) || inVal - outVal;
+      row.in_qty += inVal;
+      row.out_qty += outVal;
+      row.sfg_stock += live;
+    });
+
     (firstItems || []).forEach((item: any) => {
       const row = ensure(item.item_name, item.category);
       if (!row) return;
@@ -153,13 +167,13 @@ export default function IMSFinal({ onBack }: { onBack: () => void }) {
 
     return Array.from(map.values())
       .map((row) => {
-        const live_stock = row.g_floor_stock + row.first_floor_stock;
+        const live_stock = row.g_floor_stock + row.sfg_stock + row.first_floor_stock;
         const sale_percent = row.in_qty > 0 ? Number(((row.out_qty / row.in_qty) * 100).toFixed(1)) : 0;
         const max_level = Number((row.avg_daily_con * row.lead_time * row.safety_factor).toFixed(2));
         return { ...row, live_stock, sale_percent, max_level };
       })
       .sort((a, b) => a.item_name.localeCompare(b.item_name));
-  }, [masterItems, firstItems]);
+  }, [masterItems, sfgItems, firstItems]);
 
   const bucketCounts = useMemo(() => {
     const counts = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 };
@@ -246,6 +260,7 @@ export default function IMSFinal({ onBack }: { onBack: () => void }) {
         "Avg. Consumption": item.avg_daily_con,
         "Lead Time": item.lead_time,
         "G Floor Stock": item.g_floor_stock,
+        "SFG Stock": item.sfg_stock,
         "1st Floor Stock": item.first_floor_stock,
         SF: item.safety_factor,
         Max: item.max_level,
@@ -287,9 +302,10 @@ export default function IMSFinal({ onBack }: { onBack: () => void }) {
     });
 
     const firstTxs = (firstItems || []).map(floorMapper('1st Floor IMS'));
+    const sfgTxs = (sfgItems || []).map(floorMapper('SFG IMS'));
 
-    return [...masterTxs, ...firstTxs];
-  }, [timeSeriesData, firstItems]);
+    return [...masterTxs, ...sfgTxs, ...firstTxs];
+  }, [timeSeriesData, firstItems, sfgItems]);
 
   const dateRange = useMemo(() => {
     let start, end;
@@ -590,8 +606,9 @@ export default function IMSFinal({ onBack }: { onBack: () => void }) {
                         {new Date(log.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: '2-digit' })}
                       </td>
                       <td className="py-2 px-3 text-[11px] font-black uppercase">
-                        <span className={`inline-block px-2 py-0.5 rounded border text-[10px] font-black uppercase tracking-wider ${
+        <span className={`inline-block px-2 py-0.5 rounded border text-[10px] font-black uppercase tracking-wider ${
                           log.source === 'IMS - G Floor' ? 'border-blue-200 dark:border-blue-500/20 bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400' :
+                          log.source === 'SFG IMS' ? 'border-teal-200 dark:border-teal-500/20 bg-teal-50 dark:bg-teal-500/10 text-teal-600 dark:text-teal-400' :
                           'border-purple-200 dark:border-purple-500/20 bg-purple-50 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400'
                         }`}>
                           {log.source}
@@ -674,6 +691,7 @@ export default function IMSFinal({ onBack }: { onBack: () => void }) {
                     <th className="py-2.5 px-3 text-[10px] font-black text-orange-600 dark:text-orange-500 uppercase tracking-widest border-b border-orange-200 dark:border-orange-500/20 text-right whitespace-nowrap">Avg. Con</th>
                     <th className="py-2.5 px-3 text-[10px] font-black text-orange-600 dark:text-orange-500 uppercase tracking-widest border-b border-orange-200 dark:border-orange-500/20 text-right">Lead</th>
                     <th className="py-2.5 px-3 text-[10px] font-black text-orange-600 dark:text-orange-500 uppercase tracking-widest border-b border-orange-200 dark:border-orange-500/20 text-right whitespace-nowrap">G Floor</th>
+                    <th className="py-2.5 px-3 text-[10px] font-black text-teal-600 dark:text-teal-400 uppercase tracking-widest border-b border-orange-200 dark:border-orange-500/20 text-right whitespace-nowrap">SFG</th>
                     <th className="py-2.5 px-3 text-[10px] font-black text-orange-600 dark:text-orange-500 uppercase tracking-widest border-b border-orange-200 dark:border-orange-500/20 text-right whitespace-nowrap">1st Floor</th>
                     <th className="py-2.5 px-3 text-[10px] font-black text-orange-600 dark:text-orange-500 uppercase tracking-widest border-b border-orange-200 dark:border-orange-500/20 text-right">SF</th>
                     <th className="py-2.5 px-3 text-[10px] font-black text-orange-600 dark:text-orange-500 uppercase tracking-widest border-b border-orange-200 dark:border-orange-500/20 text-right">Max</th>
@@ -716,6 +734,7 @@ export default function IMSFinal({ onBack }: { onBack: () => void }) {
                         <td className="py-2 px-3 text-[11px] font-bold text-gray-600 dark:text-gray-400 text-right">{item.avg_daily_con || "—"}</td>
                         <td className="py-2 px-3 text-[11px] font-bold text-gray-600 dark:text-gray-400 text-right">{item.lead_time}</td>
                         <td className="py-2 px-3 text-[11px] font-bold text-blue-600 dark:text-blue-400 text-right">{item.g_floor_stock.toLocaleString()}</td>
+                        <td className="py-2 px-3 text-[11px] font-bold text-teal-600 dark:text-teal-400 text-right">{item.sfg_stock.toLocaleString()}</td>
                         <td className="py-2 px-3 text-[11px] font-bold text-purple-600 dark:text-purple-400 text-right">{item.first_floor_stock.toLocaleString()}</td>
                         <td className="py-2 px-3 text-[11px] font-bold text-gray-600 dark:text-gray-400 text-right">{item.safety_factor}</td>
                         <td className="py-2 px-3 text-[11px] font-bold text-[#003875] dark:text-[#FFD500] text-right">{item.max_level || "—"}</td>
@@ -724,7 +743,7 @@ export default function IMSFinal({ onBack }: { onBack: () => void }) {
                   })}
                   {paginatedItems.length === 0 && (
                     <tr>
-                      <td colSpan={12} className="py-12 text-center text-gray-400 text-[11px] font-black uppercase tracking-widest">
+                      <td colSpan={13} className="py-12 text-center text-gray-400 text-[11px] font-black uppercase tracking-widest">
                         {categoryFilters.length > 0 || itemNameFilters.length > 0 || searchQuery || legendFilter !== null
                           ? "No items found matching filters"
                           : "No items available"}

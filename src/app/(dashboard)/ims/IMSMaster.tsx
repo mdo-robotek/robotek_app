@@ -62,6 +62,7 @@ const formatDate = (dateString?: string) => {
 const formatTxSourceLabel = (source?: string) => {
   if (source === "GFloor") return "G Floor";
   if (source === "1stFloor") return "1st OUT";
+  if (source === "SFG") return "SFG OUT";
   if (source === "GRN") return "GRN";
   return "O2D";
 };
@@ -72,6 +73,9 @@ const getTxSourceBadgeClass = (source?: string) => {
   }
   if (source === "1stFloor") {
     return "bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-300";
+  }
+  if (source === "SFG") {
+    return "bg-teal-100 text-teal-700 dark:bg-teal-500/20 dark:text-teal-300";
   }
   if (source === "GRN") {
     return "bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300";

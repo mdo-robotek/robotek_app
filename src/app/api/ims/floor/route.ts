@@ -1,19 +1,65 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getFloorIMSItems, addFloorIMSItem, addFloorIMSItems, updateFloorIMSItem, deleteFloorIMSItem, markFloorIMSItemsChecked } from "@/lib/ims-floor-sheets";
+import { getFloorIMSItems, addFloorIMSItem, addFloorIMSItems, updateFloorIMSItem, deleteFloorIMSItem, markFloorIMSItemsChecked, isValidFloorLocation } from "@/lib/ims-floor-sheets";
 import { FloorIMS } from "@/types/ims-floor";
+import { isGrnUnpacked, isSfgVirtualGrnId, sfgVirtualGrnId } from "@/lib/grn-packed";
 
 export const dynamic = "force-dynamic";
+
+function mergeUnpackedGrnIntoSfg(sheetItems: FloorIMS[], grns: { id: string; Item_Name?: string; Category?: string; Qty?: string; cancelled?: string | boolean; status_1?: string; Packed_Unpacked?: string; updated_at?: string }[]): FloorIMS[] {
+  const overlayById = new Map(
+    sheetItems.filter((i) => isSfgVirtualGrnId(i.id)).map((i) => [String(i.id), i])
+  );
+  const ledgerItems = sheetItems.filter((i) => !isSfgVirtualGrnId(i.id));
+
+  const virtualIns: FloorIMS[] = [];
+  grns.forEach((g) => {
+    if (!g.Item_Name || g.cancelled || g.status_1 === "Rejected" || !isGrnUnpacked(g)) return;
+    const id = sfgVirtualGrnId(g.id);
+    const overlay = overlayById.get(id);
+    const inQty = parseFloat(String(g.Qty || 0)) || 0;
+    virtualIns.push({
+      id,
+      item_name: g.Item_Name,
+      category: g.Category || overlay?.category || "",
+      in_qty: String(inQty),
+      out_qty: "0",
+      date: g.updated_at || overlay?.date || "",
+      packed_status: "UNPACKED",
+      checked_status: overlay?.checked_status || "",
+      updated_at: g.updated_at || overlay?.updated_at || "",
+      live_stock: inQty,
+    });
+  });
+
+  return [...virtualIns, ...ledgerItems];
+}
+
+function asSfgOutOnly<T extends Partial<FloorIMS>>(item: T): T {
+  const outQty = parseFloat(String(item.out_qty || item.in_qty || 0)) || 0;
+  return {
+    ...item,
+    in_qty: "0",
+    out_qty: String(outQty),
+    packed_status: item.packed_status || "PACKED",
+  };
+}
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const location = searchParams.get("location");
 
-    if (!location || !["1st", "g"].includes(location)) {
+    if (!isValidFloorLocation(location)) {
       return NextResponse.json({ error: "Invalid location" }, { status: 400 });
     }
 
-    const items = await getFloorIMSItems(location);
+    let items = await getFloorIMSItems(location);
+
+    if (location === "sfg") {
+      const { getGRNItems } = await import("@/lib/grn-sheets");
+      const grns = await getGRNItems();
+      items = mergeUnpackedGrnIntoSfg(items, grns);
+    }
 
     if (location === "g" && searchParams.get("ledgerOnly") !== "1") {
       const { getOutFormData } = await import("@/lib/o2d-sheets");
@@ -59,11 +105,21 @@ export async function POST(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const location = searchParams.get("location");
     
-    if (!location || !["1st", "g"].includes(location)) {
+    if (!isValidFloorLocation(location)) {
       return NextResponse.json({ error: "Invalid location" }, { status: 400 });
     }
 
     const data = await request.json();
+
+    if (location === "sfg") {
+      const list = Array.isArray(data) ? data : Array.isArray(data?.items) ? data.items : [data];
+      const outOnly = list.map(asSfgOutOnly);
+      const result = await addFloorIMSItems(location, outOnly);
+      if (!result.success) {
+        return NextResponse.json({ error: "Failed to add Floor IMS items" }, { status: 500 });
+      }
+      return NextResponse.json({ success: true, added: result.added });
+    }
 
     if (Array.isArray(data)) {
       const result = await addFloorIMSItems(location, data);
@@ -99,12 +155,16 @@ export async function PUT(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const location = searchParams.get("location");
     
-    if (!location || !["1st", "g"].includes(location)) {
+    if (!isValidFloorLocation(location)) {
       return NextResponse.json({ error: "Invalid location" }, { status: 400 });
     }
 
     const data: FloorIMS = await request.json();
-    const success = await updateFloorIMSItem(location, data.id, data);
+    if (isSfgVirtualGrnId(data.id)) {
+      return NextResponse.json({ error: "GRN inward entries cannot be edited here" }, { status: 400 });
+    }
+    const payload = location === "sfg" ? asSfgOutOnly(data) : data;
+    const success = await updateFloorIMSItem(location, payload.id, payload as FloorIMS);
 
     if (!success) {
       return NextResponse.json({ error: "Failed to update Floor IMS item" }, { status: 500 });
@@ -123,12 +183,16 @@ export async function DELETE(request: NextRequest) {
     const location = searchParams.get("location");
     const id = searchParams.get("id");
     
-    if (!location || !["1st", "g"].includes(location)) {
+    if (!isValidFloorLocation(location)) {
       return NextResponse.json({ error: "Invalid location" }, { status: 400 });
     }
     
     if (!id) {
       return NextResponse.json({ error: "ID is required" }, { status: 400 });
+    }
+
+    if (isSfgVirtualGrnId(id)) {
+      return NextResponse.json({ error: "GRN inward entries cannot be deleted here" }, { status: 400 });
     }
 
     const success = await deleteFloorIMSItem(location, id);
@@ -149,7 +213,7 @@ export async function PATCH(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const location = searchParams.get("location");
 
-    if (!location || !["1st", "g"].includes(location)) {
+    if (!isValidFloorLocation(location)) {
       return NextResponse.json({ error: "Invalid location" }, { status: 400 });
     }
 

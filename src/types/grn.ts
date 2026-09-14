@@ -10,6 +10,7 @@ export interface GRN {
   Payment_Terms_In_days: string;
   Payment_Completed: string;
   filled_by: string;
+  Packed_Unpacked?: string;
   updated_at: string;
   indent_id?: string;
   cancelled?: string;

@@ -35,7 +35,7 @@ import TimeSeriesTable, { TimeBucket, Transaction } from "@/components/TimeSerie
 import DateFilterBar, { FilterPeriod } from "@/components/DateFilterBar";
 import SearchableMultiSelect from "@/components/SearchableMultiSelect";
 import { matchesCategoryItemFilters, matchesExactFilterValue, matchesOptionSearch, normalizeFilterKey } from "@/lib/ims-filters";
-import { getDatewiseTxKey, getTxSortTime, normalizeTxDate } from "@/lib/ims-datewise-key";
+import { getTxSortTime, normalizeTxDate, withUniqueDatewiseIds, matchesDatewiseStatus } from "@/lib/ims-datewise-key";
 import GFloorLedgerModals from "@/app/(dashboard)/ims/GFloorLedgerModals";
 import { startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfQuarter, endOfQuarter, startOfYear, endOfYear } from "date-fns";
 
@@ -615,6 +615,8 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
   const { data: approvalData, mutate: mutateApprovals } = useSWR<{
     keys: string[];
     checkedKeys?: string[];
+    uidKeys?: string[];
+    checkedUidKeys?: string[];
   }>(
     viewMode === "datewise" ? "/api/ims/gfloor-approval" : null,
     fetcher,
@@ -632,6 +634,16 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
 
   const checkedTxKeys = useMemo(
     () => new Set(approvalData?.checkedKeys || []),
+    [approvalData]
+  );
+
+  const approvedUidKeys = useMemo(
+    () => new Set(approvalData?.uidKeys || []),
+    [approvalData]
+  );
+
+  const checkedUidKeys = useMemo(
+    () => new Set(approvalData?.checkedUidKeys || []),
     [approvalData]
   );
 
@@ -677,11 +689,12 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
   const datewiseTransactions = useMemo(() => {
     if (viewMode !== "datewise" || timeSeriesData.length === 0) return [];
 
+    const withIds = withUniqueDatewiseIds(timeSeriesData);
+
     // Precompute sort times once — avoids Date.parse on every comparator call
-    const withSortTime = timeSeriesData.map((item) => ({
+    const withSortTime = withIds.map((item) => ({
       ...item,
       _sortTime: getTxSortTime(item.date),
-      _txKey: getDatewiseTxKey(item),
     }));
 
     withSortTime.sort((a, b) => a._sortTime - b._sortTime);
@@ -737,12 +750,11 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
             case "running_stock":
               return (row as { running_stock?: number }).running_stock || 0;
             case "checked": {
-              const key = getDatewiseTxKey(row);
-              const checked = checkedTxKeys.has(key) || isLedgerChecked(row);
+              const checked = matchesDatewiseStatus(row, checkedUidKeys, checkedTxKeys) || isLedgerChecked(row);
               return checked ? 1 : 0;
             }
             case "approval":
-              return approvedTxKeys.has(getDatewiseTxKey(row)) ? 1 : 0;
+              return matchesDatewiseStatus(row, approvedUidKeys, approvedTxKeys) ? 1 : 0;
             default:
               return "";
           }
@@ -758,7 +770,7 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
     }
 
     return result;
-  }, [datewiseTransactions, categoryFilters, itemNameFilters, sourceFilters, datewiseSortKey, datewiseSortDir, approvedTxKeys, checkedTxKeys]);
+  }, [datewiseTransactions, categoryFilters, itemNameFilters, sourceFilters, datewiseSortKey, datewiseSortDir, approvedTxKeys, checkedTxKeys, approvedUidKeys, checkedUidKeys]);
 
   const filteredTimeSeriesData = useMemo(() => {
     return timeSeriesData.filter((item) => {
@@ -1170,9 +1182,9 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
 
   const paginatedDatewiseWithMeta = useMemo(() => {
     return paginatedDatewiseTransactions.map((log) => {
-      const txKey = getDatewiseTxKey(log);
-      const isApproved = approvedTxKeys.has(txKey);
-      const isChecked = checkedTxKeys.has(txKey) || isLedgerChecked(log);
+      const txKey = log.row_uid;
+      const isApproved = matchesDatewiseStatus(log, approvedUidKeys, approvedTxKeys);
+      const isChecked = matchesDatewiseStatus(log, checkedUidKeys, checkedTxKeys) || isLedgerChecked(log);
       const canCheck = !isChecked;
       const canApprove = !isApproved;
       return {
@@ -1185,7 +1197,7 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
         selectable: canApprove || canCheck,
       };
     });
-  }, [paginatedDatewiseTransactions, approvedTxKeys, checkedTxKeys]);
+  }, [paginatedDatewiseTransactions, approvedTxKeys, checkedTxKeys, approvedUidKeys, checkedUidKeys]);
 
   const pageSelectableKeys = useMemo(
     () => paginatedDatewiseWithMeta.filter((row) => row.selectable).map((row) => row.txKey),
@@ -1197,18 +1209,16 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
 
   const selectedCheckableCount = useMemo(() => {
     return filteredDatewiseTransactions.filter((log) => {
-      const key = getDatewiseTxKey(log);
-      if (!selectedTxKeys.has(key)) return false;
-      return !(checkedTxKeys.has(key) || isLedgerChecked(log));
+      if (!selectedTxKeys.has(log.row_uid)) return false;
+      return !(matchesDatewiseStatus(log, checkedUidKeys, checkedTxKeys) || isLedgerChecked(log));
     }).length;
-  }, [filteredDatewiseTransactions, selectedTxKeys, checkedTxKeys]);
+  }, [filteredDatewiseTransactions, selectedTxKeys, checkedTxKeys, checkedUidKeys]);
 
   const selectedApprovableCount = useMemo(() => {
     return filteredDatewiseTransactions.filter((log) => {
-      const key = getDatewiseTxKey(log);
-      return selectedTxKeys.has(key) && !approvedTxKeys.has(key);
+      return selectedTxKeys.has(log.row_uid) && !matchesDatewiseStatus(log, approvedUidKeys, approvedTxKeys);
     }).length;
-  }, [filteredDatewiseTransactions, selectedTxKeys, approvedTxKeys]);
+  }, [filteredDatewiseTransactions, selectedTxKeys, approvedTxKeys, approvedUidKeys]);
 
   const toggleTxSelection = (txKey: string, selectable: boolean) => {
     if (!selectable) return;
@@ -1231,8 +1241,7 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
 
   const handleBulkApprove = async () => {
     const toApprove = filteredDatewiseTransactions.filter((log) => {
-      const key = getDatewiseTxKey(log);
-      return selectedTxKeys.has(key) && !approvedTxKeys.has(key);
+      return selectedTxKeys.has(log.row_uid) && !matchesDatewiseStatus(log, approvedUidKeys, approvedTxKeys);
     });
     if (toApprove.length === 0) {
       showStatus("Select pending rows to approve", "error");
@@ -1253,6 +1262,7 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
             date: log.date,
             in_qty: log.in_qty || 0,
             out_qty: log.out_qty || 0,
+            tx_uid: log.row_uid,
           })),
         }),
       });
@@ -1275,9 +1285,8 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
 
   const handleBulkMarkChecked = async () => {
     const toCheck = filteredDatewiseTransactions.filter((log) => {
-      const key = getDatewiseTxKey(log);
-      if (!selectedTxKeys.has(key)) return false;
-      return !(checkedTxKeys.has(key) || isLedgerChecked(log));
+      if (!selectedTxKeys.has(log.row_uid)) return false;
+      return !(matchesDatewiseStatus(log, checkedUidKeys, checkedTxKeys) || isLedgerChecked(log));
     });
 
     if (toCheck.length === 0) {
@@ -1299,6 +1308,7 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
             date: log.date,
             in_qty: log.in_qty || 0,
             out_qty: log.out_qty || 0,
+            tx_uid: log.row_uid,
           })),
         }),
       });
@@ -1333,8 +1343,8 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
         log.in_qty > 0 ? `+${log.in_qty}` : "-",
         log.out_qty > 0 ? `-${log.out_qty}` : "-",
         (log as any).running_stock,
-        checkedTxKeys.has(getDatewiseTxKey(log)) || isLedgerChecked(log) ? "CHECKED" : "Pending",
-        approvedTxKeys.has(getDatewiseTxKey(log)) ? "Approved" : "Pending",
+        matchesDatewiseStatus(log, checkedUidKeys, checkedTxKeys) || isLedgerChecked(log) ? "CHECKED" : "Pending",
+        matchesDatewiseStatus(log, approvedUidKeys, approvedTxKeys) ? "Approved" : "Pending",
       ]);
     } else {
       headers = ["ID", "Item Name", "Est. Amount/Item", "GST", "Final Amount", "Category", "In Qty", "Out Qty", "Live Stock", "Sale %", "Avg Daily Con. (60d)", "Lead Time", "Safety Factor", "Max Level"];
@@ -1741,11 +1751,11 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100 dark:divide-white/5">
-                  {paginatedDatewiseWithMeta.map(({ log, txKey, isApproved, isChecked, selectable }, index) => {
+                  {paginatedDatewiseWithMeta.map(({ log, txKey, isApproved, isChecked, selectable }) => {
                     const canEditFloor = log.source === "GFloor" && Boolean(log.floor_id);
                     return (
                     <tr
-                      key={`${txKey}-${index}`}
+                      key={txKey}
                       className={`hover:bg-blue-50/30 dark:hover:bg-white/[0.03] even:bg-gray-50/50 dark:even:bg-[#1f2937]/30 transition-colors group ${
                         isApproved ? "bg-emerald-50/40 dark:bg-emerald-500/5" : ""
                       } ${isChecked ? "bg-blue-50/50 dark:bg-blue-500/5" : ""}`}

@@ -26,6 +26,7 @@ class IMSGFloorApprovalService extends BaseSheetsService<IMSGFloorApproval> {
       date: get("date"),
       approval_status: get("approval status"),
       checked_status: get("checked status"),
+      tx_uid: get("tx uid"),
       updated_at: get("updated_at"),
     };
   }
@@ -46,6 +47,7 @@ class IMSGFloorApprovalService extends BaseSheetsService<IMSGFloorApproval> {
     set("date", item.date);
     set("approval status", item.approval_status || "");
     set("checked status", item.checked_status || "");
+    set("tx uid", item.tx_uid || "");
     set("updated_at", item.updated_at || "");
 
     return row;
@@ -108,6 +110,7 @@ export type ApprovalInput = {
   date: string;
   in_qty?: number;
   out_qty?: number;
+  tx_uid?: string;
 };
 
 function toDateOnly(dateStr: string) {
@@ -133,9 +136,12 @@ export async function upsertIMSGFloorStatuses(
       await imsGfloorApprovalService.ensureColumns([...IMS_GFLOOR_APPROVAL_HEADERS]);
 
       const existingRows = await imsGfloorApprovalService.getAll();
-      const byKey = new Map<string, IMSGFloorApproval>();
+      const byUid = new Map<string, IMSGFloorApproval>();
+      const byLegacyContent = new Map<string, IMSGFloorApproval>();
       existingRows.forEach((row) => {
-        byKey.set(approvalToTxKey(row), row);
+        const uid = (row.tx_uid || "").trim();
+        if (uid) byUid.set(uid, row);
+        else byLegacyContent.set(approvalToTxKey(row), row);
       });
 
       const toAdd: IMSGFloorApproval[] = [];
@@ -151,17 +157,30 @@ export async function upsertIMSGFloorStatuses(
           date: tx.date,
           in_qty: tx.in_qty || 0,
           out_qty: tx.out_qty || 0,
+          tx_uid: (tx.tx_uid || "").trim(),
         };
         const key = approvalToTxKey({
           ...candidate,
           in_qty: candidate.in_qty,
           out_qty: candidate.out_qty,
         });
+        const uid = candidate.tx_uid || "";
 
-        const existing = byKey.get(key);
+        let existing = uid ? byUid.get(uid) : undefined;
+        if (!existing && uid) {
+          existing = byLegacyContent.get(key);
+        } else if (!existing) {
+          existing = byLegacyContent.get(key);
+        }
+
         if (existing) {
           let changed = false;
           const next: IMSGFloorApproval = { ...existing };
+
+          if (uid && (existing.tx_uid || "").trim() !== uid) {
+            next.tx_uid = uid;
+            changed = true;
+          }
 
           if (flags.approve) {
             if ((existing.approval_status || "").toLowerCase() === "approved") {
@@ -189,7 +208,8 @@ export async function upsertIMSGFloorStatuses(
           next.updated_at = now;
           const ok = await imsGfloorApprovalService.update(existing.id, next);
           if (!ok) throw new Error("Failed to update approval/check status");
-          byKey.set(key, next);
+          if (uid) byUid.set(uid, next);
+          if ((existing.tx_uid || "").trim() === "") byLegacyContent.delete(key);
           updated++;
           continue;
         }
@@ -204,10 +224,12 @@ export async function upsertIMSGFloorStatuses(
           date: toDateOnly(candidate.date),
           approval_status: flags.approve ? "Approved" : "",
           checked_status: flags.check ? "CHECKED" : "",
+          tx_uid: uid,
           updated_at: now,
         };
         toAdd.push(row);
-        byKey.set(key, row);
+        if (uid) byUid.set(uid, row);
+        else byLegacyContent.set(key, row);
       }
 
       if (toAdd.length > 0) {

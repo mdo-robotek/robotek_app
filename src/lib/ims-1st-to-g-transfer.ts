@@ -15,6 +15,7 @@ export type FloorToGFloorTx = {
   in_qty: number;
   out_qty: number;
   source: "1stFloor" | "SFG";
+  tx_uid?: string;
 };
 
 export type FirstFloorToGFloorTx = FloorToGFloorTx;
@@ -49,7 +50,7 @@ export function floorOutRowsToGFloorInTxs(
 ): FloorToGFloorTx[] {
   const transactions: FloorToGFloorTx[] = [];
 
-  ledger.forEach((row) => {
+  ledger.forEach((row, index) => {
     const name = (row.item_name || "").trim();
     if (!name) return;
 
@@ -57,6 +58,8 @@ export function floorOutRowsToGFloorInTxs(
     if (outQty <= 0) return;
 
     const lowerName = name.toLowerCase();
+    const prefix = source === "SFG" ? "sfg" : "1st";
+    const rowId = String(row.id || "").trim();
     transactions.push({
       item_name: name,
       category: (row.category || "").trim() || categoryMap[lowerName] || "GENERAL",
@@ -64,6 +67,7 @@ export function floorOutRowsToGFloorInTxs(
       in_qty: outQty,
       out_qty: 0,
       source,
+      tx_uid: rowId ? `${prefix}:${rowId}:out2g` : `${prefix}:idx:${index}:out2g`,
     });
   });
 

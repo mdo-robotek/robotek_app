@@ -18,6 +18,8 @@ export interface Transaction {
   floor_id?: string;
   /** Checked Status from IMS-G Floor sheet */
   checked_status?: string;
+  /** Stable unique id so duplicate same-day/qty rows stay independent */
+  tx_uid?: string;
 }
 
 interface TimeSeriesTableProps {

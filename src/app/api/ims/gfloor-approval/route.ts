@@ -14,15 +14,25 @@ export async function GET() {
     const rows = await getIMSGFloorApprovals();
     const keys: string[] = [];
     const checkedKeys: string[] = [];
+    const uidKeys: string[] = [];
+    const checkedUidKeys: string[] = [];
 
     rows.forEach((r) => {
+      const uid = (r.tx_uid || "").trim();
       const key = approvalToTxKey(r);
-      if ((r.approval_status || "").toLowerCase() === "approved") keys.push(key);
-      if ((r.checked_status || "").trim().toUpperCase() === "CHECKED") checkedKeys.push(key);
+      const approved = (r.approval_status || "").toLowerCase() === "approved";
+      const checked = (r.checked_status || "").trim().toUpperCase() === "CHECKED";
+      if (uid) {
+        if (approved) uidKeys.push(uid);
+        if (checked) checkedUidKeys.push(uid);
+      } else {
+        if (approved) keys.push(key);
+        if (checked) checkedKeys.push(key);
+      }
     });
 
     return NextResponse.json(
-      { rows, keys, checkedKeys },
+      { rows, keys, checkedKeys, uidKeys, checkedUidKeys },
       { headers: { "Cache-Control": "no-store, max-age=0" } }
     );
   } catch (error) {

@@ -4,6 +4,13 @@ export type DatewiseTxLike = {
   date: string;
   in_qty?: number;
   out_qty?: number;
+  tx_uid?: string;
+};
+
+export type DatewiseRowIdentity = {
+  row_uid: string;
+  _contentKey: string;
+  _occurrence: number;
 };
 
 export function normalizeTxDate(dateStr: string): string {
@@ -55,4 +62,45 @@ export function approvalToTxKey(row: {
     in_qty: parseFloat(String(row.in_qty ?? 0)) || 0,
     out_qty: parseFloat(String(row.out_qty ?? 0)) || 0,
   });
+}
+
+/** Stable unique id per row so same-day / same-qty duplicates can be selected independently. */
+export function withUniqueDatewiseIds<T extends DatewiseTxLike>(
+  rows: T[]
+): Array<T & DatewiseRowIdentity> {
+  const seen = new Map<string, number>();
+  return rows.map((row) => {
+    const contentKey = getDatewiseTxKey(row);
+    const occurrence = seen.get(contentKey) ?? 0;
+    seen.set(contentKey, occurrence + 1);
+    const explicitUid = (row.tx_uid || "").trim();
+    return {
+      ...row,
+      row_uid: explicitUid || `${contentKey}#${occurrence}`,
+      _contentKey: contentKey,
+      _occurrence: occurrence,
+    };
+  });
+}
+
+export function uniquifyByBaseId<T>(
+  rows: T[],
+  getId: (row: T, index: number) => string
+): Array<T & { row_uid: string }> {
+  const seen = new Map<string, number>();
+  return rows.map((row, index) => {
+    const base = (getId(row, index) || "").trim() || `noid-${index}`;
+    const n = seen.get(base) ?? 0;
+    seen.set(base, n + 1);
+    return { ...row, row_uid: n === 0 ? base : `${base}#${n}` };
+  });
+}
+
+export function matchesDatewiseStatus(
+  row: DatewiseRowIdentity,
+  uidSet: Set<string>,
+  legacyContentSet: Set<string>
+): boolean {
+  if (uidSet.has(row.row_uid)) return true;
+  return row._occurrence === 0 && legacyContentSet.has(row._contentKey);
 }

@@ -62,17 +62,19 @@ export async function GET() {
           in_qty: qty,
           out_qty: 0,
           source: 'GRN',
+          tx_uid: `grn:${grn.id}`,
         });
       }
     });
 
     // Out Form (Outward)
-    outForm.forEach(row => {
+    outForm.forEach((row, index) => {
       let txDate = row.date || row.updated_at || "";
       const ts = parseDateStr(txDate);
       if (ts > 0) txDate = new Date(ts).toISOString();
+      const orderNo = String(row.orderNo || "").trim();
 
-      const addQty = (desc: string, qty: number) => {
+      const addQty = (desc: string, qty: number, lineIdx: number) => {
         const lowerDesc = desc.toLowerCase();
         transactions.push({
           item_name: desc,
@@ -81,16 +83,17 @@ export async function GET() {
           in_qty: 0,
           out_qty: qty,
           source: 'O2D',
+          tx_uid: `o2d:${index}:${lineIdx}:${orderNo}`,
         });
       };
 
       if (row.description && row.description.trim().startsWith("[") && row.description.trim().endsWith("]")) {
         try {
           const lineItems = JSON.parse(row.description);
-          lineItems.forEach((item: any) => {
+          lineItems.forEach((item: any, lineIdx: number) => {
             const desc = (item.Description || item.description || "").trim();
             const qty = parseFloat(item.Qty || item.qty) || 0;
-            if (desc) addQty(desc, qty);
+            if (desc) addQty(desc, qty, lineIdx);
           });
         } catch (e) {
           // Fallback if parse fails
@@ -98,12 +101,12 @@ export async function GET() {
       } else if (row.description) {
         const desc = row.description.trim();
         const qty = parseFloat(row.qty) || 0;
-        if (desc) addQty(desc, qty);
+        if (desc) addQty(desc, qty, 0);
       }
     });
 
     // G Floor ledger (Production IN + physical adjustments)
-    gFloorLedger.forEach((row) => {
+    gFloorLedger.forEach((row, index) => {
       const name = (row.item_name || "").trim();
       if (!name) return;
 
@@ -114,6 +117,7 @@ export async function GET() {
       const inQty = parseFloat(row.in_qty || "") || 0;
       const outQty = parseFloat(row.out_qty || "") || 0;
       const lowerName = name.toLowerCase();
+      const floorId = row.id ? String(row.id) : `idx-${index}`;
       const floorMeta = {
         floor_id: row.id ? String(row.id) : undefined,
         checked_status: row.checked_status || "",
@@ -128,6 +132,7 @@ export async function GET() {
           out_qty: 0,
           source: 'GFloor',
           ...floorMeta,
+          tx_uid: `gfloor:${floorId}:in`,
         });
       }
       if (outQty > 0) {
@@ -139,6 +144,7 @@ export async function GET() {
           out_qty: outQty,
           source: 'GFloor',
           ...floorMeta,
+          tx_uid: `gfloor:${floorId}:out`,
         });
       }
     });

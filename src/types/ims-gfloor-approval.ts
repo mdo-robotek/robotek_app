@@ -7,6 +7,7 @@ export interface IMSGFloorApproval {
   date: string;
   approval_status: string;
   checked_status?: string;
+  tx_uid?: string;
   updated_at?: string;
 }
 
@@ -20,5 +21,6 @@ export const IMS_GFLOOR_APPROVAL_HEADERS = [
   "Date",
   "Approval Status",
   "Checked Status",
+  "Tx Uid",
   "updated_at",
 ] as const;

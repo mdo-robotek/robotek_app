@@ -27,6 +27,7 @@ import DateFilterBar, { FilterPeriod } from "@/components/DateFilterBar";
 import SearchableMultiSelect from "@/components/SearchableMultiSelect";
 import SearchableSelect from "@/components/SearchableSelect";
 import { matchesCategoryItemFilters } from "@/lib/ims-filters";
+import { uniquifyByBaseId } from "@/lib/ims-datewise-key";
 import { startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfQuarter, endOfQuarter, startOfYear, endOfYear, isWithinInterval } from "date-fns";
 import { CalendarIcon } from "@heroicons/react/24/outline";
 
@@ -384,10 +385,14 @@ function parseDateStr(dStr: string) {
   }, [filteredItems, currentPage]);
 
   const datewiseTotalPages = Math.ceil(filteredDatewiseItems.length / itemsPerPage);
+  const datewiseItemsWithUid = useMemo(
+    () => uniquifyByBaseId(filteredDatewiseItems, (item, index) => String(item.id ?? "").trim() || `noid-${index}`),
+    [filteredDatewiseItems]
+  );
   const paginatedDatewiseItems = useMemo(() => {
     const start = (currentPage - 1) * itemsPerPage;
-    return filteredDatewiseItems.slice(start, start + itemsPerPage);
-  }, [filteredDatewiseItems, currentPage]);
+    return datewiseItemsWithUid.slice(start, start + itemsPerPage);
+  }, [datewiseItemsWithUid, currentPage]);
 
   const transactionLogs = useMemo(() => {
     if (!selectedLogItem) return [];
@@ -701,10 +706,14 @@ function parseDateStr(dStr: string) {
   };
 
   const handleMarkChecked = async () => {
-    const ids = selectedVerifyIds.filter((id) => {
-      const item = rawItems.find((i) => String(i.id) === id);
-      return item && canVerifyLog(id) && !isItemChecked(item);
-    });
+    const ids = selectedVerifyIds
+      .map((uid) => datewiseItemsWithUid.find((item) => item.row_uid === uid))
+      .filter((item): item is (typeof datewiseItemsWithUid)[number] => {
+        if (!item) return false;
+        const id = String(item.id);
+        return canVerifyLog(id) && !isItemChecked(item);
+      })
+      .map((item) => String(item.id));
 
     if (ids.length === 0) {
       showStatus("Select unchecked entries to mark as checked", "error");
@@ -1106,10 +1115,10 @@ function parseDateStr(dStr: string) {
                   {paginatedDatewiseItems.map((log) => {
                     const checked = isItemChecked(log);
                     const canVerify = canVerifyLog(log.id);
-                    const isSelected = selectedVerifyIds.includes(String(log.id));
+                    const isSelected = selectedVerifyIds.includes(log.row_uid);
                     return (
                     <tr
-                      key={log.id}
+                      key={log.row_uid}
                       className={`transition-colors group ${
                         checked
                           ? location === '1st'
@@ -1123,7 +1132,7 @@ function parseDateStr(dStr: string) {
                           <input
                             type="checkbox"
                             checked={isSelected}
-                            onChange={() => toggleVerifySelection(String(log.id))}
+                            onChange={() => toggleVerifySelection(log.row_uid)}
                             className={`w-4 h-4 rounded border-gray-300 cursor-pointer ${
                               location === '1st' ? 'text-purple-600 focus:ring-purple-500' : 'text-emerald-600 focus:ring-emerald-500'
                             }`}
@@ -1354,8 +1363,8 @@ function parseDateStr(dStr: string) {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100 dark:divide-white/5">
-                    {transactionLogs.map((log) => (
-                      <tr key={log.id} className="hover:bg-gray-50 dark:hover:bg-white/[0.02]">
+                    {transactionLogs.map((log, index) => (
+                      <tr key={`${log.id || "row"}-${index}`} className="hover:bg-gray-50 dark:hover:bg-white/[0.02]">
                         <td className="py-2 px-4 text-[11px] font-bold text-gray-500">{formatDate(log.date || log.updated_at)}</td>
                         <td className="py-2 px-4 text-[11px] font-black text-emerald-600 dark:text-emerald-400 text-right">{log.in_qty !== "0" && log.in_qty !== "" ? `+${log.in_qty}` : "-"}</td>
                         <td className="py-2 px-4 text-[11px] font-black text-rose-600 dark:text-rose-400 text-right">{log.out_qty !== "0" && log.out_qty !== "" ? `-${log.out_qty}` : "-"}</td>

@@ -18,7 +18,9 @@ import {
   ChartBarIcon,
   HashtagIcon,
   ClipboardDocumentCheckIcon,
-  CheckIcon
+  CheckIcon,
+  ExclamationTriangleIcon,
+  CalendarIcon,
 } from "@heroicons/react/24/outline";
 import { FloorIMS } from "@/types/ims-floor";
 import { isSfgVirtualGrnId } from "@/lib/grn-packed";
@@ -26,12 +28,51 @@ import TimeSeriesTable, { TimeBucket } from "@/components/TimeSeriesTable";
 import DateFilterBar, { FilterPeriod } from "@/components/DateFilterBar";
 import SearchableMultiSelect from "@/components/SearchableMultiSelect";
 import SearchableSelect from "@/components/SearchableSelect";
-import { matchesCategoryItemFilters } from "@/lib/ims-filters";
+import { matchesCategoryItemFilters, matchesActiveFilter, ActiveStatusFilter } from "@/lib/ims-filters";
 import { uniquifyByBaseId } from "@/lib/ims-datewise-key";
+import { indexMasterByName, masterItemKey, overlayFromMaster } from "@/lib/ims-master-overlay";
+import { IMSMasterItem } from "@/types/ims-master";
 import { startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfQuarter, endOfQuarter, startOfYear, endOfYear, isWithinInterval } from "date-fns";
-import { CalendarIcon } from "@heroicons/react/24/outline";
 
 const fetcher = (url: string) => fetch(url).then(res => res.json());
+
+const DEFAULT_LEAD = 30;
+const DEFAULT_SF = 1;
+
+const getLegendBucket = (live: number, maxLevel: number) => {
+  if (live < 0) return 6;
+  if (live === 0) return 5;
+  const pct = maxLevel > 0 ? (live / maxLevel) * 100 : 100;
+  if (pct <= 20) return 4;
+  if (pct <= 50) return 3;
+  if (pct <= 100) return 2;
+  return 1;
+};
+
+const getHealth = (live: number, max_level: number) => {
+  const bucket = getLegendBucket(live, max_level);
+  const max = max_level > 0 ? max_level : Math.max(100, live);
+  if (bucket === 6) return { color: "bg-gray-400", text: "text-gray-500", label: "Negative", pct: 0 };
+  if (bucket === 5) return { color: "bg-black dark:bg-gray-700", text: "text-gray-900 dark:text-gray-400", label: "Stockout", pct: 0 };
+
+  const percentage = max > 0 ? (live / max) * 100 : 100;
+  if (bucket === 1) return { color: "bg-purple-500", text: "text-purple-600", label: "Overstock", pct: Math.min(percentage, 100) };
+  if (bucket === 2) return { color: "bg-emerald-500", text: "text-emerald-600", label: "Healthy", pct: percentage };
+  if (bucket === 3) return { color: "bg-amber-400", text: "text-amber-600", label: "Warning", pct: percentage };
+  if (bucket === 4) return { color: "bg-rose-500", text: "text-rose-600", label: "Critical", pct: percentage };
+
+  return { color: "bg-gray-200", text: "text-gray-500", label: "Unknown", pct: 0 };
+};
+
+type FloorAggItem = FloorIMS & {
+  sale_percent: number;
+  avg_daily_con: number;
+  lead_time: number;
+  safety_factor: number;
+  max_level: number;
+  sku_code: string;
+  active_status: string;
+};
 
 const formatDate = (dateString?: string) => {
   if (!dateString) return 'N/A';
@@ -139,6 +180,8 @@ export default function IMSFloor({ location, onBack }: { location: "1st" | "g" |
 
   const [packedFilter, setPackedFilter] = useState<'ALL' | 'PACKED' | 'UNPACKED'>('ALL');
   const [checkedFilter, setCheckedFilter] = useState<'ALL' | 'CHECKED' | 'UNCHECKED'>('ALL');
+  const [legendFilter, setLegendFilter] = useState<number | null>(null);
+  const [activeFilter, setActiveFilter] = useState<ActiveStatusFilter>("ALL");
   const [selectedVerifyIds, setSelectedVerifyIds] = useState<string[]>([]);
 
   const mappedTimeBucket: TimeBucket = useMemo(() => {
@@ -181,6 +224,7 @@ export default function IMSFloor({ location, onBack }: { location: "1st" | "g" |
 
   const { data: rawItems = [], mutate, isLoading } = useSWR<FloorIMS[]>(`/api/ims/floor?location=${location}`, fetcher);
   const { data: masterItems = [] } = useSWR<any[]>("/api/ims", fetcher);
+  const { data: masterCatalog = [] } = useSWR<IMSMasterItem[]>("/api/ims/master", fetcher);
 
   const masterItemOptions = useMemo(() => {
     const names = Array.from(
@@ -315,8 +359,34 @@ function parseDateStr(dStr: string) {
         if (item.category) agg.category = item.category.trim();
       }
     });
-    return Array.from(map.values()).sort((a, b) => a.item_name.localeCompare(b.item_name));
-  }, [filteredRawItems, allTimeStockMap]);
+
+    const gFloorByName = new Map<string, any>();
+    masterItems.forEach((item: any) => {
+      const key = (item.item_name || "").trim().toLowerCase();
+      if (key && !gFloorByName.has(key)) gFloorByName.set(key, item);
+    });
+    const catalogByName = indexMasterByName(masterCatalog || []);
+
+    return Array.from(map.values())
+      .map((row): FloorAggItem => {
+        const gFloor = gFloorByName.get(row.item_name.toLowerCase().trim());
+        const overlaid = overlayFromMaster(row, catalogByName.get(masterItemKey(row.item_name)), {
+          lead_time: row.lead_time || DEFAULT_LEAD,
+          safety_factor: row.safety_factor || DEFAULT_SF,
+        });
+        const inQty = parseFloat(String(overlaid.in_qty)) || 0;
+        const outQty = parseFloat(String(overlaid.out_qty)) || 0;
+        const avg = parseFloat(String(gFloor?.avg_daily_con ?? 0)) || 0;
+        const max_level = Number((avg * overlaid.lead_time * overlaid.safety_factor).toFixed(2));
+        return {
+          ...overlaid,
+          sale_percent: inQty > 0 ? Number(((outQty / inQty) * 100).toFixed(1)) : 0,
+          avg_daily_con: avg,
+          max_level,
+        };
+      })
+      .sort((a, b) => a.item_name.localeCompare(b.item_name));
+  }, [filteredRawItems, allTimeStockMap, masterItems, masterCatalog]);
 
   const uniqueCategories = useMemo(() => {
     return Array.from(
@@ -349,22 +419,39 @@ function parseDateStr(dStr: string) {
       const matchesPacked = packedFilter === 'ALL' || 
                             (packedFilter === 'PACKED' && item.packed_status === 'PACKED') ||
                             (packedFilter === 'UNPACKED' && item.packed_status === 'UNPACKED');
-      return matchesPacked && matchesCategoryItemFilters(item, categoryFilters, itemNameFilters);
+      if (!matchesPacked || !matchesCategoryItemFilters(item, categoryFilters, itemNameFilters)) return false;
+      if (!matchesActiveFilter(item.active_status, activeFilter)) return false;
+      if (legendFilter !== null) {
+        return getLegendBucket(item.live_stock || 0, item.max_level || 0) === legendFilter;
+      }
+      return true;
     });
-  }, [aggregatedItems, packedFilter, categoryFilters, itemNameFilters]);
+  }, [aggregatedItems, packedFilter, categoryFilters, itemNameFilters, legendFilter, activeFilter]);
+
+  const bucketCounts = useMemo(() => {
+    const counts = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 };
+    aggregatedItems.forEach((item) => {
+      counts[getLegendBucket(item.live_stock || 0, item.max_level || 0) as keyof typeof counts]++;
+    });
+    return counts;
+  }, [aggregatedItems]);
 
   const filteredDatewiseItems = useMemo(() => {
     return filteredRawItems.filter((item) => {
       if (!matchesCategoryItemFilters(item, categoryFilters, itemNameFilters)) return false;
+      if (!matchesActiveFilter(item.active_status, activeFilter)) return false;
       if (checkedFilter === 'CHECKED') return isItemChecked(item);
       if (checkedFilter === 'UNCHECKED') return !isItemChecked(item);
       return true;
     });
-  }, [filteredRawItems, categoryFilters, itemNameFilters, checkedFilter]);
+  }, [filteredRawItems, categoryFilters, itemNameFilters, checkedFilter, activeFilter]);
 
   const filteredTimeSeriesTransactions = useMemo(() => {
     return rawItems
-      .filter((item) => matchesCategoryItemFilters(item, categoryFilters, itemNameFilters))
+      .filter((item) =>
+        matchesCategoryItemFilters(item, categoryFilters, itemNameFilters) &&
+        matchesActiveFilter(item.active_status, activeFilter)
+      )
       .map(item => ({
         item_name: item.item_name,
         category: item.category,
@@ -372,11 +459,14 @@ function parseDateStr(dStr: string) {
         in_qty: parseFloat(item.in_qty) || 0,
         out_qty: parseFloat(item.out_qty) || 0,
       }));
-  }, [rawItems, categoryFilters, itemNameFilters]);
+  }, [rawItems, categoryFilters, itemNameFilters, activeFilter]);
 
   const masterCategories = useMemo(() => {
-    return Array.from(new Set(masterItems.map(i => i.category))).filter(Boolean);
-  }, [masterItems]);
+    return Array.from(new Set([
+      ...masterItems.map((i: any) => i.category),
+      ...(masterCatalog || []).map((i) => i.category),
+    ])).filter(Boolean);
+  }, [masterItems, masterCatalog]);
 
   const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
   const paginatedItems = useMemo(() => {
@@ -404,7 +494,7 @@ function parseDateStr(dStr: string) {
   React.useEffect(() => {
     setCurrentPage(1);
     setSelectedVerifyIds([]);
-  }, [packedFilter, categoryFilters, itemNameFilters, checkedFilter, viewMode, filterPeriod, filterDate, filterStartDate, filterEndDate]);
+  }, [packedFilter, categoryFilters, itemNameFilters, checkedFilter, viewMode, filterPeriod, filterDate, filterStartDate, filterEndDate, legendFilter, activeFilter]);
 
   React.useEffect(() => {
     setSelectedVerifyIds([]);
@@ -841,14 +931,26 @@ function parseDateStr(dStr: string) {
         (log as any).running_stock
       ]);
     } else {
-      headers = ["Item Name", "Category", "In Qty", "Out Qty", "Live Stock"];
-      rows = filteredItems.map((item) => [
-        item.item_name,
-        item.category,
-        item.in_qty,
-        item.out_qty,
-        item.live_stock,
-      ]);
+      headers = ["SKU", "Category", "Item Name", "Active/Inactive", "Stock Health", "Max", "IN Qty", "OUT Qty", "Sale %", "Avg. Con", "Lead", "SF"];
+      if (showPacked) headers.push("Status");
+      rows = filteredItems.map((item) => {
+        const row: any[] = [
+          item.sku_code || "—",
+          item.category,
+          item.item_name,
+          item.active_status || "—",
+          item.live_stock,
+          item.max_level,
+          item.in_qty,
+          item.out_qty,
+          `${item.sale_percent}%`,
+          item.avg_daily_con || "—",
+          item.lead_time,
+          item.safety_factor,
+        ];
+        if (showPacked) row.push(item.packed_status || "—");
+        return row;
+      });
     }
 
     const csvContent = [
@@ -970,6 +1072,7 @@ function parseDateStr(dStr: string) {
 
       <div className="flex flex-wrap items-stretch gap-2 mb-2 shrink-0">
         <DateFilterBar 
+          variant="dropdown"
           period={filterPeriod}
           setPeriod={setFilterPeriod}
           currentDate={filterDate}
@@ -979,6 +1082,7 @@ function parseDateStr(dStr: string) {
           endDate={filterEndDate}
           setEndDate={setFilterEndDate}
           theme={location === '1st' ? 'purple' : 'emerald'}
+          className="shrink-0"
         />
 
         <div className={`flex flex-wrap items-end gap-2 flex-1 min-w-[280px] p-2 bg-white dark:bg-[#111827] border rounded-xl shadow-sm ${
@@ -1010,11 +1114,22 @@ function parseDateStr(dStr: string) {
               onChange={(e) => setPackedFilter(e.target.value as 'ALL' | 'PACKED' | 'UNPACKED')}
               className="px-3 py-2 bg-gray-50 dark:bg-[#0a0f1c] border border-gray-200 dark:border-white/10 rounded-lg text-[11px] font-black uppercase tracking-wider outline-none focus:ring-2 focus:ring-purple-500 dark:text-white shadow-sm h-[42px] cursor-pointer shrink-0"
             >
-              <option value="ALL">ALL STATUS</option>
+              <option value="ALL">All Packed</option>
               <option value="PACKED">PACKED</option>
               <option value="UNPACKED">UNPACKED</option>
             </select>
           )}
+          <select
+            value={activeFilter}
+            onChange={(e) => setActiveFilter(e.target.value as ActiveStatusFilter)}
+            className={`px-3 py-2 bg-gray-50 dark:bg-[#0a0f1c] border border-gray-200 dark:border-white/10 rounded-lg text-[11px] font-black uppercase tracking-wider outline-none dark:text-white shadow-sm h-[42px] cursor-pointer shrink-0 ${
+              location === '1st' ? 'focus:ring-2 focus:ring-purple-500' : 'focus:ring-2 focus:ring-emerald-500'
+            }`}
+          >
+            <option value="ALL">All Status</option>
+            <option value="ACTIVE">Active</option>
+            <option value="INACTIVE">Inactive</option>
+          </select>
           {viewMode === 'datewise' && (
             <select
               value={checkedFilter}
@@ -1028,12 +1143,13 @@ function parseDateStr(dStr: string) {
               <option value="UNCHECKED">UNCHECKED</option>
             </select>
           )}
-          {(categoryFilters.length > 0 || itemNameFilters.length > 0 || checkedFilter !== 'ALL') && (
+          {(categoryFilters.length > 0 || itemNameFilters.length > 0 || checkedFilter !== 'ALL' || activeFilter !== 'ALL') && (
             <button
               onClick={() => {
                 setCategoryFilters([]);
                 setItemNameFilters([]);
                 setCheckedFilter('ALL');
+                setActiveFilter('ALL');
               }}
               className={`mb-0.5 px-3 py-2.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition-colors shrink-0 border ${
                 location === '1st'
@@ -1046,6 +1162,53 @@ function parseDateStr(dStr: string) {
           )}
         </div>
       </div>
+
+      {viewMode === 'default' && (
+        <div className="flex flex-wrap items-center gap-2 shrink-0 w-full bg-white dark:bg-[#111827] px-3 py-2 rounded-xl border border-gray-200 dark:border-white/5 shadow-sm">
+          <div className="flex items-center gap-1.5 shrink-0 pr-1">
+            <ExclamationTriangleIcon className={`w-4 h-4 ${location === '1st' ? 'text-purple-500' : 'text-emerald-500'}`} />
+            <span className="text-[10px] font-black text-gray-600 dark:text-gray-300 uppercase tracking-widest">Color Logic</span>
+          </div>
+          <div className="flex flex-1 flex-wrap items-stretch gap-1.5 min-w-0">
+            {([
+              { id: 1, label: '> 100%', count: bucketCounts[1], fill: 'bg-gradient-to-b from-purple-400 to-purple-600', ring: 'ring-2 ring-purple-700 ring-offset-1 shadow-lg shadow-purple-500/40', text: 'text-white' },
+              { id: 2, label: '51-100%', count: bucketCounts[2], fill: 'bg-gradient-to-b from-emerald-400 to-emerald-600', ring: 'ring-2 ring-emerald-600 ring-offset-1 shadow-lg shadow-emerald-500/40', text: 'text-white' },
+              { id: 3, label: '21-50%', count: bucketCounts[3], fill: 'bg-gradient-to-b from-amber-300 to-amber-500', ring: 'ring-2 ring-amber-500 ring-offset-1 shadow-lg shadow-amber-400/40', text: 'text-amber-950' },
+              { id: 4, label: '1-20%', count: bucketCounts[4], fill: 'bg-gradient-to-b from-rose-400 to-rose-600', ring: 'ring-2 ring-rose-600 ring-offset-1 shadow-lg shadow-rose-500/40', text: 'text-white' },
+              { id: 5, label: '0%', count: bucketCounts[5], fill: 'bg-gradient-to-b from-gray-700 to-gray-900', ring: 'ring-2 ring-gray-900 dark:ring-gray-500 ring-offset-1 shadow-lg', text: 'text-white' },
+              { id: 6, label: '< 0%', count: bucketCounts[6], fill: 'bg-gradient-to-b from-gray-200 to-gray-400', ring: 'ring-2 ring-gray-500 ring-offset-1 shadow-lg', text: 'text-gray-800' },
+            ] as const).map((chip) => {
+              const selected = legendFilter === chip.id;
+              return (
+                <button
+                  key={chip.id}
+                  type="button"
+                  onClick={() => setLegendFilter(selected ? null : chip.id)}
+                  className={`flex-1 min-w-[88px] h-11 px-2.5 rounded-xl flex items-center justify-center gap-2 transition-all duration-200 cursor-pointer shadow-md ${chip.text} ${chip.fill} ${selected ? `${chip.ring} scale-[1.02]` : 'hover:scale-[1.02] hover:brightness-110 active:scale-[0.98]'}`}
+                >
+                  <span className="text-[11px] font-black uppercase tracking-wide whitespace-nowrap">{chip.label}</span>
+                  <span className={`min-w-[1.6rem] h-6 px-1.5 rounded-md text-[12px] font-black tabular-nums flex items-center justify-center ${
+                    chip.id === 3 || chip.id === 6
+                      ? 'bg-black/15 text-inherit'
+                      : 'bg-white/25 text-white'
+                  }`}>
+                    {chip.count}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+          {legendFilter !== null && (
+            <button
+              type="button"
+              onClick={() => setLegendFilter(null)}
+              className="h-11 px-3 rounded-xl text-[10px] uppercase font-black tracking-wider text-gray-600 dark:text-gray-300 bg-gray-100 hover:bg-gray-200 dark:bg-white/10 dark:hover:bg-white/15 border border-gray-200 dark:border-white/10 shrink-0 transition-colors"
+            >
+              Clear
+            </button>
+          )}
+        </div>
+      )}
 
       {viewMode === 'datewise' ? (
         <div className="flex-1 bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/5 rounded-xl overflow-hidden flex flex-col shadow-sm min-h-0 mt-2">
@@ -1254,29 +1417,38 @@ function parseDateStr(dStr: string) {
               ))}
             </div>
           ) : (
-            <table className="w-full text-left border-collapse relative">
+            <table className="w-full text-left border-collapse relative min-w-[1100px]">
               <thead className={`sticky top-0 z-20 shadow-sm ${location === '1st' ? 'bg-purple-50 dark:bg-purple-900/20' : 'bg-emerald-50 dark:bg-emerald-900/20'}`}>
                 <tr>
                   <th className={`py-2.5 px-3 border-b text-center sticky left-0 z-30 w-12 ${location === '1st' ? 'border-purple-200 dark:border-purple-500/20 bg-purple-50 dark:bg-purple-900/20 shadow-[1px_0_0_0_#e9d5ff] dark:shadow-[1px_0_0_0_rgba(168,85,247,0.2)]' : 'border-emerald-200 dark:border-emerald-500/20 bg-emerald-50 dark:bg-emerald-900/20 shadow-[1px_0_0_0_#a7f3d0] dark:shadow-[1px_0_0_0_rgba(16,185,129,0.2)]'}`}>
                     <span className={`text-[10px] font-black uppercase tracking-widest ${location === '1st' ? 'text-purple-600 dark:text-purple-400' : 'text-emerald-600 dark:text-emerald-400'}`}>#</span>
                   </th>
                   <th className={`py-2.5 px-3 text-[10px] font-black uppercase tracking-widest border-b whitespace-nowrap ${location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20' : 'text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'}`}>Category</th>
-                  <th className={`py-2.5 px-3 text-[10px] font-black uppercase tracking-widest border-b whitespace-nowrap ${location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20' : 'text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'}`}>Item Name</th>
-                  <th className={`py-2.5 px-3 text-[10px] font-black uppercase tracking-widest border-b text-right ${location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20' : 'text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'}`}>Total In</th>
-                  <th className={`py-2.5 px-3 text-[10px] font-black uppercase tracking-widest border-b text-right ${location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20' : 'text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'}`}>Total Out</th>
-                  <th className={`py-2.5 px-4 text-[10px] font-black uppercase tracking-widest border-b text-right w-32 ${location === '1st' ? 'text-purple-700 dark:text-purple-400 border-purple-200 dark:border-purple-500/20 bg-purple-100/50 dark:bg-purple-500/10' : 'text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20 bg-emerald-100/50 dark:bg-emerald-500/10'}`}>Live Stock</th>
+                  <th className={`py-2.5 px-3 text-[10px] font-black uppercase tracking-widest border-b min-w-[200px] ${location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20' : 'text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'}`}>Item Name</th>
+                  <th className={`py-2.5 px-3 text-[10px] font-black uppercase tracking-widest border-b whitespace-nowrap ${location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20' : 'text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'}`}>SKU</th>
+                  <th className={`py-2.5 px-3 text-[10px] font-black uppercase tracking-widest border-b text-center whitespace-nowrap ${location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20' : 'text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'}`}>Active</th>
+                  <th className={`py-2.5 px-4 text-[10px] font-black uppercase tracking-widest border-b text-left w-56 ${location === '1st' ? 'text-purple-700 dark:text-purple-400 border-purple-200 dark:border-purple-500/20 bg-purple-100/50 dark:bg-purple-500/10' : 'text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20 bg-emerald-100/50 dark:bg-emerald-500/10'}`}>Stock Health</th>
+                  <th className={`py-2.5 px-3 text-[10px] font-black uppercase tracking-widest border-b text-right ${location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20' : 'text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'}`}>Max</th>
+                  <th className={`py-2.5 px-3 text-[10px] font-black uppercase tracking-widest border-b text-right ${location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20' : 'text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'}`}>IN Qty</th>
+                  <th className={`py-2.5 px-3 text-[10px] font-black uppercase tracking-widest border-b text-right ${location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20' : 'text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'}`}>OUT Qty</th>
+                  <th className={`py-2.5 px-3 text-[10px] font-black uppercase tracking-widest border-b text-right ${location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20' : 'text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'}`}>Sale %</th>
+                  <th className={`py-2.5 px-3 text-[10px] font-black uppercase tracking-widest border-b text-right whitespace-nowrap ${location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20' : 'text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'}`}>Avg. Con</th>
+                  <th className={`py-2.5 px-3 text-[10px] font-black uppercase tracking-widest border-b text-right ${location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20' : 'text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'}`}>Lead</th>
+                  <th className={`py-2.5 px-3 text-[10px] font-black uppercase tracking-widest border-b text-right ${location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20' : 'text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'}`}>SF</th>
                   {showPacked && (
-                    <th className="py-2.5 px-4 text-[10px] font-black uppercase tracking-widest border-b text-center text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20 w-24">Status</th>
+                    <th className={`py-2.5 px-4 text-[10px] font-black uppercase tracking-widest border-b text-center w-24 ${location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20' : 'text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'}`}>Status</th>
                   )}
                 </tr>
               </thead>
               <tbody className={`divide-y ${location === '1st' ? 'divide-purple-100 dark:divide-purple-500/10' : 'divide-emerald-100 dark:divide-emerald-500/10'}`}>
-                {paginatedItems.map((item, idx) => {
-                  const health = getHealthColors(item.live_stock || 0);
+                {paginatedItems.map((item) => {
+                  const health = getHealth(item.live_stock || 0, item.max_level || 0);
+                  const inQty = parseFloat(String(item.in_qty)) || 0;
+                  const outQty = parseFloat(String(item.out_qty)) || 0;
                   return (
                     <tr
                       key={item.item_name}
-                      className="hover:bg-gray-50/50 dark:hover:bg-white/[0.03] transition-colors group"
+                      className="hover:bg-gray-50/50 dark:hover:bg-white/[0.03] even:bg-gray-50/50 dark:even:bg-[#1f2937]/30 transition-colors group"
                     >
                       <td className={`py-1 px-2 text-center sticky left-0 z-10 transition-colors border-r bg-white dark:bg-[#111827] ${
                           location === '1st' 
@@ -1292,16 +1464,44 @@ function parseDateStr(dStr: string) {
                           </button>
                         </div>
                       </td>
-                      <td className="py-2 px-3 text-[11px] font-bold text-gray-500 uppercase whitespace-nowrap">{item.category}</td>
-                      <td className="py-2 px-3 text-[11px] font-black text-gray-900 dark:text-white uppercase truncate max-w-[300px]" title={item.item_name}>{item.item_name}</td>
-                      <td className="py-2 px-3 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 text-right">{item.in_qty}</td>
-                      <td className="py-2 px-3 text-[11px] font-bold text-rose-600 dark:text-rose-400 text-right">{item.out_qty}</td>
+                      <td className="py-2 px-3">
+                        <span className="inline-block px-2 py-0.5 rounded border border-gray-200 dark:border-white/10 bg-gray-100 dark:bg-white/5 text-[10px] font-black text-gray-600 dark:text-gray-300 uppercase tracking-wider">
+                          {item.category}
+                        </span>
+                      </td>
+                      <td className="py-2 px-3 text-[11px] font-black text-[#003875] dark:text-[#FFD500] uppercase whitespace-normal break-words min-w-[200px] max-w-[320px] leading-snug">{item.item_name}</td>
+                      <td className="py-2 px-3 text-[11px] font-bold text-gray-600 dark:text-gray-300 uppercase whitespace-nowrap">{item.sku_code || "—"}</td>
+                      <td className="py-2 px-3 text-center">
+                        {item.active_status ? (
+                          <span className={`inline-block px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider ${
+                            item.active_status.toLowerCase() === "active"
+                              ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400"
+                              : "bg-gray-200 text-gray-600 dark:bg-white/10 dark:text-gray-400"
+                          }`}>
+                            {item.active_status}
+                          </span>
+                        ) : (
+                          <span className="text-[9px] font-black uppercase tracking-wider text-amber-600 dark:text-amber-400">Not set</span>
+                        )}
+                      </td>
                       <td className="py-1 px-4 bg-gray-50/50 dark:bg-white/[0.02]">
-                        <div className="flex flex-col gap-1 w-full justify-end items-end">
-                          <span className={`text-sm font-black ${health.text}`}>{item.live_stock}</span>
-                          <span className="text-[9px] font-bold text-gray-400 uppercase">{health.label}</span>
+                        <div className="flex flex-col gap-1 w-full max-w-[180px]">
+                          <div className="flex justify-between items-baseline leading-none">
+                            <span className={`text-xs font-black ${health.text}`}>{(item.live_stock || 0).toLocaleString()}</span>
+                            <span className="text-[9px] font-bold text-gray-400 uppercase">{health.label}</span>
+                          </div>
+                          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 overflow-hidden flex">
+                            <div className={`h-full ${health.color} transition-all duration-500`} style={{ width: `${health.pct}%` }} />
+                          </div>
                         </div>
                       </td>
+                      <td className="py-2 px-3 text-[11px] font-bold text-[#003875] dark:text-[#FFD500] text-right">{item.max_level || "—"}</td>
+                      <td className="py-2 px-3 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 text-right">{inQty !== 0 ? inQty.toLocaleString() : "—"}</td>
+                      <td className="py-2 px-3 text-[11px] font-bold text-rose-600 dark:text-rose-400 text-right">{outQty !== 0 ? outQty.toLocaleString() : "—"}</td>
+                      <td className="py-2 px-3 text-[11px] font-bold text-indigo-600 dark:text-indigo-400 text-right">{item.sale_percent}%</td>
+                      <td className="py-2 px-3 text-[11px] font-bold text-gray-600 dark:text-gray-400 text-right">{item.avg_daily_con || "—"}</td>
+                      <td className="py-2 px-3 text-[11px] font-bold text-gray-600 dark:text-gray-400 text-right">{item.lead_time}</td>
+                      <td className="py-2 px-3 text-[11px] font-bold text-gray-600 dark:text-gray-400 text-right">{item.safety_factor}</td>
                       {showPacked && (
                         <td className="py-2 px-4 text-center">
                           {item.packed_status === 'PACKED' ? (
@@ -1316,7 +1516,7 @@ function parseDateStr(dStr: string) {
                 })}
                 {filteredItems.length === 0 && (
                   <tr>
-                    <td colSpan={showPacked ? 7 : 6} className="py-8 text-center text-gray-400 text-[11px] font-black uppercase">No items found</td>
+                    <td colSpan={showPacked ? 14 : 13} className="py-8 text-center text-gray-400 text-[11px] font-black uppercase">No items found</td>
                   </tr>
                 )}
               </tbody>

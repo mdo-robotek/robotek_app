@@ -10,4 +10,9 @@ export interface FloorIMS {
   checked_status?: string;
   // Computed in frontend/API
   live_stock?: number;
+  sku_code?: string;
+  active_status?: string;
+  lead_time?: number;
+  safety_factor?: number;
+  in_master?: boolean;
 }

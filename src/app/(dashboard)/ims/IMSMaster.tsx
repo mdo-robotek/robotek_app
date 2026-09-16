@@ -34,7 +34,7 @@ import * as XLSX from "xlsx";
 import TimeSeriesTable, { TimeBucket, Transaction } from "@/components/TimeSeriesTable";
 import DateFilterBar, { FilterPeriod } from "@/components/DateFilterBar";
 import SearchableMultiSelect from "@/components/SearchableMultiSelect";
-import { matchesCategoryItemFilters, matchesExactFilterValue, matchesOptionSearch, normalizeFilterKey } from "@/lib/ims-filters";
+import { matchesCategoryItemFilters, matchesExactFilterValue, matchesOptionSearch, normalizeFilterKey, matchesActiveFilter, ActiveStatusFilter } from "@/lib/ims-filters";
 import { getTxSortTime, normalizeTxDate, withUniqueDatewiseIds, matchesDatewiseStatus } from "@/lib/ims-datewise-key";
 import GFloorLedgerModals from "@/app/(dashboard)/ims/GFloorLedgerModals";
 import { startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfQuarter, endOfQuarter, startOfYear, endOfYear } from "date-fns";
@@ -112,6 +112,8 @@ type EnrichedIMS = Omit<IMS, "live_stock" | "in_qty" | "out_qty" | "max_level" |
   avg_daily_con: number;
   lead_time: number;
   safety_factor: number;
+  sku_code: string;
+  active_status: string;
   final_amount_num: number;
   is_pending?: boolean;
   source?: IMS["source"];
@@ -342,6 +344,7 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 50;
   const [legendFilter, setLegendFilter] = useState<number | null>(null);
+  const [activeFilter, setActiveFilter] = useState<ActiveStatusFilter>("ALL");
   const { resolvedTheme } = useTheme();
   
   const fileInputRef = React.useRef<HTMLInputElement>(null);
@@ -795,11 +798,36 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
       avg_daily_con: item.avg_daily_con || 0,
       lead_time: item.lead_time || 30,
       safety_factor: item.safety_factor || 1,
+      sku_code: item.sku_code || "",
+      active_status: item.active_status || "",
       final_amount_num: parseFloat(item.final_amount) || 0,
       is_pending: isPendingItem(item),
       source: item.source || (isPendingItem(item) ? undefined : "Details"),
     })) as EnrichedIMS[];
   }, [rawItems]);
+
+  const activeByItemName = useMemo(() => {
+    const map = new Map<string, string>();
+    items.forEach((item) => {
+      const key = (item.item_name || "").trim().toLowerCase();
+      if (key) map.set(key, item.active_status || "");
+    });
+    return map;
+  }, [items]);
+
+  const datewiseActiveFiltered = useMemo(() => {
+    if (activeFilter === "ALL") return filteredDatewiseTransactions;
+    return filteredDatewiseTransactions.filter((item) =>
+      matchesActiveFilter(activeByItemName.get((item.item_name || "").trim().toLowerCase()), activeFilter)
+    );
+  }, [filteredDatewiseTransactions, activeByItemName, activeFilter]);
+
+  const timeSeriesActiveFiltered = useMemo(() => {
+    if (activeFilter === "ALL") return filteredTimeSeriesData;
+    return filteredTimeSeriesData.filter((item) =>
+      matchesActiveFilter(activeByItemName.get((item.item_name || "").trim().toLowerCase()), activeFilter)
+    );
+  }, [filteredTimeSeriesData, activeByItemName, activeFilter]);
 
   const getLegendBucket = (live: number, maxLevel: number) => {
     if (live < 0) return 6;
@@ -906,6 +934,7 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
       if (!matchesText(item)) return false;
       if (!matchesCategoryItemFilters(item, categoryFilters, itemNameFilters)) return false;
       if (!matchesExactFilterValue(item.source || "", sourceFilters)) return false;
+      if (!matchesActiveFilter(item.active_status, activeFilter)) return false;
       return true;
     });
 
@@ -929,7 +958,7 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
     }
 
     return result;
-  }, [items, searchQuery, legendFilter, categoryFilters, itemNameFilters, sourceFilters, sortKey, sortDir]);
+  }, [items, searchQuery, legendFilter, categoryFilters, itemNameFilters, sourceFilters, sortKey, sortDir, activeFilter]);
 
   const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
   const paginatedItems = useMemo(() => {
@@ -937,16 +966,16 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
     return filteredItems.slice(start, start + itemsPerPage);
   }, [filteredItems, currentPage]);
 
-  const datewiseTotalPages = Math.ceil(filteredDatewiseTransactions.length / itemsPerPage);
+  const datewiseTotalPages = Math.ceil(datewiseActiveFiltered.length / itemsPerPage);
   const paginatedDatewiseTransactions = useMemo(() => {
     const start = (currentPage - 1) * itemsPerPage;
-    return filteredDatewiseTransactions.slice(start, start + itemsPerPage);
-  }, [filteredDatewiseTransactions, currentPage]);
+    return datewiseActiveFiltered.slice(start, start + itemsPerPage);
+  }, [datewiseActiveFiltered, currentPage]);
 
   React.useEffect(() => {
     setCurrentPage(1);
     setSelectedTxKeys(new Set());
-  }, [searchQuery, legendFilter, categoryFilters, itemNameFilters, sourceFilters, viewMode, filterPeriod, filterDate, filterStartDate, filterEndDate, datewiseSortKey, datewiseSortDir]);
+  }, [searchQuery, legendFilter, categoryFilters, itemNameFilters, sourceFilters, viewMode, filterPeriod, filterDate, filterStartDate, filterEndDate, datewiseSortKey, datewiseSortDir, activeFilter]);
 
   React.useEffect(() => {
     setSourceFilters([]);
@@ -1208,17 +1237,17 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
     pageSelectableKeys.length > 0 && pageSelectableKeys.every((key) => selectedTxKeys.has(key));
 
   const selectedCheckableCount = useMemo(() => {
-    return filteredDatewiseTransactions.filter((log) => {
+    return datewiseActiveFiltered.filter((log) => {
       if (!selectedTxKeys.has(log.row_uid)) return false;
       return !(matchesDatewiseStatus(log, checkedUidKeys, checkedTxKeys) || isLedgerChecked(log));
     }).length;
-  }, [filteredDatewiseTransactions, selectedTxKeys, checkedTxKeys, checkedUidKeys]);
+  }, [datewiseActiveFiltered, selectedTxKeys, checkedTxKeys, checkedUidKeys]);
 
   const selectedApprovableCount = useMemo(() => {
-    return filteredDatewiseTransactions.filter((log) => {
+    return datewiseActiveFiltered.filter((log) => {
       return selectedTxKeys.has(log.row_uid) && !matchesDatewiseStatus(log, approvedUidKeys, approvedTxKeys);
     }).length;
-  }, [filteredDatewiseTransactions, selectedTxKeys, approvedTxKeys, approvedUidKeys]);
+  }, [datewiseActiveFiltered, selectedTxKeys, approvedTxKeys, approvedUidKeys]);
 
   const toggleTxSelection = (txKey: string, selectable: boolean) => {
     if (!selectable) return;
@@ -1240,7 +1269,7 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
   };
 
   const handleBulkApprove = async () => {
-    const toApprove = filteredDatewiseTransactions.filter((log) => {
+    const toApprove = datewiseActiveFiltered.filter((log) => {
       return selectedTxKeys.has(log.row_uid) && !matchesDatewiseStatus(log, approvedUidKeys, approvedTxKeys);
     });
     if (toApprove.length === 0) {
@@ -1284,7 +1313,7 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
   };
 
   const handleBulkMarkChecked = async () => {
-    const toCheck = filteredDatewiseTransactions.filter((log) => {
+    const toCheck = datewiseActiveFiltered.filter((log) => {
       if (!selectedTxKeys.has(log.row_uid)) return false;
       return !(matchesDatewiseStatus(log, checkedUidKeys, checkedTxKeys) || isLedgerChecked(log));
     });
@@ -1335,7 +1364,7 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
 
     if (viewMode === 'datewise') {
       headers = ["Date", "Category", "Source", "Item Name", "In Qty", "Out Qty", "Live Stock", "Checked Status", "Approval Status"];
-      rows = filteredDatewiseTransactions.map((log: any) => [
+      rows = datewiseActiveFiltered.map((log: any) => [
         new Date(log.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: '2-digit' }),
         log.category,
         formatTxSourceLabel(log.source),
@@ -1347,14 +1376,16 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
         matchesDatewiseStatus(log, approvedUidKeys, approvedTxKeys) ? "Approved" : "Pending",
       ]);
     } else {
-      headers = ["ID", "Item Name", "Est. Amount/Item", "GST", "Final Amount", "Category", "In Qty", "Out Qty", "Live Stock", "Sale %", "Avg Daily Con. (60d)", "Lead Time", "Safety Factor", "Max Level"];
+      headers = ["SKU", "Category", "Item Name", "Active/Inactive", "ID", "Est. Amount/Item", "GST", "Final Amount", "In Qty", "Out Qty", "Live Stock", "Sale %", "Avg Daily Con. (60d)", "Lead Time", "Safety Factor", "Max Level"];
       rows = filteredItems.map((item) => [
-        item.id,
+        item.sku_code || "—",
+        item.category,
         item.item_name,
+        item.active_status || "—",
+        item.id,
         item.est_amount_item,
         item.gst,
         item.final_amount,
-        item.category,
         item.in_qty,
         item.out_qty,
         item.live_stock,
@@ -1584,12 +1615,22 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
               accentClass="border-blue-500 ring-blue-500/20"
             />
           </div>
-          {(categoryFilters.length > 0 || itemNameFilters.length > 0 || sourceFilters.length > 0) && (
+          <select
+            value={activeFilter}
+            onChange={(e) => setActiveFilter(e.target.value as ActiveStatusFilter)}
+            className="px-2 py-1.5 bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 rounded-lg text-[10px] font-black uppercase tracking-wider outline-none focus:ring-2 focus:ring-blue-500 dark:text-white h-[30px] cursor-pointer shrink-0"
+          >
+            <option value="ALL">All Status</option>
+            <option value="ACTIVE">Active</option>
+            <option value="INACTIVE">Inactive</option>
+          </select>
+          {(categoryFilters.length > 0 || itemNameFilters.length > 0 || sourceFilters.length > 0 || activeFilter !== "ALL") && (
             <button
               onClick={() => {
                 setCategoryFilters([]);
                 setItemNameFilters([]);
                 setSourceFilters([]);
+                setActiveFilter("ALL");
               }}
               className="px-2 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-wider text-blue-700 dark:text-blue-400 bg-blue-50 hover:bg-blue-100 dark:bg-blue-500/10 dark:hover:bg-blue-500/20 border border-blue-200 dark:border-blue-500/20 transition-colors shrink-0 h-[30px]"
             >
@@ -1664,7 +1705,7 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
       {viewMode === 'timeseries' ? (
         <div className="flex flex-col gap-2 shrink-0 mb-2">
           <TimeSeriesTable 
-            transactions={filteredTimeSeriesData}
+            transactions={timeSeriesActiveFiltered}
             bucket={mappedTimeBucket}
             isLoading={showTimeSeriesLoading}
             searchQuery={searchQuery}
@@ -1672,10 +1713,10 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
         </div>
       ) : viewMode === 'datewise' ? (
         <div className="flex-1 bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/5 rounded-xl overflow-hidden flex flex-col shadow-sm min-h-0 mt-2">
-          {filteredDatewiseTransactions.length > 0 && !showTimeSeriesLoading && (
+          {datewiseActiveFiltered.length > 0 && !showTimeSeriesLoading && (
             <div className="py-2 px-4 border-b border-blue-200/50 dark:border-blue-500/10 flex flex-wrap items-center justify-between gap-2 bg-blue-50/50 dark:bg-[#1f2937]/50 shrink-0">
               <p className="text-[10px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-widest">
-                Showing {Math.min((currentPage - 1) * itemsPerPage + 1, filteredDatewiseTransactions.length)} to {Math.min(currentPage * itemsPerPage, filteredDatewiseTransactions.length)} of {filteredDatewiseTransactions.length} transactions
+                Showing {Math.min((currentPage - 1) * itemsPerPage + 1, datewiseActiveFiltered.length)} to {Math.min(currentPage * itemsPerPage, datewiseActiveFiltered.length)} of {datewiseActiveFiltered.length} transactions
               </p>
               <div className="flex items-center gap-2">
                 {selectedCheckableCount > 0 && (
@@ -1829,7 +1870,7 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
                     </tr>
                     );
                   })}
-                  {filteredDatewiseTransactions.length === 0 && (
+                  {datewiseActiveFiltered.length === 0 && (
                     <tr>
                       <td colSpan={11} className="py-8 text-center text-gray-400 text-[11px] font-black uppercase">No items found</td>
                     </tr>
@@ -1891,6 +1932,8 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
                         {sortableTh("Category", "category")}
                         {sortableTh("Source", "source")}
                         {sortableTh("Item Name", "item_name", { className: "min-w-[200px]" })}
+                        <th className="py-2.5 px-3 text-[10px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-widest border-b border-blue-200 dark:border-blue-500/20 whitespace-nowrap">SKU</th>
+                        <th className="py-2.5 px-3 text-[10px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-widest border-b border-blue-200 dark:border-blue-500/20 text-center whitespace-nowrap">Active</th>
                         {sortableTh("Est. Amt", "est_amount_item", { align: "right" })}
                         {sortableTh("GST", "gst", { align: "right" })}
                         {sortableTh("Final Amt", "final_amount_num", { align: "right" })}
@@ -1958,6 +2001,20 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
                               </span>
                             </td>
                             <td className="py-2 px-3 text-[11px] font-black text-gray-900 dark:text-white uppercase whitespace-normal break-words min-w-[200px] max-w-[320px] leading-snug">{item.item_name}</td>
+                            <td className="py-2 px-3 text-[11px] font-bold text-gray-600 dark:text-gray-300 uppercase whitespace-nowrap">{item.sku_code || "—"}</td>
+                            <td className="py-2 px-3 text-center">
+                              {item.active_status ? (
+                                <span className={`inline-block px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider ${
+                                  item.active_status.toLowerCase() === "active"
+                                    ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400"
+                                    : "bg-gray-200 text-gray-600 dark:bg-white/10 dark:text-gray-400"
+                                }`}>
+                                  {item.active_status}
+                                </span>
+                              ) : (
+                                <span className="text-[9px] font-black uppercase tracking-wider text-amber-600 dark:text-amber-400">Not set</span>
+                              )}
+                            </td>
                             <td className="py-2 px-3 text-[11px] font-bold text-gray-600 dark:text-gray-400 text-right">{pending && !item.est_amount_item ? "—" : item.est_amount_item}</td>
                             <td className="py-2 px-3 text-[11px] font-bold text-gray-600 dark:text-gray-400 text-right">{pending && !item.gst ? "—" : item.gst ? `${item.gst}%` : ""}</td>
                             <td className="py-2 px-3 text-[11px] font-black text-gray-800 dark:text-gray-200 text-right">{pending && !item.final_amount_num ? "—" : `₹${item.final_amount_num.toFixed(2)}`}</td>
@@ -1984,7 +2041,7 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
                       })}
                       {filteredItems.length === 0 && (
                         <tr>
-                          <td colSpan={16} className="py-8 text-center text-gray-400 text-[11px] font-black uppercase">No items found</td>
+                          <td colSpan={18} className="py-8 text-center text-gray-400 text-[11px] font-black uppercase">No items found</td>
                         </tr>
                       )}
                     </tbody>

@@ -35,3 +35,15 @@ export const matchesOptionSearch = (label: string, searchTerm: string) => {
   const tokens = term.split(/\s+/).filter(Boolean);
   return tokens.length > 0 && tokens.every((t) => hay.includes(t));
 };
+
+export type ActiveStatusFilter = "ALL" | "ACTIVE" | "INACTIVE";
+
+export const matchesActiveFilter = (
+  status: string | undefined | null,
+  filter: ActiveStatusFilter
+) => {
+  if (filter === "ALL") return true;
+  const n = (status || "").trim().toLowerCase();
+  if (filter === "ACTIVE") return n === "active";
+  return n === "inactive";
+};

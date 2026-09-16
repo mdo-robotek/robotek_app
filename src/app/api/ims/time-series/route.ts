@@ -5,6 +5,7 @@ import { getIMSItems } from "@/lib/ims-sheets";
 import { getFloorIMSItems } from "@/lib/ims-floor-sheets";
 import { firstFloorOutRowsToGFloorInTxs, floorOutRowsToGFloorInTxs } from "@/lib/ims-1st-to-g-transfer";
 import { isGrnForGFloor } from "@/lib/grn-packed";
+import { getIMSMasterItems } from "@/lib/ims-master-sheets";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -26,13 +27,14 @@ function parseDateStr(dStr: string) {
 
 export async function GET() {
   try {
-    const [items, grns, outForm, gFloorLedger, firstFloorLedger, sfgFloorLedger] = await Promise.all([
+    const [items, grns, outForm, gFloorLedger, firstFloorLedger, sfgFloorLedger, masterRows] = await Promise.all([
       getIMSItems(),
       getGRNItems(),
       getOutFormData(),
       getFloorIMSItems("g"),
       getFloorIMSItems("1st"),
       getFloorIMSItems("sfg"),
+      getIMSMasterItems(),
     ]);
 
     const categoryMap: Record<string, string> = {};
@@ -40,6 +42,10 @@ export async function GET() {
       if (i.item_name) {
         categoryMap[i.item_name.trim().toLowerCase()] = i.category || 'GENERAL';
       }
+    });
+    masterRows.forEach((row) => {
+      const key = (row.item_name || "").trim().toLowerCase();
+      if (key && row.category) categoryMap[key] = row.category;
     });
 
     const transactions: any[] = [];

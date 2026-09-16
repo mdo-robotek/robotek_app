@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import useSWR from "swr";
+import useSWR, { mutate as globalMutate } from "swr";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   ClipboardDocumentListIcon,
   ArrowDownTrayIcon,
@@ -11,12 +12,17 @@ import {
   CalendarIcon,
   MagnifyingGlassIcon,
   ExclamationTriangleIcon,
+  PencilSquareIcon,
+  XMarkIcon,
 } from "@heroicons/react/24/outline";
 import * as XLSX from "xlsx";
 import TimeSeriesTable, { TimeBucket, Transaction } from "@/components/TimeSeriesTable";
 import DateFilterBar, { FilterPeriod } from "@/components/DateFilterBar";
 import SearchableMultiSelect from "@/components/SearchableMultiSelect";
-import { matchesCategoryItemFilters, matchesOptionSearch, normalizeFilterKey } from "@/lib/ims-filters";
+import ActionStatusModal from "@/components/ActionStatusModal";
+import { matchesCategoryItemFilters, matchesOptionSearch, normalizeFilterKey, matchesActiveFilter, ActiveStatusFilter } from "@/lib/ims-filters";
+import { indexMasterByName, masterItemKey, overlayFromMaster } from "@/lib/ims-master-overlay";
+import { IMSMasterItem } from "@/types/ims-master";
 import { startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfQuarter, endOfQuarter, startOfYear, endOfYear, isWithinInterval } from "date-fns";
 
 const fetcher = (url: string) => fetch(url).then(res => res.json());
@@ -52,6 +58,9 @@ const getHealth = (live: number, max_level: number) => {
 type FinalIMSRow = {
   item_name: string;
   category: string;
+  sku_code: string;
+  active_status: string;
+  in_master: boolean;
   in_qty: number;
   out_qty: number;
   g_floor_stock: number;
@@ -70,8 +79,21 @@ export default function IMSFinal({ onBack }: { onBack: () => void }) {
   const [itemNameFilters, setItemNameFilters] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [legendFilter, setLegendFilter] = useState<number | null>(null);
+  const [activeFilter, setActiveFilter] = useState<ActiveStatusFilter>("ALL");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 50;
+  const [editingItem, setEditingItem] = useState<FinalIMSRow | null>(null);
+  const [masterForm, setMasterForm] = useState({
+    sku_code: "",
+    category: "",
+    active_status: "Active",
+    lead_time: String(DEFAULT_LEAD),
+    safety_factor: String(DEFAULT_SF),
+  });
+  const [savingMaster, setSavingMaster] = useState(false);
+  const [statusOpen, setStatusOpen] = useState(false);
+  const [statusType, setStatusType] = useState<"loading" | "success" | "error">("loading");
+  const [statusMessage, setStatusMessage] = useState("");
 
   const [viewMode, setViewMode] = useState<'default' | 'timeseries' | 'datewise'>('default');
   const [filterPeriod, setFilterPeriod] = useState<FilterPeriod>('ALL');
@@ -89,6 +111,7 @@ export default function IMSFinal({ onBack }: { onBack: () => void }) {
   const { data: masterItems = [], isLoading: isLoadingMaster } = useSWR("/api/ims", fetcher);
   const { data: firstItems = [], isLoading: isLoadingFirst } = useSWR("/api/ims/floor?location=1st", fetcher);
   const { data: sfgItems = [], isLoading: isLoadingSfg } = useSWR("/api/ims/floor?location=sfg", fetcher);
+  const { data: masterCatalog = [], mutate: mutateMasterCatalog } = useSWR<IMSMasterItem[]>("/api/ims/master", fetcher);
 
   const { data: timeSeriesData = [], isValidating: isTimeSeriesLoading } = useSWR<Transaction[]>(
     viewMode === 'timeseries' ? '/api/ims/time-series' : null,
@@ -109,6 +132,9 @@ export default function IMSFinal({ onBack }: { onBack: () => void }) {
         map.set(key, {
           item_name: name,
           category: (category || "Uncategorized").trim() || "Uncategorized",
+          sku_code: "",
+          active_status: "",
+          in_master: false,
           in_qty: 0,
           out_qty: 0,
           g_floor_stock: 0,
@@ -165,15 +191,21 @@ export default function IMSFinal({ onBack }: { onBack: () => void }) {
       row.first_floor_stock += live;
     });
 
+    const masterByName = indexMasterByName(masterCatalog || []);
+
     return Array.from(map.values())
       .map((row) => {
-        const live_stock = row.g_floor_stock + row.sfg_stock + row.first_floor_stock;
-        const sale_percent = row.in_qty > 0 ? Number(((row.out_qty / row.in_qty) * 100).toFixed(1)) : 0;
-        const max_level = Number((row.avg_daily_con * row.lead_time * row.safety_factor).toFixed(2));
-        return { ...row, live_stock, sale_percent, max_level };
+        const overlaid = overlayFromMaster(row, masterByName.get(masterItemKey(row.item_name)), {
+          lead_time: row.lead_time,
+          safety_factor: row.safety_factor,
+        });
+        const live_stock = overlaid.g_floor_stock + overlaid.sfg_stock + overlaid.first_floor_stock;
+        const sale_percent = overlaid.in_qty > 0 ? Number(((overlaid.out_qty / overlaid.in_qty) * 100).toFixed(1)) : 0;
+        const max_level = Number((overlaid.avg_daily_con * overlaid.lead_time * overlaid.safety_factor).toFixed(2));
+        return { ...overlaid, live_stock, sale_percent, max_level };
       })
       .sort((a, b) => a.item_name.localeCompare(b.item_name));
-  }, [masterItems, sfgItems, firstItems]);
+  }, [masterItems, sfgItems, firstItems, masterCatalog]);
 
   const bucketCounts = useMemo(() => {
     const counts = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 };
@@ -218,6 +250,7 @@ export default function IMSFinal({ onBack }: { onBack: () => void }) {
   const filteredItems = useMemo(() => {
     let result = aggregatedItems.filter((item) => {
       if (searchQuery && !matchesOptionSearch(item.item_name || "", searchQuery)) return false;
+      if (!matchesActiveFilter(item.active_status, activeFilter)) return false;
       return matchesCategoryItemFilters(item, categoryFilters, itemNameFilters);
     });
     if (legendFilter !== null) {
@@ -226,7 +259,7 @@ export default function IMSFinal({ onBack }: { onBack: () => void }) {
       );
     }
     return result;
-  }, [aggregatedItems, categoryFilters, itemNameFilters, searchQuery, legendFilter]);
+  }, [aggregatedItems, categoryFilters, itemNameFilters, searchQuery, legendFilter, activeFilter]);
 
   const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
   const paginatedItems = useMemo(() => {
@@ -251,9 +284,12 @@ export default function IMSFinal({ onBack }: { onBack: () => void }) {
       XLSX.writeFile(wb, `Final_IMS_Datewise_${new Date().toISOString().split("T")[0]}.xlsx`);
     } else {
       const exportData = filteredItems.map(item => ({
+        "SKU Code": item.sku_code,
         Category: item.category,
         "Item Name": item.item_name,
+        "Active/Inactive": item.active_status || "—",
         "Stock Health": item.live_stock,
+        Max: item.max_level,
         "IN Qty": item.in_qty,
         "OUT Qty": item.out_qty,
         "Sale %": item.sale_percent,
@@ -263,7 +299,6 @@ export default function IMSFinal({ onBack }: { onBack: () => void }) {
         "SFG Stock": item.sfg_stock,
         "1st Floor Stock": item.first_floor_stock,
         SF: item.safety_factor,
-        Max: item.max_level,
       }));
 
       const ws = XLSX.utils.json_to_sheet(exportData);
@@ -273,9 +308,67 @@ export default function IMSFinal({ onBack }: { onBack: () => void }) {
     }
   };
 
+  const showStatus = (message: string, type: "loading" | "success" | "error") => {
+    setStatusMessage(message);
+    setStatusType(type);
+    setStatusOpen(true);
+  };
+
+  const openMasterEdit = (item: FinalIMSRow) => {
+    const master = (masterCatalog || []).find(
+      (row) => masterItemKey(row.item_name) === masterItemKey(item.item_name)
+    );
+    setEditingItem(item);
+    setMasterForm({
+      sku_code: master?.sku_code || item.sku_code || "",
+      category: master?.category || (item.category !== "Uncategorized" ? item.category : "") || "",
+      active_status: master?.active_status || item.active_status || "Active",
+      lead_time: String(master?.lead_time || item.lead_time || DEFAULT_LEAD),
+      safety_factor: String(master?.safety_factor || item.safety_factor || DEFAULT_SF),
+    });
+  };
+
+  const handleSaveMaster = async () => {
+    if (!editingItem) return;
+    setSavingMaster(true);
+    showStatus("Saving to Master...", "loading");
+    try {
+      const res = await fetch("/api/ims/master", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          item_name: editingItem.item_name,
+          sku_code: masterForm.sku_code,
+          category: masterForm.category,
+          active_status: masterForm.active_status,
+          lead_time: masterForm.lead_time,
+          safety_factor: masterForm.safety_factor,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to save Master item");
+      await Promise.all([
+        mutateMasterCatalog(),
+        globalMutate("/api/ims"),
+        globalMutate("/api/ims/floor?location=g"),
+        globalMutate("/api/ims/floor?location=1st"),
+        globalMutate("/api/ims/floor?location=sfg"),
+        globalMutate("/api/ims/time-series"),
+        globalMutate("/api/ims/summary"),
+      ]);
+      setEditingItem(null);
+      showStatus(data.added ? "Added to Master" : "Master updated", "success");
+      setTimeout(() => setStatusOpen(false), 1500);
+    } catch (e) {
+      showStatus(e instanceof Error ? e.message : "Failed to save Master item", "error");
+    } finally {
+      setSavingMaster(false);
+    }
+  };
+
   React.useEffect(() => {
     setCurrentPage(1);
-  }, [categoryFilters, itemNameFilters, viewMode, filterPeriod, filterDate, filterStartDate, filterEndDate, searchQuery, legendFilter]);
+  }, [categoryFilters, itemNameFilters, viewMode, filterPeriod, filterDate, filterStartDate, filterEndDate, searchQuery, legendFilter, activeFilter]);
 
   React.useEffect(() => {
     setItemNameFilters((prev) => {
@@ -287,14 +380,19 @@ export default function IMSFinal({ onBack }: { onBack: () => void }) {
   }, [categoryFilters, uniqueItemNames]);
 
   const combinedTransactions = useMemo(() => {
+    const catalogByName = indexMasterByName(masterCatalog || []);
+    const categoryFor = (name: string, fallback?: string) =>
+      catalogByName.get(masterItemKey(name))?.category || fallback || "Uncategorized";
+
     const masterTxs = (timeSeriesData || []).map((item: any) => ({
       ...item,
+      category: categoryFor(item.item_name, item.category),
       source: 'IMS - G Floor'
     }));
     
     const floorMapper = (sourceName: string) => (item: any): Transaction & { source: string } => ({
       item_name: item.item_name || '',
-      category: item.category || 'Uncategorized',
+      category: categoryFor(item.item_name, item.category),
       date: item.date || item.updated_at || '',
       in_qty: parseFloat(item.in_qty) || 0,
       out_qty: parseFloat(item.out_qty) || 0,
@@ -305,7 +403,7 @@ export default function IMSFinal({ onBack }: { onBack: () => void }) {
     const sfgTxs = (sfgItems || []).map(floorMapper('SFG IMS'));
 
     return [...masterTxs, ...sfgTxs, ...firstTxs];
-  }, [timeSeriesData, firstItems, sfgItems]);
+  }, [timeSeriesData, firstItems, sfgItems, masterCatalog]);
 
   const dateRange = useMemo(() => {
     let start, end;
@@ -364,11 +462,24 @@ export default function IMSFinal({ onBack }: { onBack: () => void }) {
     });
   }, [combinedTransactions, dateRange]);
 
+  const activeByName = useMemo(() => {
+    const map = new Map<string, string>();
+    aggregatedItems.forEach((item) => {
+      const key = (item.item_name || "").trim().toLowerCase();
+      if (key) map.set(key, item.active_status || "");
+    });
+    return map;
+  }, [aggregatedItems]);
+
   const filteredDatewiseTransactions = useMemo(() => {
-    return datewiseTransactions.filter((item) =>
-      matchesCategoryItemFilters(item, categoryFilters, itemNameFilters)
-    );
-  }, [datewiseTransactions, categoryFilters, itemNameFilters]);
+    return datewiseTransactions.filter((item) => {
+      if (!matchesCategoryItemFilters(item, categoryFilters, itemNameFilters)) return false;
+      return matchesActiveFilter(
+        activeByName.get((item.item_name || "").trim().toLowerCase()),
+        activeFilter
+      );
+    });
+  }, [datewiseTransactions, categoryFilters, itemNameFilters, activeByName, activeFilter]);
 
   const datewiseTotalPages = Math.ceil(filteredDatewiseTransactions.length / itemsPerPage);
   const paginatedDatewiseTransactions = useMemo(() => {
@@ -377,13 +488,23 @@ export default function IMSFinal({ onBack }: { onBack: () => void }) {
   }, [filteredDatewiseTransactions, currentPage]);
 
   const filteredCombinedTransactions = useMemo(() => {
-    return combinedTransactions.filter((item) =>
-      matchesCategoryItemFilters(item, categoryFilters, itemNameFilters)
-    );
-  }, [combinedTransactions, categoryFilters, itemNameFilters]);
+    return combinedTransactions.filter((item) => {
+      if (!matchesCategoryItemFilters(item, categoryFilters, itemNameFilters)) return false;
+      return matchesActiveFilter(
+        activeByName.get((item.item_name || "").trim().toLowerCase()),
+        activeFilter
+      );
+    });
+  }, [combinedTransactions, categoryFilters, itemNameFilters, activeByName, activeFilter]);
 
   return (
     <div className="flex flex-col h-[calc(100vh-2rem)] gap-2">
+      <ActionStatusModal
+        isOpen={statusOpen}
+        status={statusType}
+        message={statusMessage}
+        onClose={() => setStatusOpen(false)}
+      />
       {/* Row 1: Title · tabs + export */}
       <div className="flex flex-wrap items-center gap-2 px-3 py-2.5 bg-white dark:bg-[#111827] rounded-xl shadow-sm border border-gray-200 dark:border-white/5 shrink-0">
         <div className="flex items-center gap-2.5 shrink-0">
@@ -478,12 +599,22 @@ export default function IMSFinal({ onBack }: { onBack: () => void }) {
             accentClass="border-orange-500 ring-orange-500/20"
           />
         </div>
-        {(categoryFilters.length > 0 || itemNameFilters.length > 0 || searchQuery) && (
+        <select
+          value={activeFilter}
+          onChange={(e) => setActiveFilter(e.target.value as ActiveStatusFilter)}
+          className="px-2.5 py-1.5 bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 rounded-lg text-[10px] font-black uppercase tracking-wider outline-none focus:ring-2 focus:ring-orange-500 dark:text-white shadow-sm h-[34px] cursor-pointer shrink-0"
+        >
+          <option value="ALL">All Status</option>
+          <option value="ACTIVE">Active</option>
+          <option value="INACTIVE">Inactive</option>
+        </select>
+        {(categoryFilters.length > 0 || itemNameFilters.length > 0 || searchQuery || activeFilter !== "ALL") && (
           <button
             onClick={() => {
               setCategoryFilters([]);
               setItemNameFilters([]);
               setSearchQuery("");
+              setActiveFilter("ALL");
             }}
             className="px-2.5 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-wider text-orange-700 dark:text-orange-400 bg-orange-50 hover:bg-orange-100 dark:bg-orange-500/10 dark:hover:bg-orange-500/20 border border-orange-200 dark:border-orange-500/20 transition-colors shrink-0 h-[34px]"
           >
@@ -682,9 +813,13 @@ export default function IMSFinal({ onBack }: { onBack: () => void }) {
               <table className="w-full text-left border-collapse relative min-w-[1100px]">
                 <thead className="bg-orange-50 dark:bg-orange-900/20 sticky top-0 z-20 shadow-sm">
                   <tr>
+                    <th className="py-2.5 px-3 text-[10px] font-black text-orange-600 dark:text-orange-500 uppercase tracking-widest border-b border-orange-200 dark:border-orange-500/20 text-center w-12">Acts</th>
+                    <th className="py-2.5 px-3 text-[10px] font-black text-orange-600 dark:text-orange-500 uppercase tracking-widest border-b border-orange-200 dark:border-orange-500/20 whitespace-nowrap">SKU</th>
                     <th className="py-2.5 px-3 text-[10px] font-black text-orange-600 dark:text-orange-500 uppercase tracking-widest border-b border-orange-200 dark:border-orange-500/20 whitespace-nowrap">Category</th>
                     <th className="py-2.5 px-3 text-[10px] font-black text-orange-600 dark:text-orange-500 uppercase tracking-widest border-b border-orange-200 dark:border-orange-500/20 min-w-[200px]">Item Name</th>
+                    <th className="py-2.5 px-3 text-[10px] font-black text-orange-600 dark:text-orange-500 uppercase tracking-widest border-b border-orange-200 dark:border-orange-500/20 text-center whitespace-nowrap">Active</th>
                     <th className="py-2.5 px-4 text-[10px] font-black text-orange-700 dark:text-orange-400 uppercase tracking-widest border-b border-orange-200 dark:border-orange-500/20 text-left bg-orange-100/50 dark:bg-orange-500/10 w-56">Stock Health</th>
+                    <th className="py-2.5 px-3 text-[10px] font-black text-orange-600 dark:text-orange-500 uppercase tracking-widest border-b border-orange-200 dark:border-orange-500/20 text-right">Max</th>
                     <th className="py-2.5 px-3 text-[10px] font-black text-orange-600 dark:text-orange-500 uppercase tracking-widest border-b border-orange-200 dark:border-orange-500/20 text-right">IN Qty</th>
                     <th className="py-2.5 px-3 text-[10px] font-black text-orange-600 dark:text-orange-500 uppercase tracking-widest border-b border-orange-200 dark:border-orange-500/20 text-right">OUT Qty</th>
                     <th className="py-2.5 px-3 text-[10px] font-black text-orange-600 dark:text-orange-500 uppercase tracking-widest border-b border-orange-200 dark:border-orange-500/20 text-right">Sale %</th>
@@ -694,7 +829,6 @@ export default function IMSFinal({ onBack }: { onBack: () => void }) {
                     <th className="py-2.5 px-3 text-[10px] font-black text-teal-600 dark:text-teal-400 uppercase tracking-widest border-b border-orange-200 dark:border-orange-500/20 text-right whitespace-nowrap">SFG</th>
                     <th className="py-2.5 px-3 text-[10px] font-black text-orange-600 dark:text-orange-500 uppercase tracking-widest border-b border-orange-200 dark:border-orange-500/20 text-right whitespace-nowrap">1st Floor</th>
                     <th className="py-2.5 px-3 text-[10px] font-black text-orange-600 dark:text-orange-500 uppercase tracking-widest border-b border-orange-200 dark:border-orange-500/20 text-right">SF</th>
-                    <th className="py-2.5 px-3 text-[10px] font-black text-orange-600 dark:text-orange-500 uppercase tracking-widest border-b border-orange-200 dark:border-orange-500/20 text-right">Max</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-orange-100 dark:divide-orange-500/10">
@@ -705,6 +839,21 @@ export default function IMSFinal({ onBack }: { onBack: () => void }) {
                         key={item.item_name}
                         className="hover:bg-orange-50/30 dark:hover:bg-white/[0.03] even:bg-gray-50/50 dark:even:bg-[#1f2937]/30 transition-colors group"
                       >
+                        <td className="py-2 px-3 text-center">
+                          <button
+                            type="button"
+                            onClick={() => openMasterEdit(item)}
+                            className={`hover:scale-110 transition-transform ${
+                              item.in_master
+                                ? "text-orange-600 dark:text-orange-400"
+                                : "text-amber-500 dark:text-amber-400"
+                            }`}
+                            title={item.in_master ? "Edit Master item" : "Add to Master — fill SKU, Category, Active, Lead Time, Safety Factor"}
+                          >
+                            <PencilSquareIcon className="w-4 h-4 mx-auto" />
+                          </button>
+                        </td>
+                        <td className="py-2 px-3 text-[11px] font-bold text-gray-600 dark:text-gray-300 uppercase whitespace-nowrap">{item.sku_code || "—"}</td>
                         <td className="py-2 px-3">
                           <span className="inline-block px-2 py-0.5 rounded border border-gray-200 dark:border-white/10 bg-gray-100 dark:bg-white/5 text-[10px] font-black text-gray-600 dark:text-gray-300 uppercase tracking-wider">
                             {item.category}
@@ -712,6 +861,19 @@ export default function IMSFinal({ onBack }: { onBack: () => void }) {
                         </td>
                         <td className="py-2 px-3 text-[11px] font-black text-[#003875] dark:text-[#FFD500] uppercase whitespace-normal break-words min-w-[200px] max-w-[320px] leading-snug">
                           {item.item_name}
+                        </td>
+                        <td className="py-2 px-3 text-center">
+                          {item.active_status ? (
+                            <span className={`inline-block px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider ${
+                              item.active_status.toLowerCase() === "active"
+                                ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400"
+                                : "bg-gray-200 text-gray-600 dark:bg-white/10 dark:text-gray-400"
+                            }`}>
+                              {item.active_status}
+                            </span>
+                          ) : (
+                            <span className="text-[9px] font-black uppercase tracking-wider text-amber-600 dark:text-amber-400">Not set</span>
+                          )}
                         </td>
                         <td className="py-1 px-4 bg-gray-50/50 dark:bg-white/[0.02]">
                           <div className="flex flex-col gap-1 w-full max-w-[180px]">
@@ -724,6 +886,7 @@ export default function IMSFinal({ onBack }: { onBack: () => void }) {
                             </div>
                           </div>
                         </td>
+                        <td className="py-2 px-3 text-[11px] font-bold text-[#003875] dark:text-[#FFD500] text-right">{item.max_level || "—"}</td>
                         <td className="py-2 px-3 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 text-right">
                           {item.in_qty !== 0 ? item.in_qty.toLocaleString() : "—"}
                         </td>
@@ -737,14 +900,13 @@ export default function IMSFinal({ onBack }: { onBack: () => void }) {
                         <td className="py-2 px-3 text-[11px] font-bold text-teal-600 dark:text-teal-400 text-right">{item.sfg_stock.toLocaleString()}</td>
                         <td className="py-2 px-3 text-[11px] font-bold text-purple-600 dark:text-purple-400 text-right">{item.first_floor_stock.toLocaleString()}</td>
                         <td className="py-2 px-3 text-[11px] font-bold text-gray-600 dark:text-gray-400 text-right">{item.safety_factor}</td>
-                        <td className="py-2 px-3 text-[11px] font-bold text-[#003875] dark:text-[#FFD500] text-right">{item.max_level || "—"}</td>
                       </tr>
                     );
                   })}
                   {paginatedItems.length === 0 && (
                     <tr>
-                      <td colSpan={13} className="py-12 text-center text-gray-400 text-[11px] font-black uppercase tracking-widest">
-                        {categoryFilters.length > 0 || itemNameFilters.length > 0 || searchQuery || legendFilter !== null
+                      <td colSpan={16} className="py-12 text-center text-gray-400 text-[11px] font-black uppercase tracking-widest">
+                        {categoryFilters.length > 0 || itemNameFilters.length > 0 || searchQuery || legendFilter !== null || activeFilter !== "ALL"
                           ? "No items found matching filters"
                           : "No items available"}
                       </td>
@@ -756,6 +918,112 @@ export default function IMSFinal({ onBack }: { onBack: () => void }) {
           </div>
         </div>
       )}
+
+      <AnimatePresence>
+        {editingItem && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 10 }}
+              className="bg-white dark:bg-[#111827] rounded-2xl shadow-[0_0_40px_rgba(0,0,0,0.2)] w-full max-w-md overflow-hidden border border-gray-200 dark:border-white/10"
+            >
+              <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-white/5 bg-orange-50 dark:bg-orange-900/20">
+                <h3 className="text-sm font-black uppercase tracking-widest flex items-center gap-2 text-gray-900 dark:text-white">
+                  <PencilSquareIcon className="w-5 h-5 text-orange-600" />
+                  {editingItem.in_master ? "Edit Master Item" : "Add to Master"}
+                </h3>
+                <button
+                  type="button"
+                  onClick={() => setEditingItem(null)}
+                  className="p-1.5 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white rounded-lg transition-colors"
+                >
+                  <XMarkIcon className="w-4 h-4" />
+                </button>
+              </div>
+              <div className="p-6 space-y-4 bg-white dark:bg-[#111827]">
+                <div className="p-3 rounded-xl bg-gray-50 dark:bg-white/[0.02] border border-gray-100 dark:border-white/5">
+                  <p className="text-[9px] font-black uppercase tracking-widest text-gray-400">Item Name</p>
+                  <p className="text-[11px] font-black text-gray-900 dark:text-white uppercase mt-1">{editingItem.item_name}</p>
+                </div>
+                <div>
+                  <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">SKU Code</label>
+                  <input
+                    value={masterForm.sku_code}
+                    onChange={(e) => setMasterForm((prev) => ({ ...prev, sku_code: e.target.value }))}
+                    className="mt-1 w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-white/10 bg-white dark:bg-[#0a0f1c] text-[11px] font-bold uppercase outline-none focus:ring-2 focus:ring-orange-500"
+                  />
+                </div>
+                <div>
+                  <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Category</label>
+                  <input
+                    list="final-ims-master-categories"
+                    value={masterForm.category}
+                    onChange={(e) => setMasterForm((prev) => ({ ...prev, category: e.target.value }))}
+                    className="mt-1 w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-white/10 bg-white dark:bg-[#0a0f1c] text-[11px] font-bold uppercase outline-none focus:ring-2 focus:ring-orange-500"
+                  />
+                  <datalist id="final-ims-master-categories">
+                    {uniqueCategories.map((cat) => (
+                      <option key={cat} value={cat} />
+                    ))}
+                  </datalist>
+                </div>
+                <div>
+                  <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Active / Inactive</label>
+                  <select
+                    value={masterForm.active_status}
+                    onChange={(e) => setMasterForm((prev) => ({ ...prev, active_status: e.target.value }))}
+                    className="mt-1 w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-white/10 bg-white dark:bg-[#0a0f1c] text-[11px] font-black uppercase outline-none focus:ring-2 focus:ring-orange-500"
+                  >
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                  </select>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Lead Time</label>
+                    <input
+                      type="number"
+                      min="0"
+                      value={masterForm.lead_time}
+                      onChange={(e) => setMasterForm((prev) => ({ ...prev, lead_time: e.target.value }))}
+                      className="mt-1 w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-white/10 bg-white dark:bg-[#0a0f1c] text-[11px] font-bold outline-none focus:ring-2 focus:ring-orange-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Safety Factor</label>
+                    <input
+                      type="number"
+                      min="0"
+                      step="0.1"
+                      value={masterForm.safety_factor}
+                      onChange={(e) => setMasterForm((prev) => ({ ...prev, safety_factor: e.target.value }))}
+                      className="mt-1 w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-white/10 bg-white dark:bg-[#0a0f1c] text-[11px] font-bold outline-none focus:ring-2 focus:ring-orange-500"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div className="p-4 border-t border-gray-100 dark:border-white/5 flex justify-end gap-3 bg-gray-50/50 dark:bg-[#1f2937]/50">
+                <button
+                  type="button"
+                  onClick={() => setEditingItem(null)}
+                  className="px-5 py-2 rounded-xl text-xs font-black text-gray-500 uppercase tracking-widest hover:bg-white dark:hover:bg-[#111827] shadow-sm border border-gray-200 dark:border-white/10 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSaveMaster}
+                  disabled={savingMaster}
+                  className="px-6 py-2 rounded-xl text-xs font-black text-white bg-orange-600 hover:bg-orange-700 uppercase tracking-widest shadow-lg disabled:opacity-50"
+                >
+                  Save Master
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

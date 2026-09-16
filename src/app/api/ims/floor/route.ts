@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getFloorIMSItems, addFloorIMSItem, addFloorIMSItems, updateFloorIMSItem, deleteFloorIMSItem, markFloorIMSItemsChecked, isValidFloorLocation } from "@/lib/ims-floor-sheets";
 import { FloorIMS } from "@/types/ims-floor";
 import { isGrnUnpacked, isSfgVirtualGrnId, sfgVirtualGrnId } from "@/lib/grn-packed";
+import { getIMSMasterItems, indexMasterByName, overlayFromMaster, masterItemKey } from "@/lib/ims-master-sheets";
 
 export const dynamic = "force-dynamic";
 
@@ -53,7 +54,11 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Invalid location" }, { status: 400 });
     }
 
-    let items = await getFloorIMSItems(location);
+    const [sheetItems, masterRows] = await Promise.all([
+      getFloorIMSItems(location),
+      getIMSMasterItems(),
+    ]);
+    let items = sheetItems;
 
     if (location === "sfg") {
       const { getGRNItems } = await import("@/lib/grn-sheets");
@@ -90,6 +95,9 @@ export async function GET(request: NextRequest) {
         }
       });
     }
+
+    const masterByName = indexMasterByName(masterRows);
+    items = items.map((item) => overlayFromMaster(item, masterByName.get(masterItemKey(item.item_name))));
 
     return NextResponse.json(items, {
       headers: { 'Cache-Control': 'no-store, max-age=0' },

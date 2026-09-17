@@ -37,6 +37,7 @@ import SearchableMultiSelect from "@/components/SearchableMultiSelect";
 import { matchesCategoryItemFilters, matchesExactFilterValue, matchesOptionSearch, normalizeFilterKey, matchesActiveFilter, ActiveStatusFilter } from "@/lib/ims-filters";
 import { getTxSortTime, normalizeTxDate, withUniqueDatewiseIds, matchesDatewiseStatus } from "@/lib/ims-datewise-key";
 import GFloorLedgerModals from "@/app/(dashboard)/ims/GFloorLedgerModals";
+import { isGFloorLedgerSource } from "@/lib/gfloor-ledger-utils";
 import { startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfQuarter, endOfQuarter, startOfYear, endOfYear } from "date-fns";
 
 const fetcher = (url: string) => fetch(url).then(res => res.json());
@@ -60,6 +61,7 @@ const formatDate = (dateString?: string) => {
 };
 
 const formatTxSourceLabel = (source?: string) => {
+  if (source === "Production") return "Production";
   if (source === "GFloor") return "G Floor";
   if (source === "1stFloor") return "1st OUT";
   if (source === "SFG") return "SFG OUT";
@@ -68,6 +70,9 @@ const formatTxSourceLabel = (source?: string) => {
 };
 
 const getTxSourceBadgeClass = (source?: string) => {
+  if (source === "Production") {
+    return "bg-lime-100 text-lime-800 dark:bg-lime-500/20 dark:text-lime-300";
+  }
   if (source === "GFloor") {
     return "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300";
   }
@@ -126,7 +131,7 @@ const isTxChecked = (log: { checked_status?: string }) =>
   String(log.checked_status || "").trim().toUpperCase() === "CHECKED";
 
 const isLedgerChecked = (log: { checked_status?: string; source?: string }) =>
-  log.source === "GFloor" && isTxChecked(log);
+  isGFloorLedgerSource(log.source) && isTxChecked(log);
 
 type DefaultSortKey =
   | "id"
@@ -1097,7 +1102,7 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
             mutateTimeSeries(
               (current) =>
                 current?.filter(
-                  (tx) => !(tx.source === "GFloor" && String(tx.floor_id) === floorId)
+                  (tx) => !(isGFloorLedgerSource(tx.source) && String(tx.floor_id) === floorId)
                 ),
               { revalidate: true }
             ),
@@ -1123,7 +1128,7 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
   };
 
   const openFloorEdit = (log: Transaction) => {
-    if (log.source !== "GFloor" || !log.floor_id) return;
+    if (!isGFloorLedgerSource(log.source) || !log.floor_id) return;
     const outQty = log.out_qty || 0;
     const inQty = log.in_qty || 0;
     setEditingFloorTx({
@@ -1175,10 +1180,10 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
           (current) => {
             if (!current) return current;
             const others = current.filter(
-              (tx) => !(tx.source === "GFloor" && String(tx.floor_id) === floorId)
+              (tx) => !(isGFloorLedgerSource(tx.source) && String(tx.floor_id) === floorId)
             );
             const sample = current.find(
-              (tx) => tx.source === "GFloor" && String(tx.floor_id) === floorId
+              (tx) => isGFloorLedgerSource(tx.source) && String(tx.floor_id) === floorId
             );
             const nextTx: Transaction = {
               item_name: editingFloorTx.item_name,
@@ -1186,7 +1191,7 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
               date: dateOnly,
               in_qty: newIn,
               out_qty: newOut,
-              source: "GFloor",
+              source: sample?.source || (newIn > 0 ? "Production" : "GFloor"),
               floor_id: floorId,
               checked_status: editingFloorTx.checked_status || sample?.checked_status,
             };
@@ -1793,7 +1798,7 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
                 </thead>
                 <tbody className="divide-y divide-gray-100 dark:divide-white/5">
                   {paginatedDatewiseWithMeta.map(({ log, txKey, isApproved, isChecked, selectable }) => {
-                    const canEditFloor = log.source === "GFloor" && Boolean(log.floor_id);
+                    const canEditFloor = isGFloorLedgerSource(log.source) && Boolean(log.floor_id);
                     return (
                     <tr
                       key={txKey}

@@ -74,6 +74,65 @@ type FloorAggItem = FloorIMS & {
   active_status: string;
 };
 
+type SfgTransferStatus = "TRANSFERRED" | "PENDING" | "PARTIAL";
+type TransferFilter = "ALL" | "PENDING" | "TRANSFERRED";
+
+type FloorTxItem = FloorIMS & {
+  running_stock?: number;
+  transfer_status?: SfgTransferStatus;
+  transfer_pending_qty?: number;
+};
+
+/** FIFO: allocate packed OUT qty against unpacked IN lots for the same item. */
+function attachSfgTransferStatus<T extends FloorIMS>(
+  chronoItems: T[]
+): (T & { transfer_status: SfgTransferStatus; transfer_pending_qty: number })[] {
+  const result = chronoItems.map((item) => {
+    const inQty = parseFloat(item.in_qty) || 0;
+    const outQty = parseFloat(item.out_qty) || 0;
+    return {
+      ...item,
+      transfer_status: (outQty > 0 && inQty <= 0 ? "TRANSFERRED" : "PENDING") as SfgTransferStatus,
+      transfer_pending_qty: inQty > 0 ? inQty : 0,
+    };
+  });
+
+  const byName = new Map<string, number[]>();
+  chronoItems.forEach((item, idx) => {
+    const key = (item.item_name || "").toLowerCase().trim();
+    if (!key) return;
+    const list = byName.get(key);
+    if (list) list.push(idx);
+    else byName.set(key, [idx]);
+  });
+
+  byName.forEach((indices) => {
+    let remainingOut = 0;
+    for (const idx of indices) {
+      remainingOut += parseFloat(chronoItems[idx].out_qty) || 0;
+    }
+    for (const idx of indices) {
+      const inQty = parseFloat(chronoItems[idx].in_qty) || 0;
+      const outQty = parseFloat(chronoItems[idx].out_qty) || 0;
+      if (outQty > 0 && inQty <= 0) {
+        result[idx].transfer_status = "TRANSFERRED";
+        result[idx].transfer_pending_qty = 0;
+        continue;
+      }
+      if (inQty <= 0) continue;
+      const transferred = Math.min(inQty, remainingOut);
+      remainingOut = Math.max(0, remainingOut - transferred);
+      const pending = Math.round((inQty - transferred) * 100) / 100;
+      result[idx].transfer_pending_qty = pending;
+      if (pending <= 0) result[idx].transfer_status = "TRANSFERRED";
+      else if (transferred <= 0) result[idx].transfer_status = "PENDING";
+      else result[idx].transfer_status = "PARTIAL";
+    }
+  });
+
+  return result;
+}
+
 const formatDate = (dateString?: string) => {
   if (!dateString) return 'N/A';
   const date = new Date(dateString);
@@ -180,6 +239,7 @@ export default function IMSFloor({ location, onBack }: { location: "1st" | "g" |
 
   const [packedFilter, setPackedFilter] = useState<'ALL' | 'PACKED' | 'UNPACKED'>('ALL');
   const [checkedFilter, setCheckedFilter] = useState<'ALL' | 'CHECKED' | 'UNCHECKED'>('ALL');
+  const [transferFilter, setTransferFilter] = useState<TransferFilter>('ALL');
   const [legendFilter, setLegendFilter] = useState<number | null>(null);
   const [activeFilter, setActiveFilter] = useState<ActiveStatusFilter>("ALL");
   const [selectedVerifyIds, setSelectedVerifyIds] = useState<string[]>([]);
@@ -233,8 +293,33 @@ export default function IMSFloor({ location, onBack }: { location: "1st" | "g" |
     return names.sort((a, b) => a.localeCompare(b)).map((name) => ({ id: name, label: name }));
   }, [masterItems]);
 
+  const sfgPendingItemOptions = useMemo(() => {
+    const byKey = new Map<string, { name: string; stock: number }>();
+    rawItems.forEach((item) => {
+      const name = item.item_name?.trim();
+      if (!name) return;
+      const key = name.toLowerCase();
+      const existing = byKey.get(key);
+      const delta = (parseFloat(item.in_qty) || 0) - (parseFloat(item.out_qty) || 0);
+      if (!existing) {
+        byKey.set(key, { name, stock: delta });
+      } else {
+        existing.stock += delta;
+      }
+    });
+    return Array.from(byKey.values())
+      .filter((item) => item.stock > 0)
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .map((item) => ({
+        id: item.name,
+        label: `${item.name} (${formatQty(item.stock)})`,
+      }));
+  }, [rawItems]);
+
+  const formItemOptions = isSfg ? sfgPendingItemOptions : masterItemOptions;
+
   const isValidMasterItemName = (name: string) =>
-    masterItemOptions.some((opt) => opt.id.toLowerCase() === name.toLowerCase());
+    formItemOptions.some((opt) => opt.id.toLowerCase() === name.toLowerCase());
 
   const dateRange = useMemo(() => {
     let start, end;
@@ -304,11 +389,13 @@ function parseDateStr(dStr: string) {
       return { ...item, running_stock: current };
     });
 
-    // Reverse to show latest entry on top
-    itemsWithRunningStock.reverse();
+    const itemsWithTransfer = attachSfgTransferStatus(itemsWithRunningStock);
 
-    if (!dateRange) return itemsWithRunningStock;
-    return itemsWithRunningStock.filter(item => {
+    // Reverse to show latest entry on top
+    itemsWithTransfer.reverse();
+
+    if (!dateRange) return itemsWithTransfer;
+    return itemsWithTransfer.filter(item => {
       const ts = parseDateStr(item.date || item.updated_at || "");
       if (!ts) return false;
       const itemDate = new Date(ts);
@@ -440,11 +527,20 @@ function parseDateStr(dStr: string) {
     return filteredRawItems.filter((item) => {
       if (!matchesCategoryItemFilters(item, categoryFilters, itemNameFilters)) return false;
       if (!matchesActiveFilter(item.active_status, activeFilter)) return false;
+      if (showPacked && packedFilter !== 'ALL') {
+        if (packedFilter === 'PACKED' && item.packed_status !== 'PACKED') return false;
+        if (packedFilter === 'UNPACKED' && item.packed_status !== 'UNPACKED') return false;
+      }
+      if (isSfg && transferFilter !== 'ALL') {
+        const status = (item as FloorTxItem).transfer_status;
+        if (transferFilter === 'TRANSFERRED') return status === 'TRANSFERRED';
+        if (transferFilter === 'PENDING') return status === 'PENDING' || status === 'PARTIAL';
+      }
       if (checkedFilter === 'CHECKED') return isItemChecked(item);
       if (checkedFilter === 'UNCHECKED') return !isItemChecked(item);
       return true;
     });
-  }, [filteredRawItems, categoryFilters, itemNameFilters, checkedFilter, activeFilter]);
+  }, [filteredRawItems, categoryFilters, itemNameFilters, checkedFilter, activeFilter, packedFilter, transferFilter, showPacked, isSfg]);
 
   const filteredTimeSeriesTransactions = useMemo(() => {
     return rawItems
@@ -494,7 +590,7 @@ function parseDateStr(dStr: string) {
   React.useEffect(() => {
     setCurrentPage(1);
     setSelectedVerifyIds([]);
-  }, [packedFilter, categoryFilters, itemNameFilters, checkedFilter, viewMode, filterPeriod, filterDate, filterStartDate, filterEndDate, legendFilter, activeFilter]);
+  }, [packedFilter, categoryFilters, itemNameFilters, checkedFilter, transferFilter, viewMode, filterPeriod, filterDate, filterStartDate, filterEndDate, legendFilter, activeFilter]);
 
   React.useEffect(() => {
     setSelectedVerifyIds([]);
@@ -520,9 +616,12 @@ function parseDateStr(dStr: string) {
       if (row.id === id) {
         const newRow = { ...row, [field]: value };
         if (field === "item_name") {
-          const masterItem = masterItems.find((i: any) => i.item_name.toLowerCase() === value.toLowerCase());
-          if (masterItem) {
-            newRow.category = masterItem.category;
+          const floorItem = rawItems.find((i) => i.item_name?.toLowerCase().trim() === value.toLowerCase().trim());
+          const masterItem = masterItems.find((i: any) => i.item_name?.toLowerCase() === value.toLowerCase());
+          newRow.category = floorItem?.category || masterItem?.category || newRow.category;
+          if (isSfg && value) {
+            const stock = allTimeStockMap.get(value.toLowerCase().trim()) || 0;
+            if (!row.qty && stock > 0) newRow.qty = String(roundQty(stock));
           }
         }
         return newRow;
@@ -547,7 +646,12 @@ function parseDateStr(dStr: string) {
         return;
       }
       if (!isValidMasterItemName(row.item_name)) {
-        showStatus("Please select a valid item from the master list", "error");
+        showStatus(
+          isSfg
+            ? "Please select an item that still has stock pending transfer to G Floor"
+            : "Please select a valid item from the master list",
+          "error"
+        );
         return;
       }
     }
@@ -922,14 +1026,21 @@ function parseDateStr(dStr: string) {
 
     if (viewMode === 'datewise') {
       headers = ["Date", "Category", "Item Name", "In Qty", "Out Qty", "Live Stock"];
-      rows = filteredDatewiseItems.map(log => [
-        formatDate(log.date || log.updated_at),
-        log.category,
-        log.item_name,
-        log.in_qty !== "0" && log.in_qty !== "" ? `+${log.in_qty}` : "-",
-        log.out_qty !== "0" && log.out_qty !== "" ? `-${log.out_qty}` : "-",
-        (log as any).running_stock
-      ]);
+      if (showPacked) headers.push("Packed Status");
+      if (isSfg) headers.push("Transfer Status");
+      rows = filteredDatewiseItems.map(log => {
+        const row: any[] = [
+          formatDate(log.date || log.updated_at),
+          log.category,
+          log.item_name,
+          log.in_qty !== "0" && log.in_qty !== "" ? `+${log.in_qty}` : "-",
+          log.out_qty !== "0" && log.out_qty !== "" ? `-${log.out_qty}` : "-",
+          (log as FloorTxItem).running_stock
+        ];
+        if (showPacked) row.push(log.packed_status || "—");
+        if (isSfg) row.push((log as FloorTxItem).transfer_status || "—");
+        return row;
+      });
     } else {
       headers = ["SKU", "Category", "Item Name", "Active/Inactive", "Stock Health", "Max", "IN Qty", "OUT Qty", "Sale %", "Avg. Con", "Lead", "SF"];
       if (showPacked) headers.push("Status");
@@ -1130,6 +1241,17 @@ function parseDateStr(dStr: string) {
             <option value="ACTIVE">Active</option>
             <option value="INACTIVE">Inactive</option>
           </select>
+          {viewMode === 'datewise' && isSfg && (
+            <select
+              value={transferFilter}
+              onChange={(e) => setTransferFilter(e.target.value as TransferFilter)}
+              className="px-3 py-2 bg-gray-50 dark:bg-[#0a0f1c] border border-gray-200 dark:border-white/10 rounded-lg text-[11px] font-black uppercase tracking-wider outline-none focus:ring-2 focus:ring-emerald-500 dark:text-white shadow-sm h-[42px] cursor-pointer shrink-0"
+            >
+              <option value="ALL">ALL TRANSFERS</option>
+              <option value="PENDING">PENDING TRANSFER</option>
+              <option value="TRANSFERRED">TRANSFERRED</option>
+            </select>
+          )}
           {viewMode === 'datewise' && (
             <select
               value={checkedFilter}
@@ -1143,13 +1265,14 @@ function parseDateStr(dStr: string) {
               <option value="UNCHECKED">UNCHECKED</option>
             </select>
           )}
-          {(categoryFilters.length > 0 || itemNameFilters.length > 0 || checkedFilter !== 'ALL' || activeFilter !== 'ALL') && (
+          {(categoryFilters.length > 0 || itemNameFilters.length > 0 || checkedFilter !== 'ALL' || activeFilter !== 'ALL' || transferFilter !== 'ALL') && (
             <button
               onClick={() => {
                 setCategoryFilters([]);
                 setItemNameFilters([]);
                 setCheckedFilter('ALL');
                 setActiveFilter('ALL');
+                setTransferFilter('ALL');
               }}
               className={`mb-0.5 px-3 py-2.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition-colors shrink-0 border ${
                 location === '1st'
@@ -1268,7 +1391,10 @@ function parseDateStr(dStr: string) {
                     <th className={`py-2.5 px-3 text-[10px] font-black uppercase tracking-widest border-b text-right ${location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20' : 'text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'}`}>Out</th>
                     <th className={`py-2.5 px-3 text-[10px] font-black uppercase tracking-widest border-b text-right ${location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20' : 'text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'}`}>Live Stock</th>
                     {showPacked && (
-                      <th className="py-2.5 px-3 text-[10px] font-black uppercase tracking-widest border-b text-center text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20">Status</th>
+                      <th className={`py-2.5 px-3 text-[10px] font-black uppercase tracking-widest border-b text-center ${location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20' : 'text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'}`}>Status</th>
+                    )}
+                    {isSfg && (
+                      <th className="py-2.5 px-3 text-[10px] font-black uppercase tracking-widest border-b text-center text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20">Transfer</th>
                     )}
                     <th className={`py-2.5 px-3 text-[10px] font-black uppercase tracking-widest border-b text-center ${location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20' : 'text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'}`}>Checked</th>
                     <th className={`py-2.5 px-4 text-[10px] font-black uppercase tracking-widest border-b text-center w-24 ${location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20' : 'text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'}`}>Act</th>
@@ -1279,6 +1405,7 @@ function parseDateStr(dStr: string) {
                     const checked = isItemChecked(log);
                     const canVerify = canVerifyLog(log.id);
                     const isSelected = selectedVerifyIds.includes(log.row_uid);
+                    const transferStatus = (log as FloorTxItem).transfer_status;
                     return (
                     <tr
                       key={log.row_uid}
@@ -1317,6 +1444,19 @@ function parseDateStr(dStr: string) {
                           ) : log.packed_status === 'UNPACKED' ? (
                             <span className="px-2 py-0.5 bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400 rounded-md text-[9px] font-black uppercase">Unpacked</span>
                           ) : <span className="text-gray-300">-</span>}
+                        </td>
+                      )}
+                      {isSfg && (
+                        <td className="py-2 px-3 text-center">
+                          {transferStatus === 'TRANSFERRED' ? (
+                            <span className="px-2 py-0.5 bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400 rounded-md text-[9px] font-black uppercase">Transferred</span>
+                          ) : transferStatus === 'PARTIAL' ? (
+                            <span className="px-2 py-0.5 bg-sky-100 text-sky-700 dark:bg-sky-500/20 dark:text-sky-400 rounded-md text-[9px] font-black uppercase" title={`${formatQty((log as FloorTxItem).transfer_pending_qty || 0)} still pending`}>
+                              Partial
+                            </span>
+                          ) : (
+                            <span className="px-2 py-0.5 bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400 rounded-md text-[9px] font-black uppercase">Pending</span>
+                          )}
                         </td>
                       )}
                       <td className="py-2 px-3 text-center">
@@ -1362,7 +1502,7 @@ function parseDateStr(dStr: string) {
                   })}
                   {filteredDatewiseItems.length === 0 && (
                     <tr>
-                      <td colSpan={showPacked ? 10 : 9} className="py-8 text-center text-gray-400 text-[11px] font-black uppercase">No items found</td>
+                      <td colSpan={showPacked ? (isSfg ? 11 : 10) : 9} className="py-8 text-center text-gray-400 text-[11px] font-black uppercase">No items found</td>
                     </tr>
                   )}
                 </tbody>
@@ -1611,12 +1751,21 @@ function parseDateStr(dStr: string) {
               </div>
 
               <div className="p-4 overflow-y-auto custom-scrollbar bg-white dark:bg-[#111827] flex-1 min-h-0">
-                <button 
-                  onClick={addBulkRow}
-                  className="mb-3 flex items-center gap-2 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-[#003875] dark:text-[#FFD500] hover:bg-blue-50 dark:hover:bg-[#FFD500]/10 rounded-lg transition-colors border border-dashed border-[#003875]/30 dark:border-[#FFD500]/30"
-                >
-                  <PlusIcon className="w-3.5 h-3.5" /> Add Row
-                </button>
+                <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                  <button 
+                    onClick={addBulkRow}
+                    className="flex items-center gap-2 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-[#003875] dark:text-[#FFD500] hover:bg-blue-50 dark:hover:bg-[#FFD500]/10 rounded-lg transition-colors border border-dashed border-[#003875]/30 dark:border-[#FFD500]/30"
+                  >
+                    <PlusIcon className="w-3.5 h-3.5" /> Add Row
+                  </button>
+                  {isSfg && (
+                    <p className="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      {sfgPendingItemOptions.length > 0
+                        ? "Only items pending transfer to G Floor are listed. Remaining qty is shown in brackets."
+                        : "No items are pending transfer to G Floor."}
+                    </p>
+                  )}
+                </div>
                 <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-white/10">
                   <table className="w-full text-left border-collapse min-w-[860px]">
                     <thead>
@@ -1638,10 +1787,10 @@ function parseDateStr(dStr: string) {
                           <td className={tdClass}>
                             <SearchableSelect
                               label=""
-                              options={masterItemOptions}
+                              options={formItemOptions}
                               value={row.item_name}
                               onChange={(val) => handleBulkRowChange(row.id, "item_name", val)}
-                              placeholder="Select item..."
+                              placeholder={isSfg ? "Select pending item..." : "Select item..."}
                               className="bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 py-1.5 px-2 rounded-md text-[11px] min-h-[34px]"
                             />
                           </td>

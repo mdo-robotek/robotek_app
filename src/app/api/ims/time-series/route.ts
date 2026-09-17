@@ -6,6 +6,7 @@ import { getFloorIMSItems } from "@/lib/ims-floor-sheets";
 import { firstFloorOutRowsToGFloorInTxs, floorOutRowsToGFloorInTxs } from "@/lib/ims-1st-to-g-transfer";
 import { isGrnForGFloor } from "@/lib/grn-packed";
 import { getIMSMasterItems } from "@/lib/ims-master-sheets";
+import { resolveGFloorLedgerSource } from "@/lib/gfloor-ledger-utils";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -136,7 +137,7 @@ export async function GET() {
           date: txDate,
           in_qty: inQty,
           out_qty: 0,
-          source: 'GFloor',
+          source: resolveGFloorLedgerSource(row),
           ...floorMeta,
           tx_uid: `gfloor:${floorId}:in`,
         });
@@ -148,7 +149,7 @@ export async function GET() {
           date: txDate,
           in_qty: 0,
           out_qty: outQty,
-          source: 'GFloor',
+          source: resolveGFloorLedgerSource(row),
           ...floorMeta,
           tx_uid: `gfloor:${floorId}:out`,
         });

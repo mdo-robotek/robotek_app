@@ -29,6 +29,7 @@ class FloorIMSService extends BaseSheetsService<FloorIMS> {
       date: get("date", 5),
       packed_status: get("packed status", -1), // dynamic based on header
       checked_status: get("checked status", -1),
+      source: get("source", -1),
       updated_at: get("updated_at", 6),
     };
   }
@@ -54,6 +55,10 @@ class FloorIMSService extends BaseSheetsService<FloorIMS> {
 
     if (this.hMap["checked status"] !== undefined) {
       set("checked status", -1, ims.checked_status || "");
+    }
+
+    if (this.hMap["source"] !== undefined) {
+      set("source", -1, ims.source || "");
     }
     
     // If updated_at is mapped dynamically, use that, else assume index 6 (which might shift if packed status is inserted before it, but hMap solves this)
@@ -140,6 +145,7 @@ export async function addFloorIMSItems(
           date: data.date || "",
           packed_status: data.packed_status,
           checked_status: data.checked_status,
+          source: data.source,
           updated_at: data.updated_at || now,
         } as FloorIMS;
       });
@@ -155,7 +161,15 @@ export async function addFloorIMSItems(
 
 export async function updateFloorIMSItem(location: string, id: string, data: FloorIMS): Promise<boolean> {
   const service = getService(location);
-  const ok = await service.update(id, data);
+  const existing = (await service.getAll()).find((i) => String(i.id).trim() === String(id).trim());
+  const merged: FloorIMS = {
+    ...(existing || { id, item_name: "", category: "", in_qty: "0", out_qty: "0" }),
+    ...data,
+    packed_status: data.packed_status || existing?.packed_status,
+    source: data.source || existing?.source,
+    checked_status: data.checked_status !== undefined ? data.checked_status : existing?.checked_status,
+  };
+  const ok = await service.update(id, merged);
   // Bust cache so Date-Wise / summary reads see the new qty immediately
   service.invalidateCache();
   return ok;

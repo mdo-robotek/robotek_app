@@ -8,6 +8,7 @@ export interface FloorIMS {
   updated_at?: string;
   packed_status?: string;
   checked_status?: string;
+  source?: string;
   // Computed in frontend/API
   live_stock?: number;
   sku_code?: string;

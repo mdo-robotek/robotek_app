@@ -12,7 +12,7 @@ import {
 } from "@heroicons/react/24/outline";
 import SearchableSelect from "@/components/SearchableSelect";
 import { FloorIMS } from "@/types/ims-floor";
-import { computeAuditDiff, getGFloorItemStock, roundQty, type GFloorStockItem } from "@/lib/gfloor-ledger-utils";
+import { computeAuditDiff, getGFloorItemStock, roundQty, type GFloorStockItem, GFLOOR_ENTRY_PRODUCTION, GFLOOR_ENTRY_PHYSICAL } from "@/lib/gfloor-ledger-utils";
 
 const tableInputClass =
   "w-full px-2 py-1.5 text-[11px] font-bold text-gray-900 dark:text-white bg-white dark:bg-[#0a0f1c] border border-gray-200 dark:border-white/10 rounded-md outline-none focus:ring-1 focus:ring-[#003875] dark:focus:ring-[#FFD500] uppercase";
@@ -172,6 +172,8 @@ export default function GFloorLedgerModals({
         in_qty: String(roundQty(parseFloat(row.qty))),
         out_qty: "0",
         date: row.date || today,
+        packed_status: GFLOOR_ENTRY_PRODUCTION,
+        source: GFLOOR_ENTRY_PRODUCTION,
         updated_at: new Date().toISOString(),
       }));
       const res = await fetch("/api/ims/floor?location=g", {
@@ -255,6 +257,8 @@ export default function GFloorLedgerModals({
         in_qty: row.diff_type === "IN" ? String(roundQty(row.diff_qty)) : "0",
         out_qty: row.diff_type === "OUT" ? String(roundQty(row.diff_qty)) : "0",
         date: today,
+        packed_status: GFLOOR_ENTRY_PHYSICAL,
+        source: GFLOOR_ENTRY_PHYSICAL,
         updated_at: new Date().toISOString(),
       }));
       const res = await fetch("/api/ims/floor?location=g", {

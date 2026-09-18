@@ -34,9 +34,11 @@ import * as XLSX from "xlsx";
 import TimeSeriesTable, { TimeBucket, Transaction } from "@/components/TimeSeriesTable";
 import DateFilterBar, { FilterPeriod } from "@/components/DateFilterBar";
 import SearchableMultiSelect from "@/components/SearchableMultiSelect";
+import SearchableSelect from "@/components/SearchableSelect";
 import { matchesCategoryItemFilters, matchesExactFilterValue, matchesOptionSearch, normalizeFilterKey, matchesActiveFilter, ActiveStatusFilter } from "@/lib/ims-filters";
 import { getTxSortTime, normalizeTxDate, withUniqueDatewiseIds, matchesDatewiseStatus } from "@/lib/ims-datewise-key";
 import GFloorLedgerModals from "@/app/(dashboard)/ims/GFloorLedgerModals";
+import GFloorOutFormTab from "@/app/(dashboard)/ims/GFloorOutFormTab";
 import { isGFloorLedgerSource } from "@/lib/gfloor-ledger-utils";
 import { startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfQuarter, endOfQuarter, startOfYear, endOfYear } from "date-fns";
 
@@ -544,6 +546,8 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
 
       await globalMutate("/api/ims");
       await globalMutate("/api/ims/summary");
+      await globalMutate("/api/ims/out-form");
+      await globalMutate("/api/ims/time-series");
       setImportProgress(100);
       setImportPhase("done");
       pushLog("[DONE] Out Form import completed successfully");
@@ -595,7 +599,7 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
   // Form states
   const [itemForm, setItemForm] = useState<Partial<IMS>>({});
 
-  const [viewMode, setViewMode] = useState<'default' | 'timeseries' | 'datewise'>('default');
+  const [viewMode, setViewMode] = useState<'default' | 'timeseries' | 'datewise' | 'outform'>('default');
   const [filterPeriod, setFilterPeriod] = useState<FilterPeriod>('ALL');
   const [filterDate, setFilterDate] = useState<Date>(new Date());
   const [filterStartDate, setFilterStartDate] = useState<Date | null>(null);
@@ -886,6 +890,17 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
     [uniqueItemNames]
   );
 
+  const renameItemOptions = useMemo(() => {
+    const names = Array.from(
+      new Set(items.map((item) => item.item_name?.trim()).filter(Boolean) as string[])
+    );
+    const current = editingFloorTx?.item_name?.trim();
+    if (current && !names.some((name) => name.toLowerCase() === current.toLowerCase())) {
+      names.push(current);
+    }
+    return names.sort((a, b) => a.localeCompare(b)).map((name) => ({ id: name, label: name }));
+  }, [items, editingFloorTx?.item_name]);
+
   const uniqueSources = useMemo(() => {
     if (viewMode === "datewise" || viewMode === "timeseries") {
       const sources = timeSeriesData
@@ -1146,6 +1161,14 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
   const handleSaveFloorEdit = async () => {
     if (!editingFloorTx) return;
     const qty = parseFloat(editingFloorTx.qty);
+    if (!editingFloorTx.item_name.trim()) {
+      showStatus("Please select an item name", "error");
+      return;
+    }
+    if (!renameItemOptions.some((opt) => opt.id.toLowerCase() === editingFloorTx.item_name.trim().toLowerCase())) {
+      showStatus("Please select a valid item from the list", "error");
+      return;
+    }
     if (!editingFloorTx.qty || isNaN(qty) || qty <= 0) {
       showStatus("Please enter a valid quantity greater than 0", "error");
       return;
@@ -1542,6 +1565,16 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
             >
               <CalendarIcon className="w-3.5 h-3.5" /> Date-Wise
             </button>
+            <button
+              onClick={() => setViewMode('outform')}
+              className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider transition-all h-full ${
+                viewMode === 'outform'
+                  ? 'bg-white dark:bg-[#111827] text-orange-700 dark:text-orange-400 shadow-sm'
+                  : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
+              }`}
+            >
+              <DocumentTextIcon className="w-3.5 h-3.5" /> O2D Out
+            </button>
           </div>
 
           <div className="flex items-center gap-1 shrink-0">
@@ -1577,6 +1610,7 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
       </div>
 
       {/* Row 2: Search + category/item filters + date filter */}
+      {viewMode !== "outform" && (
       <div className="flex flex-wrap items-center gap-2 shrink-0 w-full">
         <div className="relative shrink-0 w-[220px]">
           <MagnifyingGlassIcon className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -1658,6 +1692,7 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
           className="flex-1 min-w-[300px]"
         />
       </div>
+      )}
 
       {/* Row 3: Color Logic — taller chips like Final IMS */}
       {viewMode === 'default' && (
@@ -1716,6 +1751,8 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
             searchQuery={searchQuery}
           />
         </div>
+      ) : viewMode === 'outform' ? (
+        <GFloorOutFormTab showStatus={showStatus} />
       ) : viewMode === 'datewise' ? (
         <div className="flex-1 bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/5 rounded-xl overflow-hidden flex flex-col shadow-sm min-h-0 mt-2">
           {datewiseActiveFiltered.length > 0 && !showTimeSeriesLoading && (
@@ -2233,9 +2270,29 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
               </div>
 
               <div className="p-6 space-y-4 bg-white dark:bg-[#111827]">
-                <div className="p-3 rounded-xl bg-gray-50 dark:bg-white/[0.02] border border-gray-100 dark:border-white/5 space-y-1">
-                  <p className="text-[9px] font-black uppercase tracking-widest text-gray-400">Item</p>
-                  <p className="text-[11px] font-black text-gray-900 dark:text-white uppercase">{editingFloorTx.item_name}</p>
+                <div className="p-3 rounded-xl bg-gray-50 dark:bg-white/[0.02] border border-gray-100 dark:border-white/5 space-y-2">
+                  <p className="text-[9px] font-black uppercase tracking-widest text-gray-400">Item Name</p>
+                  <SearchableSelect
+                    label=""
+                    options={renameItemOptions}
+                    value={editingFloorTx.item_name}
+                    onChange={(val) => {
+                      const match = items.find(
+                        (item) => item.item_name?.toLowerCase().trim() === val.toLowerCase().trim()
+                      );
+                      setEditingFloorTx((prev) =>
+                        prev
+                          ? {
+                              ...prev,
+                              item_name: val,
+                              category: match?.category || prev.category,
+                            }
+                          : prev
+                      );
+                    }}
+                    placeholder="Select item..."
+                    className="bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 py-2 px-3 rounded-lg text-[11px] min-h-[38px]"
+                  />
                   <p className="text-[10px] font-bold text-gray-500 uppercase">
                     {editingFloorTx.category} · {formatDate(editingFloorTx.date)}
                   </p>

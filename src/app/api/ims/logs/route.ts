@@ -32,10 +32,10 @@ export async function GET(request: NextRequest) {
 
     const queryName = itemName.trim().toLowerCase();
 
-    const [grns, outForm, sfgLedger] = await Promise.all([
+    const [grns, outForm, firstFloorLedger] = await Promise.all([
       getGRNItems(),
       getOutFormData(),
-      getFloorIMSItems("sfg"),
+      getFloorIMSItems("1st"),
     ]);
 
     const logs: any[] = [];
@@ -56,7 +56,7 @@ export async function GET(request: NextRequest) {
       }
     });
 
-    sfgLedger.forEach((row) => {
+    firstFloorLedger.forEach((row) => {
       if ((row.item_name || "").trim().toLowerCase() !== queryName) return;
       const qty = parseFloat(String(row.out_qty || 0)) || 0;
       if (qty <= 0) return;
@@ -65,7 +65,7 @@ export async function GET(request: NextRequest) {
         timestamp: parseDateStr(row.date || row.updated_at || ""),
         type: "IN",
         qty,
-        remarks: "SFG IMS packed transfer",
+        remarks: "1st Floor packed transfer",
       });
     });
 

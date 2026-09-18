@@ -24,6 +24,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { FloorIMS } from "@/types/ims-floor";
 import { isSfgVirtualGrnId } from "@/lib/grn-packed";
+import { isSfgToFirstVirtualId } from "@/lib/ims-1st-to-g-transfer";
 import TimeSeriesTable, { TimeBucket } from "@/components/TimeSeriesTable";
 import DateFilterBar, { FilterPeriod } from "@/components/DateFilterBar";
 import SearchableMultiSelect from "@/components/SearchableMultiSelect";
@@ -76,6 +77,12 @@ type FloorAggItem = FloorIMS & {
 
 type SfgTransferStatus = "TRANSFERRED" | "PENDING" | "PARTIAL";
 type TransferFilter = "ALL" | "PENDING" | "TRANSFERRED";
+
+function firstFloorSourceLabel(item: FloorIMS): "SFG" | "1st Floor" {
+  const src = String(item.source || "").trim().toUpperCase();
+  if (isSfgToFirstVirtualId(item.id) || src === "SFG") return "SFG";
+  return "1st Floor";
+}
 
 type FloorTxItem = FloorIMS & {
   running_stock?: number;
@@ -274,7 +281,7 @@ export default function IMSFloor({ location, onBack }: { location: "1st" | "g" |
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingLog, setEditingLog] = useState<FloorIMS | null>(null);
-  const [editForm, setEditForm] = useState<{ type: 'IN' | 'OUT'; qty: string }>({ type: 'IN', qty: '' });
+  const [editForm, setEditForm] = useState<{ type: 'IN' | 'OUT'; qty: string; item_name: string; category: string }>({ type: 'IN', qty: '', item_name: '', category: '' });
 
   // Form states
   const [bulkRows, setBulkRows] = useState<BulkRow[]>([]);
@@ -320,6 +327,19 @@ export default function IMSFloor({ location, onBack }: { location: "1st" | "g" |
 
   const isValidMasterItemName = (name: string) =>
     formItemOptions.some((opt) => opt.id.toLowerCase() === name.toLowerCase());
+
+  const editItemOptions = useMemo(() => {
+    const names = new Set<string>();
+    masterItemOptions.forEach((opt) => names.add(opt.id));
+    (masterCatalog || []).forEach((item) => {
+      const name = item.item_name?.trim();
+      if (name) names.add(name);
+    });
+    if (editForm.item_name.trim()) names.add(editForm.item_name.trim());
+    return Array.from(names)
+      .sort((a, b) => a.localeCompare(b))
+      .map((name) => ({ id: name, label: name }));
+  }, [masterItemOptions, masterCatalog, editForm.item_name]);
 
   const dateRange = useMemo(() => {
     let start, end;
@@ -554,6 +574,13 @@ function parseDateStr(dStr: string) {
         date: item.date || item.updated_at || '',
         in_qty: parseFloat(item.in_qty) || 0,
         out_qty: parseFloat(item.out_qty) || 0,
+        source: firstFloorSourceLabel(item) === "SFG"
+          ? "SFG" as const
+          : location === "1st"
+            ? "1stFloor" as const
+            : location === "sfg"
+              ? "SFG" as const
+              : undefined,
       }));
   }, [rawItems, categoryFilters, itemNameFilters, activeFilter]);
 
@@ -648,7 +675,7 @@ function parseDateStr(dStr: string) {
       if (!isValidMasterItemName(row.item_name)) {
         showStatus(
           isSfg
-            ? "Please select an item that still has stock pending transfer to G Floor"
+            ? "Please select an item that still has stock pending transfer to 1st Floor"
             : "Please select a valid item from the master list",
           "error"
         );
@@ -890,7 +917,8 @@ function parseDateStr(dStr: string) {
   };
 
   const isStoredFloorLog = (id: string | number) => !String(id).startsWith("outform-");
-  const canEditDeleteLog = (id: string | number) => isStoredFloorLog(id) && !isSfgVirtualGrnId(id);
+  const canEditDeleteLog = (id: string | number) =>
+    isStoredFloorLog(id) && !isSfgVirtualGrnId(id) && !isSfgToFirstVirtualId(id);
   const canVerifyLog = (id: string | number) => isStoredFloorLog(id);
 
   const toggleVerifySelection = (id: string) => {
@@ -946,6 +974,8 @@ function parseDateStr(dStr: string) {
     setEditForm({
       type: outQty > 0 ? 'OUT' : 'IN',
       qty: (outQty > 0 ? outQty : inQty).toString(),
+      item_name: log.item_name || "",
+      category: log.category || "",
     });
     setIsEditModalOpen(true);
   };
@@ -953,6 +983,14 @@ function parseDateStr(dStr: string) {
   const handleSaveEdit = async () => {
     if (!editingLog) return;
     const qty = parseFloat(editForm.qty);
+    if (!editForm.item_name.trim()) {
+      showStatus("Please select an item name", "error");
+      return;
+    }
+    if (!editItemOptions.some((opt) => opt.id.toLowerCase() === editForm.item_name.trim().toLowerCase())) {
+      showStatus("Please select a valid item from the list", "error");
+      return;
+    }
     if (!editForm.qty || isNaN(qty) || qty <= 0) {
       showStatus("Please enter a valid quantity greater than 0", "error");
       return;
@@ -964,6 +1002,8 @@ function parseDateStr(dStr: string) {
     try {
       const payload: FloorIMS = {
         ...editingLog,
+        item_name: editForm.item_name.trim(),
+        category: editForm.category || editingLog.category,
         in_qty: editForm.type === 'IN' ? qty.toString() : "0",
         out_qty: editForm.type === 'OUT' ? qty.toString() : "0",
         updated_at: new Date().toISOString(),
@@ -1176,7 +1216,7 @@ function parseDateStr(dStr: string) {
               location === '1st' ? 'bg-purple-600 hover:bg-purple-700' : 'bg-emerald-600 hover:bg-emerald-700'
             }`}
           >
-            <PlusIcon className="w-4 h-4 stroke-2" /> {isSfg ? "Transfer to G Floor" : "Add Log"}
+            <PlusIcon className="w-4 h-4 stroke-2" /> {isSfg ? "Transfer to 1st Floor" : "Add Log"}
           </button>
         </div>
       </div>
@@ -1396,6 +1436,9 @@ function parseDateStr(dStr: string) {
                     {isSfg && (
                       <th className="py-2.5 px-3 text-[10px] font-black uppercase tracking-widest border-b text-center text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20">Transfer</th>
                     )}
+                    {location === "1st" && (
+                      <th className="py-2.5 px-3 text-[10px] font-black uppercase tracking-widest border-b text-center text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20">Source</th>
+                    )}
                     <th className={`py-2.5 px-3 text-[10px] font-black uppercase tracking-widest border-b text-center ${location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20' : 'text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'}`}>Checked</th>
                     <th className={`py-2.5 px-4 text-[10px] font-black uppercase tracking-widest border-b text-center w-24 ${location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20' : 'text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'}`}>Act</th>
                   </tr>
@@ -1459,6 +1502,15 @@ function parseDateStr(dStr: string) {
                           )}
                         </td>
                       )}
+                      {location === "1st" && (
+                        <td className="py-2 px-3 text-center">
+                          {firstFloorSourceLabel(log) === "SFG" ? (
+                            <span className="px-2 py-0.5 bg-teal-100 text-teal-700 dark:bg-teal-500/20 dark:text-teal-300 rounded-md text-[9px] font-black uppercase">SFG</span>
+                          ) : (
+                            <span className="px-2 py-0.5 bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-300 rounded-md text-[9px] font-black uppercase">1st Floor</span>
+                          )}
+                        </td>
+                      )}
                       <td className="py-2 px-3 text-center">
                         {checked ? (
                           <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[9px] font-black uppercase ${
@@ -1502,7 +1554,7 @@ function parseDateStr(dStr: string) {
                   })}
                   {filteredDatewiseItems.length === 0 && (
                     <tr>
-                      <td colSpan={showPacked ? (isSfg ? 11 : 10) : 9} className="py-8 text-center text-gray-400 text-[11px] font-black uppercase">No items found</td>
+                      <td colSpan={showPacked ? (isSfg || location === "1st" ? 11 : 10) : 9} className="py-8 text-center text-gray-400 text-[11px] font-black uppercase">No items found</td>
                     </tr>
                   )}
                 </tbody>
@@ -1743,7 +1795,7 @@ function parseDateStr(dStr: string) {
               <div className="flex items-center justify-between p-5 border-b border-blue-800/20 dark:border-white/5 bg-gradient-to-r from-[#003875] to-blue-800 dark:from-[#1f2937] dark:to-[#111827] text-white shrink-0">
                 <h3 className="text-sm font-black uppercase tracking-widest flex items-center gap-2">
                   <ClipboardDocumentListIcon className="w-5 h-5 text-blue-200 dark:text-[#FFD500]" />
-                  {isSfg ? "Transfer Packed Stock to G Floor" : `Add Multiple Items - ${title}`}
+                  {isSfg ? "Transfer Packed Stock to 1st Floor" : `Add Multiple Items - ${title}`}
                 </h3>
                 <button onClick={() => setItemModalOpen(false)} className="p-1.5 text-white/70 hover:text-white bg-white/10 hover:bg-white/20 dark:bg-[#1f2937] rounded-lg shadow-sm transition-colors">
                   <XMarkIcon className="w-4 h-4" />
@@ -1761,8 +1813,8 @@ function parseDateStr(dStr: string) {
                   {isSfg && (
                     <p className="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       {sfgPendingItemOptions.length > 0
-                        ? "Only items pending transfer to G Floor are listed. Remaining qty is shown in brackets."
-                        : "No items are pending transfer to G Floor."}
+                        ? "Only items pending transfer to 1st Floor are listed. Remaining qty is shown in brackets."
+                        : "No items are pending transfer to 1st Floor."}
                     </p>
                   )}
                 </div>
@@ -1817,7 +1869,7 @@ function parseDateStr(dStr: string) {
                                 onClick={() => handleBulkRowChange(row.id, "type", "OUT")}
                                 className={`px-2 py-1 rounded text-[9px] font-black uppercase tracking-wider transition-all ${row.type === "OUT" ? "bg-rose-500 text-white shadow-sm" : "text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"}`}
                               >
-                                {isSfg ? "TO G FLOOR" : "OUT"}
+                                {isSfg ? "TO 1ST FLOOR" : "OUT"}
                               </button>
                             </div>
                           </td>
@@ -2079,10 +2131,26 @@ function parseDateStr(dStr: string) {
               </div>
 
               <div className="p-6 space-y-4 bg-white dark:bg-[#111827]">
-                <div className="p-3 rounded-xl bg-gray-50 dark:bg-white/[0.02] border border-gray-100 dark:border-white/5 space-y-1">
-                  <p className="text-[9px] font-black uppercase tracking-widest text-gray-400">Item</p>
-                  <p className="text-[11px] font-black text-gray-900 dark:text-white uppercase">{editingLog.item_name}</p>
-                  <p className="text-[10px] font-bold text-gray-500 uppercase">{editingLog.category} · {formatDate(editingLog.date || editingLog.updated_at)}</p>
+                <div className="p-3 rounded-xl bg-gray-50 dark:bg-white/[0.02] border border-gray-100 dark:border-white/5 space-y-2">
+                  <p className="text-[9px] font-black uppercase tracking-widest text-gray-400">Item Name</p>
+                  <SearchableSelect
+                    label=""
+                    options={editItemOptions}
+                    value={editForm.item_name}
+                    onChange={(val) => {
+                      const floorItem = rawItems.find((i) => i.item_name?.toLowerCase().trim() === val.toLowerCase().trim());
+                      const masterItem = masterItems.find((i: any) => i.item_name?.toLowerCase().trim() === val.toLowerCase().trim());
+                      const catalogItem = (masterCatalog || []).find((i) => i.item_name?.toLowerCase().trim() === val.toLowerCase().trim());
+                      setEditForm((prev) => ({
+                        ...prev,
+                        item_name: val,
+                        category: floorItem?.category || masterItem?.category || catalogItem?.category || prev.category,
+                      }));
+                    }}
+                    placeholder="Select item..."
+                    className="bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 py-2 px-3 rounded-lg text-[11px] min-h-[38px]"
+                  />
+                  <p className="text-[10px] font-bold text-gray-500 uppercase">{editForm.category || editingLog.category} · {formatDate(editingLog.date || editingLog.updated_at)}</p>
                 </div>
 
                 <div className="flex items-center gap-3">
@@ -2099,7 +2167,7 @@ function parseDateStr(dStr: string) {
                       onClick={() => setEditForm(prev => ({ ...prev, type: 'OUT' }))}
                       className={`px-4 py-2 rounded-md text-[10px] font-black uppercase tracking-wider transition-all ${editForm.type === 'OUT' ? 'bg-rose-500 text-white shadow-sm' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
                     >
-                      {isSfg ? "To G Floor" : "OUT"}
+                      {isSfg ? "To 1st Floor" : "OUT"}
                     </button>
                   </div>
                   <div className="flex-1">

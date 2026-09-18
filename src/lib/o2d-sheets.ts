@@ -1,5 +1,6 @@
 import { BaseSheetsService, getColumnLetter } from "./sheets/base-service";
 import { O2D, O2DStepConfig } from "@/types/o2d";
+import { OutFormLineItem, OutFormRow } from "@/types/ims-out-form";
 import { google } from "googleapis";
 import { globalCache } from "./cache";
 
@@ -1019,9 +1020,32 @@ export async function appendOutFormData(
   }
 }
 
-export async function getOutFormData(): Promise<any[]> {
+export type { OutFormLineItem, OutFormRow } from "@/types/ims-out-form";
+
+function parseOutFormLineItems(description: string, fallbackQty?: string): OutFormLineItem[] {
+  const raw = String(description || "").trim();
+  if (raw.startsWith("[") && raw.endsWith("]")) {
+    try {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) {
+        return parsed
+          .map((item: any) => ({
+            description: String(item.Description || item.description || "").trim(),
+            qty: parseFloat(String(item.Qty ?? item.qty ?? 0)) || 0,
+          }))
+          .filter((item) => item.description || item.qty > 0);
+      }
+    } catch {
+      // keep raw text below
+    }
+  }
+  if (!raw) return [];
+  return [{ description: raw, qty: parseFloat(String(fallbackQty || 0)) || 0 }];
+}
+
+export async function getOutFormData(): Promise<OutFormRow[]> {
   const cacheKey = `${GOOGLE_SHEET_ID}_out_form`;
-  const cached = globalCache.get<any[]>(cacheKey);
+  const cached = globalCache.get<OutFormRow[]>(cacheKey);
   if (cached) return cached;
 
   try {
@@ -1035,16 +1059,23 @@ export async function getOutFormData(): Promise<any[]> {
     // rows[0] is header, skip it.
     if (rows.length <= 1) return [];
 
-    const data: any[] = [];
+    const data: OutFormRow[] = [];
     for (let i = 1; i < rows.length; i++) {
       const row = rows[i];
+      const description = row[3] || "";
+      const qty = row[4] || "";
+      const items = parseOutFormLineItems(description, qty);
+      const totalQty = items.reduce((sum, item) => sum + (item.qty || 0), 0);
       data.push({
+        rowIndex: i + 1,
         date: row[0] || "",
         orderNo: row[1] || "",
         partyName: row[2] || "",
-        description: row[3] || "", // Items (JSON)
-        qty: row[4] || "",
+        description,
+        qty,
         updated_at: row[0] || "",
+        items,
+        totalQty,
       });
     }
 
@@ -1053,6 +1084,47 @@ export async function getOutFormData(): Promise<any[]> {
   } catch (error) {
     console.error("Error fetching Out Form data:", error);
     return [];
+  }
+}
+
+export async function deleteOutFormRows(rowIndexes: number[]): Promise<{ success: boolean; deleted: number }> {
+  const unique = Array.from(
+    new Set(
+      rowIndexes
+        .map((n) => Math.trunc(Number(n)))
+        .filter((n) => Number.isFinite(n) && n >= 2)
+    )
+  );
+  if (unique.length === 0) return { success: true, deleted: 0 };
+
+  try {
+    const sheets = await (o2dService as any).getSheetsClient();
+    const spreadsheet = await sheets.spreadsheets.get({ spreadsheetId: GOOGLE_SHEET_ID });
+    const sheetId = spreadsheet.data.sheets?.find((s: any) => s.properties?.title === "Out Form")?.properties?.sheetId;
+    if (sheetId === undefined) return { success: false, deleted: 0 };
+
+    unique.sort((a, b) => b - a);
+    await sheets.spreadsheets.batchUpdate({
+      spreadsheetId: GOOGLE_SHEET_ID,
+      requestBody: {
+        requests: unique.map((rowIndex) => ({
+          deleteDimension: {
+            range: {
+              sheetId,
+              dimension: "ROWS",
+              startIndex: rowIndex - 1,
+              endIndex: rowIndex,
+            },
+          },
+        })),
+      },
+    });
+
+    globalCache.delete(`${GOOGLE_SHEET_ID}_out_form`);
+    return { success: true, deleted: unique.length };
+  } catch (error) {
+    console.error("Error deleting Out Form rows:", error);
+    return { success: false, deleted: 0 };
   }
 }
 

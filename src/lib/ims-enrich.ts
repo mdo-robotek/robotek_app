@@ -43,8 +43,7 @@ export function buildIMSMovementMaps(
   grns: { Item_Name?: string; Qty?: string; cancelled?: string | boolean; status_1?: string; Packed_Unpacked?: string }[],
   outForm: { description?: string; qty?: string; date?: string; updated_at?: string }[],
   gFloorLedger: FloorLedgerRow[] = [],
-  firstFloorLedger: FloorLedgerRow[] = [],
-  sfgFloorLedger: FloorLedgerRow[] = []
+  firstFloorLedger: FloorLedgerRow[] = []
 ): IMSMovementMaps {
   const inQtyMap: Record<string, number> = {};
   const outQtyMap: Record<string, number> = {};
@@ -127,7 +126,6 @@ export function buildIMSMovementMaps(
   });
 
   applyFloorOutToGFloorInMap(firstFloorLedger, inQtyMap, rememberName);
-  applyFloorOutToGFloorInMap(sfgFloorLedger, inQtyMap, rememberName);
 
   return { inQtyMap, outQtyMap, outQty60DaysMap, displayNameMap, grnKeys, o2dKeys };
 }

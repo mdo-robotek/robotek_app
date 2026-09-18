@@ -48,11 +48,6 @@ const IMS_CALC_INFO: Record<ImsLocation, ImsCalcInfo> = {
           "Manual Production IN entries and Physical Check IN adjustments logged on the G Floor ledger sheet.",
       },
       {
-        label: "SFG IMS OUT → G Floor IN (auto transfer)",
-        detail:
-          "When packed stock is manually booked OUT from SFG IMS, that qty is treated as IN on G Floor. No manual Production IN is needed for this transfer.",
-      },
-      {
         label: "1st Floor OUT → G Floor IN (auto transfer)",
         detail:
           "Every OUT qty recorded on IMS-1st Floor is treated as an IN transfer to G Floor. No manual Production IN needed for floor-to-floor movement.",
@@ -73,12 +68,17 @@ const IMS_CALC_INFO: Record<ImsLocation, ImsCalcInfo> = {
     liveHow:
       "For each catalog item (and pending GRN/O2D orphans): total IN minus total OUT. Orphan items from movement only also appear in the table.",
     approvalHow:
-      "Date-Wise tab lists all IN/OUT movements (newest date first). Select rows to Mark Checked and/or Approve — both save to the IMS-G Floor Approval sheet (Checked Status + Approval Status). Works for GRN, O2D, G Floor, SFG OUT, and 1st OUT virtual entries.",
+      "Date-Wise tab lists all IN/OUT movements (newest date first). Select rows to Mark Checked and/or Approve — both save to the IMS-G Floor Approval sheet (Checked Status + Approval Status). Works for GRN, O2D, G Floor, Production, and 1st OUT virtual entries.",
   },
   "1st": {
     title: "IMS - 1st Floor",
     formula: "Live Stock = IN − OUT",
     inSources: [
+      {
+        label: "SFG IMS OUT → 1st Floor IN (auto transfer)",
+        detail:
+          "When packed stock is booked OUT from SFG IMS, that qty lands as IN on 1st Floor with source SFG.",
+      },
       {
         label: "IMS-1st Floor Sheet (in_qty)",
         detail: "Sum of every in_qty row from manual bulk entry or Physical Check IN adjustments.",
@@ -107,10 +107,10 @@ const IMS_CALC_INFO: Record<ImsLocation, ImsCalcInfo> = {
       {
         label: "IMS-SFG Floor Sheet (out_qty)",
         detail:
-          "Manual packed OUT. Each OUT transfers the same qty as IN on G Floor IMS.",
+          "Manual packed OUT. Each OUT transfers the same qty as IN on 1st Floor IMS (source SFG).",
       },
     ],
-    liveHow: "Unpacked GRN IN minus packed transfers OUT to G Floor, aggregated per item.",
+    liveHow: "Unpacked GRN IN minus packed transfers OUT to 1st Floor, aggregated per item.",
   },
   final: {
     title: "Final IMS",
@@ -118,7 +118,7 @@ const IMS_CALC_INFO: Record<ImsLocation, ImsCalcInfo> = {
     inSources: [
       {
         label: "IMS - G Floor IN",
-        detail: "Packed GRN + G Floor ledger IN + SFG OUT transfers + 1st Floor OUT transfers.",
+        detail: "Packed GRN + G Floor ledger IN + 1st Floor OUT transfers.",
       },
       {
         label: "SFG IMS IN",
@@ -126,7 +126,7 @@ const IMS_CALC_INFO: Record<ImsLocation, ImsCalcInfo> = {
       },
       {
         label: "IMS - 1st Floor IN",
-        detail: "All in_qty from the 1st Floor ledger sheet.",
+        detail: "SFG packed transfers plus all in_qty from the 1st Floor ledger sheet.",
       },
     ],
     outSources: [
@@ -140,7 +140,7 @@ const IMS_CALC_INFO: Record<ImsLocation, ImsCalcInfo> = {
       },
       {
         label: "SFG IMS OUT",
-        detail: "Packed transfers from SFG to G Floor.",
+        detail: "Packed transfers from SFG to 1st Floor.",
       },
     ],
     liveHow: "G Floor Live Stock + SFG Live Stock + 1st Floor Live Stock.",
@@ -285,7 +285,7 @@ export default function IMSHub() {
                 <div className="flex items-center justify-between mb-1.5">
                   <span className={`font-black text-white/80 uppercase tracking-widest flex items-center gap-1.5 leading-tight ${id === "1st" || id === "sfg" ? "text-[10px] sm:text-xs" : "text-xs sm:text-sm"}`}>
                     <ArrowTrendingDownIcon className="w-4 h-4 shrink-0"/>
-                    {id === "1st" || id === "sfg" ? "Transfer to G Floor" : "Out"}
+                    {id === "sfg" ? "Transfer to 1st Floor" : id === "1st" ? "Transfer to G Floor" : "Out"}
                   </span>
                 </div>
                 <div

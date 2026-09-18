@@ -1,6 +1,7 @@
 import { BaseSheetsService } from "./sheets/base-service";
 import { FloorIMS } from "@/types/ims-floor";
 import { isSfgVirtualGrnId } from "./grn-packed";
+import { isSfgToFirstVirtualId, parseSfgIdFromFirstVirtual } from "./ims-1st-to-g-transfer";
 
 const SPREADSHEET_ID = "12lk8GV7ZBpm6J-bA5TBWfHQ1qY0eEHIrwOICSnsuceE";
 
@@ -190,6 +191,7 @@ export async function markFloorIMSItemsChecked(
   const allItems = await service.getAll();
   let updated = 0;
   let grns: { id: string; Item_Name?: string; Category?: string; updated_at?: string }[] | null = null;
+  let sfgRows: FloorIMS[] | null = null;
 
   for (const id of ids) {
     const item = allItems.find((i) => String(i.id).trim() === String(id).trim());
@@ -221,6 +223,28 @@ export async function markFloorIMSItemsChecked(
         date: grn.updated_at || new Date().toISOString().slice(0, 10),
         packed_status: "UNPACKED",
         checked_status: "CHECKED",
+        updated_at: new Date().toISOString(),
+      } as FloorIMS);
+      if (ok) updated++;
+    }
+
+    if (location === "1st" && isSfgToFirstVirtualId(id)) {
+      if (!sfgRows) {
+        sfgRows = await getFloorIMSItems("sfg");
+      }
+      const sfgId = parseSfgIdFromFirstVirtual(id);
+      const sfgRow = sfgRows.find((row) => String(row.id) === sfgId);
+      if (!sfgRow) continue;
+      const ok = await addFloorIMSItem(location, {
+        id,
+        item_name: sfgRow.item_name || "",
+        category: sfgRow.category || "",
+        in_qty: "0",
+        out_qty: "0",
+        date: sfgRow.date || sfgRow.updated_at || new Date().toISOString().slice(0, 10),
+        packed_status: "PACKED",
+        checked_status: "CHECKED",
+        source: "SFG",
         updated_at: new Date().toISOString(),
       } as FloorIMS);
       if (ok) updated++;

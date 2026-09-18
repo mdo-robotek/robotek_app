@@ -34,7 +34,7 @@ export async function GET() {
       getFloorIMSItems("sfg"),
     ]);
 
-    const maps = buildIMSMovementMaps(grns, outForm, gFloorLedger, firstFloorLedger, sfgFloorLedger);
+    const maps = buildIMSMovementMaps(grns, outForm, gFloorLedger, firstFloorLedger);
     const main = summarizeIMSMovement(items, maps);
 
     const gSummary = summarizeFloor(gFloorLedger);
@@ -67,12 +67,13 @@ export async function GET() {
     gSummary.totalIn += gInFrom1st;
     gSummary.liveStock += gInFrom1st;
 
-    let gInFromSfg = 0;
+    const firstSummary = summarizeFloor(firstFloorLedger);
+    let firstInFromSfg = 0;
     sfgFloorLedger.forEach((row) => {
-      gInFromSfg += parseFloat(String(row.out_qty || 0)) || 0;
+      firstInFromSfg += parseFloat(String(row.out_qty || 0)) || 0;
     });
-    gSummary.totalIn += gInFromSfg;
-    gSummary.liveStock += gInFromSfg;
+    firstSummary.totalIn += firstInFromSfg;
+    firstSummary.liveStock += firstInFromSfg;
 
     const sfgSummary = summarizeFloor(sfgFloorLedger);
     grns.forEach((grn) => {
@@ -86,7 +87,7 @@ export async function GET() {
     return NextResponse.json(
       {
         main,
-        first: summarizeFloor(firstFloorLedger),
+        first: firstSummary,
         sfg: sfgSummary,
         g: gSummary,
       },

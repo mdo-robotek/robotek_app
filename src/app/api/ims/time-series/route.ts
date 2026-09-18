@@ -3,7 +3,7 @@ import { getGRNItems } from "@/lib/grn-sheets";
 import { getOutFormData } from "@/lib/o2d-sheets";
 import { getIMSItems } from "@/lib/ims-sheets";
 import { getFloorIMSItems } from "@/lib/ims-floor-sheets";
-import { firstFloorOutRowsToGFloorInTxs, floorOutRowsToGFloorInTxs } from "@/lib/ims-1st-to-g-transfer";
+import { firstFloorOutRowsToGFloorInTxs } from "@/lib/ims-1st-to-g-transfer";
 import { isGrnForGFloor } from "@/lib/grn-packed";
 import { getIMSMasterItems } from "@/lib/ims-master-sheets";
 import { resolveGFloorLedgerSource } from "@/lib/gfloor-ledger-utils";
@@ -28,13 +28,12 @@ function parseDateStr(dStr: string) {
 
 export async function GET() {
   try {
-    const [items, grns, outForm, gFloorLedger, firstFloorLedger, sfgFloorLedger, masterRows] = await Promise.all([
+    const [items, grns, outForm, gFloorLedger, firstFloorLedger, masterRows] = await Promise.all([
       getIMSItems(),
       getGRNItems(),
       getOutFormData(),
       getFloorIMSItems("g"),
       getFloorIMSItems("1st"),
-      getFloorIMSItems("sfg"),
       getIMSMasterItems(),
     ]);
 
@@ -157,7 +156,6 @@ export async function GET() {
     });
 
     transactions.push(...firstFloorOutRowsToGFloorInTxs(firstFloorLedger, categoryMap));
-    transactions.push(...floorOutRowsToGFloorInTxs(sfgFloorLedger, categoryMap, "SFG"));
 
     return NextResponse.json(transactions, {
       headers: { 'Cache-Control': 'no-store, max-age=0' },

@@ -12,17 +12,16 @@ export const revalidate = 0;
 
 export async function GET() {
   try {
-    const [items, grns, outForm, gFloorLedger, firstFloorLedger, sfgFloorLedger, masterRows] = await Promise.all([
+    const [items, grns, outForm, gFloorLedger, firstFloorLedger, masterRows] = await Promise.all([
       getIMSItems(),
       getGRNItems(),
       getOutFormData(),
       getFloorIMSItems("g"),
       getFloorIMSItems("1st"),
-      getFloorIMSItems("sfg"),
       getIMSMasterItems(),
     ]);
 
-    const maps = buildIMSMovementMaps(grns, outForm, gFloorLedger, firstFloorLedger, sfgFloorLedger);
+    const maps = buildIMSMovementMaps(grns, outForm, gFloorLedger, firstFloorLedger);
     const masterByName = indexMasterByName(masterRows);
     const enrichedItems = enrichIMSItems(items, maps).map((item) => {
       const overlaid = overlayFromMaster(item, masterByName.get(masterItemKey(item.item_name)), {

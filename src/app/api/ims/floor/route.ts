@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getFloorIMSItems, addFloorIMSItem, addFloorIMSItems, updateFloorIMSItem, deleteFloorIMSItem, markFloorIMSItemsChecked, isValidFloorLocation } from "@/lib/ims-floor-sheets";
 import { FloorIMS } from "@/types/ims-floor";
 import { isGrnUnpacked, isSfgVirtualGrnId, sfgVirtualGrnId } from "@/lib/grn-packed";
+import { isSfgToFirstVirtualId, mergeSfgOutIntoFirstFloor } from "@/lib/ims-1st-to-g-transfer";
 import { getIMSMasterItems, indexMasterByName, overlayFromMaster, masterItemKey } from "@/lib/ims-master-sheets";
 
 export const dynamic = "force-dynamic";
@@ -64,6 +65,11 @@ export async function GET(request: NextRequest) {
       const { getGRNItems } = await import("@/lib/grn-sheets");
       const grns = await getGRNItems();
       items = mergeUnpackedGrnIntoSfg(items, grns);
+    }
+
+    if (location === "1st") {
+      const sfgLedger = await getFloorIMSItems("sfg");
+      items = mergeSfgOutIntoFirstFloor(items, sfgLedger);
     }
 
     if (location === "g" && searchParams.get("ledgerOnly") !== "1") {
@@ -171,6 +177,9 @@ export async function PUT(request: NextRequest) {
     if (isSfgVirtualGrnId(data.id)) {
       return NextResponse.json({ error: "GRN inward entries cannot be edited here" }, { status: 400 });
     }
+    if (isSfgToFirstVirtualId(data.id)) {
+      return NextResponse.json({ error: "SFG transfers cannot be edited on 1st Floor. Edit the SFG OUT instead." }, { status: 400 });
+    }
     const payload = location === "sfg" ? asSfgOutOnly(data) : data;
     const success = await updateFloorIMSItem(location, payload.id, payload as FloorIMS);
 
@@ -201,6 +210,9 @@ export async function DELETE(request: NextRequest) {
 
     if (isSfgVirtualGrnId(id)) {
       return NextResponse.json({ error: "GRN inward entries cannot be deleted here" }, { status: 400 });
+    }
+    if (isSfgToFirstVirtualId(id)) {
+      return NextResponse.json({ error: "SFG transfers cannot be deleted on 1st Floor. Delete the SFG OUT instead." }, { status: 400 });
     }
 
     const success = await deleteFloorIMSItem(location, id);

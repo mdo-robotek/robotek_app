@@ -1,3 +1,19 @@
+import type { FloorIMS } from "@/types/ims-floor";
+
+export const SFG_TO_FIRST_PREFIX = "sfg2first:";
+
+export function sfgToFirstVirtualId(sfgRowId: string | number): string {
+  return `${SFG_TO_FIRST_PREFIX}${sfgRowId}`;
+}
+
+export function isSfgToFirstVirtualId(id: string | number): boolean {
+  return String(id).startsWith(SFG_TO_FIRST_PREFIX);
+}
+
+export function parseSfgIdFromFirstVirtual(id: string | number): string {
+  return String(id).slice(SFG_TO_FIRST_PREFIX.length);
+}
+
 export type FloorLedgerRow = {
   id?: string;
   item_name?: string;
@@ -6,6 +22,9 @@ export type FloorLedgerRow = {
   out_qty?: string | number;
   date?: string;
   updated_at?: string;
+  packed_status?: string;
+  checked_status?: string;
+  source?: string;
 };
 
 export type FloorToGFloorTx = {
@@ -105,4 +124,38 @@ export function applyFirstFloorOutToGFloorInMap(
   rememberName: (raw: string) => string
 ) {
   applyFloorOutToGFloorInMap(firstFloorLedger, inQtyMap, rememberName);
+}
+
+/** SFG packed OUT rows become virtual 1st Floor IN lots (source SFG). Overlay rows keep checked status. */
+export function mergeSfgOutIntoFirstFloor(
+  firstItems: FloorIMS[],
+  sfgLedger: FloorLedgerRow[]
+): FloorIMS[] {
+  const overlayById = new Map(
+    firstItems.filter((i) => isSfgToFirstVirtualId(i.id)).map((i) => [String(i.id), i])
+  );
+  const ledgerItems = firstItems.filter((i) => !isSfgToFirstVirtualId(i.id));
+  const virtualIns: FloorIMS[] = [];
+
+  sfgLedger.forEach((row) => {
+    const outQty = parseFloat(String(row.out_qty ?? 0)) || 0;
+    if (!row.item_name || outQty <= 0) return;
+    const id = sfgToFirstVirtualId(row.id || "");
+    const overlay = overlayById.get(id);
+    virtualIns.push({
+      id,
+      item_name: row.item_name,
+      category: (row.category || overlay?.category || "").trim(),
+      in_qty: String(outQty),
+      out_qty: "0",
+      date: row.date || overlay?.date || "",
+      packed_status: "PACKED",
+      checked_status: overlay?.checked_status || "",
+      source: "SFG",
+      updated_at: row.updated_at || overlay?.updated_at || "",
+      live_stock: outQty,
+    });
+  });
+
+  return [...virtualIns, ...ledgerItems];
 }

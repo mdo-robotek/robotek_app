@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { google } from "googleapis";
+import { globalCache } from "@/lib/cache";
 
 const GOOGLE_SHEET_ID = "1T0vSzAgHoO21DifCUcPMRLR4yOy-kFteJ2bv6pG-UTc";
 
@@ -43,6 +44,8 @@ export async function POST(req: NextRequest) {
         values: rows,
       },
     });
+
+    globalCache.delete(`${GOOGLE_SHEET_ID}_out_form`);
 
     return NextResponse.json({ success: true, message: `Successfully imported ${rows.length} rows to Out Form.` });
   } catch (error: any) {

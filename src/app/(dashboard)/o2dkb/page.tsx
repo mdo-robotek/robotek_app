@@ -5,6 +5,10 @@ import { useSession } from "next-auth/react";
 import { O2DKB, O2DKBItemDetail, O2DKB_STEPS, O2DKB_STEP_SHORTS, O2DKBStepConfig } from "@/types/o2dkb";
 import { PartyManagement } from "@/types/party-management";
 import useSWR, { mutate, useSWRConfig } from "swr";
+import { useSSE } from "@/hooks/useSSE";
+import { applyPaginatedIncrementalUpdate } from "@/lib/utils/swr-sync";
+
+const O2DKB_SSE_MODULES = ["o2dkb"];
 const fetcher = async (url: string) => {
   const res = await fetch(url);
   return res.json();
@@ -401,7 +405,7 @@ export default function O2DPage() {
   const { data: paginatedResponse, error: paginatedError } = useSWR(
     tableQueryKey,
     fetcher,
-    { revalidateOnFocus: true, refreshInterval: 10000 }
+    { revalidateOnFocus: false, refreshInterval: 0 }
   );
 
   useEffect(() => {
@@ -433,7 +437,7 @@ export default function O2DPage() {
   const { data: sidebarResponse, isLoading: isSidebarLoading } = useSWR(
     sidebarQueryKey,
     fetcher,
-    { revalidateOnFocus: true, refreshInterval: 15000, keepPreviousData: true }
+    { revalidateOnFocus: false, refreshInterval: 0, keepPreviousData: true }
   );
 
   // Fetch summary data first to know total count
@@ -444,7 +448,7 @@ export default function O2DPage() {
   }>(
     "/api/o2dkb/summary",
     fetcher,
-    { revalidateOnFocus: true, refreshInterval: 30000 }
+    { revalidateOnFocus: false, refreshInterval: 0 }
   );
 
   // Use summaryData to set total rows if not already set by paginated fetch
@@ -471,6 +475,27 @@ export default function O2DPage() {
 
 
   const { mutate: globalMutate } = useSWRConfig();
+
+  useSSE({
+    modules: O2DKB_SSE_MODULES,
+    onUpdate: (incremental) => {
+      const updates = incremental.find((m) => m.module === "o2dkb");
+      if (!updates) return;
+      globalMutate(
+        tableQueryKey,
+        (current: any) => applyPaginatedIncrementalUpdate(current, updates.upserts, updates.currentIds),
+        { revalidate: false }
+      );
+      if (sidebarQueryKey !== tableQueryKey) {
+        globalMutate(
+          sidebarQueryKey,
+          (current: any) => applyPaginatedIncrementalUpdate(current, updates.upserts, updates.currentIds),
+          { revalidate: false }
+        );
+      }
+    },
+  });
+
   const [isSyncing, setIsSyncing] = useState(false);
 
   const handleSync = async () => {
@@ -2037,9 +2062,22 @@ export default function O2DPage() {
       if (!res.ok) throw new Error("Step update failed");
       setActionStatus("success");
       setActionMessage("Step Updated Successfully");
-      globalMutate(tableQueryKey, undefined, { revalidate: true });
-      globalMutate(sidebarQueryKey, undefined, { revalidate: true });
-      globalMutate("/api/o2dkb/summary", undefined, { revalidate: true });
+      if (mergedOrder) {
+        globalMutate(tableQueryKey, (current: any) => {
+          if (!current?.data) return current;
+          return {
+            ...current,
+            data: current.data.map((row: any) =>
+              row.order_no === selectedOrderNo || String(row.id) === String(mergedOrder.id)
+                ? { ...row, ...mergedOrder, id: row.id }
+                : row
+            ),
+          };
+        }, { revalidate: false });
+        setAllO2Ds((prev) =>
+          prev.map((row) => (row.order_no === selectedOrderNo ? { ...row, ...mergedOrder, id: row.id, item_name: row.item_name } : row))
+        );
+      }
 
       // MANUAL CACHE UPDATE: Ensure the detail panel shows the updated step immediately
       const stepItems = orderItems;

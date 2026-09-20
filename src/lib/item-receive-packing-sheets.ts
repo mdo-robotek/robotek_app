@@ -8,7 +8,7 @@ const SHEET_NAME = "Item Receive (PACKING)";
 class ItemReceivePackingService extends BaseSheetsService<ItemReceivePacking> {
   protected spreadsheetId = GOOGLE_SHEET_ID;
   protected sheetName = SHEET_NAME;
-  protected range = "A:ZZ"; 
+  protected range = "A:AA"; 
   protected idColumnIndex = 0;
 
   private readonly CANONICAL_HEADERS = [

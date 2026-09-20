@@ -2,8 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getTickets } from "@/lib/ticket-sheets";
 import { getDelegations } from "@/lib/delegation-sheets";
 import { getChecklists } from "@/lib/checklist-sheets";
-import { getMeetings } from "@/lib/meeting-sheets";
-import { getO2Ds, getO2DStepConfig } from "@/lib/o2d-sheets";
+import { getO2Ds } from "@/lib/o2d-sheets";
 import { getParties } from "@/lib/party-management-sheets";
 import { auth } from "@/auth";
 import { getUsers } from "@/lib/google-sheets";
@@ -111,11 +110,6 @@ export async function GET(req: NextRequest) {
     const istYear = parseInt(getPart('year'));
     const istMonth = parseInt(getPart('month'));
     const istDay = parseInt(getPart('day'));
-    const istHour = parseInt(getPart('hour'));
-    const istMinute = parseInt(getPart('minute'));
-    const istSecond = parseInt(getPart('second'));
-
-    const istNow = new Date(istYear, istMonth - 1, istDay, istHour, istMinute, istSecond);
     const todayStrRaw = `${istYear}-${String(istMonth).padStart(2, '0')}-${String(istDay).padStart(2, '0')}`;
     const tMM = String(istMonth).padStart(2, '0');
     const tDD = String(istDay).padStart(2, '0');
@@ -123,7 +117,7 @@ export async function GET(req: NextRequest) {
     const from = new Date(istYear, istMonth - 1, 1, 0, 0, 0, 0);
     const to = new Date(istYear, istMonth, 0, 23, 59, 59, 999);
 
-    const [users, attendance, leaves, tickets, delegations, checklists, o2ds, stepConfigs, meetings, parties] = await Promise.all([
+    const [users, attendance, leaves, tickets, delegations, checklists, o2ds, parties] = await Promise.all([
       getUsers(),
       getAttendanceRecords(),
       leaveRequestService.getAll(),
@@ -131,8 +125,6 @@ export async function GET(req: NextRequest) {
       getDelegations(),
       getChecklists(),
       getO2Ds(),
-      getO2DStepConfig(),
-      getMeetings(),
       getParties()
     ]);
 
@@ -265,17 +257,11 @@ export async function GET(req: NextRequest) {
 
     const companyMetrics = calculateMetrics(allTasks, from, to);
 
-    const upcomingMeetings = meetings
-      .filter((m: any) => {
-        const start = parseDate(m.start_time);
-        if (!start) return false;
-        return start >= new Date(istNow.getFullYear(), istNow.getMonth(), istNow.getDate()); 
-      })
-      .sort((a: any, b: any) => parseDate(a.start_time)!.getTime() - parseDate(b.start_time)!.getTime())
-      .slice(0, 10);
-
     const attendanceTodayWithRole = attendanceToday.map((r: any) => ({
-        ...r,
+        userName: r.userName,
+        inTime: r.inTime,
+        outTime: r.outTime,
+        userId: r.userId,
         role: users.find((u: any) => String(u.id) === String(r.userId))?.role_name || 'User'
     }));
 
@@ -283,8 +269,17 @@ export async function GET(req: NextRequest) {
         ? attendanceTodayWithRole
         : attendanceTodayWithRole.filter((r: any) => r.userId === userId || r.userName === username);
 
+    const visibleTickets = (isAdmin ? openTickets : openTickets.filter((t: any) => t.raised_by === username || t.solver_person === username)).slice(0, 15);
+
     const responsePayload = {
       attendanceToday: filteredAttendanceToday.slice(0, 10),
+      attendanceHistory: attendance
+        .filter((r: any) => String(r.userId) === String(userId))
+        .map((r: any) => ({
+          date: normalizeDateStr(r.date),
+          inTime: r.inTime,
+          outTime: r.outTime,
+        })),
       summary: {
         totalIn: inTodayCount,
         onLeave: leaveTodayCount,
@@ -295,7 +290,7 @@ export async function GET(req: NextRequest) {
       anniversaries: anniversaries.map((u: any) => ({ username: u.username, role: u.role_name, image: u.image_url })),
       partyBirthdays: partyBirthdays.map((p: any) => ({ partyName: p.partyName, partyType: p.partyType })),
       partyAnniversaries: partyAnniversaries.map((p: any) => ({ partyName: p.partyName, partyType: p.partyType })),
-      openTickets: (isAdmin ? openTickets : openTickets.filter((t: any) => t.raised_by === username || t.solver_person === username)).slice(0, 15),
+      openTickets: visibleTickets.map((t: any) => ({ id: t.id, title: t.title, status: t.status })),
       recentLeaves: (isAdmin ? leaves : leaves.filter((l: any) => l.userName === username)).slice(0, 5).map((l: any) => {
         const startDate = normalizeDateStr(l.startDate);
         const endDate = normalizeDateStr(l.endDate);
@@ -304,14 +299,14 @@ export async function GET(req: NextRequest) {
           return u ? (u.full_name || u.username) : null;
         }).filter(Boolean);
         return {
-          ...l,
+          userName: l.userName,
+          reason: l.reason,
+          status: l.status,
           startDate,
           endDate,
           involved
         };
       }),
-      upcomingMeetings,
-      teamMembers: users.map((u: any) => ({ username: u.username, image_url: u.image_url })),
       score: companyMetrics,
       isAdmin
     };

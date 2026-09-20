@@ -61,25 +61,26 @@ export async function POST(
 
     await addChecklistRevision(revision);
 
-    // Send WhatsApp Notifications for Status Change
-    try {
-      const formattedNow = formatDate(new Date().toISOString());
-      const message = `🔄 *Checklist Status Updated*\n━━━━━━━━━━━━━━━━━\n📌 *Task:* ${current.task}\n🎯 *Priority:* ${current.priority}\n🏢 *Department:* ${current.department}\n👤 *Assigned To:* ${current.assigned_to}\n👨‍💼 *Assigned By:* ${current.assigned_by}\n📉 *From:* ${current.status}\n📈 *To:* ${newStatus}\n📝 *Reason:* ${reason || "N/A"}\n⏱️ *Updated At:* ${formattedNow}`;
-      
-      // Notify both parties
-      const parties = [current.assigned_to, current.assigned_by];
-      const uniqueParties = [...new Set(parties)];
+    // Return immediately so the page can show Completed without waiting on WhatsApp
+    void (async () => {
+      try {
+        const formattedNow = formatDate(new Date().toISOString());
+        const message = `🔄 *Checklist Status Updated*\n━━━━━━━━━━━━━━━━━\n📌 *Task:* ${current.task}\n🎯 *Priority:* ${current.priority}\n🏢 *Department:* ${current.department}\n👤 *Assigned To:* ${current.assigned_to}\n👨‍💼 *Assigned By:* ${current.assigned_by}\n📉 *From:* ${current.status}\n📈 *To:* ${newStatus}\n📝 *Reason:* ${reason || "N/A"}\n⏱️ *Updated At:* ${formattedNow}`;
+        
+        const parties = [current.assigned_to, current.assigned_by];
+        const uniqueParties = [...new Set(parties)];
 
-      for (const username of uniqueParties) {
-        if (!username) continue;
-        const user = await getUserByUsernameOrEmail(username);
-        if (user && user.phone) {
-          await sendWhatsAppMessage(user.phone, message);
+        for (const username of uniqueParties) {
+          if (!username) continue;
+          const user = await getUserByUsernameOrEmail(username);
+          if (user && user.phone) {
+            await sendWhatsAppMessage(user.phone, message);
+          }
         }
+      } catch (err) {
+        console.error("Error sending WhatsApp notification:", err);
       }
-    } catch (err) {
-      console.error("Error sending WhatsApp notification:", err);
-    }
+    })();
 
     return NextResponse.json({ 
       message: "Status updated and revision logged",

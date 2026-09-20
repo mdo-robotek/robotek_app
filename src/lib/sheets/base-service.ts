@@ -1,5 +1,7 @@
-import { google } from "googleapis";
 import { globalCache } from "../cache";
+import { getSheetsClient } from "../sheet-utils";
+
+const inflightGets = new Map<string, Promise<unknown>>();
 
 export interface SheetItem {
   id: string | number;
@@ -28,6 +30,7 @@ export abstract class BaseSheetsService<T extends SheetItem> {
   // Column used to store a last-modified Unix timestamp (a cell unlikely to collide with data)
   private META_COL = 'ZZ';
   private META_ROW = 1;
+  private sheetRowById = new Map<string, number>();
 
   protected abstract mapRowToItem(row: any[]): T;
   protected abstract mapItemToRow(item: T): any[];
@@ -38,16 +41,35 @@ export abstract class BaseSheetsService<T extends SheetItem> {
   }
 
   protected async getSheetsClient() {
-    const oauth2Client = new google.auth.OAuth2(
-      process.env.GOOGLE_CLIENT_ID,
-      process.env.GOOGLE_CLIENT_SECRET,
-      process.env.NEXTAUTH_URL
-    );
+    return getSheetsClient();
+  }
 
-    const tokens = JSON.parse(process.env.GOOGLE_OAUTH_TOKENS || "{}");
-    oauth2Client.setCredentials(tokens);
+  private rememberSheetRows(data: T[]) {
+    this.sheetRowById.clear();
+    data.forEach((item, i) => {
+      const id = String(item.id ?? "").trim();
+      if (id) this.sheetRowById.set(id, i + 2);
+    });
+  }
 
-    return google.sheets({ version: "v4", auth: oauth2Client });
+  private async fetchAllUncached(cacheKey: string): Promise<T[]> {
+    console.log(`[API CALL] Fetching ${this.sheetName}...`);
+    const sheets = await this.getSheetsClient();
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId: this.spreadsheetId,
+      range: `${this.sheetName}!${this.range}`,
+    });
+
+    const rows = response.data.values;
+    if (rows && rows.length > 0) {
+      const headers = rows[0].map((h: any) => h.toString().toLowerCase().trim());
+      globalCache.set(`${this.spreadsheetId}_${this.sheetName}_headers`, headers, 24 * 60 * 60 * 1000);
+    }
+
+    const data = rows ? rows.slice(1).map((row) => this.mapRowToItem(row)) : [];
+    this.rememberSheetRows(data);
+    globalCache.set(cacheKey, data, this.CACHE_TTL);
+    return data;
   }
 
   async getAll(): Promise<T[]> {
@@ -56,32 +78,26 @@ export abstract class BaseSheetsService<T extends SheetItem> {
     const cachedData = globalCache.get<T[]>(cacheKey);
 
     if (cachedData) {
+      if (this.sheetRowById.size === 0) this.rememberSheetRows(cachedData);
       console.log(`[CACHE HIT] ${this.sheetName}`);
       return cachedData;
     }
 
-    try {
-      console.log(`[API CALL] Fetching ${this.sheetName}...`);
-      const sheets = await this.getSheetsClient();
-      const response = await sheets.spreadsheets.values.get({
-        spreadsheetId: this.spreadsheetId,
-        range: `${this.sheetName}!${this.range}`,
-      });
+    const inflight = inflightGets.get(cacheKey);
+    if (inflight) {
+      return inflight as Promise<T[]>;
+    }
 
-      const rows = response.data.values;
-      if (rows && rows.length > 0) {
-        const headers = rows[0].map((h: any) => h.toString().toLowerCase().trim());
-        globalCache.set(`${this.spreadsheetId}_${this.sheetName}_headers`, headers, 24 * 60 * 60 * 1000); // Cache headers for 24 hours
-      }
-      
-      const data = rows ? rows.slice(1).map((row) => this.mapRowToItem(row)) : [];
-      globalCache.set(cacheKey, data, this.CACHE_TTL);
-      return data;
-    } catch (error) {
-       console.error(`Error fetching ${this.sheetName}:`, error);
-       return [];
-     }
-   }
+    const fetchPromise = this.fetchAllUncached(cacheKey).catch((error) => {
+      console.error(`Error fetching ${this.sheetName}:`, error);
+      return [] as T[];
+    }).finally(() => {
+      inflightGets.delete(cacheKey);
+    });
+
+    inflightGets.set(cacheKey, fetchPromise);
+    return fetchPromise;
+  }
  
   async getLatestIds(): Promise<(string | number)[]> {
     await this.ensureHeaders();
@@ -297,7 +313,7 @@ export abstract class BaseSheetsService<T extends SheetItem> {
       const itemIds = new Set(itemsArray.map(i => String(i.id)));
 
       if (action === 'add') {
-        newData = [...itemsArray, ...cachedData];
+        newData = [...cachedData, ...itemsArray];
       } else if (action === 'update') {
         newData = cachedData.map(i => {
           const updatedItem = itemsArray.find(newItem => String(newItem.id) === String(i.id));
@@ -336,6 +352,8 @@ export abstract class BaseSheetsService<T extends SheetItem> {
       console.log(`[SHEETS] Append response for ${this.sheetName}:`, res.status, res.statusText);
 
       this.updateInMemoryCache('add', item);
+      const priorCount = (globalCache.get<T[]>(`${this.spreadsheetId}_${this.sheetName}`)?.length || 1) - 1;
+      this.sheetRowById.set(String(item.id).trim(), priorCount + 2);
       void this.writeLastModified(); // meta-level heartbeat
       return true;
     } catch (error) {
@@ -377,25 +395,31 @@ export abstract class BaseSheetsService<T extends SheetItem> {
     }
   }
 
+  private async resolveSheetRow(id: string | number): Promise<number> {
+    const searchId = String(id).trim();
+    const cachedRow = this.sheetRowById.get(searchId);
+    if (cachedRow) return cachedRow;
+
+    const sheets = await this.getSheetsClient();
+    const idColLetter = getColumnLetter(this.idColumnIndex);
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId: this.spreadsheetId,
+      range: `${this.sheetName}!${idColLetter}:${idColLetter}`,
+    });
+    const rows = response.data.values;
+    if (!rows) return -1;
+    const rowIndex = rows.findIndex(row => String(row[0]).trim() === searchId);
+    if (rowIndex === -1) return -1;
+    this.sheetRowById.set(searchId, rowIndex + 1);
+    return rowIndex + 1;
+  }
+
   async update(id: string | number, item: T): Promise<boolean> {
     await this.ensureHeaders();
     try {
       console.log(`[API CALL] Updating ${this.sheetName} ID: ${id}...`);
-      const sheets = await this.getSheetsClient();
-      
-      const idColLetter = getColumnLetter(this.idColumnIndex);
-      const response = await sheets.spreadsheets.values.get({
-        spreadsheetId: this.spreadsheetId,
-        range: `${this.sheetName}!${idColLetter}:${idColLetter}`,
-      });
-
-      const rows = response.data.values;
-      if (!rows) return false;
-
-      const searchId = String(id).trim();
-      const rowIndex = rows.findIndex(row => String(row[0]).trim() === searchId);
-      
-      if (rowIndex === -1) return false;
+      const sheetRow = await this.resolveSheetRow(id);
+      if (sheetRow === -1) return false;
 
       const endCol = getColumnLetter(Math.max(...Object.values(this.hMap)));
 
@@ -404,9 +428,10 @@ export abstract class BaseSheetsService<T extends SheetItem> {
         (item as any).updated_at = new Date().toISOString();
       }
 
+      const sheets = await this.getSheetsClient();
       await sheets.spreadsheets.values.update({
         spreadsheetId: this.spreadsheetId,
-        range: `${this.sheetName}!A${rowIndex + 1}:${endCol}${rowIndex + 1}`,
+        range: `${this.sheetName}!A${sheetRow}:${endCol}${sheetRow}`,
         valueInputOption: "USER_ENTERED",
         requestBody: {
           values: [this.mapItemToRow(item)],
@@ -425,19 +450,10 @@ export abstract class BaseSheetsService<T extends SheetItem> {
   async delete(id: string | number): Promise<boolean> {
     try {
       console.log(`[API CALL] Deleting from ${this.sheetName} ID: ${id}...`);
+      const sheetRow = await this.resolveSheetRow(id);
+      if (sheetRow === -1) return false;
+
       const sheets = await this.getSheetsClient();
-      const idColLetter = getColumnLetter(this.idColumnIndex);
-      const response = await sheets.spreadsheets.values.get({
-        spreadsheetId: this.spreadsheetId,
-        range: `${this.sheetName}!${idColLetter}:${idColLetter}`,
-      });
-
-      const rows = response.data.values;
-      if (!rows) return false;
-
-      const rowIndex = rows.findIndex(row => String(row[0]).trim() === String(id).trim());
-      if (rowIndex === -1) return false;
-
       const spreadsheet = await sheets.spreadsheets.get({ spreadsheetId: this.spreadsheetId });
       const sheetId = spreadsheet.data.sheets?.find(s => s.properties?.title === this.sheetName)?.properties?.sheetId;
 
@@ -448,13 +464,17 @@ export abstract class BaseSheetsService<T extends SheetItem> {
         requestBody: {
           requests: [{
             deleteDimension: {
-              range: { sheetId, dimension: "ROWS", startIndex: rowIndex, endIndex: rowIndex + 1 }
+              range: { sheetId, dimension: "ROWS", startIndex: sheetRow - 1, endIndex: sheetRow }
             }
           }]
         }
       });
 
       this.updateInMemoryCache('delete', { id } as T);
+      this.sheetRowById.delete(String(id).trim());
+      for (const [key, row] of this.sheetRowById) {
+        if (row > sheetRow) this.sheetRowById.set(key, row - 1);
+      }
       void this.writeLastModified(); // stamp timestamp — non-blocking
       return true;
     } catch (error) {
@@ -616,5 +636,6 @@ export abstract class BaseSheetsService<T extends SheetItem> {
     globalCache.delete(headerCacheKey);
     // Reset in-memory hMap so ensureHeaders() re-fetches on next request
     this.hMap = {};
+    this.sheetRowById.clear();
   }
 }

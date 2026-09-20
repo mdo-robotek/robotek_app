@@ -11,6 +11,10 @@ import {
 } from "@/types/o2d";
 import { PartyManagement } from "@/types/party-management";
 import useSWR, { mutate, useSWRConfig } from "swr";
+import { useSSE } from "@/hooks/useSSE";
+import { applyPaginatedIncrementalUpdate } from "@/lib/utils/swr-sync";
+
+const O2D_SSE_MODULES = ["o2d"];
 const fetcher = async (url: string) => {
   const res = await fetch(url);
   return res.json();
@@ -447,7 +451,7 @@ export default function O2DPage() {
   const { data: paginatedResponse, error: paginatedError } = useSWR(
     tableQueryKey,
     fetcher,
-    { revalidateOnFocus: true, refreshInterval: 10000 }
+    { revalidateOnFocus: false, refreshInterval: 0 }
   );
 
   useEffect(() => {
@@ -479,7 +483,7 @@ export default function O2DPage() {
   const { data: sidebarResponse, isLoading: isSidebarLoading } = useSWR(
     sidebarQueryKey,
     fetcher,
-    { revalidateOnFocus: true, refreshInterval: 15000, keepPreviousData: true }
+    { revalidateOnFocus: false, refreshInterval: 0, keepPreviousData: true }
   );
 
   // Fetch summary data first to know total count
@@ -490,7 +494,7 @@ export default function O2DPage() {
   }>(
     "/api/o2d/summary",
     fetcher,
-    { revalidateOnFocus: true, refreshInterval: 30000 }
+    { revalidateOnFocus: false, refreshInterval: 0 }
   );
 
   // Use summaryData to set total rows if not already set by paginated fetch
@@ -517,6 +521,45 @@ export default function O2DPage() {
 
 
   const { mutate: globalMutate } = useSWRConfig();
+
+  useSSE({
+    modules: O2D_SSE_MODULES,
+    onUpdate: (incremental) => {
+      const updates = incremental.find((m) => m.module === "o2d");
+      if (!updates) return;
+      globalMutate(
+        tableQueryKey,
+        (current: any) => applyPaginatedIncrementalUpdate(current, updates.upserts, updates.currentIds),
+        { revalidate: false }
+      );
+      if (sidebarQueryKey !== tableQueryKey) {
+        globalMutate(
+          sidebarQueryKey,
+          (current: any) => applyPaginatedIncrementalUpdate(current, updates.upserts, updates.currentIds),
+          { revalidate: false }
+        );
+      }
+    },
+  });
+
+  const patchO2DOrderCache = (mergedOrder: O2D) => {
+    const patch = (current: any) => {
+      if (!current?.data) return current;
+      return {
+        ...current,
+        data: current.data.map((row: O2D) =>
+          row.order_no === mergedOrder.order_no || String(row.id) === String(mergedOrder.id)
+            ? { ...row, ...mergedOrder, id: row.id }
+            : row
+        ),
+      };
+    };
+    globalMutate(tableQueryKey, patch, { revalidate: false });
+    if (sidebarQueryKey !== tableQueryKey) {
+      globalMutate(sidebarQueryKey, patch, { revalidate: false });
+    }
+  };
+
   const [isSyncing, setIsSyncing] = useState(false);
 
   const handleSync = async () => {
@@ -1648,9 +1691,6 @@ export default function O2DPage() {
       if (!res.ok) throw new Error(`Failed to toggle ${action}`);
       setActionStatus("success");
       setActionMessage("Status Updated");
-      globalMutate(tableQueryKey);
-      globalMutate(sidebarQueryKey);
-      globalMutate("/api/o2d/summary");
 
       // MANUAL CACHE UPDATE: Reflect the status change in the master map immediately
       setMasterOrderMap(prev => {
@@ -1663,6 +1703,11 @@ export default function O2DPage() {
         }));
         return { ...prev, [orderNo]: updated };
       });
+      setAllO2Ds((prev) =>
+        prev.map((o) =>
+          o.order_no === orderNo ? { ...o, [action]: newValue, updated_at: new Date().toISOString() } : o
+        )
+      );
       setTimeout(() => setIsStatusModalOpen(false), 1500);
     } catch (e: any) {
       setActionStatus("error");
@@ -1802,9 +1847,6 @@ export default function O2DPage() {
       setActionStatus("success");
       setActionMessage("Data Cleared Successfully");
       setIsRemoveFollowUpModalOpen(false);
-      globalMutate(tableQueryKey, undefined, { revalidate: true });
-      globalMutate(sidebarQueryKey, undefined, { revalidate: true });
-      globalMutate("/api/o2d/summary", undefined, { revalidate: true });
 
       // MANUAL CACHE UPDATE: Refresh the master map to reflect purged steps immediately
       setMasterOrderMap(prev => {
@@ -2107,9 +2149,21 @@ export default function O2DPage() {
       if (!res.ok) throw new Error("Step update failed");
       setActionStatus("success");
       setActionMessage("Step Updated Successfully");
-      globalMutate(tableQueryKey, undefined, { revalidate: true });
-      globalMutate(sidebarQueryKey, undefined, { revalidate: true });
-      globalMutate("/api/o2d/summary", undefined, { revalidate: true });
+      if (mergedOrder) {
+        patchO2DOrderCache(mergedOrder);
+        setAllO2Ds((prev) => {
+          const expanded = orderItems.flatMap(expandO2DItem);
+          return prev.map((row) => {
+            if (row.order_no !== selectedOrderNo) return row;
+            return expanded.find((item) => String(item.id) === String(row.id) || item.item_name === row.item_name) || {
+              ...row,
+              ...mergedOrder,
+              id: row.id,
+              item_name: row.item_name,
+            };
+          });
+        });
+      }
 
       // MANUAL CACHE UPDATE: Ensure the detail panel shows the updated step immediately
       const stepItems = orderItems.map(expandO2DItem).flat();

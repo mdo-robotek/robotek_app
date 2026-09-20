@@ -9,7 +9,7 @@ const CONFIG_SHEET_NAME = "Step Configuration";
 class O2DKBService extends BaseSheetsService<O2DKB> {
   protected spreadsheetId = GOOGLE_SHEET_ID;
   protected sheetName = SHEET_NAME;
-  protected range = "A:ZZ";
+  protected range = "A:BH";
   protected idColumnIndex = 0;
 
   mapRowToItem(row: any[]): O2DKB {

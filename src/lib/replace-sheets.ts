@@ -8,7 +8,7 @@ const SHEET_NAME = "Replace";
 class ReplaceService extends BaseSheetsService<Replace> {
   protected spreadsheetId = GOOGLE_SHEET_ID;
   protected sheetName = SHEET_NAME;
-  protected range = "A:ZZ"; 
+  protected range = "A:AQ"; 
   protected idColumnIndex = 0;
 
   private readonly CANONICAL_HEADERS = [

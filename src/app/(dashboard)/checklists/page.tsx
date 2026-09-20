@@ -175,9 +175,9 @@ export default function ChecklistsPage() {
       frequency: Record<string, number>;
     };
   }>(checklistSWRKey, fetcher, {
-    revalidateOnFocus: true,
+    revalidateOnFocus: false,
     revalidateOnMount: true,
-    refreshInterval: 10000, // 10s background polling for other users
+    refreshInterval: 0,
   });
   const isLoading = isPageLoading;
 
@@ -187,10 +187,7 @@ export default function ChecklistsPage() {
     onUpdate: (incremental) => {
       const updates = incremental.find(m => m.module === 'checklists');
       if (updates) {
-        // 1. Surgical update of the list for immediate feedback
         mutateChecklists((current) => applyPaginatedIncrementalUpdate(current as any, updates.upserts, updates.currentIds), false);
-        // 2. Background refetch to update counts and handle complex filters
-        mutateChecklists();
       }
     } 
   });
@@ -247,7 +244,7 @@ export default function ChecklistsPage() {
 
     setIsStatusModalOpen(true);
     setActionStatus('loading');
-    setActionMessage("Syncing with sheet...");
+    setActionMessage("Updating status...");
     setIsSubmittingUpdate(true);
     
     try {
@@ -265,12 +262,23 @@ export default function ChecklistsPage() {
       });
 
       if (res.ok) {
-        await mutateChecklists(); // Wait for sync from sheet
+        const data = await res.json();
+        if (data.checklist) {
+          mutateChecklists((current) => {
+            if (!current?.data) return current;
+            return {
+              ...current,
+              data: current.data.map((c) =>
+                String(c.id) === String(data.checklist.id) ? data.checklist : c
+              ),
+            };
+          }, false);
+        }
         setUpdatingStatus("");
         setRevisionReason("");
         setEvidenceFile(null);
         setRevisedDueDate("");
-        setSelectedTask(null); // Close sidebar
+        setSelectedTask(data.checklist || null);
 
         setActionStatus('success');
         setActionMessage("Status updated successfully!");
@@ -308,7 +316,6 @@ export default function ChecklistsPage() {
 
       if (res.ok) {
         setRemarkText("");
-        await mutateChecklists(); // Wait for sync
         
         setActionStatus('success');
         setActionMessage("Remark added successfully!");

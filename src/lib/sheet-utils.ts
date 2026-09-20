@@ -1,6 +1,10 @@
-import { google } from "googleapis";
+import { google, sheets_v4 } from "googleapis";
+
+let sheetsClient: sheets_v4.Sheets | null = null;
 
 export async function getSheetsClient() {
+  if (sheetsClient) return sheetsClient;
+
   try {
     const clientId = process.env.GOOGLE_CLIENT_ID;
     const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
@@ -12,7 +16,8 @@ export async function getSheetsClient() {
     if (!tokensStr) throw new Error("GOOGLE_OAUTH_TOKENS environment variable is not set");
     
     oauth2Client.setCredentials(JSON.parse(tokensStr));
-    return google.sheets({ version: "v4", auth: oauth2Client });
+    sheetsClient = google.sheets({ version: "v4", auth: oauth2Client });
+    return sheetsClient;
   } catch (error: any) {
     console.error("[Sheets Lib] Failed to initialize sheets client:", error.message);
     throw error;

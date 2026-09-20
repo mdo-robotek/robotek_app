@@ -12,7 +12,7 @@ const CONFIG_SHEET_NAME = "Step Configuration";
 class O2DService extends BaseSheetsService<O2D> {
   protected spreadsheetId = GOOGLE_SHEET_ID;
   protected sheetName: string;
-  protected range = "A:ZZ";
+  protected range = "A:BI";
   protected idColumnIndex = 0;
 
   constructor(sheetName: string = SHEET_NAME) {

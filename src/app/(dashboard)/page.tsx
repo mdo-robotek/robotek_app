@@ -28,13 +28,10 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 export default function Dashboard() {
   const { data: session } = useSession();
-  const userId = session?.user?.id;
   
   const { data, error, isLoading } = useSWR('/api/dashboard', fetcher, {
     refreshInterval: 300000 
   });
-
-  const { data: attendanceData } = useSWR(userId ? `/api/attendance?userId=${userId}` : null, fetcher);
 
   const firstName = (session?.user as any)?.username || session?.user?.name?.split(' ')[0] || "Guest";
   const username = (session?.user as any)?.username as string | undefined;
@@ -45,12 +42,12 @@ export default function Dashboard() {
   let avgIn = "--:--";
   let avgOut = "--:--";
 
-  if (attendanceData?.history) {
+  if (data?.attendanceHistory) {
     const now = new Date();
     const currentMonth = now.getMonth();
     const currentYear = now.getFullYear();
 
-    const monthRecords = attendanceData.history.filter((r: any) => {
+    const monthRecords = data.attendanceHistory.filter((r: any) => {
       const d = new Date(r.date);
       return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
     });
@@ -122,7 +119,7 @@ export default function Dashboard() {
         {/* Right Column: Personal Calendar */}
         <div className="lg:col-span-4">
             <HighightedCalendar 
-              history={attendanceData?.history || []} 
+              history={data?.attendanceHistory || []} 
               leaveDates={data?.leaveDates || []} 
               avgIn={avgIn} 
               avgOut={avgOut} 

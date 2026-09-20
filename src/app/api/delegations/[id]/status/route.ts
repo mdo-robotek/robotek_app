@@ -57,23 +57,25 @@ export async function POST(
 
     await addDelegationRevision(payloadRevision);
 
-    try {
-      const formattedNow = formatDate(new Date().toISOString());
-      const message = `🔄 *Delegation Status Updated*\n━━━━━━━━━━━━━━━━━\n📌 *Task:* ${current.title}\n🎯 *Priority:* ${current.priority}\n👤 *Assigned To:* ${current.assigned_to}\n👨‍💼 *Assigned By:* ${current.assigned_by}\n📉 *From:* ${current.status}\n📈 *To:* ${newStatus}\n📝 *Reason:* ${reason || "N/A"}\n⏱️ *Updated At:* ${formattedNow}`;
-      
-      const parties = [current.assigned_to, current.assigned_by];
-      const uniqueParties = [...new Set(parties)];
+    void (async () => {
+      try {
+        const formattedNow = formatDate(new Date().toISOString());
+        const message = `🔄 *Delegation Status Updated*\n━━━━━━━━━━━━━━━━━\n📌 *Task:* ${current.title}\n🎯 *Priority:* ${current.priority}\n👤 *Assigned To:* ${current.assigned_to}\n👨‍💼 *Assigned By:* ${current.assigned_by}\n📉 *From:* ${current.status}\n📈 *To:* ${newStatus}\n📝 *Reason:* ${reason || "N/A"}\n⏱️ *Updated At:* ${formattedNow}`;
+        
+        const parties = [current.assigned_to, current.assigned_by];
+        const uniqueParties = [...new Set(parties)];
 
-      for (const username of uniqueParties) {
-        if (!username) continue;
-        const user = await getUserByUsernameOrEmail(username);
-        if (user && user.phone) {
-          await sendWhatsAppMessage(user.phone, message);
+        for (const username of uniqueParties) {
+          if (!username) continue;
+          const user = await getUserByUsernameOrEmail(username);
+          if (user && user.phone) {
+            await sendWhatsAppMessage(user.phone, message);
+          }
         }
+      } catch (err) {
+        console.error("Error sending WhatsApp notification:", err);
       }
-    } catch (err) {
-      console.error("Error sending WhatsApp notification:", err);
-    }
+    })();
 
     return NextResponse.json({ 
       message: "Status updated and revision logged",

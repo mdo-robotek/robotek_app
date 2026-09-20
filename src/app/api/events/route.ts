@@ -8,6 +8,7 @@ import { partyManagementService } from '@/lib/party-management-sheets';
 import { checklistService } from '@/lib/checklist-sheets';
 
 import { o2dService } from '@/lib/o2d-sheets';
+import { o2dkbService } from '@/lib/o2dkb-sheets';
 import { replaceService } from '@/lib/replace-sheets';
 import { i2rPackingService } from '@/lib/i2r-packing-sheets';
 import { itemReceivePackingService } from '@/lib/item-receive-packing-sheets';
@@ -21,6 +22,7 @@ const SERVICES: Record<string, any> = {
   'party-management': partyManagementService,
   checklists: checklistService,
   o2d: o2dService,
+  o2dkb: o2dkbService,
   replace: replaceService,
   'i2r-packing': i2rPackingService,
   'item-receive-packing': itemReceivePackingService,

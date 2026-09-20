@@ -54,7 +54,7 @@ const DEFAULT_HRMS_STEPS: Record<HrmsModuleType, string[]> = {
 class RecruitmentService extends BaseSheetsService<Recruitment> {
   protected spreadsheetId = GOOGLE_SHEET_ID;
   protected sheetName = "Recruitment";
-  protected range = "A:ZZ";
+  protected range = "A:AJ";
   protected idColumnIndex = 0;
 
   public readonly CANONICAL_HEADERS = [
@@ -146,7 +146,7 @@ class RecruitmentService extends BaseSheetsService<Recruitment> {
 class CandidateService extends BaseSheetsService<Candidate> {
   protected spreadsheetId = GOOGLE_SHEET_ID;
   protected sheetName = "Candidate";
-  protected range = "A:ZZ";
+  protected range = "A:AW";
   protected idColumnIndex = 0;
 
   public readonly CANONICAL_HEADERS = [
@@ -246,7 +246,7 @@ class CandidateService extends BaseSheetsService<Candidate> {
 class SalesService extends BaseSheetsService<Sales> {
   protected spreadsheetId = GOOGLE_SHEET_ID;
   protected sheetName = "Sales";
-  protected range = "A:ZZ";
+  protected range = "A:BA";
   protected idColumnIndex = 0;
 
   public readonly CANONICAL_HEADERS = [
@@ -347,7 +347,7 @@ class SalesService extends BaseSheetsService<Sales> {
 class OnboardService extends BaseSheetsService<Onboard> {
   protected spreadsheetId = GOOGLE_SHEET_ID;
   protected sheetName = "Onboard";
-  protected range = "A:ZZ";
+  protected range = "A:BM";
   protected idColumnIndex = 0;
 
   public readonly CANONICAL_HEADERS = [
@@ -451,7 +451,7 @@ class OnboardService extends BaseSheetsService<Onboard> {
 class OffboardService extends BaseSheetsService<OffboardRecord> {
   protected spreadsheetId = GOOGLE_SHEET_ID;
   protected sheetName = "Offboard";
-  protected range = "A:ZZ";
+  protected range = "A:AL";
   protected idColumnIndex = 0;
 
   public readonly CANONICAL_HEADERS = [

@@ -83,7 +83,7 @@ export default function TicketsPage() {
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const { data: swrTickets, mutate: mutateTickets } = useSWR<Ticket[]>("/api/tickets", fetcher, {
     refreshInterval: 0,        // No background polling — SSE handles change detection
-    revalidateOnFocus: true,   // Refetch when user returns to the tab
+    revalidateOnFocus: false,
     revalidateOnMount: true,   // Refetch on page load
   });
 

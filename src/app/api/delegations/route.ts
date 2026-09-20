@@ -52,19 +52,20 @@ export async function POST(req: NextRequest) {
 
     await addDelegation(payload);
 
-    // Send WhatsApp Notification
-    try {
-      const assignedUser = await getUserByUsernameOrEmail(delegationData.assigned_to || "");
-      if (assignedUser && assignedUser.phone) {
-        const formattedDueDate = formatDate(delegationData.due_date || "");
-        const message = `🔔 *New Delegation Assigned*\n━━━━━━━━━━━━━━━━━\n📌 *Task:* ${delegationData.title}\n🎯 *Priority:* ${delegationData.priority}\n⏳ *Due Date:* ${formattedDueDate}\n👨‍💼 *Assigned By:* ${delegationData.assigned_by}\n📝 *Description:* ${delegationData.description}`;
-        await sendWhatsAppMessage(assignedUser.phone, message);
+    void (async () => {
+      try {
+        const assignedUser = await getUserByUsernameOrEmail(delegationData.assigned_to || "");
+        if (assignedUser && assignedUser.phone) {
+          const formattedDueDate = formatDate(delegationData.due_date || "");
+          const message = `🔔 *New Delegation Assigned*\n━━━━━━━━━━━━━━━━━\n📌 *Task:* ${delegationData.title}\n🎯 *Priority:* ${delegationData.priority}\n⏳ *Due Date:* ${formattedDueDate}\n👨‍💼 *Assigned By:* ${delegationData.assigned_by}\n📝 *Description:* ${delegationData.description}`;
+          await sendWhatsAppMessage(assignedUser.phone, message);
+        }
+      } catch (err) {
+        console.error("Error sending WhatsApp notification:", err);
       }
-    } catch (err) {
-      console.error("Error sending WhatsApp notification:", err);
-    }
+    })();
 
-    return NextResponse.json({ message: "Delegation added successfully" });
+    return NextResponse.json({ message: "Delegation added successfully", delegation: payload });
 
   } catch (error: any) {
     console.error("POST Delegation Error:", error);

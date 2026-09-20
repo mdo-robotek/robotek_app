@@ -34,25 +34,27 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     }
 
     const timestamp = new Date().toISOString();
-    await updateDelegation(id, {
+    const updated = {
       ...delegationData,
       id,
       updated_at: timestamp
-    });
+    };
+    await updateDelegation(id, updated);
 
-    // Send WhatsApp Notification for Update
-    try {
-      const assignedUser = await getUserByUsernameOrEmail(delegationData.assigned_to || "");
-      if (assignedUser && assignedUser.phone) {
-        const formattedDueDate = formatDate(delegationData.due_date || "");
-        const message = `📝 *Delegation Updated*\n━━━━━━━━━━━━━━━━━\n📌 *Task:* ${delegationData.title}\n🎯 *Priority:* ${delegationData.priority}\n⏳ *Due Date:* ${formattedDueDate}\n👨‍💼 *Assigned By:* ${delegationData.assigned_by}\n📝 *Description:* ${delegationData.description}`;
-        await sendWhatsAppMessage(assignedUser.phone, message);
+    void (async () => {
+      try {
+        const assignedUser = await getUserByUsernameOrEmail(delegationData.assigned_to || "");
+        if (assignedUser && assignedUser.phone) {
+          const formattedDueDate = formatDate(delegationData.due_date || "");
+          const message = `📝 *Delegation Updated*\n━━━━━━━━━━━━━━━━━\n📌 *Task:* ${delegationData.title}\n🎯 *Priority:* ${delegationData.priority}\n⏳ *Due Date:* ${formattedDueDate}\n👨‍💼 *Assigned By:* ${delegationData.assigned_by}\n📝 *Description:* ${delegationData.description}`;
+          await sendWhatsAppMessage(assignedUser.phone, message);
+        }
+      } catch (err) {
+        console.error("Error sending WhatsApp notification:", err);
       }
-    } catch (err) {
-      console.error("Error sending WhatsApp notification:", err);
-    }
+    })();
 
-    return NextResponse.json({ message: "Delegation updated successfully" });
+    return NextResponse.json({ message: "Delegation updated successfully", delegation: updated });
   } catch (error: any) {
     console.error("API Error updating delegation:", error);
     return NextResponse.json({ error: error.message || "Failed to update delegation" }, { status: 400 });

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useSession } from "next-auth/react";
 import { Delegation } from "@/types/delegation";
 import { 
@@ -57,9 +57,10 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
  
    const [delegations, setDelegations] = useState<Delegation[]>([]);
   const { data: swrDelegations, mutate: mutateDelegations } = useSWR<Delegation[]>("/api/delegations", fetcher, {
-    refreshInterval: 0,        // No background polling — SSE handles change detection
-    revalidateOnFocus: true,   // Refetch when user returns to the tab
-    revalidateOnMount: true,   // Refetch on page load
+    refreshInterval: 0,
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+    revalidateOnMount: true,
   });
 
   // SSE: incrementally update local cache when a change is detected
@@ -271,9 +272,12 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
         // Update local state immediately for both sidebar and main list
         if (data.delegation) {
           setSelectedTask(prev => prev?.id === data.delegation.id ? data.delegation : prev);
-          mutateDelegations(); // Re-fetch all to ensure consistency
-        } else {
-          mutateDelegations(); 
+          mutateDelegations((current) => {
+            if (!current) return current;
+            return current.map((d) =>
+              String(d.id) === String(data.delegation.id) ? data.delegation : d
+            );
+          }, false);
         }
         
         fetchTaskHistory(selectedTask.id); // Refresh history timeline
@@ -415,10 +419,20 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
       });
 
       if (res.ok) {
+        const data = await res.json().catch(() => ({}));
+        const saved = data.delegation;
+        if (saved) {
+          mutateDelegations((current) => {
+            if (!current) return [saved];
+            if (editingDelegation) {
+              return current.map((d) => String(d.id) === String(saved.id) ? { ...d, ...saved } : d);
+            }
+            return [saved, ...current];
+          }, false);
+        }
         setIsStatusModalOpen(false);
         setIsModalOpen(false);
         resetForm();
-        mutateDelegations();
       } else {
         const errData = await res.json();
         throw new Error(errData.error || "Failed to save delegation");
@@ -619,7 +633,10 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
       const res = await fetch(`/api/delegations/${pendingDeleteId}`, { method: "DELETE" });
       if (res.ok) {
         setIsStatusModalOpen(false);
-        mutateDelegations();
+        mutateDelegations((current) =>
+          (current || []).filter((d) => String(d.id) !== String(pendingDeleteId)),
+          false
+        );
       } else {
         throw new Error("Delete failed");
       }
@@ -669,20 +686,52 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
   };
 
   const isRegularUser = userRole?.toUpperCase() === 'USER' || userRole?.toUpperCase() === 'SALES' || userRole?.toUpperCase() === 'CRM';
-  const baseDelegations = isRegularUser 
-    ? delegations.filter(d => d.assigned_to === currentUser)
-    : delegations;
+  const baseDelegations = useMemo(
+    () => (isRegularUser ? delegations.filter(d => d.assigned_to === currentUser) : delegations),
+    [delegations, isRegularUser, currentUser]
+  );
 
-  const filteredDelegations = baseDelegations.filter((d) => {
-    // Search match
-    const matchesSearch = Object.values(d).some((val) =>
-      val?.toString().toLowerCase().includes(searchTerm.toLowerCase())
+  const statusCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const d of baseDelegations) {
+      const s = getDisplayStatus(d);
+      counts[s] = (counts[s] || 0) + 1;
+    }
+    return counts;
+  }, [baseDelegations]);
+
+  const dateFilterCounts = useMemo(() => {
+    const counts: Record<string, number> = { Delayed: 0, Today: 0, Tomorrow: 0, Next3: 0 };
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+    for (const d of baseDelegations) {
+      const displayStatus = getDisplayStatus(d);
+      if (!d.due_date || displayStatus === 'Completed' || displayStatus === 'Approved') continue;
+      let due = new Date(d.due_date);
+      if (isNaN(due.getTime()) && d.due_date.includes('/')) {
+        const parts = d.due_date.split(' ')[0].split('/');
+        if (parts.length === 3) due = new Date(`${parts[2]}-${parts[1]}-${parts[0]}`);
+      }
+      if (isNaN(due.getTime())) continue;
+      due.setHours(0, 0, 0, 0);
+      const diffDays = Math.round((due.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+      if (diffDays < 0) counts.Delayed++;
+      if (diffDays === 0) counts.Today++;
+      if (diffDays === 1) counts.Tomorrow++;
+      if (diffDays > 0 && diffDays <= 3) counts.Next3++;
+    }
+    return counts;
+  }, [baseDelegations]);
+
+  const filteredDelegations = useMemo(() => {
+    const searchLower = searchTerm.toLowerCase();
+    return baseDelegations.filter((d) => {
+    const matchesSearch = !searchLower || Object.values(d).some((val) =>
+      val?.toString().toLowerCase().includes(searchLower)
     );
     
-    // Status match
     const matchesStatus = activeStatusFilters.length === 0 || activeStatusFilters.includes(getDisplayStatus(d));
     
-    // Assignment match
     let matchesAssignment = true;
     
     if (userRole === 'USER') {
@@ -695,7 +744,6 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
       }
     }
 
-    // Date match
     let matchesDate = true;
     if (dateFilters.length > 0) {
       const displayStatus = getDisplayStatus(d);
@@ -726,7 +774,6 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
       }
     }
 
-    // Modal Advanced Filters
     let matchesModalStatus = true;
     if (modalStatusFilter.length > 0) {
       matchesModalStatus = modalStatusFilter.includes(getDisplayStatus(d));
@@ -784,32 +831,13 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
     return matchesSearch && matchesStatus && matchesAssignment && matchesDate && 
            matchesModalStatus && matchesModalAssignedBy && matchesModalAssignedTo && 
            matchesModalDepartment && matchesModalPriority && matchesDateRange;
-  });
-
-  const getDateFilterCount = (filter: string) => {
-    return baseDelegations.filter(d => {
-      const displayStatus = getDisplayStatus(d);
-      if (!d.due_date || displayStatus === 'Completed' || displayStatus === 'Approved') return false;
-      
-      const now = new Date();
-      now.setHours(0, 0, 0, 0);
-      let due = new Date(d.due_date);
-      if (isNaN(due.getTime()) && d.due_date.includes('/')) {
-        const parts = d.due_date.split(' ')[0].split('/');
-        if (parts.length === 3) due = new Date(`${parts[2]}-${parts[1]}-${parts[0]}`);
-      }
-      if (isNaN(due.getTime())) return false;
-      
-      due.setHours(0, 0, 0, 0);
-      const diffDays = Math.round((due.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-      
-      if (filter === 'Delayed') return diffDays < 0;
-      if (filter === 'Today') return diffDays === 0;
-      if (filter === 'Tomorrow') return diffDays === 1;
-      if (filter === 'Next3') return diffDays > 0 && diffDays <= 3;
-      return false;
-    }).length;
-  };
+    });
+  }, [
+    baseDelegations, searchTerm, activeStatusFilters, userRole, currentUser,
+    assignmentFilter, dateFilters, modalStatusFilter, modalAssignedByFilter,
+    modalAssignedToFilter, modalDepartmentFilter, modalPriorityFilter,
+    filterStartDate, filterEndDate
+  ]);
 
   const handleSort = (key: keyof Delegation) => {
     let direction: 'asc' | 'desc' = 'asc';
@@ -819,13 +847,13 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
     setSortConfig({ key, direction });
   };
 
-  const sortedDelegations = [...filteredDelegations].sort((a, b) => {
-    if (!sortConfig) return 0;
+  const sortedDelegations = useMemo(() => {
+    if (!sortConfig) return filteredDelegations;
     const { key, direction } = sortConfig;
+    return [...filteredDelegations].sort((a, b) => {
     let aValue = a[key] || "";
     let bValue = b[key] || "";
     
-    // Numeric sort for ID
     if (key === 'id') {
       const aNum = parseInt(String(aValue));
       const bNum = parseInt(String(bValue));
@@ -837,7 +865,8 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
     if (aValue < bValue) return direction === 'asc' ? -1 : 1;
     if (aValue > bValue) return direction === 'asc' ? 1 : -1;
     return 0;
-  });
+    });
+  }, [filteredDelegations, sortConfig]);
 
   const SortIcon = ({ column }: { column: keyof Delegation }) => {
     if (sortConfig?.key !== column) return <div className="w-3 h-3 ml-1 opacity-20" />;
@@ -1086,7 +1115,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
             { label: 'Re-Open', icon: <BoltIcon className="w-3 h-3" />, color: 'bg-violet-50 text-violet-600 border-violet-300 dark:bg-violet-900/30 dark:text-violet-400 dark:border-violet-700' },
             { label: 'Overdue', icon: <ExclamationTriangleIcon className="w-3 h-3" />, color: 'bg-red-50 text-red-600 border-red-300 dark:bg-red-900/30 dark:text-red-400 dark:border-red-700' },
           ].map(tile => {
-            const count = tile.label === 'All' ? baseDelegations.length : baseDelegations.filter(d => getDisplayStatus(d) === tile.label).length;
+            const count = tile.label === 'All' ? baseDelegations.length : (statusCounts[tile.label] || 0);
             const isActive = tile.label === 'All' ? activeStatusFilters.length === 0 : activeStatusFilters.includes(tile.label);
             return (
               <button
@@ -1176,7 +1205,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                 { id: 'Tomorrow', label: 'Tomorrow', color: 'bg-blue-50 text-blue-600 border-blue-300 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-700' },
                 { id: 'Next3', label: 'Next 3', color: 'bg-emerald-50 text-emerald-600 border-emerald-300 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-700' }
               ].map(f => {
-                const count = getDateFilterCount(f.id);
+                const count = dateFilterCounts[f.id] || 0;
                 const isActive = dateFilters.includes(f.id);
                 return (
                   <button
@@ -2348,7 +2377,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                           {['Pending', 'Planned', 'Need Clarity', 'Need Revision', 'Completed', 'Approved', 'Hold', 'Re-Open', 'Overdue']
                             .filter(s => s.toLowerCase().includes(modalStatusSearch.toLowerCase()))
                             .map(s => {
-                              const count = baseDelegations.filter(d => getDisplayStatus(d) === s).length;
+                              const count = statusCounts[s] || 0;
                               const isSelected = modalStatusFilter.includes(s);
                               return (
                                 <div key={s} 

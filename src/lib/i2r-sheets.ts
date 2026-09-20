@@ -8,7 +8,7 @@ const SHEET_NAME = "I2R";
 class I2RService extends BaseSheetsService<I2R> {
   protected spreadsheetId = GOOGLE_SHEET_ID;
   protected sheetName = SHEET_NAME;
-  protected range = "A:ZZ"; 
+  protected range = "A:AX"; 
   protected idColumnIndex = 0;
 
   private readonly CANONICAL_HEADERS = [

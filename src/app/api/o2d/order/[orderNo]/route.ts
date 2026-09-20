@@ -85,7 +85,7 @@ export async function PUT(
       await sendO2DRemarkNotification(updatedItems, "Updated");
     }
 
-    return NextResponse.json({ message: "Order updated successfully" });
+    return NextResponse.json({ message: "Order updated successfully", items: updatedItems });
   } catch (error: any) {
     console.error("PUT Order Error:", error);
     return NextResponse.json({ error: error.message }, { status: 400 });

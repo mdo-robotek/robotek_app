@@ -233,6 +233,9 @@ export default function IMSFloor({ location, onBack }: { location: "1st" | "g" |
   const showPacked = location === "1st" || location === "sfg";
   const allowManualIn = location !== "sfg";
   const isSfg = location === "sfg";
+  const isFirst = location === "1st";
+  const [sfgTransferMode, setSfgTransferMode] = useState(false);
+  const isSfgTransfer = isSfg || sfgTransferMode;
   const [submitting, setSubmitting] = useState(false);
   const [statusMessage, setStatusMessage] = useState("");
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
@@ -290,6 +293,10 @@ export default function IMSFloor({ location, onBack }: { location: "1st" | "g" |
   const [auditPasteText, setAuditPasteText] = useState("");
 
   const { data: rawItems = [], mutate, isLoading } = useSWR<FloorIMS[]>(`/api/ims/floor?location=${location}`, fetcher);
+  const { data: sfgFloorItems = [], isLoading: sfgItemsLoading } = useSWR<FloorIMS[]>(
+    isFirst && sfgTransferMode ? "/api/ims/floor?location=sfg" : null,
+    fetcher
+  );
   const { data: masterItems = [] } = useSWR<any[]>("/api/ims", fetcher);
   const { data: masterCatalog = [] } = useSWR<IMSMasterItem[]>("/api/ims/master", fetcher);
 
@@ -300,9 +307,11 @@ export default function IMSFloor({ location, onBack }: { location: "1st" | "g" |
     return names.sort((a, b) => a.localeCompare(b)).map((name) => ({ id: name, label: name }));
   }, [masterItems]);
 
+  const sfgSourceItems = isSfg ? rawItems : sfgFloorItems;
+
   const sfgPendingItemOptions = useMemo(() => {
     const byKey = new Map<string, { name: string; stock: number }>();
-    rawItems.forEach((item) => {
+    sfgSourceItems.forEach((item) => {
       const name = item.item_name?.trim();
       if (!name) return;
       const key = name.toLowerCase();
@@ -321,9 +330,21 @@ export default function IMSFloor({ location, onBack }: { location: "1st" | "g" |
         id: item.name,
         label: `${item.name} (${formatQty(item.stock)})`,
       }));
-  }, [rawItems]);
+  }, [sfgSourceItems]);
 
-  const formItemOptions = isSfg ? sfgPendingItemOptions : masterItemOptions;
+  const sfgStockMap = useMemo(() => {
+    const map = new Map<string, number>();
+    sfgSourceItems.forEach((item) => {
+      const key = item.item_name?.toLowerCase().trim();
+      if (!key) return;
+      const inVal = parseFloat(item.in_qty) || 0;
+      const outVal = parseFloat(item.out_qty) || 0;
+      map.set(key, (map.get(key) || 0) + inVal - outVal);
+    });
+    return map;
+  }, [sfgSourceItems]);
+
+  const formItemOptions = isSfgTransfer ? sfgPendingItemOptions : masterItemOptions;
 
   const isValidMasterItemName = (name: string) =>
     formItemOptions.some((opt) => opt.id.toLowerCase() === name.toLowerCase());
@@ -643,11 +664,11 @@ function parseDateStr(dStr: string) {
       if (row.id === id) {
         const newRow = { ...row, [field]: value };
         if (field === "item_name") {
-          const floorItem = rawItems.find((i) => i.item_name?.toLowerCase().trim() === value.toLowerCase().trim());
+          const floorItem = (isSfgTransfer ? sfgSourceItems : rawItems).find((i) => i.item_name?.toLowerCase().trim() === value.toLowerCase().trim());
           const masterItem = masterItems.find((i: any) => i.item_name?.toLowerCase() === value.toLowerCase());
           newRow.category = floorItem?.category || masterItem?.category || newRow.category;
-          if (isSfg && value) {
-            const stock = allTimeStockMap.get(value.toLowerCase().trim()) || 0;
+          if (isSfgTransfer && value) {
+            const stock = sfgStockMap.get(value.toLowerCase().trim()) || 0;
             if (!row.qty && stock > 0) newRow.qty = String(roundQty(stock));
           }
         }
@@ -658,7 +679,7 @@ function parseDateStr(dStr: string) {
   };
 
   const addBulkRow = () => {
-    setBulkRows(prev => [...prev, { id: Date.now().toString(), item_name: '', category: '', type: allowManualIn ? 'IN' : 'OUT', qty: '', date: '', packed_status: isSfg ? 'PACKED' : '' }]);
+    setBulkRows(prev => [...prev, { id: Date.now().toString(), item_name: '', category: '', type: isSfgTransfer || !allowManualIn ? 'OUT' : 'IN', qty: '', date: '', packed_status: isSfgTransfer ? 'PACKED' : '' }]);
   };
 
   const removeBulkRow = (id: string) => {
@@ -674,8 +695,8 @@ function parseDateStr(dStr: string) {
       }
       if (!isValidMasterItemName(row.item_name)) {
         showStatus(
-          isSfg
-            ? "Please select an item that still has stock pending transfer to 1st Floor"
+          isSfgTransfer
+            ? "Please select an item that still has stock pending transfer from SFG"
             : "Please select a valid item from the master list",
           "error"
         );
@@ -690,28 +711,33 @@ function parseDateStr(dStr: string) {
 
       const items: Partial<FloorIMS>[] = bulkRows.map((row) => {
         const qty = parseFloat(row.qty) || 0;
+        const type = isSfgTransfer ? "OUT" : row.type;
         return {
           item_name: row.item_name.trim(),
           category: row.category,
-          in_qty: row.type === 'IN' ? qty.toString() : "0",
-          out_qty: row.type === 'OUT' ? qty.toString() : "0",
+          in_qty: type === "IN" ? qty.toString() : "0",
+          out_qty: type === "OUT" ? qty.toString() : "0",
           date: row.date || today,
-          packed_status: isSfg ? (row.packed_status || "PACKED") : (row.packed_status || ""),
+          packed_status: isSfgTransfer ? (row.packed_status || "PACKED") : (row.packed_status || ""),
           updated_at: new Date().toISOString(),
         };
       });
 
-      const res = await fetch(`/api/ims/floor?location=${location}`, {
+      const postLocation = isSfgTransfer ? "sfg" : location;
+      const res = await fetch(`/api/ims/floor?location=${postLocation}`, {
         method: 'POST',
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ items }),
       });
       if (!res.ok) throw new Error("Save failed");
       mutate();
+      globalMutate("/api/ims/floor?location=sfg");
+      globalMutate("/api/ims/floor?location=1st");
       globalMutate("/api/ims");
       globalMutate("/api/ims/summary");
       globalMutate("/api/ims/time-series");
       setItemModalOpen(false);
+      setSfgTransferMode(false);
       setBulkRows([]);
       showStatus("Records Saved Successfully!", "success");
       setTimeout(() => setIsStatusModalOpen(false), 1500);
@@ -1207,17 +1233,32 @@ function parseDateStr(dStr: string) {
             <ClipboardDocumentCheckIcon className="w-4 h-4" /> Physical Check
           </button>
           )}
+          {isFirst && (
           <button
             onClick={() => {
-              setBulkRows([{ id: Date.now().toString(), item_name: '', category: '', type: allowManualIn ? 'IN' : 'OUT', qty: '', date: '', packed_status: isSfg ? 'PACKED' : '' }]);
+              setSfgTransferMode(true);
+              setBulkRows([{ id: Date.now().toString(), item_name: '', category: '', type: 'OUT', qty: '', date: '', packed_status: 'PACKED' }]);
+              setItemModalOpen(true);
+            }}
+            className="flex items-center gap-2 px-4 py-2 text-white rounded-lg text-[11px] font-black uppercase tracking-widest transition-all shadow-md hover:-translate-y-0.5 whitespace-nowrap bg-emerald-600 hover:bg-emerald-700"
+          >
+            <PlusIcon className="w-4 h-4 stroke-2" /> SFG In
+          </button>
+          )}
+          {!isSfg && (
+          <button
+            onClick={() => {
+              setSfgTransferMode(false);
+              setBulkRows([{ id: Date.now().toString(), item_name: '', category: '', type: allowManualIn ? 'IN' : 'OUT', qty: '', date: '', packed_status: '' }]);
               setItemModalOpen(true);
             }}
             className={`flex items-center gap-2 px-4 py-2 text-white rounded-lg text-[11px] font-black uppercase tracking-widest transition-all shadow-md hover:-translate-y-0.5 whitespace-nowrap ${
               location === '1st' ? 'bg-purple-600 hover:bg-purple-700' : 'bg-emerald-600 hover:bg-emerald-700'
             }`}
           >
-            <PlusIcon className="w-4 h-4 stroke-2" /> {isSfg ? "Transfer to 1st Floor" : "Add Log"}
+            <PlusIcon className="w-4 h-4 stroke-2" /> Add Log
           </button>
+          )}
         </div>
       </div>
 
@@ -1795,9 +1836,9 @@ function parseDateStr(dStr: string) {
               <div className="flex items-center justify-between p-5 border-b border-blue-800/20 dark:border-white/5 bg-gradient-to-r from-[#003875] to-blue-800 dark:from-[#1f2937] dark:to-[#111827] text-white shrink-0">
                 <h3 className="text-sm font-black uppercase tracking-widest flex items-center gap-2">
                   <ClipboardDocumentListIcon className="w-5 h-5 text-blue-200 dark:text-[#FFD500]" />
-                  {isSfg ? "Transfer Packed Stock to 1st Floor" : `Add Multiple Items - ${title}`}
+                  {isSfgTransfer ? "SFG In — Transfer Packed Stock from SFG" : `Add Multiple Items - ${title}`}
                 </h3>
-                <button onClick={() => setItemModalOpen(false)} className="p-1.5 text-white/70 hover:text-white bg-white/10 hover:bg-white/20 dark:bg-[#1f2937] rounded-lg shadow-sm transition-colors">
+                <button onClick={() => { setItemModalOpen(false); setSfgTransferMode(false); }} className="p-1.5 text-white/70 hover:text-white bg-white/10 hover:bg-white/20 dark:bg-[#1f2937] rounded-lg shadow-sm transition-colors">
                   <XMarkIcon className="w-4 h-4" />
                 </button>
               </div>
@@ -1810,11 +1851,13 @@ function parseDateStr(dStr: string) {
                   >
                     <PlusIcon className="w-3.5 h-3.5" /> Add Row
                   </button>
-                  {isSfg && (
+                  {isSfgTransfer && (
                     <p className="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      {sfgPendingItemOptions.length > 0
-                        ? "Only items pending transfer to 1st Floor are listed. Remaining qty is shown in brackets."
-                        : "No items are pending transfer to 1st Floor."}
+                      {sfgItemsLoading
+                        ? "Loading pending SFG stock..."
+                        : sfgPendingItemOptions.length > 0
+                        ? "Only items with pending SFG stock are listed. Remaining qty is shown in brackets. Saving books SFG OUT and 1st Floor IN."
+                        : "No items are pending transfer from SFG."}
                     </p>
                   )}
                 </div>
@@ -1842,7 +1885,7 @@ function parseDateStr(dStr: string) {
                               options={formItemOptions}
                               value={row.item_name}
                               onChange={(val) => handleBulkRowChange(row.id, "item_name", val)}
-                              placeholder={isSfg ? "Select pending item..." : "Select item..."}
+                              placeholder={isSfgTransfer ? "Select pending SFG item..." : "Select item..."}
                               className="bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 py-1.5 px-2 rounded-md text-[11px] min-h-[34px]"
                             />
                           </td>
@@ -1857,7 +1900,7 @@ function parseDateStr(dStr: string) {
                           </td>
                           <td className={`${tdClass} text-center`}>
                             <div className="flex bg-gray-100 dark:bg-gray-800 p-0.5 rounded-md justify-center">
-                              {allowManualIn && (
+                              {allowManualIn && !isSfgTransfer && (
                               <button
                                 onClick={() => handleBulkRowChange(row.id, "type", "IN")}
                                 className={`px-2 py-1 rounded text-[9px] font-black uppercase tracking-wider transition-all ${row.type === "IN" ? "bg-emerald-500 text-white shadow-sm" : "text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"}`}
@@ -1867,9 +1910,9 @@ function parseDateStr(dStr: string) {
                               )}
                               <button
                                 onClick={() => handleBulkRowChange(row.id, "type", "OUT")}
-                                className={`px-2 py-1 rounded text-[9px] font-black uppercase tracking-wider transition-all ${row.type === "OUT" ? "bg-rose-500 text-white shadow-sm" : "text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"}`}
+                                className={`px-2 py-1 rounded text-[9px] font-black uppercase tracking-wider transition-all ${row.type === "OUT" || isSfgTransfer ? "bg-emerald-500 text-white shadow-sm" : "text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"}`}
                               >
-                                {isSfg ? "TO 1ST FLOOR" : "OUT"}
+                                {isSfgTransfer ? "SFG IN" : "OUT"}
                               </button>
                             </div>
                           </td>
@@ -1926,7 +1969,7 @@ function parseDateStr(dStr: string) {
               </div>
 
               <div className="p-4 border-t border-gray-100 dark:border-white/5 flex justify-end gap-3 bg-gray-50/50 dark:bg-[#1f2937]/50 shrink-0">
-                <button onClick={() => setItemModalOpen(false)} className="px-5 py-2 rounded-xl text-xs font-black text-gray-500 uppercase tracking-widest hover:bg-white dark:hover:bg-[#111827] shadow-sm border border-gray-200 dark:border-white/10 transition-colors">Cancel</button>
+                <button onClick={() => { setItemModalOpen(false); setSfgTransferMode(false); }} className="px-5 py-2 rounded-xl text-xs font-black text-gray-500 uppercase tracking-widest hover:bg-white dark:hover:bg-[#111827] shadow-sm border border-gray-200 dark:border-white/10 transition-colors">Cancel</button>
                 <button 
                   onClick={handleSaveItem} 
                   disabled={submitting}

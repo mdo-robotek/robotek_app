@@ -344,10 +344,55 @@ export default function IMSFloor({ location, onBack }: { location: "1st" | "g" |
     return map;
   }, [sfgSourceItems]);
 
-  const formItemOptions = isSfgTransfer ? sfgPendingItemOptions : masterItemOptions;
+  const floorStockOptions = useMemo(() => {
+    const byKey = new Map<string, { name: string; stock: number }>();
+    rawItems.forEach((item) => {
+      const name = item.item_name?.trim();
+      if (!name) return;
+      const key = name.toLowerCase();
+      const delta = (parseFloat(item.in_qty) || 0) - (parseFloat(item.out_qty) || 0);
+      const existing = byKey.get(key);
+      if (!existing) {
+        byKey.set(key, { name, stock: delta });
+      } else {
+        existing.stock += delta;
+      }
+    });
+    return Array.from(byKey.values())
+      .filter((item) => item.stock > 0)
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .map((item) => ({
+        id: item.name,
+        label: `${item.name} (${formatQty(item.stock)})`,
+      }));
+  }, [rawItems]);
 
-  const isValidMasterItemName = (name: string) =>
-    formItemOptions.some((opt) => opt.id.toLowerCase() === name.toLowerCase());
+  const firstFloorInOptions = useMemo(() => {
+    const byKey = new Map<string, { id: string; label: string }>();
+    masterItemOptions.forEach((opt) => byKey.set(opt.id.toLowerCase(), opt));
+    rawItems.forEach((item) => {
+      const name = item.item_name?.trim();
+      if (!name) return;
+      const key = name.toLowerCase();
+      if (!byKey.has(key)) byKey.set(key, { id: name, label: name });
+    });
+    floorStockOptions.forEach((opt) => byKey.set(opt.id.toLowerCase(), opt));
+    return Array.from(byKey.values()).sort((a, b) => a.id.localeCompare(b.id));
+  }, [masterItemOptions, rawItems, floorStockOptions]);
+
+  const getBulkItemOptions = (row: BulkRow) => {
+    if (isSfgTransfer) return sfgPendingItemOptions;
+    if (isFirst && row.type === "OUT") return floorStockOptions;
+    if (isFirst) return firstFloorInOptions;
+    return masterItemOptions;
+  };
+
+  const isValidMasterItemName = (name: string) => {
+    const key = name.toLowerCase().trim();
+    if (masterItemOptions.some((opt) => opt.id.toLowerCase() === key)) return true;
+    if (floorStockOptions.some((opt) => opt.id.toLowerCase() === key)) return true;
+    return rawItems.some((item) => (item.item_name || "").toLowerCase().trim() === key);
+  };
 
   const editItemOptions = useMemo(() => {
     const names = new Set<string>();
@@ -356,11 +401,15 @@ export default function IMSFloor({ location, onBack }: { location: "1st" | "g" |
       const name = item.item_name?.trim();
       if (name) names.add(name);
     });
+    rawItems.forEach((item) => {
+      const name = item.item_name?.trim();
+      if (name) names.add(name);
+    });
     if (editForm.item_name.trim()) names.add(editForm.item_name.trim());
     return Array.from(names)
       .sort((a, b) => a.localeCompare(b))
       .map((name) => ({ id: name, label: name }));
-  }, [masterItemOptions, masterCatalog, editForm.item_name]);
+  }, [masterItemOptions, masterCatalog, rawItems, editForm.item_name]);
 
   const dateRange = useMemo(() => {
     let start, end;
@@ -670,6 +719,9 @@ function parseDateStr(dStr: string) {
           if (isSfgTransfer && value) {
             const stock = sfgStockMap.get(value.toLowerCase().trim()) || 0;
             if (!row.qty && stock > 0) newRow.qty = String(roundQty(stock));
+          } else if (isFirst && (row.type === "OUT" || newRow.type === "OUT") && value) {
+            const stock = allTimeStockMap.get(value.toLowerCase().trim()) || 0;
+            if (!row.qty && stock > 0) newRow.qty = String(roundQty(stock));
           }
         }
         return newRow;
@@ -693,10 +745,12 @@ function parseDateStr(dStr: string) {
         showStatus("Please fill all fields and ensure qty > 0", "error");
         return;
       }
-      if (!isValidMasterItemName(row.item_name)) {
+      if (!getBulkItemOptions(row).some((opt) => opt.id.toLowerCase() === row.item_name.toLowerCase().trim())) {
         showStatus(
           isSfgTransfer
             ? "Please select an item that still has stock pending transfer from SFG"
+            : isFirst && row.type === "OUT"
+            ? "Please select an item that still has stock on 1st Floor (including SFG In)"
             : "Please select a valid item from the master list",
           "error"
         );
@@ -1860,6 +1914,11 @@ function parseDateStr(dStr: string) {
                         : "No items are pending transfer from SFG."}
                     </p>
                   )}
+                  {isFirst && !isSfgTransfer && (
+                    <p className="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      OUT lists 1st Floor live stock, including items received via SFG In. Remaining qty is shown in brackets.
+                    </p>
+                  )}
                 </div>
                 <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-white/10">
                   <table className="w-full text-left border-collapse min-w-[860px]">
@@ -1882,10 +1941,16 @@ function parseDateStr(dStr: string) {
                           <td className={tdClass}>
                             <SearchableSelect
                               label=""
-                              options={formItemOptions}
+                              options={getBulkItemOptions(row)}
                               value={row.item_name}
                               onChange={(val) => handleBulkRowChange(row.id, "item_name", val)}
-                              placeholder={isSfgTransfer ? "Select pending SFG item..." : "Select item..."}
+                              placeholder={
+                                isSfgTransfer
+                                  ? "Select pending SFG item..."
+                                  : isFirst && row.type === "OUT"
+                                  ? "Select 1st Floor stock item..."
+                                  : "Select item..."
+                              }
                               className="bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 py-1.5 px-2 rounded-md text-[11px] min-h-[34px]"
                             />
                           </td>
@@ -2070,7 +2135,7 @@ function parseDateStr(dStr: string) {
                             ) : (
                               <SearchableSelect
                                 label=""
-                                options={masterItemOptions}
+                                options={isFirst ? firstFloorInOptions : masterItemOptions}
                                 value={row.item_name}
                                 onChange={(val) => handleAuditRowChange(row.id, "item_name", val)}
                                 placeholder="Select item..."

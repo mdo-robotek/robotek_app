@@ -332,18 +332,6 @@ export default function IMSFloor({ location, onBack }: { location: "1st" | "g" |
       }));
   }, [sfgSourceItems]);
 
-  const sfgStockMap = useMemo(() => {
-    const map = new Map<string, number>();
-    sfgSourceItems.forEach((item) => {
-      const key = item.item_name?.toLowerCase().trim();
-      if (!key) return;
-      const inVal = parseFloat(item.in_qty) || 0;
-      const outVal = parseFloat(item.out_qty) || 0;
-      map.set(key, (map.get(key) || 0) + inVal - outVal);
-    });
-    return map;
-  }, [sfgSourceItems]);
-
   const floorStockOptions = useMemo(() => {
     const byKey = new Map<string, { name: string; stock: number }>();
     rawItems.forEach((item) => {
@@ -716,13 +704,6 @@ function parseDateStr(dStr: string) {
           const floorItem = (isSfgTransfer ? sfgSourceItems : rawItems).find((i) => i.item_name?.toLowerCase().trim() === value.toLowerCase().trim());
           const masterItem = masterItems.find((i: any) => i.item_name?.toLowerCase() === value.toLowerCase());
           newRow.category = floorItem?.category || masterItem?.category || newRow.category;
-          if (isSfgTransfer && value) {
-            const stock = sfgStockMap.get(value.toLowerCase().trim()) || 0;
-            if (!row.qty && stock > 0) newRow.qty = String(roundQty(stock));
-          } else if (isFirst && (row.type === "OUT" || newRow.type === "OUT") && value) {
-            const stock = allTimeStockMap.get(value.toLowerCase().trim()) || 0;
-            if (!row.qty && stock > 0) newRow.qty = String(roundQty(stock));
-          }
         }
         return newRow;
       }

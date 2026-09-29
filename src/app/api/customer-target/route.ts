@@ -103,6 +103,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     await addPlannedParty({
       partyName: body.partyName,
+      customerName: body.customerName,
       mobile: body.mobile,
       months: body.months,
     });
@@ -123,6 +124,7 @@ export async function PUT(req: NextRequest) {
     const body = await req.json();
     await updatePlannedParty({
       partyName: body.partyName,
+      customerName: body.customerName,
       mobile: body.mobile,
       months: body.months,
       originalPartyName: body.originalPartyName || body.partyName,

@@ -14,7 +14,6 @@ import {
   PaperAirplaneIcon,
   MagnifyingGlassIcon,
   XMarkIcon,
-  EyeIcon,
   ExclamationTriangleIcon,
   CheckCircleIcon,
   InformationCircleIcon,
@@ -25,6 +24,7 @@ import {
   UserGroupIcon,
   CurrencyRupeeIcon,
 } from "@heroicons/react/24/outline";
+import { CheckIcon } from "@heroicons/react/24/solid";
 import {
   MONTH_NAMES,
   MonthName,
@@ -48,6 +48,19 @@ const emptyMonths = (): MonthlyValues =>
     return acc;
   }, {} as MonthlyValues);
 
+function getVisiblePages(current: number, total: number, max = 7): number[] {
+  if (total <= 1) return [1];
+  if (total <= max) return Array.from({ length: total }, (_, i) => i + 1);
+  const half = Math.floor(max / 2);
+  let start = Math.max(1, current - half);
+  let end = start + max - 1;
+  if (end > total) {
+    end = total;
+    start = Math.max(1, end - max + 1);
+  }
+  return Array.from({ length: end - start + 1 }, (_, i) => start + i);
+}
+
 function formatAmount(n: number) {
   return Number(n || 0).toLocaleString("en-IN", {
     minimumFractionDigits: 0,
@@ -55,28 +68,39 @@ function formatAmount(n: number) {
   });
 }
 
-function round2(n: number) {
-  return Math.round((Number(n) || 0) * 100) / 100;
+function sendBlockedReason(row: CustomerTargetRow, msgType: MessageType): string | null {
+  if (!isValidMobile(row.mobile)) {
+    return row.mobile
+      ? "Fix the mobile number first. This number is invalid so you cannot send the message."
+      : "Add a valid 10-digit mobile first. Missing number so you cannot send the message.";
+  }
+  if (!(Number(row.target) > 0)) {
+    return "Fill the Target first. Target is 0 so you cannot send the message.";
+  }
+  if (msgType === "ACHIEVEMENT" && !(Number(row.achieved) > 0)) {
+    return "Fill the Achievement first. Achievement is 0 so you cannot send the message.";
+  }
+  return null;
 }
 
 function StatusBadge({ status }: { status: string }) {
   if (status === "SENDING" || status === "PROCESSING") {
     return (
-      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-widest bg-sky-100 text-sky-700 dark:bg-sky-900/40 dark:text-sky-300">
-        <span className="w-3 h-3 border-2 border-sky-500 border-t-transparent rounded-full animate-spin" />
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[9px] font-black uppercase tracking-widest text-white bg-gradient-to-r from-sky-500 to-blue-600 shadow-md shadow-sky-500/40">
+        <span className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
         Sending
       </span>
     );
   }
   const map: Record<string, string> = {
-    SENT: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300",
-    FAILED: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300",
-    SKIPPED: "bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-300",
-    NOT_SENT: "bg-gray-100 text-gray-600 dark:bg-white/10 dark:text-gray-300",
-    QUEUED: "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300",
+    SENT: "text-white bg-gradient-to-r from-emerald-500 to-teal-600 shadow-md shadow-emerald-500/40",
+    FAILED: "text-white bg-gradient-to-r from-rose-500 to-orange-500 shadow-md shadow-rose-500/40",
+    SKIPPED: "text-white bg-gradient-to-r from-pink-500 to-fuchsia-600 shadow-md shadow-pink-500/40",
+    NOT_SENT: "text-white bg-gradient-to-r from-slate-500 to-slate-700 shadow-md shadow-slate-500/30",
+    QUEUED: "text-white bg-gradient-to-r from-indigo-500 to-violet-600 shadow-md shadow-indigo-500/40",
   };
   return (
-    <span className={`inline-flex px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${map[status] || map.NOT_SENT}`}>
+    <span className={`inline-flex px-2.5 py-1 rounded-xl text-[9px] font-black uppercase tracking-widest ${map[status] || map.NOT_SENT}`}>
       {status.replace("_", " ")}
     </span>
   );
@@ -112,6 +136,18 @@ export default function CustomerTargetPage() {
   const [guideOpen, setGuideOpen] = useState(false);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [rowTip, setRowTip] = useState<{ text: string; x: number; y: number } | null>(null);
+
+  const showRowTip = (e: React.MouseEvent, reason: string | null) => {
+    if (!reason) {
+      setRowTip(null);
+      return;
+    }
+    const width = 280;
+    const x = Math.min(Math.max(12, e.clientX + 18), window.innerWidth - width - 12);
+    const y = Math.max(12, e.clientY - 12);
+    setRowTip({ text: reason, x, y });
+  };
 
   const [statusMessage, setStatusMessage] = useState("");
   const [statusType, setStatusType] = useState<"loading" | "success" | "error">("loading");
@@ -142,11 +178,15 @@ export default function CustomerTargetPage() {
     const q = search.trim().toLowerCase();
     if (!q) return rows;
     return rows.filter(
-      (r) => r.partyName.toLowerCase().includes(q) || String(r.mobile).includes(q)
+      (r) =>
+        r.partyName.toLowerCase().includes(q) ||
+        (r.customerName || "").toLowerCase().includes(q) ||
+        String(r.mobile).includes(q)
     );
   }, [rows, search]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+  const visiblePages = useMemo(() => getVisiblePages(page, totalPages), [page, totalPages]);
   const paginated = useMemo(() => {
     const start = (page - 1) * pageSize;
     return filtered.slice(start, start + pageSize);
@@ -160,6 +200,10 @@ export default function CustomerTargetPage() {
   useEffect(() => {
     setPage(1);
   }, [search, pageSize, activeTab]);
+
+  useEffect(() => {
+    setPage((p) => Math.min(Math.max(1, p), totalPages));
+  }, [totalPages]);
 
   const toggleSelect = (name: string) => {
     setSelected((prev) => {
@@ -177,7 +221,7 @@ export default function CustomerTargetPage() {
     }
     const next = new Set<string>();
     rows.forEach((r) => {
-      if (!isValidMobile(r.mobile) || !(Number(r.target) > 0)) return;
+      if (sendBlockedReason(r, msgType)) return;
       if (mode === "all") next.add(r.partyName);
       if (mode === "failed" && r.sendStatus === "FAILED") next.add(r.partyName);
       if (mode === "not_sent" && (r.sendStatus === "NOT_SENT" || r.sendStatus === "SKIPPED")) next.add(r.partyName);
@@ -188,6 +232,7 @@ export default function CustomerTargetPage() {
   const [crudOpen, setCrudOpen] = useState(false);
   const [editing, setEditing] = useState<CustomerTargetRow | null>(null);
   const [formName, setFormName] = useState("");
+  const [formCustomerName, setFormCustomerName] = useState("");
   const [formMobile, setFormMobile] = useState("");
   const [formMonths, setFormMonths] = useState<MonthlyValues>(emptyMonths());
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
@@ -195,6 +240,7 @@ export default function CustomerTargetPage() {
   const openAdd = () => {
     setEditing(null);
     setFormName("");
+    setFormCustomerName("");
     setFormMobile("");
     setFormMonths(emptyMonths());
     setCrudOpen(true);
@@ -203,6 +249,7 @@ export default function CustomerTargetPage() {
   const openEdit = async (row: CustomerTargetRow) => {
     setEditing(row);
     setFormName(row.partyName);
+    setFormCustomerName(row.customerName || "");
     setFormMobile(row.mobile);
     const months = emptyMonths();
     months[month] = row.target || "";
@@ -212,6 +259,7 @@ export default function CustomerTargetPage() {
       const res = await fetch(`/api/customer-target?month=${month}&type=${msgType}&year=${year}&full=1`);
       const json = await res.json();
       const full = (json.rows || []).find((r: any) => r.partyName === row.partyName);
+      if (full?.customerName) setFormCustomerName(full.customerName);
       if (full?.allMonths) setFormMonths({ ...emptyMonths(), ...full.allMonths });
     } catch {
       /* keep partial */
@@ -250,6 +298,7 @@ export default function CustomerTargetPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           partyName: formName.trim(),
+          customerName: formCustomerName.trim(),
           mobile: formMobile.trim(),
           months: formMonths,
           originalPartyName: editing?.partyName,
@@ -400,8 +449,8 @@ export default function CustomerTargetPage() {
     } else if (sendScope === "selected_force") {
       list = list.filter((r) => selected.has(r.partyName));
     }
-    return list.filter((r) => isValidMobile(r.mobile) && Number(r.target) > 0);
-  }, [rows, selected, sendScope]);
+    return list.filter((r) => !sendBlockedReason(r, msgType));
+  }, [rows, selected, sendScope, msgType]);
 
   const bulkStats = useMemo(() => {
     const selectedRows = rows.filter((r) => selected.has(r.partyName));
@@ -447,6 +496,55 @@ export default function CustomerTargetPage() {
       setTimeout(() => setStatusOpen(false), 2000);
     } catch (e: any) {
       showStatus(e.message || "Test failed", "error");
+    }
+  };
+
+  const sendRowMessage = async (row: CustomerTargetRow) => {
+    if (!canWrite || sending) return;
+    if (!isValidMobile(row.mobile)) {
+      showStatus("This party has no valid mobile number", "error");
+      return;
+    }
+    const blocked = sendBlockedReason(row, msgType);
+    if (blocked) {
+      showStatus(blocked, "error");
+      return;
+    }
+    if ((liveStatus[row.partyName] || row.sendStatus) === "SENT") {
+      showStatus("Already SENT. Use Force Resend Selected if you need to send again.", "error");
+      return;
+    }
+
+    setSelected(new Set([row.partyName]));
+    setSending(true);
+    setLiveStatus((prev) => ({ ...prev, [row.partyName]: "SENDING" }));
+
+    try {
+      const res = await fetch("/api/customer-target/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          mode: "bulk",
+          type: msgType,
+          month,
+          year,
+          sendScope: "selected",
+          partyNames: [row.partyName],
+        }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || "Send failed");
+      const status = String((json.results || [])[0]?.status || "FAILED").toUpperCase();
+      setLiveStatus((prev) => ({ ...prev, [row.partyName]: status }));
+      await mutate();
+      if (status !== "SENT" && status !== "SKIPPED") {
+        throw new Error((json.results || [])[0]?.error || "Send failed");
+      }
+    } catch (e: any) {
+      setLiveStatus((prev) => ({ ...prev, [row.partyName]: "FAILED" }));
+      showStatus(e.message || "Send failed", "error");
+    } finally {
+      setSending(false);
     }
   };
 
@@ -550,12 +648,12 @@ export default function CustomerTargetPage() {
   const exportReport = () => {
     const headers =
       msgType === "ACHIEVEMENT"
-        ? ["Party Name", "Mobile", "Target", "Achieved", "Pending", "Achievement %", "Status"]
-        : ["Party Name", "Mobile", "Target", "Status"];
+        ? ["Party Name", "Customer Name", "Mobile", "Target", "Achieved", "Pending", "Achievement %", "Status"]
+        : ["Party Name", "Customer Name", "Mobile", "Target", "Status"];
     const lines = [
       headers.join(","),
       ...filtered.map((r) => {
-        const base = [`"${r.partyName}"`, `"${r.mobile}"`, r.target, ...(msgType === "ACHIEVEMENT" ? [r.achieved, r.pending, r.achievementPct] : []), `"${r.sendStatus}"`];
+        const base = [`"${r.partyName}"`, `"${r.customerName || ""}"`, `"${r.mobile}"`, r.target, ...(msgType === "ACHIEVEMENT" ? [r.achieved, r.pending, r.achievementPct] : []), `"${r.sendStatus}"`];
         return base.join(",");
       }),
     ];
@@ -740,7 +838,7 @@ export default function CustomerTargetPage() {
               <input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search party / mobile"
+                placeholder="Search party / customer / mobile"
                 className="w-full pl-9 pr-3 py-2 rounded-xl border-2 border-sky-100 dark:border-sky-500/20 bg-white dark:bg-slate-950 text-xs font-semibold focus:border-sky-400 outline-none"
               />
             </div>
@@ -817,6 +915,7 @@ export default function CustomerTargetPage() {
                 <tr className="text-[9px] font-black uppercase tracking-widest text-gray-400">
                   <th className="p-3 w-10"></th>
                   <th className="p-3">Party Name</th>
+                  <th className="p-3">Customer Name</th>
                   <th className="p-3">Mobile</th>
                   {(activeTab === "party" || activeTab === "target" || activeTab === "achievement") && (
                     <th className="p-3 text-right">Target (₹)</th>
@@ -829,24 +928,41 @@ export default function CustomerTargetPage() {
                     </>
                   )}
                   <th className="p-3">Status</th>
-                  <th className="p-3">Preview Message</th>
+                  <th className="p-3">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 dark:divide-white/5">
                 {paginated.map((row) => {
-                  const disabled = !isValidMobile(row.mobile) || !(Number(row.target) > 0);
+                  const blockReason = sendBlockedReason(row, msgType);
+                  const cannotSend = !!blockReason;
+                  const targetZero = !(Number(row.target) > 0);
+                  const achievedZero = !(Number(row.achieved) > 0);
                   return (
-                    <tr key={row.partyName} className={`hover:bg-slate-50/80 dark:hover:bg-white/5 ${disabled ? "opacity-55" : ""}`}>
+                    <tr
+                      key={row.partyName}
+                      className="hover:bg-slate-50/80 dark:hover:bg-white/5"
+                      onMouseEnter={(e) => showRowTip(e, blockReason)}
+                      onMouseMove={(e) => showRowTip(e, blockReason)}
+                      onMouseLeave={() => setRowTip(null)}
+                    >
                       <td className="p-3">
-                        <input
-                          type="checkbox"
-                          className="rounded border-gray-300"
-                          checked={selected.has(row.partyName)}
-                          disabled={disabled && row.sendStatus !== "FAILED"}
-                          onChange={() => toggleSelect(row.partyName)}
-                        />
+                        <button
+                          type="button"
+                          aria-label={selected.has(row.partyName) ? "Deselect party" : "Select party"}
+                          onClick={() => toggleSelect(row.partyName)}
+                          className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${
+                            selected.has(row.partyName)
+                              ? "border-emerald-500 bg-emerald-500 shadow-sm"
+                              : "border-gray-400 bg-white dark:bg-slate-900 dark:border-gray-500 hover:border-emerald-400"
+                          }`}
+                        >
+                          {selected.has(row.partyName) && (
+                            <CheckIcon className="w-3.5 h-3.5 text-white stroke-[3]" />
+                          )}
+                        </button>
                       </td>
                       <td className="p-3 text-xs font-bold text-gray-900 dark:text-white">{row.partyName}</td>
+                      <td className="p-3 text-xs font-semibold text-gray-700 dark:text-gray-200">{row.customerName || "—"}</td>
                       <td className="p-3 text-xs font-semibold">
                         {row.mobile ? (
                           isValidMobile(row.mobile) ? (
@@ -862,10 +978,14 @@ export default function CustomerTargetPage() {
                           </span>
                         )}
                       </td>
-                      <td className="p-3 text-right text-xs font-bold">{formatAmount(row.target)}</td>
+                      <td className={`p-3 text-right text-xs font-bold ${targetZero ? "text-amber-500" : ""}`}>
+                        {formatAmount(row.target)}
+                      </td>
                       {showAchievementColumns && (
                         <>
-                          <td className="p-3 text-right text-xs font-bold text-emerald-600">{formatAmount(row.achieved)}</td>
+                          <td className={`p-3 text-right text-xs font-bold ${msgType === "ACHIEVEMENT" && achievedZero ? "text-amber-500" : "text-emerald-600"}`}>
+                            {formatAmount(row.achieved)}
+                          </td>
                           <td className="p-3 text-right text-xs font-bold text-amber-600">{formatAmount(row.pending)}</td>
                           <td className="p-3 text-right"><PctBadge pct={row.achievementPct} /></td>
                         </>
@@ -874,26 +994,23 @@ export default function CustomerTargetPage() {
                         <StatusBadge status={liveStatus[row.partyName] || row.sendStatus} />
                       </td>
                       <td className="p-3">
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 whitespace-nowrap">
                           <button
                             onClick={() => setPreviewParty(row)}
-                            className="p-1.5 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 text-[#2563eb]"
-                            title="Preview"
+                            className="px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest text-white bg-gradient-to-r from-blue-500 to-indigo-600 shadow-md shadow-blue-500/30 hover:brightness-110"
                           >
-                            <EyeIcon className="w-4 h-4" />
+                            Preview
                           </button>
                           {canWrite && (
                             <button
-                              onClick={() => {
-                                setSelected(new Set([row.partyName]));
-                                setTestPhone(testPhone || "");
-                                showStatus("Party selected for test — enter your number below and click Send Test Message", "success");
-                                setTimeout(() => setStatusOpen(false), 1800);
-                              }}
-                              className="p-1.5 rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-900/20 text-emerald-600"
-                              title="Use for test sample"
+                              onClick={() => !cannotSend && sendRowMessage(row)}
+                              className={`px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest text-white ${
+                                sending || cannotSend
+                                  ? "bg-gradient-to-r from-slate-300 to-slate-400 shadow-none cursor-not-allowed"
+                                  : "bg-gradient-to-r from-emerald-500 to-teal-600 shadow-md shadow-emerald-500/30 hover:brightness-110"
+                              }`}
                             >
-                              <PaperAirplaneIcon className="w-4 h-4" />
+                              Send
                             </button>
                           )}
                         </div>
@@ -903,7 +1020,7 @@ export default function CustomerTargetPage() {
                 })}
                 {paginated.length === 0 && (
                   <tr>
-                    <td colSpan={showAchievementColumns ? 9 : 6} className="p-10 text-center text-xs font-bold text-gray-400 uppercase tracking-widest">
+                    <td colSpan={showAchievementColumns ? 10 : 7} className="p-10 text-center text-xs font-bold text-gray-400 uppercase tracking-widest">
                       No parties found
                     </td>
                   </tr>
@@ -931,9 +1048,7 @@ export default function CustomerTargetPage() {
             </div>
             <div className="flex items-center gap-1">
               <button disabled={page <= 1} onClick={() => setPage((p) => p - 1)} className="px-3 py-1.5 rounded-lg border border-gray-200 dark:border-white/10 disabled:opacity-40">Prev</button>
-              {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => {
-                const p = totalPages <= 7 ? i + 1 : Math.min(Math.max(page - 3, 1) + i, totalPages);
-                return (
+              {visiblePages.map((p) => (
                   <button
                     key={p}
                     onClick={() => setPage(p)}
@@ -941,8 +1056,7 @@ export default function CustomerTargetPage() {
                   >
                     {p}
                   </button>
-                );
-              })}
+              ))}
               <button disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)} className="px-3 py-1.5 rounded-lg border border-gray-200 dark:border-white/10 disabled:opacity-40">Next</button>
             </div>
           </div>
@@ -1140,7 +1254,10 @@ export default function CustomerTargetPage() {
             <div className="px-5 py-4 border-b border-gray-100 dark:border-white/10 flex items-center justify-between bg-[#003875] text-white">
               <div>
                 <p className="text-[10px] font-black uppercase tracking-widest text-white/70">Message Preview · {msgType}</p>
-                <h3 className="font-black uppercase">{previewParty.partyName}</h3>
+                <h3 className="font-black uppercase">{previewParty.customerName || previewParty.partyName}</h3>
+                {previewParty.customerName && previewParty.customerName !== previewParty.partyName && (
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-white/70">{previewParty.partyName}</p>
+                )}
               </div>
               <button onClick={() => setPreviewParty(null)}><XMarkIcon className="w-5 h-5" /></button>
             </div>
@@ -1160,10 +1277,14 @@ export default function CustomerTargetPage() {
               <button onClick={() => setCrudOpen(false)}><XMarkIcon className="w-5 h-5" /></button>
             </div>
             <div className="p-5 space-y-4 overflow-y-auto">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <div>
                   <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Party Name</label>
                   <input value={formName} onChange={(e) => setFormName(e.target.value)} className="mt-1 w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-white/10 bg-transparent text-sm font-bold" />
+                </div>
+                <div>
+                  <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Customer Name</label>
+                  <input value={formCustomerName} onChange={(e) => setFormCustomerName(e.target.value)} className="mt-1 w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-white/10 bg-transparent text-sm font-bold" />
                 </div>
                 <div>
                   <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Mobile Num</label>
@@ -1302,7 +1423,7 @@ export default function CustomerTargetPage() {
               <div className="max-h-40 overflow-auto text-[11px] font-bold text-gray-600 dark:text-gray-300 space-y-1">
                 {recipientsForScope.slice(0, 40).map((r) => (
                   <div key={r.partyName} className="flex justify-between gap-2 border-b border-gray-50 dark:border-white/5 py-1">
-                    <span>{r.partyName}</span>
+                    <span>{r.customerName || r.partyName}</span>
                     <StatusBadge status={r.sendStatus} />
                   </div>
                 ))}
@@ -1352,7 +1473,7 @@ export default function CustomerTargetPage() {
               </section>
               <section className="space-y-2">
                 {[
-                  ["Month + Message Type", "Month drives all numbers and WhatsApp text. Target = assigned target message. Achievement = pending/achieved message."],
+                  ["Month + Message Type", "Month drives all numbers and WhatsApp text. Target = assigned target message. Achievement = pending/achieved message. Greeting uses Customer Name (falls back to Party Name)."],
                   ["Summary card", "Total parties, how many have target/achievement, and total pending ₹ for the month."],
                   ["Tabs", "Party List (work table), Target Sheet1 view, Achievement view, Send Log audit."],
                   ["Select Eligible", "Only parties with valid mobile AND target > 0."],
@@ -1382,6 +1503,26 @@ export default function CustomerTargetPage() {
         confirmLabel="Delete"
         type="danger"
       />
+
+      {rowTip && (
+        <div
+          className="fixed z-[400] pointer-events-none -translate-y-full"
+          style={{ left: rowTip.x, top: rowTip.y }}
+        >
+          <div className="relative w-72 rounded-2xl bg-gradient-to-br from-slate-900 via-[#1e293b] to-amber-950 text-white shadow-[0_12px_40px_rgba(245,158,11,0.35)] ring-1 ring-amber-400/50 px-4 py-3">
+            <div className="flex items-start gap-2.5">
+              <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 shadow-md shadow-amber-500/40">
+                <ExclamationTriangleIcon className="w-4 h-4 text-white" />
+              </span>
+              <div>
+                <p className="text-[9px] font-black uppercase tracking-[0.18em] text-amber-300">Cannot send</p>
+                <p className="mt-1 text-xs font-bold leading-relaxed text-white/95">{rowTip.text}</p>
+              </div>
+            </div>
+            <span className="absolute left-6 top-full h-0 w-0 border-x-[7px] border-x-transparent border-t-[8px] border-t-amber-900" />
+          </div>
+        </div>
+      )}
 
       <ActionStatusModal
         isOpen={statusOpen}

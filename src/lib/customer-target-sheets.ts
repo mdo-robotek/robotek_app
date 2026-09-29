@@ -27,7 +27,9 @@ const PLANNED_SHEET = "Sheet1";
 const ACHIEVEMENT_SHEET = "Achievement";
 const SEND_LOG_SHEET = "Send Log";
 
-const PLANNED_HEADERS = ["Party Name", "Mobile Num", ...MONTH_NAMES];
+const PLANNED_HEADERS = ["Party Name", "Customer Name", "Mobile Num", ...MONTH_NAMES];
+const DATA_RANGE = "A:O";
+const ROW_RANGE_END = "O";
 const SEND_LOG_HEADERS = [
   "Id",
   "Timestamp",
@@ -66,7 +68,7 @@ function emptyMonths(): MonthlyValues {
   }, {} as MonthlyValues);
 }
 
-function parseMonthsFromRow(row: any[], startIdx = 2): MonthlyValues {
+function parseMonthsFromRow(row: any[], startIdx = 3): MonthlyValues {
   const months = emptyMonths();
   MONTH_NAMES.forEach((month, i) => {
     const raw = row[startIdx + i];
@@ -87,8 +89,59 @@ function monthsToRowValues(months?: Partial<MonthlyValues>): any[] {
   });
 }
 
-function plannedToRow(party: { partyName: string; mobile: string; months?: Partial<MonthlyValues> }): any[] {
-  return [party.partyName.trim(), String(party.mobile || "").trim(), ...monthsToRowValues(party.months)];
+function colLetter(index: number): string {
+  let n = index + 1;
+  let s = "";
+  while (n > 0) {
+    const m = (n - 1) % 26;
+    s = String.fromCharCode(65 + m) + s;
+    n = Math.floor((n - 1) / 26);
+  }
+  return s;
+}
+
+function mapHeaderIndexes(header: any[]) {
+  const names = (header || []).map((h) => String(h || "").trim().toLowerCase());
+  const idx = (pred: (h: string) => boolean) => names.findIndex(pred);
+  const party = idx((h) => h === "party name" || (h.includes("party") && !h.includes("customer")));
+  const customer = idx((h) => h.includes("customer"));
+  const mobile = idx((h) => h.includes("mobile"));
+  const january = idx((h) => h === "january" || h.startsWith("jan"));
+  return {
+    party: party >= 0 ? party : 0,
+    customer,
+    mobile: mobile >= 0 ? mobile : customer >= 0 ? 2 : 1,
+    monthsStart: january >= 0 ? january : (mobile >= 0 ? mobile + 1 : customer >= 0 ? 3 : 2),
+  };
+}
+
+function parsePartySheetRows(rows: any[][]): PlannedParty[] {
+  if (rows.length <= 1) return [];
+  const cols = mapHeaderIndexes(rows[0]);
+  return rows
+    .slice(1)
+    .map((row, idx) => ({
+      rowNumber: idx + 2,
+      partyName: String(row[cols.party] || "").trim(),
+      customerName: cols.customer >= 0 ? String(row[cols.customer] || "").trim() : "",
+      mobile: String(row[cols.mobile] || "").trim(),
+      months: parseMonthsFromRow(row, cols.monthsStart),
+    }))
+    .filter((p) => p.partyName);
+}
+
+function plannedToRow(party: {
+  partyName: string;
+  customerName?: string;
+  mobile: string;
+  months?: Partial<MonthlyValues>;
+}): any[] {
+  return [
+    party.partyName.trim(),
+    String(party.customerName || "").trim(),
+    String(party.mobile || "").trim(),
+    ...monthsToRowValues(party.months),
+  ];
 }
 
 function clearCache(sheetName?: string) {
@@ -155,7 +208,7 @@ async function readSheetRows(sheetName: string): Promise<any[][]> {
   const sheets = await getSheetsClient();
   const response = await sheets.spreadsheets.values.get({
     spreadsheetId: SPREADSHEET_ID,
-    range: `'${sheetName}'!A:N`,
+    range: `'${sheetName}'!${DATA_RANGE}`,
   });
   const rows = response.data.values || [];
   globalCache.set(cacheKey, rows, CACHE_TTL);
@@ -164,25 +217,13 @@ async function readSheetRows(sheetName: string): Promise<any[][]> {
 
 export async function getPlannedParties(): Promise<PlannedParty[]> {
   const rows = await readSheetRows(PLANNED_SHEET);
-  if (rows.length <= 1) return [];
-  return rows.slice(1).map((row, idx) => ({
-    rowNumber: idx + 2,
-    partyName: String(row[0] || "").trim(),
-    mobile: String(row[1] || "").trim(),
-    months: parseMonthsFromRow(row, 2),
-  })).filter((p) => p.partyName);
+  return parsePartySheetRows(rows);
 }
 
 export async function getAchievementParties(): Promise<AchievementParty[]> {
   await ensureCustomerTargetSheets();
   const rows = await readSheetRows(ACHIEVEMENT_SHEET);
-  if (rows.length <= 1) return [];
-  return rows.slice(1).map((row, idx) => ({
-    rowNumber: idx + 2,
-    partyName: String(row[0] || "").trim(),
-    mobile: String(row[1] || "").trim(),
-    months: parseMonthsFromRow(row, 2),
-  })).filter((p) => p.partyName);
+  return parsePartySheetRows(rows);
 }
 
 export async function getSendLogs(): Promise<SendLogEntry[]> {
@@ -256,10 +297,11 @@ export async function getJoinedCustomerTargetRows(
     const pending = calcPending(target, achieved);
     const achievementPct = calcAchievementPct(target, achieved);
     const { status, error } = latestSendStatus(logs, p.partyName, month, year, type);
-    const preview = buildMessage(type, p.partyName, month, target, achieved, year);
+    const preview = buildMessage(type, p.partyName, month, target, achieved, year, p.customerName || ach?.customerName);
 
     return {
       partyName: p.partyName,
+      customerName: p.customerName || ach?.customerName || "",
       mobile: p.mobile || ach?.mobile || "",
       plannedRowNumber: p.rowNumber,
       achievementRowNumber: ach?.rowNumber ?? null,
@@ -288,13 +330,14 @@ export async function addPlannedParty(input: PlannedInput): Promise<boolean> {
 
   const row = plannedToRow({
     partyName,
+    customerName: input.customerName || "",
     mobile: input.mobile || "",
     months: input.months,
   });
 
   await sheets.spreadsheets.values.append({
     spreadsheetId: SPREADSHEET_ID,
-    range: `'${PLANNED_SHEET}'!A:N`,
+    range: `'${PLANNED_SHEET}'!${DATA_RANGE}`,
     valueInputOption: "USER_ENTERED",
     requestBody: { values: [row] },
   });
@@ -302,9 +345,14 @@ export async function addPlannedParty(input: PlannedInput): Promise<boolean> {
   // Mirror blank achievement row
   await sheets.spreadsheets.values.append({
     spreadsheetId: SPREADSHEET_ID,
-    range: `'${ACHIEVEMENT_SHEET}'!A:N`,
+    range: `'${ACHIEVEMENT_SHEET}'!${DATA_RANGE}`,
     valueInputOption: "USER_ENTERED",
-    requestBody: { values: [[partyName, String(input.mobile || "").trim(), ...monthsToRowValues({})]] },
+    requestBody: { values: [plannedToRow({
+      partyName,
+      customerName: input.customerName || "",
+      mobile: input.mobile || "",
+      months: {},
+    })] },
   });
 
   clearCache();
@@ -336,39 +384,48 @@ export async function updatePlannedParty(input: PlannedInput): Promise<boolean> 
   }
   const row = plannedToRow({
     partyName: newName,
+    customerName: input.customerName ?? target.customerName,
     mobile: input.mobile ?? target.mobile,
     months: mergedMonths,
   });
 
   await sheets.spreadsheets.values.update({
     spreadsheetId: SPREADSHEET_ID,
-    range: `'${PLANNED_SHEET}'!A${target.rowNumber}:N${target.rowNumber}`,
+    range: `'${PLANNED_SHEET}'!A${target.rowNumber}:${ROW_RANGE_END}${target.rowNumber}`,
     valueInputOption: "USER_ENTERED",
     requestBody: { values: [row] },
   });
 
-  // Sync achievement party name + mobile
+  // Sync achievement party name + customer name + mobile
   const achievement = await getAchievementParties();
   const ach = achievement.find((a) => normalizePartyKey(a.partyName) === normalizePartyKey(originalName));
+  const syncedCustomer = String(input.customerName ?? target.customerName ?? ach?.customerName ?? "").trim();
+  const syncedMobile = String(input.mobile ?? target.mobile ?? ach?.mobile ?? "").trim();
   if (ach) {
-    const achRow = [
-      newName,
-      String(input.mobile ?? target.mobile ?? ach.mobile).trim(),
-      ...monthsToRowValues(ach.months),
-    ];
+    const achRow = plannedToRow({
+      partyName: newName,
+      customerName: syncedCustomer,
+      mobile: syncedMobile,
+      months: ach.months,
+    });
     await sheets.spreadsheets.values.update({
       spreadsheetId: SPREADSHEET_ID,
-      range: `'${ACHIEVEMENT_SHEET}'!A${ach.rowNumber}:N${ach.rowNumber}`,
+      range: `'${ACHIEVEMENT_SHEET}'!A${ach.rowNumber}:${ROW_RANGE_END}${ach.rowNumber}`,
       valueInputOption: "USER_ENTERED",
       requestBody: { values: [achRow] },
     });
   } else {
     await sheets.spreadsheets.values.append({
       spreadsheetId: SPREADSHEET_ID,
-      range: `'${ACHIEVEMENT_SHEET}'!A:N`,
+      range: `'${ACHIEVEMENT_SHEET}'!${DATA_RANGE}`,
       valueInputOption: "USER_ENTERED",
       requestBody: {
-        values: [[newName, String(input.mobile ?? target.mobile).trim(), ...monthsToRowValues({})]],
+        values: [plannedToRow({
+          partyName: newName,
+          customerName: syncedCustomer,
+          mobile: syncedMobile,
+          months: {},
+        })],
       },
     });
   }
@@ -453,8 +510,8 @@ export async function importAchievementForMonth(
   const plannedByKey = new Map(planned.map((p) => [normalizePartyKey(p.partyName), p]));
   const achByKey = new Map(achievement.map((a) => [normalizePartyKey(a.partyName), a]));
 
-  const monthColIndex = 2 + MONTH_NAMES.indexOf(month); // 0-based in row
-  const colLetter = String.fromCharCode(65 + monthColIndex); // A=0 ... works for A-N
+  const monthColIndex = 3 + MONTH_NAMES.indexOf(month);
+  const monthCol = colLetter(monthColIndex);
 
   const unmatched: string[] = [];
   const matched: string[] = [];
@@ -493,14 +550,18 @@ export async function importAchievementForMonth(
       // Create achievement row
       await sheets.spreadsheets.values.append({
         spreadsheetId: SPREADSHEET_ID,
-        range: `'${ACHIEVEMENT_SHEET}'!A:N`,
+        range: `'${ACHIEVEMENT_SHEET}'!${DATA_RANGE}`,
         valueInputOption: "USER_ENTERED",
         requestBody: {
-          values: [[
-            plannedParty.partyName,
-            plannedParty.mobile,
-            ...MONTH_NAMES.map((m) => (m === month ? amount : "")),
-          ]],
+          values: [plannedToRow({
+            partyName: plannedParty.partyName,
+            customerName: plannedParty.customerName,
+            mobile: plannedParty.mobile,
+            months: MONTH_NAMES.reduce((acc, m) => {
+              acc[m] = m === month ? amount : "";
+              return acc;
+            }, {} as MonthlyValues),
+          })],
         },
       });
       updated++;
@@ -508,14 +569,14 @@ export async function importAchievementForMonth(
     }
 
     dataUpdates.push({
-      range: `'${ACHIEVEMENT_SHEET}'!${colLetter}${ach.rowNumber}`,
+      range: `'${ACHIEVEMENT_SHEET}'!${monthCol}${ach.rowNumber}`,
       values: [[amount]],
     });
 
-    // Keep mobile in sync from planned
+    // Keep identity in sync from planned
     dataUpdates.push({
-      range: `'${ACHIEVEMENT_SHEET}'!A${ach.rowNumber}:B${ach.rowNumber}`,
-      values: [[plannedParty.partyName, plannedParty.mobile]],
+      range: `'${ACHIEVEMENT_SHEET}'!A${ach.rowNumber}:C${ach.rowNumber}`,
+      values: [[plannedParty.partyName, plannedParty.customerName || "", plannedParty.mobile]],
     });
     updated++;
   }

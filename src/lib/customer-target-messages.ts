@@ -58,6 +58,10 @@ export function isValidMobile(mobile: string): boolean {
   return digits.length === 10 || (digits.length === 12 && digits.startsWith("91"));
 }
 
+export function messageRecipientName(customerName?: string, partyName?: string): string {
+  return String(customerName || partyName || "").trim();
+}
+
 export function buildTargetMessage(partyName: string, month: MonthName, target: number, year = new Date().getFullYear()): string {
   const party = String(partyName || "").trim().toUpperCase();
   return `Namaste *${party} JI*,
@@ -104,8 +108,10 @@ export function buildMessage(
   month: MonthName,
   target: number,
   achieved: number,
-  year = new Date().getFullYear()
+  year = new Date().getFullYear(),
+  customerName?: string
 ): string {
-  if (type === "TARGET") return buildTargetMessage(partyName, month, target, year);
-  return buildAchievementMessage(partyName, month, target, achieved);
+  const greeting = messageRecipientName(customerName, partyName);
+  if (type === "TARGET") return buildTargetMessage(greeting, month, target, year);
+  return buildAchievementMessage(greeting, month, target, achieved);
 }

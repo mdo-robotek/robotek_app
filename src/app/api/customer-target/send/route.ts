@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: "No party data available for test message" }, { status: 400 });
       }
 
-      const message = buildMessage(type, sample.partyName, month as MonthName, sample.target, sample.achieved, year);
+      const message = buildMessage(type, sample.partyName, month as MonthName, sample.target, sample.achieved, year, sample.customerName);
       const result = await sendWhatsAppMessage(testPhone, message);
 
       await appendSendLog({
@@ -190,7 +190,7 @@ export async function POST(req: NextRequest) {
         continue;
       }
 
-      const message = buildMessage(type, row.partyName, month as MonthName, row.target, row.achieved, year);
+      const message = buildMessage(type, row.partyName, month as MonthName, row.target, row.achieved, year, row.customerName);
 
       try {
         const result = await sendWhatsAppMessage(row.mobile, message);

@@ -26,6 +26,7 @@ export type MonthlyValues = Record<MonthName, number | "">;
 export interface PlannedParty {
   rowNumber: number;
   partyName: string;
+  customerName: string;
   mobile: string;
   months: MonthlyValues;
 }
@@ -33,6 +34,7 @@ export interface PlannedParty {
 export interface AchievementParty {
   rowNumber: number;
   partyName: string;
+  customerName: string;
   mobile: string;
   months: MonthlyValues;
 }
@@ -57,6 +59,7 @@ export interface SendLogEntry {
 
 export interface CustomerTargetRow {
   partyName: string;
+  customerName: string;
   mobile: string;
   plannedRowNumber: number;
   achievementRowNumber: number | null;
@@ -71,6 +74,7 @@ export interface CustomerTargetRow {
 
 export interface PlannedInput {
   partyName: string;
+  customerName?: string;
   mobile: string;
   months?: Partial<MonthlyValues>;
   originalPartyName?: string;

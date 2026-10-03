@@ -14,6 +14,7 @@ import {
 } from "@/types/customer-target";
 import {
   normalizePartyKey,
+  normalizeMobileKey,
   parseAmount,
   calcPending,
   calcAchievementPct,
@@ -493,7 +494,7 @@ export async function deletePlannedParty(partyName: string): Promise<boolean> {
 
 export async function importAchievementForMonth(
   month: MonthName,
-  rows: { accountName: string; nettSaleAmt: number }[]
+  rows: { no?: string; accountName?: string; customerName?: string; mobile?: string; nettSaleAmt?: number; amount?: number }[]
 ): Promise<{
   updated: number;
   unmatched: string[];
@@ -507,7 +508,26 @@ export async function importAchievementForMonth(
   const planned = await getPlannedParties();
   const achievement = await getAchievementParties();
 
-  const plannedByKey = new Map(planned.map((p) => [normalizePartyKey(p.partyName), p]));
+  const byMobile = new Map<string, PlannedParty>();
+  const byParty = new Map<string, PlannedParty>();
+  const byCustomer = new Map<string, PlannedParty>();
+  planned.forEach((p) => {
+    const mobileKey = normalizeMobileKey(p.mobile);
+    if (mobileKey.length === 10) byMobile.set(mobileKey, p);
+    byParty.set(normalizePartyKey(p.partyName), p);
+    if (p.customerName) byCustomer.set(normalizePartyKey(p.customerName), p);
+  });
+
+  const findPlanned = (id: string): PlannedParty | undefined => {
+    const mobileKey = normalizeMobileKey(id);
+    if (mobileKey.length === 10) {
+      const hit = byMobile.get(mobileKey);
+      if (hit) return hit;
+    }
+    const nameKey = normalizePartyKey(id);
+    return byParty.get(nameKey) || byCustomer.get(nameKey);
+  };
+
   const achByKey = new Map(achievement.map((a) => [normalizePartyKey(a.partyName), a]));
 
   const monthColIndex = 3 + MONTH_NAMES.indexOf(month);
@@ -518,36 +538,40 @@ export async function importAchievementForMonth(
   const zeroAmount: string[] = [];
   let updated = 0;
 
-  // Aggregate duplicate account names (sum)
-  const aggregated = new Map<string, { displayName: string; amount: number }>();
+  const aggregated = new Map<string, { displayName: string; amount: number; party: PlannedParty }>();
   for (const r of rows) {
-    const displayName = String(r.accountName || "").trim();
-    if (!displayName) continue;
-    const key = normalizePartyKey(displayName);
-    const amount = parseAmount(r.nettSaleAmt);
+    const ids = [r.mobile, r.no, r.customerName, r.accountName]
+      .map((v) => String(v || "").trim())
+      .filter(Boolean);
+    if (ids.length === 0) continue;
+    const displayName = ids[0];
+    let party: PlannedParty | undefined;
+    for (const id of ids) {
+      party = findPlanned(id);
+      if (party) break;
+    }
+    const amount = parseAmount(r.amount ?? r.nettSaleAmt);
+    if (!party) {
+      unmatched.push(displayName);
+      continue;
+    }
+    const key = normalizePartyKey(party.partyName);
     const prev = aggregated.get(key);
     if (prev) {
       prev.amount += amount;
     } else {
-      aggregated.set(key, { displayName, amount });
+      aggregated.set(key, { displayName, amount, party });
     }
   }
 
   const dataUpdates: { range: string; values: any[][] }[] = [];
 
-  for (const [key, { displayName, amount }] of aggregated.entries()) {
-    const plannedParty = plannedByKey.get(key);
-    if (!plannedParty) {
-      unmatched.push(displayName);
-      continue;
-    }
-
+  for (const { amount, party: plannedParty } of aggregated.values()) {
     matched.push(plannedParty.partyName);
     if (amount === 0) zeroAmount.push(plannedParty.partyName);
 
-    let ach = achByKey.get(key);
+    const ach = achByKey.get(normalizePartyKey(plannedParty.partyName));
     if (!ach) {
-      // Create achievement row
       await sheets.spreadsheets.values.append({
         spreadsheetId: SPREADSHEET_ID,
         range: `'${ACHIEVEMENT_SHEET}'!${DATA_RANGE}`,
@@ -573,7 +597,6 @@ export async function importAchievementForMonth(
       values: [[amount]],
     });
 
-    // Keep identity in sync from planned
     dataUpdates.push({
       range: `'${ACHIEVEMENT_SHEET}'!A${ach.rowNumber}:C${ach.rowNumber}`,
       values: [[plannedParty.partyName, plannedParty.customerName || "", plannedParty.mobile]],

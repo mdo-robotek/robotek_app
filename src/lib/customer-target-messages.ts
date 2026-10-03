@@ -30,8 +30,40 @@ export function formatTargetNumber(value: number): string {
   return Number.isInteger(rounded) ? String(rounded) : String(rounded);
 }
 
+export function normalizeMobileKey(mobile: string): string {
+  const digits = String(mobile || "").replace(/\D/g, "");
+  if (digits.length >= 10) return digits.slice(-10);
+  return digits;
+}
+
 export function normalizePartyKey(name: string): string {
   return String(name || "").trim().toLowerCase().replace(/\s+/g, " ");
+}
+
+export function importNoMatchesParty(
+  no: string,
+  party: { partyName: string; customerName?: string; mobile: string }
+): boolean {
+  const id = String(no || "").trim();
+  if (!id) return false;
+  const mobileKey = normalizeMobileKey(id);
+  if (mobileKey.length === 10 && normalizeMobileKey(party.mobile) === mobileKey) return true;
+  const nameKey = normalizePartyKey(id);
+  return (
+    normalizePartyKey(party.partyName) === nameKey ||
+    normalizePartyKey(party.customerName || "") === nameKey
+  );
+}
+
+export function importRowMatchesParty(
+  row: { no?: string; customerName?: string; mobile?: string },
+  party: { partyName: string; customerName?: string; mobile: string }
+): boolean {
+  return (
+    importNoMatchesParty(row.mobile || "", party) ||
+    importNoMatchesParty(row.no || "", party) ||
+    importNoMatchesParty(row.customerName || "", party)
+  );
 }
 
 export function parseAmount(value: unknown): number {

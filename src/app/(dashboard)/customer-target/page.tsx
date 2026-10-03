@@ -34,7 +34,7 @@ import {
   SendScope,
   SendLogEntry,
 } from "@/types/customer-target";
-import { isValidMobile, normalizePartyKey } from "@/lib/customer-target-messages";
+import { isValidMobile, importRowMatchesParty } from "@/lib/customer-target-messages";
 import ActionStatusModal from "@/components/ActionStatusModal";
 import ConfirmModal from "@/components/ConfirmModal";
 
@@ -66,6 +66,10 @@ function formatAmount(n: number) {
     minimumFractionDigits: 0,
     maximumFractionDigits: 2,
   });
+}
+
+function round2(n: number) {
+  return Math.round((Number(n) || 0) * 100) / 100;
 }
 
 function sendBlockedReason(row: CustomerTargetRow, msgType: MessageType): string | null {
@@ -337,7 +341,7 @@ export default function CustomerTargetPage() {
 
   const importRef = useRef<HTMLInputElement>(null);
   const [importPreview, setImportPreview] = useState<{
-    rows: { accountName: string; nettSaleAmt: number }[];
+    rows: { no: string; mobile: string; customerName: string; amount: number }[];
     fileName: string;
   } | null>(null);
 
@@ -352,25 +356,46 @@ export default function CustomerTargetPage() {
       const parsed = json
         .map((row) => {
           const keys = Object.keys(row);
-          const accountKey =
-            keys.find((k) => k.toLowerCase().includes("account") && k.toLowerCase().includes("name")) ||
-            keys.find((k) => k.toLowerCase() === "party name") ||
-            keys.find((k) => k.toLowerCase().includes("account"));
+          const norm = (k: string) => k.toLowerCase().replace(/\./g, "").trim();
+          const customerKey = keys.find((k) => {
+            const h = norm(k);
+            return h === "customer name" || h === "customer";
+          });
+          const mobileKey = keys.find((k) => {
+            const h = norm(k);
+            return h === "mobile no" || h === "mobile num" || h === "mobile number" || h === "mobile";
+          });
+          const noKey =
+            keys.find((k) => norm(k) === "no") ||
+            (!mobileKey && !customerKey
+              ? keys.find((k) => norm(k) === "party name") ||
+                keys.find((k) => norm(k).includes("account") && norm(k).includes("name"))
+              : undefined);
           const amtKey =
-            keys.find((k) => k.toLowerCase().includes("nett") && k.toLowerCase().includes("sale")) ||
-            keys.find((k) => k.toLowerCase().includes("nett")) ||
-            keys.find((k) => k.toLowerCase().includes("sale"));
-          const accountName = String(accountKey ? row[accountKey] : "").trim();
+            keys.find((k) => {
+              const h = norm(k);
+              return h === "achievement amount" || h === "achievement" || h.includes("achievement");
+            }) ||
+            keys.find((k) => norm(k).includes("nett") && norm(k).includes("sale")) ||
+            keys.find((k) => {
+              const h = norm(k);
+              return h === "amount" || h === "amt" || h.includes("amount");
+            });
+          const customerName = String(customerKey ? row[customerKey] : "").trim();
+          const mobile = String(mobileKey ? row[mobileKey] : "").trim();
+          const no = String(noKey ? row[noKey] : "").trim();
           const rawAmt = amtKey ? row[amtKey] : 0;
-          const nettSaleAmt = round2(
+          const amount = round2(
             typeof rawAmt === "number"
               ? rawAmt
               : parseFloat(String(rawAmt).replace(/,/g, "").replace(/[^\d.-]/g, "")) || 0
           );
-          return { accountName, nettSaleAmt };
+          return { no, mobile, customerName, amount };
         })
-        .filter((r) => r.accountName);
-      if (parsed.length === 0) throw new Error("No rows found. Expected headers: Account Name, Nett Sale Amt.");
+        .filter((r) => r.no || r.mobile || r.customerName);
+      if (parsed.length === 0) {
+        throw new Error("No rows found. Use No + Achievement Amount, or Customer Name + Mobile No + Achievement Amount.");
+      }
       setImportPreview({ rows: parsed, fileName: file.name });
     } catch (err: any) {
       showStatus(err.message || "Failed to parse file", "error");
@@ -379,21 +404,16 @@ export default function CustomerTargetPage() {
     }
   };
 
-  const partyKeySet = useMemo(
-    () => new Set(rows.map((r) => normalizePartyKey(r.partyName))),
-    [rows]
-  );
-
   const importMatchStats = useMemo(() => {
     if (!importPreview) return { matched: 0, unmatched: 0 };
     let matched = 0;
     let unmatched = 0;
     importPreview.rows.forEach((r) => {
-      if (partyKeySet.has(normalizePartyKey(r.accountName))) matched += 1;
+      if (rows.some((row) => importRowMatchesParty(r, row))) matched += 1;
       else unmatched += 1;
     });
     return { matched, unmatched };
-  }, [importPreview, partyKeySet]);
+  }, [importPreview, rows]);
 
   const confirmImport = async () => {
     if (!importPreview || !canWrite) return;
@@ -405,8 +425,10 @@ export default function CustomerTargetPage() {
         body: JSON.stringify({
           month,
           rows: importPreview.rows.map((r) => ({
-            accountName: r.accountName,
-            nettSaleAmt: round2(r.nettSaleAmt),
+            no: r.no,
+            mobile: r.mobile,
+            customerName: r.customerName,
+            amount: round2(r.amount),
           })),
         }),
       });
@@ -1342,7 +1364,7 @@ export default function CustomerTargetPage() {
               </div>
               {importMatchStats.unmatched > 0 && (
                 <p className="text-[11px] font-semibold text-rose-600 mt-2">
-                  Red rows are not in Sheet1. Fix the party name in Sheet1 (Add/Edit Party), then import again. File names are not editable here.
+                  Red rows are not in Sheet1. Match Mobile No first, then No, then Customer / Party Name. Fix Sheet1, then import again.
                 </p>
               )}
             </div>
@@ -1351,14 +1373,16 @@ export default function CustomerTargetPage() {
                 <thead className="sticky top-0 bg-white dark:bg-slate-900">
                   <tr className="text-[9px] font-black uppercase tracking-widest text-gray-400">
                     <th className="py-1 pr-2">#</th>
-                    <th className="py-1">Account Name</th>
-                    <th className="py-1 text-right">Nett Sale Amt</th>
+                    <th className="py-1">Customer Name</th>
+                    <th className="py-1">No / Mobile</th>
+                    <th className="py-1 text-right">Achievement Amount</th>
                     <th className="py-1 text-right pl-2">Match</th>
                   </tr>
                 </thead>
                 <tbody>
                   {importPreview.rows.map((r, i) => {
-                    const matched = partyKeySet.has(normalizePartyKey(r.accountName));
+                    const matched = rows.some((row) => importRowMatchesParty(r, row));
+                    const id = r.mobile || r.no || "—";
                     return (
                       <tr
                         key={i}
@@ -1370,9 +1394,12 @@ export default function CustomerTargetPage() {
                       >
                         <td className="py-1.5 pr-2 text-gray-400 font-bold">{i + 1}</td>
                         <td className={`py-1.5 font-bold ${matched ? "text-gray-900 dark:text-white" : "text-rose-700 dark:text-rose-300"}`}>
-                          {r.accountName}
+                          {r.customerName || "—"}
                         </td>
-                        <td className="py-1.5 text-right font-black tabular-nums">{formatAmount(r.nettSaleAmt)}</td>
+                        <td className={`py-1.5 font-bold tabular-nums ${matched ? "text-gray-900 dark:text-white" : "text-rose-700 dark:text-rose-300"}`}>
+                          {id}
+                        </td>
+                        <td className="py-1.5 text-right font-black tabular-nums">{formatAmount(r.amount)}</td>
                         <td className="py-1.5 text-right pl-2">
                           {matched ? (
                             <span className="text-[9px] font-black uppercase tracking-widest text-emerald-600">OK</span>
@@ -1388,7 +1415,7 @@ export default function CustomerTargetPage() {
             </div>
             <div className="p-4 border-t border-gray-100 dark:border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-2 shrink-0">
               <p className="text-[10px] font-bold text-gray-400">
-                Only matched parties will import. Fix missing names in Sheet1 first.
+                Only matched rows will import. Files can be No + Amount, or Customer Name + Mobile No + Amount.
               </p>
               <div className="flex justify-end gap-2">
                 <button onClick={() => setImportPreview(null)} className="px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest text-gray-500">Cancel</button>

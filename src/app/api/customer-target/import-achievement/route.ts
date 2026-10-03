@@ -31,14 +31,23 @@ export async function POST(req: NextRequest) {
 
     const normalized = rows
       .map((r: any) => ({
-        accountName: String(r.accountName || r["Account Name"] || "").trim(),
-        nettSaleAmt: parseAmount(r.nettSaleAmt ?? r["Nett Sale Amt."] ?? r["Nett Sale Amt"] ?? 0),
+        no: String(r.no || r["No"] || "").trim(),
+        mobile: String(r.mobile || r["Mobile No"] || r["Mobile Num"] || r["Mobile"] || "").trim(),
+        customerName: String(r.customerName || r["Customer Name"] || r.accountName || r["Account Name"] || "").trim(),
+        amount: parseAmount(
+          r.amount ??
+            r.nettSaleAmt ??
+            r["Achievement Amount"] ??
+            r["Nett Sale Amt."] ??
+            r["Nett Sale Amt"] ??
+            0
+        ),
       }))
-      .filter((r: { accountName: string }) => r.accountName);
+      .filter((r: { no: string; mobile: string; customerName: string }) => r.no || r.mobile || r.customerName);
 
     if (normalized.length === 0) {
       return NextResponse.json({
-        error: "No valid rows. Expected headers: Account Name, Nett Sale Amt.",
+        error: "No valid rows. Use No + Achievement Amount, or Customer Name + Mobile No + Achievement Amount.",
       }, { status: 400 });
     }
 

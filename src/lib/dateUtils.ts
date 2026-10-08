@@ -99,3 +99,36 @@ export function formatDateMMM(dateStr: string | null): string {
         year: 'numeric'
     });
 }
+
+/** Date-only display: 06 Apr 26 (no timezone shift for YYYY-MM-DD). */
+export function formatDateDdMmmYy(dateStr: string | null | undefined): string {
+  if (!dateStr) return "—";
+  const raw = String(dateStr).trim();
+  const iso = raw.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  let d: Date;
+  if (iso) {
+    d = new Date(Number(iso[1]), Number(iso[2]) - 1, Number(iso[3]));
+  } else {
+    d = parseDateString(raw) || new Date(raw);
+    if (isNaN(d.getTime())) return raw;
+  }
+  const dd = String(d.getDate()).padStart(2, "0");
+  const mon = d.toLocaleString("en-GB", { month: "short" });
+  const yy = String(d.getFullYear()).slice(-2);
+  // Non-breaking spaces keep "08 Oct 26" on one line in tight table cells
+  return `${dd}\u00A0${mon}\u00A0${yy}`;
+}
+
+/** Normalize any date input to YYYY-MM-DD (no time). */
+export function toDateOnlyString(dateStr: string | null | undefined): string {
+  if (!dateStr) return "";
+  const raw = String(dateStr).trim();
+  const iso = raw.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (iso) return `${iso[1]}-${iso[2]}-${iso[3]}`;
+  const d = parseDateString(raw) || new Date(raw);
+  if (isNaN(d.getTime())) return "";
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}

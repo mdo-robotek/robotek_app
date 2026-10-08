@@ -50,9 +50,12 @@ export default function Sidebar({ mobileOpen, setMobileOpen }: SidebarProps) {
           return null;
         };
 
-        const [delData, checkData, tickData, o2dSummary, badgeData, hrmsSummary] = await Promise.all([
+        const isRegularUser = userRole?.toUpperCase() === 'USER' || userRole?.toUpperCase() === 'SALES' || userRole?.toUpperCase() === 'CRM';
+        const checklistCountUrl = `/api/checklists?page=1&limit=1&view=tasks&currentUser=${encodeURIComponent(currentUser || '')}&userRole=${encodeURIComponent(userRole || 'USER')}&assignmentFilter=${isRegularUser ? 'ToMe' : 'All'}`;
+
+        const [delData, checkPage, tickData, o2dSummary, badgeData, hrmsSummary] = await Promise.all([
           safeFetch('/api/delegations'),
-          safeFetch('/api/checklists'),
+          safeFetch(checklistCountUrl),
           safeFetch('/api/tickets'),
           safeFetch('/api/o2d/summary'),   // lightweight — just aggregate counts, not all rows
           safeFetch('/api/sidebar/badges'),
@@ -60,9 +63,7 @@ export default function Sidebar({ mobileOpen, setMobileOpen }: SidebarProps) {
         ]);
         
         // Filter for USER role
-        const isRegularUser = userRole?.toUpperCase() === 'USER' || userRole?.toUpperCase() === 'SALES' || userRole?.toUpperCase() === 'CRM';
         const baseDel = (delData || []).length > 0 && isRegularUser ? delData.filter((d: any) => d.assigned_to === currentUser) : (delData || []);
-        const baseCheck = (checkData || []).length > 0 && isRegularUser ? checkData.filter((c: any) => c.assigned_to === currentUser) : (checkData || []);
 
         // Common helper
         const getEarliestDate = (dateString?: string) => {
@@ -97,7 +98,11 @@ export default function Sidebar({ mobileOpen, setMobileOpen }: SidebarProps) {
         };
 
         setDelegationsPendingCount(baseDel.filter(isDelayedOrToday).length);
-        setChecklistsPendingCount(baseCheck.filter(isDelayedOrToday).length);
+        const checkStatusCounts = checkPage?.statusCounts || {};
+        setChecklistsPendingCount(
+          (checkStatusCounts.Overdue || checkStatusCounts.Delayed || 0) +
+            (checkStatusCounts.Pending || 0)
+        );
         setTicketsOpenCount((tickData || []).filter((t: any) => t.status !== 'Resolved').length);
 
         // O2D badge: use summary stepCounts (steps 1-11 that are incomplete = pending)

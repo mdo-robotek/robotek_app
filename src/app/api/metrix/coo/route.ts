@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { getAttendanceRecords, getLeaveRequests } from "@/lib/sheets/attendance-sheets";
 import { getDelegations } from "@/lib/delegation-sheets";
-import { getChecklists } from "@/lib/checklist-sheets";
+import { getChecklistsPaginated } from "@/lib/checklist-sheets";
+import { ChecklistOccurrence } from "@/types/checklist";
 import { getUsers } from "@/lib/google-sheets";
 import { getAllO2DsForAnalytics } from "@/lib/o2d-sheets";
 import { getIMSItems } from "@/lib/ims-sheets";
@@ -53,15 +54,20 @@ export async function GET(request: Request) {
     const now = new Date();
 
     // ── Parallel fetch all data sources ──
-    const [allO2Ds, allLeaves, allDelegations, allChecklists, allUsers, allAttendance, allIMS] = await Promise.all([
+    const [allO2Ds, allLeaves, allDelegations, checklistPage, allUsers, allAttendance, allIMS] = await Promise.all([
       getAllO2DsForAnalytics(),
       getLeaveRequests(),
       getDelegations(),
-      getChecklists(),
+      getChecklistsPaginated(
+        1, 100000, "", [], "All", "", "ADMIN",
+        [], "", "", [], [], [], [], [], [],
+        "due_date", "desc", "tasks"
+      ),
       getUsers(),
       getAttendanceRecords(),
       getIMSItems(),
     ]);
+    const allChecklists = (checklistPage.data || []) as ChecklistOccurrence[];
 
     // Process O2D rows into orders (same as metrix route)
     const groupedByOrder: Record<string, any[]> = {};
@@ -397,13 +403,16 @@ export async function GET(request: Request) {
     // ── 7. TEAM SCORE SCORECARD ──
     const scorecard = (allUsers as any[]).filter((u: any) => u.status !== "Inactive").map((u: any) => {
       const userDelegations = allDelegations.filter(d => d.assigned_to === u.username);
-      const userChecklists = allChecklists.filter((c: any) => c.assigned_to === u.username);
+      const userChecklists = allChecklists.filter((c) => c.assigned_to === u.username);
       const totalAssigned = userDelegations.length + userChecklists.length;
       const completedCount = userDelegations.filter(d => d.status === "Completed").length +
-        userChecklists.filter((c: any) => c.status === "Completed").length;
+        userChecklists.filter((c) => c.display_status === "Completed").length;
       const onTimeCount = [
         ...userDelegations.filter(d => d.status === "Completed").map(d => ({ due: normalizeDate(d.due_date), done: normalizeDate(d.updated_at) })),
-        ...userChecklists.filter(c => c.status === "Completed").map(c => ({ due: normalizeDate(c.due_date), done: normalizeDate(c.updated_at) }))
+        ...userChecklists.filter(c => c.display_status === "Completed").map(c => ({
+          due: normalizeDate(c.occurrence_due_date || c.due_date),
+          done: normalizeDate(c.completed_date),
+        }))
       ].filter(t => t.due && t.done && t.done <= t.due).length;
 
       const overdueUser = userDelegations.filter(d => {

@@ -5,31 +5,31 @@ export interface Checklist {
   assigned_to: string;
   priority: string;
   department: string;
-  verification_required: string;
-  attachment_required: string;
   frequency: string;
   due_date: string;
-  status: string;
   group_id: string;
   created_at: string;
   updated_at: string;
 }
 
+/**
+ * Completion row in checklists_revision_history
+ * - group_id: links to checklists.group_id (task reference)
+ * - id: sequential submission index only (1, 2, 3…) — not the checklist task id
+ */
 export interface ChecklistRevision {
+  group_id: string;
   id: string;
-  checklists_id: string;
-  old_status: string;
   new_status: string;
-  reason: string;
-  created_at: string;
-  evidence_urls: string;
+  due_date: string;
+  timestamp: string;
 }
 
-export interface ChecklistRemark {
-  id: string;
-  checklists_id: string;
-  user_id: string;
-  username: string;
-  remark: string;
-  created_at: string;
+/** Virtual occurrence shown on the Tasks tab */
+export interface ChecklistOccurrence extends Checklist {
+  occurrence_due_date: string;
+  completed_date: string;
+  display_status: string;
+  is_late_complete: boolean;
+  occurrence_key: string;
 }

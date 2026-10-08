@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getDelegations } from "@/lib/delegation-sheets";
-import { getChecklists } from "@/lib/checklist-sheets";
+import { getChecklistsPaginated } from "@/lib/checklist-sheets";
+import { ChecklistOccurrence } from "@/types/checklist";
 import { getO2Ds, getO2DStepConfig } from "@/lib/o2d-sheets";
 import { getFollowUpData, getCallData } from "@/lib/scot-sheets";
 import { getUsers } from "@/lib/google-sheets";
@@ -100,9 +101,13 @@ export async function GET(request: Request) {
 
   try {
     const baseUrl = new URL(request.url).origin;
-    const [delegations, checklists, o2ds, stepConfigs, users, followUps, allCalls, leaves] = await Promise.all([
+    const [delegations, checklistPage, o2ds, stepConfigs, users, followUps, allCalls, leaves] = await Promise.all([
       getDelegations(),
-      getChecklists(),
+      getChecklistsPaginated(
+        1, 100000, "", [], "All", "", "ADMIN",
+        [], "", "", [], [], [], [], [], [],
+        "due_date", "desc", "tasks"
+      ),
       getO2Ds(),
       getO2DStepConfig(),
       getUsers(),
@@ -110,6 +115,7 @@ export async function GET(request: Request) {
       getCallData(),
       leaveRequestService.getAll(),
     ]);
+    const checklists = (checklistPage.data || []) as ChecklistOccurrence[];
 
     const leaveItems = leaves.map((l) => {
       const status = (l.status || "").toLowerCase();
@@ -182,23 +188,21 @@ export async function GET(request: Request) {
       });
     });
 
-    // Process Checklists
-    checklists.forEach(c => {
-      const planned = parseDate(c.due_date);
-      const actual = c.status === "Completed" ? parseDate(c.updated_at) : null;
+    // Process Checklists (expanded occurrences through today)
+    checklists.forEach((c) => {
+      const planned = parseDate(c.occurrence_due_date || c.due_date);
+      const actual =
+        c.display_status === "Completed" ? parseDate(c.completed_date) : null;
       allTasks.push({
         category: "checklist",
         user: c.assigned_to,
         plannedDate: planned,
         actualDate: actual,
         isCompleted: !!actual,
-        // Checklists: compare DATE only (ignore time) — same day = On Time
-        isLate: planned && actual
-          ? actual.toISOString().split('T')[0] > planned.toISOString().split('T')[0]
-          : false,
+        isLate: Boolean(c.is_late_complete),
         title: c.task,
-        id: c.id,
-        status: c.status
+        id: c.occurrence_key || c.id,
+        status: c.display_status,
       });
     });
 

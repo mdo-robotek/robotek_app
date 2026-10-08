@@ -30,7 +30,7 @@ export function useSchedulerData() {
     try {
       const [delRes, checkRes, tickRes, o2dRes, meetRes, scotRes] = await Promise.all([
         fetch("/api/delegations"),
-        fetch("/api/checklists"),
+        fetch("/api/checklists?view=tasks&page=1&limit=100000&userRole=ADMIN&assignmentFilter=All"),
         fetch("/api/tickets"),
         fetch("/api/o2d?all=true"),
         fetch("/api/scheduler/meetings"),
@@ -86,17 +86,18 @@ export function useSchedulerData() {
       });
     });
 
-    // 2. Checklists
+    // 2. Checklists (API returns expanded task occurrences by default)
     data.checklists.forEach((c) => {
-      const start = parseDateString(c.due_date);
+      const due = c.occurrence_due_date || c.due_date;
+      const start = parseDateString(due);
       if (!start) return;
       events.push({
-        id: `check-${c.id}`,
+        id: `check-${c.occurrence_key || `${c.id}-${due}`}`,
         title: c.task,
         description: `Department: ${c.department}`,
         type: "checklist",
         start,
-        status: c.status,
+        status: c.display_status || c.status || "Pending",
         priority: c.priority,
         assignedTo: c.assigned_to,
         itemData: c,

@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getTickets } from "@/lib/ticket-sheets";
 import { getDelegations } from "@/lib/delegation-sheets";
-import { getChecklists } from "@/lib/checklist-sheets";
+import { getChecklistsPaginated } from "@/lib/checklist-sheets";
+import { ChecklistOccurrence } from "@/types/checklist";
 import { getO2Ds } from "@/lib/o2d-sheets";
 import { getParties } from "@/lib/party-management-sheets";
 import { auth } from "@/auth";
@@ -117,16 +118,21 @@ export async function GET(req: NextRequest) {
     const from = new Date(istYear, istMonth - 1, 1, 0, 0, 0, 0);
     const to = new Date(istYear, istMonth, 0, 23, 59, 59, 999);
 
-    const [users, attendance, leaves, tickets, delegations, checklists, o2ds, parties] = await Promise.all([
+    const [users, attendance, leaves, tickets, delegations, checklistPage, o2ds, parties] = await Promise.all([
       getUsers(),
       getAttendanceRecords(),
       leaveRequestService.getAll(),
       getTickets(),
       getDelegations(),
-      getChecklists(),
+      getChecklistsPaginated(
+        1, 100000, "", [], "All", "", "ADMIN",
+        [], "", "", [], [], [], [], [], [],
+        "due_date", "desc", "tasks"
+      ),
       getO2Ds(),
       getParties()
     ]);
+    const checklists = (checklistPage.data || []) as ChecklistOccurrence[];
 
     const attendanceToday = attendance.filter((r: any) => normalizeDateStr(r.date) === todayStrRaw);
     const totalUsersCount = users.length;
@@ -226,14 +232,15 @@ export async function GET(req: NextRequest) {
         isLate: planned && actual ? actual > planned : false,
       });
     });
-    checklists.forEach((c: any) => {
-      const planned = parseDate(c.due_date);
-      const actual = c.status === "Completed" ? parseDate(c.updated_at) : null;
+    checklists.forEach((c) => {
+      const planned = parseDate(c.occurrence_due_date || c.due_date);
+      const actual =
+        c.display_status === "Completed" ? parseDate(c.completed_date) : null;
       allTasks.push({
         plannedDate: planned,
         actualDate: actual,
         isCompleted: !!actual,
-        isLate: planned && actual ? actual > planned : false,
+        isLate: Boolean(c.is_late_complete),
       });
     });
     o2ds.forEach((order: any) => {

@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
-import { Checklist } from "@/types/checklist";
+import { Checklist, ChecklistOccurrence } from "@/types/checklist";
+import { formatDateDdMmmYy, toDateOnlyString } from "@/lib/dateUtils";
 import { 
   PlusIcon, 
   PencilSquareIcon, 
@@ -53,8 +54,6 @@ import ActionStatusModal from "@/components/ActionStatusModal";
 import ConfirmModal from "@/components/ConfirmModal";
 import Portal from "@/components/Portal";
 import useSWR from "swr";
-import { useSSE } from "@/hooks/useSSE";
-import { applyPaginatedIncrementalUpdate } from "@/lib/utils/swr-sync";
 
 import { User } from "@/types/user";
 
@@ -69,10 +68,20 @@ export default function ChecklistsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<Checklist | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortConfig, setSortConfig] = useState<{ key: keyof Checklist; direction: 'asc' | 'desc' } | null>({ key: 'id', direction: 'desc' });
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' } | null>({ key: 'due_date', direction: 'desc' });
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [viewMode, setViewMode] = useState<'list' | 'tile'>('list');
+  const [activeTab, setActiveTab] = useState<'tasks' | 'master'>('tasks');
+
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setDebouncedSearch(searchTerm);
+      setCurrentPage(1);
+    }, 300);
+    return () => clearTimeout(t);
+  }, [searchTerm]);
 
   // Filters
   const [activeStatusFilters, setActiveStatusFilters] = useState<string[]>([]);
@@ -86,11 +95,8 @@ export default function ChecklistsPage() {
     assigned_to: "",
     priority: "Medium",
     department: "",
-    verification_required: "No",
-    attachment_required: "No",
     frequency: "Daily",
     due_date: "",
-    status: "Pending",
     group_id: "",
   });
 
@@ -142,23 +148,24 @@ export default function ChecklistsPage() {
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
 
   // Follow Up Sidebar States
-  const [selectedTask, setSelectedTask] = useState<Checklist | null>(null);
+  const [selectedTask, setSelectedTask] = useState<ChecklistOccurrence | Checklist | null>(null);
   const [taskHistory, setTaskHistory] = useState<any[]>([]);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
-  const [updatingStatus, setUpdatingStatus] = useState("");
-  const [remarkText, setRemarkText] = useState("");
   const [isSubmittingUpdate, setIsSubmittingUpdate] = useState(false);
-  const [revisionReason, setRevisionReason] = useState("");
-  const [evidenceFile, setEvidenceFile] = useState<File | null>(null);
-  const [revisedDueDate, setRevisedDueDate] = useState("");
-   const [pendingDeleteGroupId, setPendingDeleteGroupId] = useState<string | null>(null);
+  const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
+  const [isBulkCompleting, setIsBulkCompleting] = useState(false);
+  /** Stuck Completed overrides — never cleared by a stale refetch. */
+  const [localCompletions, setLocalCompletions] = useState<Record<string, string>>({});
  
    const [submitting, setSubmitting] = useState(false);
 
-  // Server-side paginated SWR
-  const checklistSWRKey = `/api/checklists?page=${currentPage}&limit=${itemsPerPage}&search=${encodeURIComponent(searchTerm)}&statusFilters=${encodeURIComponent(JSON.stringify(activeStatusFilters))}&assignmentFilter=${encodeURIComponent(assignmentFilter)}&currentUser=${encodeURIComponent(currentUser)}&userRole=${encodeURIComponent(userRole)}&dateFilters=${encodeURIComponent(JSON.stringify(dateFilters))}&startDate=${encodeURIComponent(modalStartDate)}&endDate=${encodeURIComponent(modalEndDate)}&modalStatus=${encodeURIComponent(JSON.stringify(modalStatusFilter))}&modalPriority=${encodeURIComponent(JSON.stringify(modalPriorityFilter))}&modalAssignedTo=${encodeURIComponent(JSON.stringify(modalAssignedToFilter))}&modalAssignedBy=${encodeURIComponent(JSON.stringify(modalAssignedByFilter))}&modalDepartment=${encodeURIComponent(JSON.stringify(modalDepartmentFilter))}&modalFrequency=${encodeURIComponent(JSON.stringify(modalFrequencyFilter))}&sortKey=${encodeURIComponent(sortConfig?.key || 'id')}&sortDir=${encodeURIComponent(sortConfig?.direction || 'desc')}`;
+  // Server-side paginated SWR — no auto revalidate (complete updates are applied locally)
+  const checklistSWRKey =
+    currentUser
+      ? `/api/checklists?page=${currentPage}&limit=${itemsPerPage}&view=${activeTab}&search=${encodeURIComponent(debouncedSearch)}&statusFilters=${encodeURIComponent(JSON.stringify(activeStatusFilters))}&assignmentFilter=${encodeURIComponent(assignmentFilter)}&currentUser=${encodeURIComponent(currentUser)}&userRole=${encodeURIComponent(userRole)}&dateFilters=${encodeURIComponent(JSON.stringify(dateFilters))}&startDate=${encodeURIComponent(modalStartDate)}&endDate=${encodeURIComponent(modalEndDate)}&modalStatus=${encodeURIComponent(JSON.stringify(modalStatusFilter))}&modalPriority=${encodeURIComponent(JSON.stringify(modalPriorityFilter))}&modalAssignedTo=${encodeURIComponent(JSON.stringify(modalAssignedToFilter))}&modalAssignedBy=${encodeURIComponent(JSON.stringify(modalAssignedByFilter))}&modalDepartment=${encodeURIComponent(JSON.stringify(modalDepartmentFilter))}&modalFrequency=${encodeURIComponent(JSON.stringify(modalFrequencyFilter))}&sortKey=${encodeURIComponent(sortConfig?.key || (activeTab === 'tasks' ? 'due_date' : 'id'))}&sortDir=${encodeURIComponent(sortConfig?.direction || 'desc')}`
+      : null;
   const { data: paginationData, isLoading: isPageLoading, mutate: mutateChecklists } = useSWR<{
-    data: Checklist[];
+    data: (Checklist | ChecklistOccurrence)[];
     total: number;
     page: number;
     limit: number;
@@ -176,26 +183,110 @@ export default function ChecklistsPage() {
     };
   }>(checklistSWRKey, fetcher, {
     revalidateOnFocus: false,
+    revalidateOnReconnect: false,
     revalidateOnMount: true,
     refreshInterval: 0,
+    keepPreviousData: true,
   });
   const isLoading = isPageLoading;
 
-  // SSE: incrementally update local cache when a change is detected
-  useSSE({ 
-    modules: ['checklists'], 
-    onUpdate: (incremental) => {
-      const updates = incremental.find(m => m.module === 'checklists');
-      if (updates) {
-        mutateChecklists((current) => applyPaginatedIncrementalUpdate(current as any, updates.upserts, updates.currentIds), false);
-      }
-    } 
-  });
+  // No SSE revalidate on this page — it was wiping Completed back to Pending
+  // before Sheets history was readable.
 
-  // Derived data from server response
-  const paginatedChecklists = paginationData?.data || [];
+  const occurrenceKeyOf = (item: Checklist | ChecklistOccurrence) => {
+    const occ = item as ChecklistOccurrence;
+    if (occ.occurrence_key) return String(occ.occurrence_key);
+    const due = toDateOnlyString(occ.occurrence_due_date || item.due_date) || "";
+    const gid = item.group_id || `chk_${item.id}`;
+    return `${gid}|${due}`;
+  };
+
+  const localCompletedDateFor = (item: Checklist | ChecklistOccurrence) => {
+    const occ = item as ChecklistOccurrence;
+    const due = toDateOnlyString(occ.occurrence_due_date || item.due_date) || "";
+    const gid = String(item.group_id || `chk_${item.id}`);
+    const keys = [
+      occ.occurrence_key,
+      `${gid}|${due}`,
+      `chk_${item.id}|${due}`,
+      `${item.id}|${due}`,
+    ].filter(Boolean) as string[];
+    for (const k of keys) {
+      if (localCompletions[k]) return localCompletions[k];
+    }
+    // Fallback: any local key with same due date + matching id/group
+    for (const [k, v] of Object.entries(localCompletions)) {
+      if (!k.endsWith(`|${due}`)) continue;
+      const left = k.slice(0, k.lastIndexOf("|"));
+      if (
+        left === gid ||
+        left === `chk_${item.id}` ||
+        left === String(item.id) ||
+        left.endsWith(`_${item.id}`)
+      ) {
+        return v;
+      }
+    }
+    return "";
+  };
+
+  const rememberLocalCompletions = (
+    entries: { group_id: string; id?: string; due_date: string }[],
+    completedDate: string
+  ) => {
+    setLocalCompletions((prev) => {
+      const next = { ...prev };
+      for (const e of entries) {
+        const due = e.due_date;
+        const gid = e.group_id;
+        next[`${gid}|${due}`] = completedDate;
+        if (e.id) {
+          next[`${e.id}|${due}`] = completedDate;
+          next[`chk_${e.id}|${due}`] = completedDate;
+        }
+        if (gid.startsWith("chk_")) {
+          next[`${gid.replace(/^chk_/, "")}|${due}`] = completedDate;
+        }
+      }
+      return next;
+    });
+  };
+
+  // Always patch rows with local completions so Completed never flashes away
+  const paginatedChecklists = (paginationData?.data || []).map((item) => {
+    if (activeTab !== "tasks") return item;
+    const occ = item as ChecklistOccurrence;
+    const localDate = localCompletedDateFor(item);
+    if (!localDate) return item;
+    const due = toDateOnlyString(occ.occurrence_due_date || occ.due_date) || "";
+    return {
+      ...occ,
+      display_status: "Completed",
+      completed_date: occ.completed_date || localDate,
+      is_late_complete: Boolean(
+        (occ.completed_date || localDate) &&
+          due &&
+          (occ.completed_date || localDate) > due
+      ),
+    };
+  });
   const totalPages = paginationData?.totalPages || 1;
-  const statusCounts = paginationData?.statusCounts || {};
+  const statusCounts = (() => {
+    const base = { ...(paginationData?.statusCounts || {}) };
+    if (activeTab !== "tasks" || Object.keys(localCompletions).length === 0) return base;
+    for (const item of paginationData?.data || []) {
+      const occ = item as ChecklistOccurrence;
+      if (!localCompletedDateFor(item) || occ.display_status === "Completed") continue;
+      const prev = occ.display_status || "Pending";
+      if (prev === "Pending") base.Pending = Math.max(0, (base.Pending || 0) - 1);
+      if (prev === "Overdue") {
+        base.Overdue = Math.max(0, (base.Overdue || 0) - 1);
+        base.Delayed = Math.max(0, (base.Delayed || 0) - 1);
+      }
+      base.Completed = (base.Completed || 0) + 1;
+    }
+    return base;
+  })();
   const dateCounts = paginationData?.dateCounts || {};
   const toMeCount = paginationData?.toMeCount || 0;
   const byMeCount = paginationData?.byMeCount || 0;
@@ -207,16 +298,23 @@ export default function ChecklistsPage() {
 
   useEffect(() => {
     if (selectedTask) {
-      fetchHistory(selectedTask.id);
+      fetchHistory(selectedTask.group_id || selectedTask.id);
     } else {
       setTaskHistory([]);
-      setUpdatingStatus("");
-      setRemarkText("");
-      setRevisionReason("");
-      setEvidenceFile(null);
-      setRevisedDueDate("");
     }
   }, [selectedTask]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+    setActiveStatusFilters([]);
+    setDateFilters([]);
+    setSelectedKeys(new Set());
+    setSortConfig(
+      activeTab === "master"
+        ? { key: "id", direction: "desc" }
+        : { key: "due_date", direction: "desc" }
+    );
+  }, [activeTab]);
 
   const fetchHistory = async (id: string) => {
     setIsLoadingHistory(true);
@@ -233,103 +331,100 @@ export default function ChecklistsPage() {
     }
   };
 
-  const handleUpdateStatus = async () => {
-    if (!selectedTask || !updatingStatus) return;
+  const markRowsCompletedLocally = (
+    current: typeof paginationData,
+    match: (row: ChecklistOccurrence) => boolean,
+    completedDate: string
+  ) => {
+    if (!current?.data) return current;
+    let pendingDelta = 0;
+    let overdueDelta = 0;
+    let completedDelta = 0;
+    const data = current.data.map((c) => {
+      const row = c as ChecklistOccurrence;
+      if (!match(row) || row.display_status === "Completed") return c;
+      const prev = row.display_status || getDisplayStatus(row);
+      if (prev === "Pending") pendingDelta -= 1;
+      if (prev === "Overdue") overdueDelta -= 1;
+      completedDelta += 1;
+      const due = toDateOnlyString(row.occurrence_due_date || row.due_date) || "";
+      return {
+        ...row,
+        display_status: "Completed",
+        completed_date: completedDate,
+        is_late_complete: Boolean(completedDate && due && completedDate > due),
+      };
+    });
+    const statusCounts = { ...(current.statusCounts || {}) };
+    statusCounts.Pending = Math.max(0, (statusCounts.Pending || 0) + pendingDelta);
+    statusCounts.Overdue = Math.max(0, (statusCounts.Overdue || 0) + overdueDelta);
+    statusCounts.Delayed = Math.max(0, (statusCounts.Delayed || 0) + overdueDelta);
+    statusCounts.Completed = (statusCounts.Completed || 0) + completedDelta;
+    return { ...current, data, statusCounts };
+  };
 
-    // Validation: Compulsory evidence if required
-    if (updatingStatus === 'Completed' && selectedTask.attachment_required === 'Yes' && !evidenceFile) {
-      alert("Attachment is required for this checklist item when marking as Completed.");
-      return;
-    }
+  const handleCompleteTask = async () => {
+    if (!selectedTask) return;
+    const occ = selectedTask as ChecklistOccurrence;
+    const dueDate =
+      toDateOnlyString(occ.occurrence_due_date || occ.due_date) || "";
+    if (!dueDate) return;
+    const groupId = String(occ.group_id || `chk_${selectedTask.id}`);
 
     setIsStatusModalOpen(true);
-    setActionStatus('loading');
-    setActionMessage("Updating status...");
+    setActionStatus("loading");
+    setActionMessage("Marking completed...");
     setIsSubmittingUpdate(true);
-    
-    try {
-      const formDataToSend = new FormData();
-      formDataToSend.append("status", updatingStatus);
-      formDataToSend.append("reason", revisionReason);
-      formDataToSend.append("revised_due_date", revisedDueDate);
-      if (evidenceFile) {
-        formDataToSend.append("evidence", evidenceFile);
-      }
 
+    try {
       const res = await fetch(`/api/checklists/${selectedTask.id}/status`, {
         method: "POST",
-        body: formDataToSend,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "Completed", due_date: dueDate }),
       });
 
       if (res.ok) {
         const data = await res.json();
-        if (data.checklist) {
-          mutateChecklists((current) => {
-            if (!current?.data) return current;
-            return {
-              ...current,
-              data: current.data.map((c) =>
-                String(c.id) === String(data.checklist.id) ? data.checklist : c
-              ),
-            };
-          }, false);
-        }
-        setUpdatingStatus("");
-        setRevisionReason("");
-        setEvidenceFile(null);
-        setRevisedDueDate("");
-        setSelectedTask(data.checklist || null);
-
-        setActionStatus('success');
-        setActionMessage("Status updated successfully!");
+        const completedDate =
+          data.revision?.timestamp ||
+          new Date().toISOString().slice(0, 10);
+        rememberLocalCompletions(
+          [
+            {
+              group_id: groupId,
+              id: String(selectedTask.id),
+              due_date: dueDate,
+            },
+          ],
+          completedDate
+        );
+        await mutateChecklists(
+          (current) =>
+            markRowsCompletedLocally(
+              current,
+              (row) =>
+                (String(row.group_id) === groupId ||
+                  String(row.id) === String(selectedTask.id)) &&
+                toDateOnlyString(row.occurrence_due_date || row.due_date) ===
+                  dueDate,
+              completedDate
+            ),
+          { revalidate: false }
+        );
+        setSelectedTask(null);
+        setActionStatus("success");
+        setActionMessage("Marked completed!");
         setTimeout(() => setIsStatusModalOpen(false), 1500);
       } else {
         const err = await res.json();
-        setActionStatus('error');
-        setActionMessage(err.error || "Failed to update status");
+        setActionStatus("error");
+        setActionMessage(err.error || "Failed to complete");
         setTimeout(() => setIsStatusModalOpen(false), 3000);
       }
     } catch (error) {
-      console.error("Error updating status:", error);
-      setActionStatus('error');
-      setActionMessage("An error occurred while updating status");
-      setTimeout(() => setIsStatusModalOpen(false), 3000);
-    } finally {
-      setIsSubmittingUpdate(false);
-    }
-  };
-
-  const handleAddRemark = async () => {
-    if (!selectedTask || !remarkText.trim()) return;
-
-    setIsStatusModalOpen(true);
-    setActionStatus('loading');
-    setActionMessage("Adding remark to sheet...");
-    setIsSubmittingUpdate(true);
-
-    try {
-      const res = await fetch(`/api/checklists/${selectedTask.id}/remarks`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ remark: remarkText }),
-      });
-
-      if (res.ok) {
-        setRemarkText("");
-        
-        setActionStatus('success');
-        setActionMessage("Remark added successfully!");
-        setTimeout(() => setIsStatusModalOpen(false), 1500);
-      } else {
-        const err = await res.json();
-        setActionStatus('error');
-        setActionMessage(err.error || "Failed to add remark");
-        setTimeout(() => setIsStatusModalOpen(false), 3000);
-      }
-    } catch (error) {
-      console.error("Error adding remark:", error);
-      setActionStatus('error');
-      setActionMessage("An error occurred while adding remark");
+      console.error("Error completing checklist:", error);
+      setActionStatus("error");
+      setActionMessage("An error occurred while completing");
       setTimeout(() => setIsStatusModalOpen(false), 3000);
     } finally {
       setIsSubmittingUpdate(false);
@@ -359,11 +454,8 @@ export default function ChecklistsPage() {
       assigned_to: "",
       priority: "Medium",
       department: "",
-      verification_required: "No",
-      attachment_required: "No",
       frequency: "Daily",
       due_date: "",
-      status: "Pending",
       group_id: "",
     });
     setAssignedBySearch("");
@@ -375,85 +467,53 @@ export default function ChecklistsPage() {
   };
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    const now = new Date();
-    const nowIso = now.toISOString();
 
     setIsModalOpen(false);
     setActionStatus('loading');
-    setActionMessage(editingItem ? "Updating Task..." : "Creating Tasks...");
+    setActionMessage(editingItem ? "Updating Task..." : "Creating Task...");
     setIsStatusModalOpen(true);
 
     try {
+      const dueDate = toDateOnlyString(
+        (formData.due_date || "").split(",")[0]?.trim() || formData.due_date || ""
+      );
+      const payload = {
+        task: formData.task || "",
+        assigned_by: formData.assigned_by || "",
+        assigned_to: formData.assigned_to || "",
+        priority: formData.priority || "Medium",
+        department: formData.department || "",
+        frequency: formData.frequency || "Daily",
+        due_date: dueDate,
+      };
+
       if (editingItem) {
-        const url = formData.group_id 
-          ? `/api/checklists/${editingItem.id}?groupId=${formData.group_id}`
-          : `/api/checklists/${editingItem.id}`;
-        
-        let finalDueDate = formData.due_date || "";
-        if (finalDueDate && /^\d{4}-\d{2}-\d{2}$/.test(finalDueDate)) {
-          const d = new Date(finalDueDate);
-          d.setHours(now.getHours(), now.getMinutes(), now.getSeconds(), now.getMilliseconds());
-          finalDueDate = d.toISOString();
-        }
-
-        const payload = {
-          ...formData,
-          due_date: finalDueDate,
-          frequency: formData.frequency?.startsWith('Weekly') ? 'Weekly' : formData.frequency,
-          updated_at: nowIso,
-        } as Checklist;
-
-        const res = await fetch(url, {
+        const res = await fetch(`/api/checklists/${editingItem.id}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
         });
-
         if (!res.ok) {
           const errorData = await res.json().catch(() => ({}));
           throw new Error(errorData.error || "Failed to update checklist");
         }
       } else {
-        const selectedDates = formData.due_date?.split(',').map(d => d.trim()).filter(Boolean) || [];
-        const datesToSubmit = selectedDates.length > 0 ? selectedDates : [""];
-        const sharedGroupId = `GR-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
-
-        const payloadArray = datesToSubmit.map((dateStr) => {
-          let finalDueDate = dateStr;
-          if (dateStr && /^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
-            const d = new Date(dateStr);
-            d.setHours(now.getHours(), now.getMinutes(), now.getSeconds(), now.getMilliseconds());
-            finalDueDate = d.toISOString();
-          }
-
-          return {
-            ...formData,
-            id: "", 
-            group_id: sharedGroupId,
-            due_date: finalDueDate,
-            frequency: formData.frequency?.startsWith('Weekly') ? 'Weekly' : formData.frequency,
-            created_at: nowIso,
-            updated_at: nowIso,
-          };
-        });
-
         const res = await fetch("/api/checklists", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payloadArray),
+          body: JSON.stringify(payload),
         });
-
         if (!res.ok) {
           const errorData = await res.json().catch(() => ({}));
-          throw new Error(errorData.error || `Failed to create checklist`);
+          throw new Error(errorData.error || "Failed to create checklist");
         }
       }
 
       resetForm();
-      await mutateChecklists(); // Final wait for sync
+      setActiveTab("master");
+      await mutateChecklists();
       setActionStatus('success');
-      setActionMessage(editingItem ? "Task updated successfully!" : "Tasks created successfully!");
+      setActionMessage(editingItem ? "Task updated successfully!" : "Task created successfully!");
       setTimeout(() => setIsStatusModalOpen(false), 1500);
     } catch (error: any) {
       console.error("Save error:", error);
@@ -541,31 +601,7 @@ export default function ChecklistsPage() {
     return `${year}-${month}-${day}`;
   };
 
-  const formatDateDisplay = (dateStr: string) => {
-    if (!dateStr) return "";
-    const dates = dateStr.split(',').map(d => d.trim()).filter(Boolean);
-    
-    const formattedDates = dates.map(d => {
-      // Handle ISO strings
-      if (d.includes('T')) {
-        const date = new Date(d);
-        return isNaN(date.getTime()) ? d : date.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
-      }
-
-      // Handle YYYY-MM-DD
-      if (d.includes('-') && d.split('-').length === 3) {
-        const [y, m, day] = d.split('-').map(Number);
-        if (!isNaN(y) && !isNaN(m) && !isNaN(day)) {
-          return new Date(y, m - 1, day).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
-        }
-      }
-      
-      const date = new Date(d);
-      return isNaN(date.getTime()) ? d : date.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
-    });
-
-    return formattedDates.join(', ');
-  };
+  const formatDateDisplay = (dateStr: string) => formatDateDdMmmYy(dateStr);
 
   const handleExport = async () => {
     const exportUrl = checklistSWRKey
@@ -576,12 +612,37 @@ export default function ChecklistsPage() {
       const result = await res.json();
       const allItems: Checklist[] = result.data || [];
 
-      const headers = ["ID", "Task", "Assigned By", "Assigned To", "Priority", "Department", "Verification", "Attachment", "Frequency", "Due Date", "Status", "Group ID"];
-      const rows = allItems.map((c: Checklist) => [
-        c.id, c.task, c.assigned_by, c.assigned_to, c.priority, c.department,
-        c.verification_required, c.attachment_required,
-        c.frequency, c.due_date, c.status, c.group_id
-      ]);
+      const headers =
+        activeTab === "tasks"
+          ? ["ID", "Task", "Assigned By", "Assigned To", "Priority", "Department", "Frequency", "Due Date", "Completed Date", "Status", "Group ID"]
+          : ["ID", "Task", "Assigned By", "Assigned To", "Priority", "Department", "Frequency", "Due Date", "Group ID"];
+      const rows = allItems.map((c: any) =>
+        activeTab === "tasks"
+          ? [
+              c.id,
+              c.task,
+              c.assigned_by,
+              c.assigned_to,
+              c.priority,
+              c.department,
+              c.frequency,
+              c.occurrence_due_date || c.due_date,
+              c.completed_date || "",
+              c.display_status || "",
+              c.group_id,
+            ]
+          : [
+              c.id,
+              c.task,
+              c.assigned_by,
+              c.assigned_to,
+              c.priority,
+              c.department,
+              c.frequency,
+              c.due_date,
+              c.group_id,
+            ]
+      );
 
       const csvContent = [
         headers.join(","),
@@ -604,7 +665,6 @@ export default function ChecklistsPage() {
 
   const handleDeleteClick = (item: Checklist) => {
     setPendingDeleteId(item.id);
-    setPendingDeleteGroupId(item.group_id);
     setIsConfirmOpen(true);
   };
 
@@ -613,18 +673,14 @@ export default function ChecklistsPage() {
 
     setIsConfirmOpen(false);
     setActionStatus('loading');
-    setActionMessage(pendingDeleteGroupId ? "Deleting Group..." : "Deleting Task...");
+    setActionMessage("Deleting Task...");
     setIsStatusModalOpen(true);
 
     try {
-      const url = pendingDeleteGroupId 
-        ? `/api/checklists/${pendingDeleteId}?groupId=${pendingDeleteGroupId}`
-        : `/api/checklists/${pendingDeleteId}`;
-
-      const res = await fetch(url, { method: "DELETE" });
+      const res = await fetch(`/api/checklists/${pendingDeleteId}`, { method: "DELETE" });
       if (!res.ok) throw new Error("Delete failed");
       
-      await mutateChecklists(); // Wait for sync
+      await mutateChecklists();
       setActionStatus('success');
       setActionMessage("Deleted successfully!");
       setTimeout(() => setIsStatusModalOpen(false), 1500);
@@ -635,33 +691,23 @@ export default function ChecklistsPage() {
       mutateChecklists(); 
     } finally {
       setPendingDeleteId(null);
-      setPendingDeleteGroupId(null);
     }
   };
 
-  // Filtering and sorting handled server-side. Client only needs display status for badges.
-  const getDisplayStatus = (item: Checklist) => {
-    const s = item.status;
-    if (s && s !== 'Pending') return s;
-    if (!item.due_date) return s || 'Pending';
-    const now = new Date();
-    now.setHours(0, 0, 0, 0);
-    const due = getEarliestDate(item.due_date);
-    if (!due) return item.status || 'Pending';
-    due.setHours(0, 0, 0, 0);
-    if (due < now) return 'Overdue';
-    if (due > now) return 'Planned';
-    return 'Pending';
+  const getDisplayStatus = (item: Checklist | ChecklistOccurrence) => {
+    const occ = item as ChecklistOccurrence;
+    if (occ.display_status) return occ.display_status;
+    return "Pending";
   };
 
-  const handleSort = (key: keyof Checklist) => {
+  const handleSort = (key: string) => {
     let direction: 'asc' | 'desc' = 'asc';
     if (sortConfig && sortConfig.key === key && sortConfig.direction === 'asc') direction = 'desc';
     setSortConfig({ key, direction });
     setCurrentPage(1);
   };
 
-  const SortIcon = ({ column }: { column: keyof Checklist }) => {
+  const SortIcon = ({ column }: { column: string }) => {
     if (sortConfig?.key !== column) return <div className="w-3 h-3 ml-1 opacity-20" />;
     return sortConfig.direction === 'asc' ?
       <ChevronUpIcon className="w-3 h-3 ml-1 text-[#FFD500]" /> :
@@ -703,18 +749,21 @@ export default function ChecklistsPage() {
     } else if (s === 'approved') {
       color = "bg-green-50 text-green-600 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800";
       Icon = ShieldCheckIcon;
-    } else if (s === 'overdue') {
+    } else if (s === 'overdue' || s === 'delayed') {
       color = "bg-red-50 text-red-600 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800";
       Icon = ExclamationTriangleIcon;
     } else if (s === 'planned') {
       color = "bg-blue-50 text-blue-600 border-blue-200 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800";
       Icon = CalendarDaysIcon;
     }
+
+    const label =
+      s === "overdue" || s === "delayed" ? "Delayed" : status || "Pending";
     
     return (
       <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-black uppercase tracking-widest rounded-md border ${color}`}>
         <Icon className="w-3 h-3" />
-        {status || "Pending"}
+        {label}
       </span>
     );
   };
@@ -741,25 +790,121 @@ export default function ChecklistsPage() {
     );
   };
 
-  const renderUserAvatar = (username: string) => {
-    if (!username || username === "—") return <span className="font-bold text-gray-500 dark:text-gray-400">—</span>;
-    const user = usersList.find((u) => u.username === username);
-    if (user?.image_url) {
-      return (
-        <div className="flex items-center gap-2">
-          <img src={user.image_url} alt={username} className="w-6 h-6 rounded-full object-cover border border-gray-200 dark:border-white/10 shadow-sm" />
-          <span className="font-bold text-gray-900 dark:text-white text-[11px] truncate">{username}</span>
-        </div>
-      );
+  const renderUserName = (username: string) => {
+    if (!username || username === "—") {
+      return <span className="font-bold text-gray-500 dark:text-gray-400">—</span>;
     }
     return (
-      <div className="flex items-center gap-2">
-        <div className="w-6 h-6 rounded-full shrink-0 bg-gradient-to-br from-[#003875] to-[#002855] text-white flex items-center justify-center text-[10px] font-bold shadow-sm">
-          {username.charAt(0).toUpperCase()}
-        </div>
-        <span className="font-bold text-gray-900 dark:text-white text-[11px] truncate">{username}</span>
-      </div>
+      <span className="font-bold text-gray-900 dark:text-white text-[11px] truncate">
+        {username}
+      </span>
     );
+  };
+
+  const toggleSelectKey = (key: string) => {
+    setSelectedKeys((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  };
+
+  const rowKeyFor = (item: Checklist | ChecklistOccurrence) => {
+    const occ = item as ChecklistOccurrence;
+    if (occ.occurrence_key) return String(occ.occurrence_key);
+    const due = toDateOnlyString(occ.occurrence_due_date || item.due_date) || "nodue";
+    const gid = item.group_id || `chk_${item.id || "x"}`;
+    return `${gid}|${due}`;
+  };
+
+  const masterRowKey = (item: Checklist, index: number) =>
+    String(item.group_id || item.id || `master-${index}`);
+
+  const selectableOnPage = paginatedChecklists.filter((item) => {
+    if (activeTab !== "tasks") return false;
+    return getDisplayStatus(item) !== "Completed";
+  }) as ChecklistOccurrence[];
+
+  const allPageSelected =
+    selectableOnPage.length > 0 &&
+    selectableOnPage.every((item) => selectedKeys.has(rowKeyFor(item)));
+
+  const toggleSelectAllPage = () => {
+    setSelectedKeys((prev) => {
+      const next = new Set(prev);
+      if (allPageSelected) {
+        selectableOnPage.forEach((item) => next.delete(rowKeyFor(item)));
+      } else {
+        selectableOnPage.forEach((item) => next.add(rowKeyFor(item)));
+      }
+      return next;
+    });
+  };
+
+  const handleBulkComplete = async () => {
+    if (selectedKeys.size === 0 || activeTab !== "tasks" || isBulkCompleting) return;
+    const payload = [...selectedKeys]
+      .map((key) => {
+        const sep = String(key).lastIndexOf("|");
+        if (sep < 0) return null;
+        const group_id = String(key).slice(0, sep).trim();
+        const due = String(key).slice(sep + 1).trim();
+        if (group_id && due && /^\d{4}-\d{2}-\d{2}$/.test(due)) {
+          return { group_id, due_date: due };
+        }
+        return null;
+      })
+      .filter(Boolean) as { group_id: string; due_date: string }[];
+    if (payload.length === 0) return;
+
+    setIsBulkCompleting(true);
+    try {
+      const res = await fetch("/api/checklists/bulk-complete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ items: payload }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Bulk complete failed");
+      const completedDate =
+        data.completed_date || new Date().toISOString().slice(0, 10);
+      rememberLocalCompletions(
+        payload.map((p) => ({
+          group_id: p.group_id,
+          id: p.group_id.replace(/^chk_/, ""),
+          due_date: p.due_date,
+        })),
+        completedDate
+      );
+      const doneDueByGroup = new Map(
+        payload.map((p) => [`${p.group_id}|${p.due_date}`, true] as const)
+      );
+      await mutateChecklists(
+        (current) =>
+          markRowsCompletedLocally(
+            current,
+            (row) => {
+              const due =
+                toDateOnlyString(row.occurrence_due_date || row.due_date) || "";
+              const gid = String(row.group_id || `chk_${row.id}`);
+              return (
+                doneDueByGroup.has(`${gid}|${due}`) ||
+                doneDueByGroup.has(`chk_${row.id}|${due}`) ||
+                doneDueByGroup.has(`${row.id}|${due}`) ||
+                doneDueByGroup.has(occurrenceKeyOf(row))
+              );
+            },
+            completedDate
+          ),
+        { revalidate: false }
+      );
+      setSelectedKeys(new Set());
+    } catch (e: any) {
+      console.error("Bulk complete failed:", e?.message || e);
+    } finally {
+      setIsBulkCompleting(false);
+    }
   };
 
   return (
@@ -770,246 +915,223 @@ export default function ChecklistsPage() {
       <div className="flex flex-col lg:flex-row items-center gap-4 px-1">
         <div className="w-full lg:w-1/3 text-center lg:text-left min-w-0">
           <h1 className="text-xl md:text-2xl font-black text-gray-900 dark:text-white tracking-tight">Checklists</h1>
-          <p className="text-gray-500 dark:text-slate-300 font-bold text-[8px] md:text-[10px] uppercase tracking-wider">Task Verification System</p>
+          <p className="text-gray-500 dark:text-slate-300 font-bold text-[8px] md:text-[10px] uppercase tracking-wider">Master tasks + date-wise occurrences</p>
         </div>
         
         <div className="w-full lg:w-1/3 flex justify-center flex-shrink-0 min-w-0">
-          <div className="flex items-center gap-1.5 rounded-full border-2 border-b-4 border-[#003875] dark:border-[#FFD500] bg-white dark:bg-navy-800 shadow-sm transition-all active:translate-y-[2px] active:border-b-2 p-1 max-w-full">
-          {/* View Toggle */}
-          <div className="flex items-center bg-gray-50 dark:bg-navy-900 rounded-full p-0.5 border border-gray-100 dark:border-navy-700">
+          <div className="flex items-center gap-1 rounded-full border-2 border-b-4 border-[#003875] dark:border-[#FFD500] bg-white dark:bg-navy-800 shadow-sm transition-all active:translate-y-[2px] active:border-b-2 pl-1 pr-1.5 py-1 overflow-visible">
+            <div className="flex items-center bg-gray-50 dark:bg-navy-900 rounded-full p-0.5 border border-gray-100 dark:border-navy-700 shrink-0">
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveTab("tasks");
+                  setSelectedKeys(new Set());
+                  setCurrentPage(1);
+                }}
+                className={`px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-widest transition-all ${
+                  activeTab === "tasks"
+                    ? "bg-[#003875] text-white shadow-sm"
+                    : "text-gray-500 hover:text-gray-700 dark:hover:text-gray-200"
+                }`}
+              >
+                Tasks
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveTab("master");
+                  setSelectedKeys(new Set());
+                  setCurrentPage(1);
+                }}
+                className={`px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-widest transition-all ${
+                  activeTab === "master"
+                    ? "bg-[#003875] text-white shadow-sm"
+                    : "text-gray-500 hover:text-gray-700 dark:hover:text-gray-200"
+                }`}
+              >
+                Master
+              </button>
+            </div>
+
+            <div className="h-4 w-[1px] bg-gray-100 dark:bg-white/10 shrink-0" />
+
+            <div className="flex items-center bg-gray-50 dark:bg-navy-900 rounded-full p-0.5 border border-gray-100 dark:border-navy-700 shrink-0">
+              <button
+                onClick={() => setViewMode('list')}
+                className={`p-1.5 rounded-full transition-all ${viewMode === 'list' ? 'bg-[#003875] text-white shadow-sm' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'}`}
+                title="List View"
+              >
+                <ListBulletIcon className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => setViewMode('tile')}
+                className={`p-1.5 rounded-full transition-all ${viewMode === 'tile' ? 'bg-[#003875] text-white shadow-sm' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'}`}
+                title="Tile View"
+              >
+                <Squares2X2Icon className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="h-4 w-[1px] bg-gray-100 dark:bg-white/10 shrink-0" />
+
             <button
-              onClick={() => setViewMode('list')}
-              className={`p-1.5 rounded-full transition-all ${viewMode === 'list' ? 'bg-[#003875] text-white shadow-sm' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'}`}
-              title="List View"
+              onClick={handleExport}
+              className="flex items-center justify-center gap-1.5 text-[#003875] dark:text-[#FFD500] px-2 md:px-2.5 py-1.5 font-black transition-colors hover:bg-gray-100 dark:hover:bg-navy-700 uppercase tracking-widest text-[9px] md:text-[10px] rounded-full whitespace-nowrap shrink-0"
+              title="Export to CSV"
             >
-              <ListBulletIcon className="w-4 h-4" />
+              <ArrowDownTrayIcon className="w-4 h-4" />
+              <span className="hidden sm:inline">Export</span>
             </button>
+
+            <div className="h-4 w-[1px] bg-gray-100 dark:bg-white/10 shrink-0" />
+
             <button
-              onClick={() => setViewMode('tile')}
-              className={`p-1.5 rounded-full transition-all ${viewMode === 'tile' ? 'bg-[#003875] text-white shadow-sm' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'}`}
-              title="Tile View"
+              onClick={() => setIsFilterModalOpen(true)}
+              className="flex items-center justify-center gap-1.5 text-[#003875] dark:text-[#FFD500] px-2 md:px-2.5 py-1.5 font-black transition-colors hover:bg-gray-100 dark:hover:bg-navy-700 uppercase tracking-widest text-[9px] md:text-[10px] rounded-full whitespace-nowrap relative shrink-0"
+              title="Advanced Filters"
             >
-              <Squares2X2Icon className="w-4 h-4" />
+              <FunnelIcon className="w-4 h-4" />
+              <span className="hidden sm:inline">Filter</span>
+              {(modalStartDate || modalEndDate || modalStatusFilter.length > 0 || modalPriorityFilter.length > 0 || modalAssignedToFilter.length > 0 || modalAssignedByFilter.length > 0 || modalDepartmentFilter.length > 0 || modalFrequencyFilter.length > 0) && (
+                <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-navy-800 animate-pulse" />
+              )}
+            </button>
+
+            <div className="h-4 w-[1px] bg-gray-100 dark:bg-white/10 shrink-0" />
+
+            <button
+              onClick={() => {
+                setActiveTab("master");
+                resetForm();
+                setIsModalOpen(true);
+              }}
+              className="flex items-center justify-center hover:bg-gray-100 dark:hover:bg-navy-700 text-[#003875] dark:text-[#FFD500] p-1.5 transition-colors rounded-full shrink-0"
+              title="New Checklist"
+            >
+              <PlusIcon className="w-5 h-5" />
             </button>
           </div>
-
-          <div className="h-4 w-[1px] bg-gray-100 dark:bg-white/10" />
-
-          <button
-            onClick={handleExport}
-            className="flex items-center justify-center gap-2 text-[#003875] dark:text-[#FFD500] px-3 md:px-5 py-2 font-black transition-colors hover:bg-gray-100 dark:hover:bg-navy-700 uppercase tracking-widest text-[9px] md:text-[10px] rounded-full whitespace-nowrap"
-            title="Export to CSV"
-          >
-            <ArrowDownTrayIcon className="w-4 h-4" />
-            <span className="hidden sm:inline">Export</span>
-          </button>
-
-          <div className="h-4 w-[1px] bg-gray-100 dark:bg-white/10" />
-
-          <button
-            onClick={() => setIsFilterModalOpen(true)}
-            className="flex items-center justify-center gap-2 text-[#003875] dark:text-[#FFD500] px-3 md:px-5 py-2 font-black transition-colors hover:bg-gray-100 dark:hover:bg-navy-700 uppercase tracking-widest text-[9px] md:text-[10px] rounded-full whitespace-nowrap relative"
-            title="Advanced Filters"
-          >
-            <FunnelIcon className="w-4 h-4" />
-            <span className="hidden sm:inline">Filter</span>
-            {(modalStartDate || modalEndDate || modalStatusFilter.length > 0 || modalPriorityFilter.length > 0 || modalAssignedToFilter.length > 0 || modalAssignedByFilter.length > 0 || modalDepartmentFilter.length > 0 || modalFrequencyFilter.length > 0) && (
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-navy-800 animate-pulse" />
-            )}
-          </button>
-
-          <div className="h-4 w-[1px] bg-gray-100 dark:bg-white/10" />
-
-          <button
-            onClick={() => {
-              setIsModalOpen(true);
-            }}
-            className="flex items-center justify-center hover:bg-gray-100 dark:hover:bg-navy-700 text-[#003875] dark:text-[#FFD500] px-3 py-2 transition-colors rounded-full"
-            title="New Checklist"
-          >
-            <PlusIcon className="w-5 h-5" />
-          </button>
-        </div>
         </div>
         <div className="hidden lg:block lg:w-1/3"></div>
       </div>
 
-      <div 
-        style={{ borderColor: 'var(--panel-border)' }}
-        className="rounded-2xl border overflow-hidden shadow-sm transition-all duration-500"
-      >
-        {/* Status Filtration Tiles - Single row scrollable on mobile */}
-        <div className="flex flex-nowrap overflow-x-auto no-scrollbar gap-2 p-3 bg-gray-50/50 dark:bg-navy-900/30 border-b border-gray-100 dark:border-navy-700/50">
-          {[
-            { label: 'All', icon: <TagIcon className="w-3 h-3" />, color: 'bg-white text-gray-700 border-gray-300 dark:bg-navy-800 dark:text-gray-300 dark:border-navy-600' },
-            { label: 'Pending', icon: <ClockIcon className="w-3 h-3" />, color: 'bg-gray-50 text-gray-600 border-gray-300 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600' },
-            { label: 'Planned', icon: <CalendarDaysIcon className="w-3 h-3" />, color: 'bg-blue-50 text-blue-600 border-blue-300 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-700' },
-            { label: 'Completed', icon: <CheckCircleIcon className="w-3 h-3" />, color: 'bg-emerald-50 text-emerald-600 border-emerald-300 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-700' },
-            { label: 'Approved', icon: <ShieldCheckIcon className="w-3 h-3" />, color: 'bg-green-50 text-green-600 border-green-300 dark:bg-green-900/30 dark:text-green-400 dark:border-green-700' },
-            { label: 'Overdue', icon: <ExclamationTriangleIcon className="w-3 h-3" />, color: 'bg-red-50 text-red-600 border-red-300 dark:bg-red-900/30 dark:text-red-400 dark:border-red-700' },
-          ].map(tile => {
-            const count = statusCounts[tile.label] || 0;
-            const isActive = tile.label === 'All' ? activeStatusFilters.length === 0 : activeStatusFilters.includes(tile.label);
-            return (
-              <button
-                key={tile.label}
-                onClick={() => {
-                  if (tile.label === 'All') {
-                    setActiveStatusFilters([]);
-                    setDateFilters([]);
-                    setAssignmentFilter('All');
-                    setSearchTerm('');
-                    // Reset modal filters
-                    setModalStartDate("");
-                    setModalEndDate("");
-                    setModalStatusFilter([]);
-                    setModalPriorityFilter([]);
-                    setModalAssignedToFilter([]);
-                    setModalAssignedByFilter([]);
-                    setModalDepartmentFilter([]);
-                    setModalFrequencyFilter([]);
-                  } else {
-                    const newFilters = activeStatusFilters.includes(tile.label)
-                      ? activeStatusFilters.filter(f => f !== tile.label)
-                      : [...activeStatusFilters, tile.label];
-                    setActiveStatusFilters(newFilters);
-                  }
-                  setCurrentPage(1);
-                }}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-[10px] font-black uppercase tracking-widest transition-all ${
-                  isActive 
-                    ? 'bg-[#003875] dark:bg-[#FFD500] text-white dark:text-black border-[#003875] dark:border-[#FFD500] shadow-md scale-105' 
-                    : `${tile.color} hover:scale-[1.02] hover:shadow-sm`
-                }`}
-              >
-                {tile.icon}
-                {tile.label}
-                <span className={`ml-1 px-1.5 py-0.5 rounded-full text-[9px] ${
-                  isActive ? 'bg-white/20 dark:bg-black/20' : 'bg-black/5 dark:bg-white/10'
-                }`}>
-                  {count}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Controls Bar */}
-        {/* Controls Bar */}
-        <div 
-          style={{ backgroundColor: 'var(--panel-card)', borderBottom: '1px solid var(--panel-border)' }}
-          className="p-3 flex flex-col lg:flex-row lg:items-center justify-between gap-3"
+        {/* Search + filters + pagination — one row */}
+        <div
+          style={{ backgroundColor: "var(--panel-card)", border: "1px solid var(--panel-border)" }}
+          className="p-2.5 flex flex-nowrap items-center gap-2 overflow-x-auto no-scrollbar rounded-2xl shadow-sm"
         >
-          <div className="flex flex-col lg:flex-row items-stretch lg:items-center gap-3 flex-1 w-full min-w-0">
-            {/* Search + Assignment Filters */}
-            <div className="flex flex-row items-center gap-2 w-full lg:w-auto lg:flex-1 lg:max-w-md">
-              <div className="relative group flex-1">
-                <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 group-focus-within:text-[#FFD500] transition-colors" />
-                <input
-                  type="text"
-                  placeholder="Search..."
-                  value={searchTerm}
-                  onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
-                  className="w-full pl-9 pr-3 py-1.5 bg-gray-50 dark:bg-navy-900 border border-gray-100 dark:border-navy-700/50 rounded-lg focus:border-[#FFD500] outline-none font-bold text-[12px] text-gray-700 dark:text-white transition-all shadow-sm"
-                />
-              </div>
-
-              {userRole !== 'USER' && (
-                <div className="flex items-center bg-gray-100 dark:bg-navy-900 rounded-full p-1 border border-gray-200 dark:border-navy-700 flex-shrink-0">
-                  <button 
-                    onClick={() => { setAssignmentFilter(assignmentFilter === 'ToMe' ? 'All' : 'ToMe'); setCurrentPage(1); }}
-                    className={`px-2 md:px-3 py-1 rounded-full text-[9px] md:text-[10px] font-black uppercase tracking-widest transition-all h-[26px] flex items-center gap-1 ${assignmentFilter === 'ToMe' ? 'bg-[#003875] text-white shadow-sm' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'}`}
-                  >
-                    <span className="hidden xs:inline">To Me</span>
-                    <span className="xs:hidden">To</span>
-                    <span className={`px-1 rounded-full text-[8px] ${assignmentFilter === 'ToMe' ? 'bg-white/20' : 'bg-gray-200 dark:bg-navy-800'}`}>
-                      {toMeCount}
-                    </span>
-                  </button>
-                  <button 
-                    onClick={() => { setAssignmentFilter(assignmentFilter === 'ByMe' ? 'All' : 'ByMe'); setCurrentPage(1); }}
-                    className={`px-2 md:px-3 py-1 rounded-full text-[9px] md:text-[10px] font-black uppercase tracking-widest transition-all h-[26px] flex items-center gap-1 ${assignmentFilter === 'ByMe' ? 'bg-[#003875] text-white shadow-sm' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'}`}
-                  >
-                    <span className="hidden xs:inline">By Me</span>
-                    <span className="xs:hidden">By</span>
-                    <span className={`px-1 rounded-full text-[8px] ${assignmentFilter === 'ByMe' ? 'bg-white/20' : 'bg-gray-200 dark:bg-navy-800'}`}>
-                      {byMeCount}
-                    </span>
-                  </button>
-                </div>
-              )}
-            </div>
-
-            {/* Date Filters */}
-            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
-              {[
-                { id: 'Delayed', label: 'Delayed', color: 'bg-red-50 text-red-600 border-red-300 dark:bg-red-900/30 dark:text-red-400 dark:border-red-700' },
-                { id: 'Today', label: 'Today', color: 'bg-amber-50 text-amber-600 border-amber-300 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-700' },
-                { id: 'Tomorrow', label: 'Tomorrow', color: 'bg-blue-50 text-blue-600 border-blue-300 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-700' },
-                { id: 'Next3', label: 'Next 3', color: 'bg-emerald-50 text-emerald-600 border-emerald-300 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-700' }
-              ].map(f => {
-                const count = dateCounts[f.id] || 0;
-                const isActive = dateFilters.includes(f.id);
-                return (
-                  <button
-                    key={f.id}
-                    onClick={() => {
-                      const newFilters = dateFilters.includes(f.id)
-                        ? dateFilters.filter(item => item !== f.id)
-                        : [...dateFilters, f.id];
-                      setDateFilters(newFilters);
-                      setCurrentPage(1);
-                    }}
-                    className={`px-3 py-1 rounded-full border text-[9px] md:text-[10px] font-black uppercase tracking-widest transition-all h-[28px] flex items-center gap-1.5 whitespace-nowrap ${
-                      isActive 
-                        ? 'bg-[#003875] dark:bg-[#FFD500] text-white dark:text-black border-[#003875] dark:border-[#FFD500] shadow-sm scale-105' 
-                        : `${f.color} hover:shadow-sm hover:scale-[1.02]`
-                    }`}
-                  >
-                    {f.label}
-                    <span className={`px-1 py-0.5 rounded-full text-[8px] ${isActive ? 'bg-white/20 dark:bg-black/20' : 'bg-black/5 dark:bg-white/10'}`}>
-                      {count}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
+          <div className="relative group flex-shrink-0 w-[140px] sm:w-[180px]">
+            <MagnifyingGlassIcon className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 group-focus-within:text-[#FFD500] transition-colors" />
+            <input
+              type="text"
+              placeholder="Search..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-8 pr-2 py-1.5 h-[28px] bg-gray-50 dark:bg-navy-900 border border-gray-100 dark:border-navy-700/50 rounded-lg focus:border-[#FFD500] outline-none font-bold text-[12px] text-gray-700 dark:text-white transition-all shadow-sm"
+            />
           </div>
 
-          {/* Pagination Info */}
-          <div className="flex items-center justify-between sm:justify-end gap-3 md:gap-4 flex-shrink-0 border-t lg:border-t-0 border-gray-100 dark:border-white/5 pt-3 lg:pt-0">
-            <div className="flex items-center gap-2">
-              <p className="text-[9px] md:text-[10px] font-black text-gray-400 uppercase tracking-widest whitespace-nowrap">
-                Page <span className="text-[#003875] dark:text-[#FFD500]">{currentPage}</span> of {totalPages || 1}
-              </p>
-              <div className="flex gap-0.5">
-                <button onClick={() => setCurrentPage(1)} disabled={currentPage === 1} className="px-1.5 py-1 text-[9px] md:text-[10px] font-bold text-gray-400 hover:text-black dark:hover:text-white hover:bg-white dark:hover:bg-white/5 disabled:opacity-30 rounded-md transition-all">First</button>
-                <button onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))} disabled={currentPage === 1} className="p-1 text-gray-400 hover:text-black dark:hover:text-white hover:bg-white dark:hover:bg-white/5 disabled:opacity-30 rounded-md transition-all">
-                  <ChevronLeftIcon className="w-3.5 h-3.5" />
-                </button>
-                <button onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))} disabled={currentPage === totalPages || totalPages === 0} className="p-1 text-gray-400 hover:text-black dark:hover:text-white hover:bg-white dark:hover:bg-white/5 disabled:opacity-30 rounded-md transition-all">
-                  <ChevronRightIcon className="w-3.5 h-3.5" />
-                </button>
-                <button onClick={() => setCurrentPage(totalPages)} disabled={currentPage === totalPages || totalPages === 0} className="px-1.5 py-1 text-[9px] md:text-[10px] font-bold text-gray-400 hover:text-black dark:hover:text-white hover:bg-white dark:hover:bg-white/5 disabled:opacity-30 rounded-md transition-all">Last</button>
-              </div>
-            </div>
-            <div className="hidden xs:block h-4 w-[1px] bg-gray-200 dark:bg-white/10" />
-            <div className="flex items-center gap-2">
-              <label className="text-[9px] md:text-[10px] font-black text-gray-400 uppercase tracking-widest">Show</label>
-              <select 
-                value={itemsPerPage}
-                onChange={(e) => { setItemsPerPage(Number(e.target.value)); setCurrentPage(1); }}
-                className="bg-transparent border-none p-0 text-[10px] font-bold outline-none dark:text-white cursor-pointer"
+          {userRole !== "USER" && (
+            <div className="flex items-center bg-gray-100 dark:bg-navy-900 rounded-full p-0.5 border border-gray-200 dark:border-navy-700 flex-shrink-0">
+              <button
+                onClick={() => {
+                  setAssignmentFilter(assignmentFilter === "ToMe" ? "All" : "ToMe");
+                  setCurrentPage(1);
+                }}
+                className={`px-2 py-1 rounded-full text-[9px] font-black uppercase tracking-widest transition-all h-[26px] flex items-center gap-1 ${assignmentFilter === "ToMe" ? "bg-[#003875] text-white shadow-sm" : "text-gray-500 hover:text-gray-700 dark:text-gray-400"}`}
               >
-                <option value={10}>10</option>
-                <option value={25}>25</option>
-                <option value={50}>50</option>
-              </select>
+                To
+                <span className={`px-1 rounded-full text-[8px] ${assignmentFilter === "ToMe" ? "bg-white/20" : "bg-gray-200 dark:bg-navy-800"}`}>
+                  {toMeCount}
+                </span>
+              </button>
+              <button
+                onClick={() => {
+                  setAssignmentFilter(assignmentFilter === "ByMe" ? "All" : "ByMe");
+                  setCurrentPage(1);
+                }}
+                className={`px-2 py-1 rounded-full text-[9px] font-black uppercase tracking-widest transition-all h-[26px] flex items-center gap-1 ${assignmentFilter === "ByMe" ? "bg-[#003875] text-white shadow-sm" : "text-gray-500 hover:text-gray-700 dark:text-gray-400"}`}
+              >
+                By
+                <span className={`px-1 rounded-full text-[8px] ${assignmentFilter === "ByMe" ? "bg-white/20" : "bg-gray-200 dark:bg-navy-800"}`}>
+                  {byMeCount}
+                </span>
+              </button>
             </div>
+          )}
+
+          {activeTab === "tasks" &&
+            [
+              { label: "Pending", icon: <ClockIcon className="w-3 h-3" />, color: "bg-gray-50 text-gray-600 border-gray-300 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600" },
+              { label: "Completed", icon: <CheckCircleIcon className="w-3 h-3" />, color: "bg-emerald-50 text-emerald-600 border-emerald-300 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-700" },
+              { label: "Delayed", icon: <ExclamationTriangleIcon className="w-3 h-3" />, color: "bg-red-50 text-red-600 border-red-300 dark:bg-red-900/30 dark:text-red-400 dark:border-red-700" },
+            ].map((tile) => {
+              const count =
+                tile.label === "Delayed"
+                  ? statusCounts.Delayed || statusCounts.Overdue || 0
+                  : statusCounts[tile.label] || 0;
+              const isActive = activeStatusFilters.includes(tile.label);
+              return (
+                <button
+                  key={tile.label}
+                  onClick={() => {
+                    const newFilters = activeStatusFilters.includes(tile.label)
+                      ? activeStatusFilters.filter((f) => f !== tile.label)
+                      : [...activeStatusFilters, tile.label];
+                    setActiveStatusFilters(newFilters);
+                    setCurrentPage(1);
+                  }}
+                  className={`flex items-center gap-1 px-2.5 py-1 rounded-full border text-[9px] font-black uppercase tracking-widest transition-all whitespace-nowrap flex-shrink-0 h-[28px] ${
+                    isActive
+                      ? "bg-[#003875] dark:bg-[#FFD500] text-white dark:text-black border-[#003875] dark:border-[#FFD500] shadow-sm"
+                      : `${tile.color} hover:shadow-sm`
+                  }`}
+                >
+                  {tile.icon}
+                  {tile.label}
+                  <span
+                    className={`px-1 rounded-full text-[8px] ${
+                      isActive ? "bg-white/20 dark:bg-black/20" : "bg-black/5 dark:bg-white/10"
+                    }`}
+                  >
+                    {count}
+                  </span>
+                </button>
+              );
+            })}
+
+          <div className="flex items-center gap-1.5 ml-auto flex-shrink-0">
+            <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest whitespace-nowrap">
+              Page <span className="text-[#003875] dark:text-[#FFD500]">{currentPage}</span> of {totalPages || 1}
+            </p>
+            <button onClick={() => setCurrentPage(1)} disabled={currentPage === 1} className="px-1.5 py-1 text-[9px] font-bold text-gray-400 hover:text-black dark:hover:text-white disabled:opacity-30 rounded-md">First</button>
+            <button onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))} disabled={currentPage === 1} className="p-1 text-gray-400 hover:text-black dark:hover:text-white disabled:opacity-30 rounded-md">
+              <ChevronLeftIcon className="w-3.5 h-3.5" />
+            </button>
+            <button onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))} disabled={currentPage === totalPages || totalPages === 0} className="p-1 text-gray-400 hover:text-black dark:hover:text-white disabled:opacity-30 rounded-md">
+              <ChevronRightIcon className="w-3.5 h-3.5" />
+            </button>
+            <button onClick={() => setCurrentPage(totalPages)} disabled={currentPage === totalPages || totalPages === 0} className="px-1.5 py-1 text-[9px] font-bold text-gray-400 hover:text-black dark:hover:text-white disabled:opacity-30 rounded-md">Last</button>
+            <select
+              value={itemsPerPage}
+              onChange={(e) => {
+                setItemsPerPage(Number(e.target.value));
+                setCurrentPage(1);
+              }}
+              className="bg-transparent border-none p-0 text-[10px] font-bold outline-none dark:text-white cursor-pointer"
+            >
+              <option value={10}>10</option>
+              <option value={25}>25</option>
+              <option value={50}>50</option>
+            </select>
           </div>
         </div>
       </div>
 
+      <div
+        style={{ borderColor: "var(--panel-border)" }}
+        className="rounded-2xl border overflow-hidden shadow-sm transition-all duration-500"
+      >
         {viewMode === 'list' ? (
           /* Table View - Scrollable on mobile */
           <div 
@@ -1019,16 +1141,39 @@ export default function ChecklistsPage() {
             <table className="w-full text-left border-collapse table-auto min-w-[800px]">
             <thead>
               <tr className="bg-[#003875] dark:bg-navy-950 text-white dark:text-slate-200 whitespace-nowrap">
-                <th onClick={() => handleSort('id')} className="px-4 py-3 text-[10px] font-black uppercase tracking-widest cursor-pointer hover:bg-white/5 transition-colors">
-                  <div className="flex items-center">ID <SortIcon column="id" /></div>
-                </th>
-                <th onClick={() => handleSort('task')} className="px-4 py-3 text-[10px] font-black uppercase tracking-widest cursor-pointer hover:bg-white/5 transition-colors min-w-[200px]">
+                {activeTab === "master" && (
+                  <th className="px-3 py-3 text-[10px] font-black uppercase tracking-widest w-[72px]">
+                    Actions
+                  </th>
+                )}
+                {activeTab === "tasks" && (
+                  <th className="px-2 py-3 text-center w-10">
+                    <button
+                      type="button"
+                      onClick={toggleSelectAllPage}
+                      className={`mx-auto w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
+                        allPageSelected
+                          ? "bg-emerald-500 border-emerald-500 text-white"
+                          : "border-white/50 hover:border-white"
+                      }`}
+                      title="Select all pending on page"
+                    >
+                      {allPageSelected && <CheckIcon className="w-3 h-3" />}
+                    </button>
+                  </th>
+                )}
+                {activeTab === "master" && (
+                  <th onClick={() => handleSort('id')} className="px-4 py-3 text-[10px] font-black uppercase tracking-widest cursor-pointer hover:bg-white/5 transition-colors">
+                    <div className="flex items-center">ID <SortIcon column="id" /></div>
+                  </th>
+                )}
+                <th onClick={() => handleSort('task')} className="px-4 py-3 text-[10px] font-black uppercase tracking-widest cursor-pointer hover:bg-white/5 transition-colors min-w-[220px]">
                   <div className="flex items-center">Task <SortIcon column="task" /></div>
                 </th>
-                <th onClick={() => handleSort('assigned_to')} className="px-4 py-3 text-[10px] font-black uppercase tracking-widest cursor-pointer hover:bg-white/5 transition-colors hidden sm:table-cell min-w-[140px]">
+                <th onClick={() => handleSort('assigned_to')} className="px-4 py-3 text-[10px] font-black uppercase tracking-widest cursor-pointer hover:bg-white/5 transition-colors hidden sm:table-cell min-w-[120px]">
                   <div className="flex items-center">Assigned To <SortIcon column="assigned_to" /></div>
                 </th>
-                <th onClick={() => handleSort('assigned_by')} className="px-4 py-3 text-[10px] font-black uppercase tracking-widest cursor-pointer hover:bg-white/5 transition-colors hidden sm:table-cell min-w-[140px]">
+                <th onClick={() => handleSort('assigned_by')} className="px-4 py-3 text-[10px] font-black uppercase tracking-widest cursor-pointer hover:bg-white/5 transition-colors hidden sm:table-cell min-w-[120px]">
                   <div className="flex items-center">Assigned By <SortIcon column="assigned_by" /></div>
                 </th>
                 <th onClick={() => handleSort('department')} className="px-4 py-3 text-[10px] font-black uppercase tracking-widest cursor-pointer hover:bg-white/5 transition-colors hidden md:table-cell">
@@ -1037,55 +1182,130 @@ export default function ChecklistsPage() {
                 <th onClick={() => handleSort('priority')} className="px-4 py-3 text-[10px] font-black uppercase tracking-widest cursor-pointer hover:bg-white/5 transition-colors hidden sm:table-cell">
                   <div className="flex items-center">Priority <SortIcon column="priority" /></div>
                 </th>
-                <th onClick={() => handleSort('status')} className="px-4 py-3 text-[10px] font-black uppercase tracking-widest cursor-pointer hover:bg-white/5 transition-colors">
-                  <div className="flex items-center">Status <SortIcon column="status" /></div>
-                </th>
                 <th onClick={() => handleSort('frequency')} className="px-4 py-3 text-[10px] font-black uppercase tracking-widest cursor-pointer hover:bg-white/5 transition-colors hidden xl:table-cell">
                   <div className="flex items-center">Freq <SortIcon column="frequency" /></div>
                 </th>
-                <th onClick={() => handleSort('due_date')} className="px-4 py-3 text-[10px] font-black uppercase tracking-widest cursor-pointer hover:bg-white/5 transition-colors">
+                <th onClick={() => handleSort('due_date')} className="px-4 py-3 text-[10px] font-black uppercase tracking-widest cursor-pointer hover:bg-white/5 transition-colors whitespace-nowrap">
                   <div className="flex items-center">Due <SortIcon column="due_date" /></div>
                 </th>
-                <th className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-right">Actions</th>
+                {activeTab === "tasks" && (
+                  <th className="px-4 py-3 text-[10px] font-black uppercase tracking-widest">
+                    Status
+                  </th>
+                )}
+                {activeTab === "tasks" && (
+                  <th className="px-4 py-3 text-[10px] font-black uppercase tracking-widest whitespace-nowrap">
+                    Completed
+                  </th>
+                )}
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 dark:divide-white/10">
               {isLoading ? (
                 <tr>
-                  <td colSpan={10} className="px-4 py-10 text-center">
+                  <td colSpan={activeTab === "tasks" ? 10 : 9} className="px-4 py-10 text-center">
                     <div className="w-6 h-6 border-2 border-gray-100 border-t-[#FFD500] rounded-full animate-spin mx-auto mb-2" />
                     <p className="text-gray-400 font-bold uppercase tracking-widest text-[8px]">Syncing...</p>
                   </td>
                 </tr>
               ) : paginatedChecklists.length === 0 ? (
                 <tr>
-                  <td colSpan={10} className="px-4 py-10 text-center">
+                  <td colSpan={activeTab === "tasks" ? 10 : 9} className="px-4 py-10 text-center">
                     <p className="text-xs text-gray-400 font-bold uppercase tracking-widest">No checklists found</p>
                   </td>
                 </tr>
               ) : (
-                paginatedChecklists.map((item) => (
-                  <tr key={item.id} className="hover:bg-orange-50/10 border-b-2 border-gray-200 dark:border-white/10 last:border-0 transition-colors group">
-                    <td className="px-4 py-3">
-                      <span className="font-mono text-[10px] text-gray-400 font-bold">#{item.id}</span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <p className="font-black text-xs text-gray-900 dark:text-white leading-tight">{item.task}</p>
-                      {item.verification_required?.toLowerCase() === 'yes' && (
-                        <p className="text-[9px] text-amber-500 font-bold mt-0.5">🔍 Verification Required</p>
-                      )}
+                paginatedChecklists.map((item, index) => {
+                  const occ = item as ChecklistOccurrence;
+                  const late =
+                    activeTab === "tasks" && Boolean(occ.is_late_complete);
+                  const rowKey =
+                    activeTab === "tasks"
+                      ? rowKeyFor(item)
+                      : masterRowKey(item, index);
+                  const reactKey = `${rowKey}__${index}`;
+                  const isSelected = selectedKeys.has(rowKey);
+                  const isCompleted = getDisplayStatus(item) === "Completed";
+                  return (
+                  <tr
+                    key={reactKey}
+                    className={`border-b-2 border-gray-200 dark:border-white/10 last:border-0 transition-colors group ${
+                      late
+                        ? "bg-red-50/80 dark:bg-red-950/30 hover:bg-red-100/80 dark:hover:bg-red-900/40"
+                        : isSelected
+                          ? "bg-emerald-50/60 dark:bg-emerald-900/15"
+                          : "hover:bg-orange-50/10"
+                    }`}
+                  >
+                    {activeTab === "master" && (
+                      <td className="px-3 py-3">
+                        <div className="flex items-center gap-1">
+                          {(['ADMIN', 'EA'].includes(userRole?.toUpperCase()) ||
+                            item.assigned_by === currentUser) && (
+                            <>
+                              <button
+                                onClick={() => handleEdit(item)}
+                                className="p-1.5 bg-[#003875]/10 text-[#003875] dark:bg-[#FFD500]/10 dark:text-[#FFD500] hover:bg-[#003875] hover:text-white dark:hover:bg-[#FFD500] dark:hover:text-black rounded-lg transition-all"
+                                title="Edit"
+                              >
+                                <PencilSquareIcon className="w-3.5 h-3.5" />
+                              </button>
+                              <button
+                                onClick={() => handleDeleteClick(item)}
+                                className="p-1.5 bg-[#CE2029]/10 text-[#CE2029] hover:bg-[#CE2029] hover:text-white rounded-lg transition-all"
+                                title="Delete"
+                              >
+                                <TrashIcon className="w-3.5 h-3.5" />
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      </td>
+                    )}
+                    {activeTab === "tasks" && (
+                      <td className="px-2 py-3 text-center">
+                        {isCompleted ? (
+                          <span
+                            className="mx-auto w-5 h-5 rounded-full bg-[#003875] border-2 border-[#003875] text-white flex items-center justify-center opacity-90 cursor-not-allowed"
+                            title="Already completed"
+                          >
+                            <CheckIcon className="w-3 h-3" />
+                          </span>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => toggleSelectKey(rowKey)}
+                            className={`mx-auto w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
+                              isSelected
+                                ? "bg-emerald-500 border-emerald-500 text-white"
+                                : "border-gray-300 dark:border-white/30 hover:border-emerald-500"
+                            }`}
+                          >
+                            {isSelected && <CheckIcon className="w-3 h-3" />}
+                          </button>
+                        )}
+                      </td>
+                    )}
+                    {activeTab === "master" && (
+                      <td className="px-4 py-3">
+                        <span className="font-mono text-[10px] text-gray-400 font-bold">#{item.id}</span>
+                      </td>
+                    )}
+                    <td className="px-4 py-3 min-w-[260px] max-w-[420px]">
+                      <p className="font-black text-sm text-gray-900 dark:text-white leading-snug whitespace-normal break-words">
+                        {item.task || "—"}
+                      </p>
                     </td>
                     <td className="px-4 py-3 hidden sm:table-cell">
-                      {renderUserAvatar(item.assigned_to)}
+                      {renderUserName(item.assigned_to)}
                     </td>
                     <td className="px-4 py-3 hidden sm:table-cell">
-                      {renderUserAvatar(item.assigned_by)}
+                      {renderUserName(item.assigned_by)}
                     </td>
                     <td className="px-4 py-3 hidden md:table-cell">
                       {getDeptBadge(item.department)}
                     </td>
                     <td className="px-4 py-3 hidden sm:table-cell">{getPriorityBadge(item.priority)}</td>
-                    <td className="px-4 py-3">{getStatusBadge(getDisplayStatus(item))}</td>
                     <td className="px-4 py-3 hidden xl:table-cell">
                       <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-indigo-50 text-indigo-600 border border-indigo-200 dark:bg-indigo-900/20 dark:text-indigo-400 dark:border-indigo-800 text-[10px] font-black uppercase tracking-widest rounded-md">
                         <CalendarDaysIcon className="w-3 h-3" />
@@ -1098,40 +1318,28 @@ export default function ChecklistsPage() {
                         ) : (item.frequency || "Daily")}
                       </span>
                     </td>
-                    <td className="px-4 py-3">
-                      <p className="text-[10px] md:text-xs font-bold text-gray-600 dark:text-slate-300">{formatDateDisplay(item.due_date) || "—"}</p>
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      <span className="text-[11px] font-bold text-gray-600 dark:text-slate-300 whitespace-nowrap">
+                        {formatDateDisplay(
+                          activeTab === "tasks"
+                            ? occ.occurrence_due_date || item.due_date
+                            : item.due_date
+                        ) || "—"}
+                      </span>
                     </td>
-                    <td className="px-4 py-3 text-right">
-                      <div className="flex items-center justify-end gap-1">
-                        <button
-                          onClick={() => setSelectedTask(item)}
-                          className="p-1.5 bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400 hover:bg-emerald-600 hover:text-white dark:hover:bg-emerald-500 dark:hover:text-black rounded-lg transition-all"
-                          title="Follow Up"
-                        >
-                          <ArrowTopRightOnSquareIcon className="w-3.5 h-3.5" />
-                        </button>
-                        {(['ADMIN', 'EA'].includes(userRole?.toUpperCase()) || item.assigned_by === currentUser) && (
-                          <>
-                            <button
-                              onClick={() => handleEdit(item)}
-                              className="p-1.5 bg-[#003875]/10 text-[#003875] dark:bg-[#FFD500]/10 dark:text-[#FFD500] hover:bg-[#003875] hover:text-white dark:hover:bg-[#FFD500] dark:hover:text-black rounded-lg transition-all"
-                              title="Edit"
-                            >
-                              <PencilSquareIcon className="w-3.5 h-3.5" />
-                            </button>
-                            <button
-                              onClick={() => handleDeleteClick(item)}
-                              className="p-1.5 bg-[#CE2029]/10 text-[#CE2029] hover:bg-[#CE2029] hover:text-white rounded-lg transition-all"
-                              title="Delete"
-                            >
-                              <TrashIcon className="w-3.5 h-3.5" />
-                            </button>
-                          </>
-                        )}
-                      </div>
-                    </td>
+                    {activeTab === "tasks" && (
+                      <td className="px-4 py-3">{getStatusBadge(getDisplayStatus(item))}</td>
+                    )}
+                    {activeTab === "tasks" && (
+                      <td className="px-4 py-3 whitespace-nowrap">
+                        <span className="text-[11px] font-bold text-gray-600 dark:text-slate-300 whitespace-nowrap">
+                          {formatDateDisplay(occ.completed_date || "") || "—"}
+                        </span>
+                      </td>
+                    )}
                   </tr>
-                ))
+                );
+                })
               )}
             </tbody>
           </table>
@@ -1151,44 +1359,59 @@ export default function ChecklistsPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {paginatedChecklists.map((item) => {
+              {paginatedChecklists.map((item, index) => {
+                const occ = item as ChecklistOccurrence;
                 const status = getDisplayStatus(item);
+                const late = activeTab === "tasks" && Boolean(occ.is_late_complete);
                 const statusColorMap: Record<string, string> = {
                   "Pending": "border-gray-200 dark:border-gray-700",
-                  "Planned": "border-blue-200 dark:border-blue-900/50",
-                  "Hold": "border-amber-200 dark:border-amber-900/50",
                   "Completed": "border-emerald-200 dark:border-emerald-900/50",
-                  "Approved": "border-green-200 dark:border-green-900/50",
-                  "Re-Open": "border-violet-200 dark:border-violet-900/50",
                   "Overdue": "border-red-200 dark:border-red-900/50",
+                  "Delayed": "border-red-200 dark:border-red-900/50",
                 };
-                const borderColor = statusColorMap[status] || "border-gray-100 dark:border-white/5";
+                const borderColor = late
+                  ? "border-red-300 dark:border-red-800"
+                  : statusColorMap[status] || "border-gray-100 dark:border-white/5";
+                const rowKey =
+                  activeTab === "tasks"
+                    ? rowKeyFor(item)
+                    : masterRowKey(item, index);
+                const reactKey = `${rowKey}__${index}`;
+                const isSelected = selectedKeys.has(rowKey);
 
                 return (
                   <div 
-                    key={item.id}
-                    className={`group bg-white dark:bg-navy-900 rounded-2xl border-4 ${borderColor} shadow-sm hover:shadow-xl hover:translate-y-[-2px] transition-all duration-300 overflow-hidden flex flex-col h-full`}
+                    key={reactKey}
+                    className={`group rounded-2xl border-4 ${borderColor} shadow-sm hover:shadow-xl hover:translate-y-[-2px] transition-all duration-300 overflow-hidden flex flex-col h-full ${
+                      late
+                        ? "bg-red-50/80 dark:bg-red-950/30"
+                        : isSelected
+                          ? "bg-emerald-50/80 dark:bg-emerald-900/20"
+                          : "bg-white dark:bg-navy-900"
+                    }`}
                   >
-                    {/* Card Header */}
                     <div className="p-3 md:p-4 border-b border-gray-50 dark:border-white/5 flex items-start justify-between gap-3 bg-gray-50/30 dark:bg-white/5">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="font-mono text-[9px] font-black text-[#003875] dark:text-[#FFD500] bg-[#003875]/5 dark:bg-[#FFD500]/10 px-1.5 py-0.5 rounded">#{item.id}</span>
+                          {activeTab === "master" && (
+                            <span className="font-mono text-[9px] font-black text-[#003875] dark:text-[#FFD500] bg-[#003875]/5 dark:bg-[#FFD500]/10 px-1.5 py-0.5 rounded">#{item.id}</span>
+                          )}
                           {getPriorityBadge(item.priority)}
                         </div>
-                        <h3 className="font-black text-sm text-gray-900 dark:text-white leading-tight line-clamp-3 uppercase tracking-wide group-hover:text-[#003875] dark:group-hover:text-[#FFD500] transition-colors">{item.task}</h3>
+                        <h3 className="font-black text-sm text-gray-900 dark:text-white leading-snug whitespace-normal break-words group-hover:text-[#003875] dark:group-hover:text-[#FFD500] transition-colors">{item.task || "—"}</h3>
                       </div>
-                      <div className="flex-shrink-0">
-                        {getStatusBadge(status)}
-                      </div>
+                      {activeTab === "tasks" && (
+                        <div className="flex-shrink-0">
+                          {getStatusBadge(status)}
+                        </div>
+                      )}
                     </div>
 
-                    {/* Card Body */}
                     <div className="p-3 md:p-4 flex-1 flex flex-col gap-4">
                       <div className="grid grid-cols-2 gap-3 mt-auto">
                         <div className="flex flex-col gap-1.5 overflow-hidden">
                           <span className="text-[8px] font-black text-gray-400 uppercase tracking-widest">Assigned To</span>
-                          {renderUserAvatar(item.assigned_to)}
+                          {renderUserName(item.assigned_to)}
                         </div>
                         <div className="flex flex-col gap-1 overflow-hidden">
                           <span className="text-[8px] font-black text-gray-400 uppercase tracking-widest">Dept</span>
@@ -1198,32 +1421,58 @@ export default function ChecklistsPage() {
                         </div>
                         <div className="flex flex-col gap-1 overflow-hidden">
                           <span className="text-[8px] font-black text-gray-400 uppercase tracking-widest">Due Date</span>
-                          <span className="text-[10px] font-black text-gray-700 dark:text-slate-300 truncate">{formatDateDisplay(item.due_date) || "—"}</span>
+                          <span className="text-[10px] font-black text-gray-700 dark:text-slate-300 truncate">
+                            {formatDateDisplay(
+                              activeTab === "tasks"
+                                ? occ.occurrence_due_date || item.due_date
+                                : item.due_date
+                            ) || "—"}
+                          </span>
                         </div>
-                        <div className="flex flex-col gap-1.5 overflow-hidden">
-                          <span className="text-[8px] font-black text-gray-400 uppercase tracking-widest">Assigned By</span>
-                          {renderUserAvatar(item.assigned_by)}
-                        </div>
+                        {activeTab === "tasks" ? (
+                          <div className="flex flex-col gap-1 overflow-hidden">
+                            <span className="text-[8px] font-black text-gray-400 uppercase tracking-widest">Completed</span>
+                            <span className="text-[10px] font-black text-gray-700 dark:text-slate-300 truncate">
+                              {formatDateDisplay(occ.completed_date || "") || "—"}
+                            </span>
+                          </div>
+                        ) : (
+                          <div className="flex flex-col gap-1.5 overflow-hidden">
+                            <span className="text-[8px] font-black text-gray-400 uppercase tracking-widest">Assigned By</span>
+                            {renderUserName(item.assigned_by)}
+                          </div>
+                        )}
                       </div>
-
-                      {item.verification_required?.toLowerCase() === 'yes' && (
-                        <div className="flex items-center gap-2 px-2 py-1 bg-amber-50 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-900/30 rounded-lg">
-                          <MagnifyingGlassIcon className="w-3 h-3 text-amber-500" />
-                          <span className="text-[9px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest">Verification Req.</span>
-                        </div>
-                      )}
                     </div>
 
-                    {/* Card Footer: Actions */}
                     <div className="p-2 md:p-3 bg-gray-50/50 dark:bg-white/5 border-t border-gray-50 dark:border-white/5 flex items-center justify-between gap-2">
-                       <button
-                          onClick={() => setSelectedTask(item)}
-                          className="flex-1 flex items-center justify-center gap-1.5 py-2 px-2 bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400 hover:bg-emerald-600 hover:text-white dark:hover:bg-emerald-500 dark:hover:text-black rounded-xl transition-all font-black text-[9px] uppercase tracking-widest whitespace-nowrap overflow-hidden"
-                        >
-                          <ArrowTopRightOnSquareIcon className="w-3.5 h-3.5 flex-shrink-0" />
-                          <span className="truncate">Follow Up</span>
-                        </button>
-                        {(['ADMIN', 'EA'].includes(userRole?.toUpperCase()) || item.assigned_by === currentUser) && (
+                      {activeTab === "tasks" ? (
+                        status === "Completed" ? (
+                          <span
+                            className="w-5 h-5 rounded-full bg-[#003875] border-2 border-[#003875] text-white flex items-center justify-center opacity-90 cursor-not-allowed"
+                            title="Already completed"
+                          >
+                            <CheckIcon className="w-3 h-3" />
+                          </span>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => toggleSelectKey(rowKey)}
+                            className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
+                              isSelected
+                                ? "bg-emerald-500 border-emerald-500 text-white"
+                                : "border-gray-300 dark:border-white/30 hover:border-emerald-500"
+                            }`}
+                          >
+                            {isSelected && <CheckIcon className="w-3 h-3" />}
+                          </button>
+                        )
+                      ) : (
+                        <div className="flex-1" />
+                      )}
+                      {activeTab === "master" &&
+                        (['ADMIN', 'EA'].includes(userRole?.toUpperCase()) ||
+                          item.assigned_by === currentUser) && (
                           <div className="flex items-center gap-1">
                             <button
                               onClick={() => handleEdit(item)}
@@ -1249,7 +1498,31 @@ export default function ChecklistsPage() {
           )}
         </div>
       )}
-    </div>
+      </div>
+
+      {/* Bulk complete overlay — above footer */}
+      {activeTab === "tasks" && (selectedKeys.size > 0 || isBulkCompleting) && (
+        <div className="fixed bottom-20 md:bottom-24 left-1/2 -translate-x-1/2 z-[9999] pointer-events-none">
+          <button
+            type="button"
+            onClick={handleBulkComplete}
+            disabled={isBulkCompleting}
+            className="pointer-events-auto flex items-center gap-2 px-6 py-3 rounded-full bg-emerald-500 text-white font-black uppercase tracking-widest text-[11px] shadow-2xl shadow-emerald-500/40 border-2 border-b-4 border-emerald-700 hover:bg-emerald-400 active:translate-y-[2px] active:border-b-2 disabled:opacity-90 disabled:cursor-wait transition-all"
+          >
+            {isBulkCompleting ? (
+              <>
+                <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                Completing…
+              </>
+            ) : (
+              <>
+                <CheckIcon className="w-4 h-4" />
+                Complete {selectedKeys.size}
+              </>
+            )}
+          </button>
+        </div>
+      )}
 
       {/* Add/Edit Modal */}
       {isModalOpen && (
@@ -1330,7 +1603,7 @@ export default function ChecklistsPage() {
                       </div>
                       <div className="max-h-40 overflow-y-auto">
                         {usersList.filter(u => ['ADMIN', 'EA'].includes(u.role_name?.toUpperCase() || '') && u.username.toLowerCase().includes(assignedBySearch.toLowerCase())).map(u => (
-                          <div key={`by-${u.id}`}
+                          <div key={`by-${u.username || `id-${u.id}`}`}
                             className="px-3 py-2 text-xs font-bold text-gray-700 dark:text-gray-300 hover:bg-[#003875]/5 dark:hover:bg-[#FFD500]/10 cursor-pointer"
                             onClick={() => { 
                               setFormData({ ...formData, assigned_by: u.username }); 
@@ -1380,7 +1653,7 @@ export default function ChecklistsPage() {
                       </div>
                       <div className="max-h-40 overflow-y-auto">
                         {usersList.filter(u => u.username.toLowerCase().includes(assignedToSearch.toLowerCase())).map(u => (
-                          <div key={`to-${u.id}`}
+                          <div key={`to-${u.username || `id-${u.id}`}`}
                             className="px-3 py-2 text-xs font-bold text-gray-700 dark:text-gray-300 hover:bg-[#003875]/5 dark:hover:bg-[#FFD500]/10 cursor-pointer"
                             onClick={() => { 
                               setFormData({ ...formData, assigned_to: u.username }); 
@@ -1475,7 +1748,7 @@ export default function ChecklistsPage() {
                 </div>
               </div>
 
-              {!editingItem && (
+              {(
                 <div className="space-y-4">
                   <div className="space-y-2">
                     <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block">Frequency</label>
@@ -1546,10 +1819,12 @@ export default function ChecklistsPage() {
                                 
                                 const newValue = newDays.length > 0 ? prefix + newDays.join(',') : 'Daily';
                                 
-                                // Auto-calculate next occurrence for ALL selected days from today
-                                const nextDates = newDays.map(d => getNextOccurringDay(d));
-                                const nextDateStr = nextDates.join(',');
-                                
+                                // Anchor = soonest next selected weekday (date only)
+                                const nextDates = newDays
+                                  .map((d) => getNextOccurringDay(d))
+                                  .filter(Boolean)
+                                  .sort();
+                                const nextDateStr = nextDates[0] || "";
                                 setFormData({ ...formData, frequency: newValue, due_date: nextDateStr });
                               }}
                               className={`w-9 h-9 rounded-full flex flex-col items-center justify-center transition-all border shadow-sm ${
@@ -1568,54 +1843,24 @@ export default function ChecklistsPage() {
                 </div>
               )}
 
-              {/* Row 4: Due Date + Verification + Attachment */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 border-t border-orange-50 dark:border-zinc-800/50 pt-4 items-end">
-                {!editingItem ? (
-                  <div>
-                    <PremiumDatePicker 
-                      label="Due Date"
-                      value={formData.due_date || ""}
-                      onChange={(val) => setFormData({ ...formData, due_date: val })}
-                      multiSelect={formData.frequency?.startsWith('Weekly') || ['Monthly', 'Quarterly', 'Half Yearly', 'Yearly'].includes(formData.frequency || "")}
-                      allowPast={false}
-                      allowSundays={false}
-                    />
-                  </div>
-                ) : (
-                  <div /> // Spacer to keep verification and attachment in correct columns
-                )}
-
-                <div>
-                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-1">Verification Required?</label>
-                  <div className="flex bg-gray-100 dark:bg-zinc-900/50 p-1 rounded-xl">
-                    {(['No', 'Yes'] as const).map((val) => (
-                      <button key={val} type="button"
-                        onClick={() => setFormData({ ...formData, verification_required: val })}
-                        className={`flex-1 py-1.5 text-[9px] font-black uppercase tracking-widest rounded-lg transition-all ${
-                          formData.verification_required === val
-                            ? val === 'Yes' ? 'bg-emerald-500 text-white shadow-md' : 'bg-gray-400 text-white shadow-md'
-                            : 'text-gray-500 dark:text-gray-400 hover:bg-white dark:hover:bg-zinc-800 hover:text-gray-900 dark:hover:text-white'
-                        }`}
-                      >{val === 'Yes' ? '✓ Yes' : '✗ No'}</button>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-1">Attachment Required?</label>
-                  <div className="flex bg-gray-100 dark:bg-zinc-900/50 p-1 rounded-xl">
-                    {(['No', 'Yes'] as const).map((val) => (
-                      <button key={val} type="button"
-                        onClick={() => setFormData({ ...formData, attachment_required: val })}
-                        className={`flex-1 py-1.5 text-[9px] font-black uppercase tracking-widest rounded-lg transition-all ${
-                          formData.attachment_required === val
-                            ? val === 'Yes' ? 'bg-blue-500 text-white shadow-md' : 'bg-gray-400 text-white shadow-md'
-                            : 'text-gray-500 dark:text-gray-400 hover:bg-white dark:hover:bg-zinc-800 hover:text-gray-900 dark:hover:text-white'
-                        }`}
-                      >{val === 'Yes' ? '✓ Yes' : '✗ No'}</button>
-                    ))}
-                  </div>
-                </div>
+              {/* Anchor due date (date only) */}
+              <div className="border-t border-orange-50 dark:border-zinc-800/50 pt-4">
+                <PremiumDatePicker
+                  label={editingItem ? "Anchor Due Date" : "Start / Due Date"}
+                  value={(formData.due_date || "").split(",")[0] || ""}
+                  onChange={(val) =>
+                    setFormData({
+                      ...formData,
+                      due_date: toDateOnlyString(String(val).split(",")[0] || val) || String(val).split(",")[0] || "",
+                    })
+                  }
+                  multiSelect={false}
+                  allowPast={false}
+                  allowSundays={true}
+                />
+                <p className="text-[10px] text-gray-400 font-semibold mt-1">
+                  Saved as date only. Tasks tab expands by frequency through today.
+                </p>
               </div>
 
               <div className="p-4 border-t border-orange-100/50 dark:border-zinc-800 flex gap-2">
@@ -1770,94 +2015,33 @@ export default function ChecklistsPage() {
                   </div>
                 </div>
 
-                {/* Status Update & Remarks Section */}
-                <div className="space-y-6 border-t border-gray-100 dark:border-white/5 pt-6 pb-2">
-                  <div className="w-full">
-                    <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-4 flex items-center gap-2 px-1">
-                      <BoltIcon className="w-4 h-4 text-amber-500" /> Quick Status Update
-                    </h4>
-                    <div className="grid grid-cols-2 gap-1.5">
-                      {[
-                        { label: 'Completed', icon: <CheckCircleIcon className="w-3 h-3" />, color: 'bg-emerald-50 text-emerald-600 border-emerald-100 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-900/30' },
-                        { label: 'Approved', icon: <ShieldCheckIcon className="w-3 h-3" />, color: 'bg-green-50 text-green-600 border-green-100 dark:bg-green-900/20 dark:text-green-400 dark:border-green-900/30', requiresPrivilege: true },
-                      ]
-                      .filter(item => {
-                        if (!item.requiresPrivilege) return true;
-                        const isAssigner = selectedTask?.assigned_by === ((session?.user as any)?.username || "");
-                        return userRole === 'ADMIN' || isAssigner;
-                      })
-                      .map((item) => (
-                        <button
-                          key={item.label}
-                          onClick={() => setUpdatingStatus(item.label === updatingStatus ? "" : item.label)}
-                          className={`flex items-center justify-center gap-1.5 px-2 py-3 rounded-xl text-[10px] font-black uppercase tracking-tight border transition-all ${
-                            updatingStatus === item.label
-                              ? 'bg-[#CE2029] text-white border-[#CE2029] shadow-lg shadow-red-500/30 scale-[1.02]'
-                              : `${item.color} hover:scale-[1.02]`
-                          }`}
-                        >
-                          {item.icon}
-                          {item.label}
-                        </button>
-                      ))}
+                {/* Complete only */}
+                <div className="space-y-4 border-t border-gray-100 dark:border-white/5 pt-6 pb-2">
+                  <div className="grid grid-cols-2 gap-3 text-[10px]">
+                    <div className="p-3 rounded-xl bg-gray-50 dark:bg-navy-950/40 border border-gray-100 dark:border-white/5">
+                      <p className="font-black uppercase tracking-widest text-gray-400 mb-1">Due</p>
+                      <p className="font-bold text-gray-800 dark:text-white">
+                        {formatDateDisplay(
+                          (selectedTask as ChecklistOccurrence).occurrence_due_date ||
+                            selectedTask.due_date
+                        )}
+                      </p>
+                    </div>
+                    <div className="p-3 rounded-xl bg-gray-50 dark:bg-navy-950/40 border border-gray-100 dark:border-white/5">
+                      <p className="font-black uppercase tracking-widest text-gray-400 mb-1">Completed</p>
+                      <p className="font-bold text-gray-800 dark:text-white">
+                        {formatDateDisplay(
+                          (selectedTask as ChecklistOccurrence).completed_date || ""
+                        ) || "—"}
+                      </p>
                     </div>
                   </div>
-
-                  {/* Conditional: Evidence Upload */}
-                  {updatingStatus === 'Completed' && selectedTask.attachment_required === 'Yes' && (
-                    <div className="animate-in fade-in slide-in-from-top-2 duration-300">
-                      <label className="text-[9px] font-black text-red-600 dark:text-red-400 uppercase tracking-widest mb-1.5 block">Upload Evidence (Required)</label>
-                      <div className="relative group/file">
-                        <input
-                          type="file"
-                          onChange={(e) => setEvidenceFile(e.target.files?.[0] || null)}
-                          className="hidden"
-                          id="evidence-upload"
-                        />
-                        <label
-                          htmlFor="evidence-upload"
-                          className="w-full flex items-center justify-between px-4 py-2.5 bg-red-50/30 dark:bg-red-900/10 border border-dashed border-red-200 dark:border-red-900/30 rounded-xl text-xs text-red-600 dark:text-red-400 cursor-pointer hover:bg-red-50 transition-colors"
-                        >
-                          <span className="truncate">{evidenceFile?.name || "Select performance proof..."}</span>
-                          <PaperClipIcon className="w-4 h-4" />
-                        </label>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Optional Reason for status change */}
-                  {updatingStatus && (
-                    <div className="animate-in fade-in slide-in-from-top-2 duration-300">
-                      <label className="text-[9px] font-black text-red-600 dark:text-red-400 uppercase tracking-widest mb-1.5 block">Reason for Status Change</label>
-                      <textarea
-                        value={revisionReason}
-                        onChange={(e) => setRevisionReason(e.target.value)}
-                        placeholder="Explain why this status change is happening..."
-                        className="w-full px-4 py-2 bg-red-50/30 dark:bg-red-900/10 border border-red-100 dark:border-red-900/30 rounded-xl text-xs dark:text-white outline-none focus:ring-2 focus:ring-red-500/50 min-h-[80px] resize-none"
-                      />
-                    </div>
-                  )}
-
-                  {/* Remarks Input - Only show if NO status is being updated */}
-                  {!updatingStatus && (
-                    <div className="pt-2 animate-in fade-in slide-in-from-top-2 duration-300">
-                      <h4 className="text-[10px] font-black text-red-600 dark:text-red-400 uppercase tracking-widest mb-3 flex items-center gap-2">
-                        <DocumentTextIcon className="w-4 h-4" /> New Remark
-                      </h4>
-                      <textarea
-                        value={remarkText}
-                        onChange={(e) => setRemarkText(e.target.value)}
-                        placeholder="Type a internal contextual remark..."
-                        className="w-full px-4 py-2 bg-red-50/30 dark:bg-red-900/10 border border-red-100 dark:border-red-900/30 rounded-xl text-xs dark:text-white outline-none focus:ring-2 focus:ring-red-500/50 min-h-[80px] resize-none"
-                      />
-                    </div>
-                  )}
                 </div>
 
-                {/* History Timeline Tracking */}
+                {/* Completion History */}
                 <div className="pt-8 border-t border-gray-100 dark:border-white/5 pb-10 w-full">
                   <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-6 flex items-center gap-2 px-1">
-                    <ClockIcon className="w-4 h-4 text-blue-500" /> Activity History
+                    <ClockIcon className="w-4 h-4 text-blue-500" /> Completion History
                   </h4>
                   
                   {isLoadingHistory ? (
@@ -1868,40 +2052,20 @@ export default function ChecklistsPage() {
                   ) : taskHistory.length > 0 ? (
                     <div className="relative pl-6 space-y-6 before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-[2px] before:bg-gray-100 dark:before:bg-white/5">
                       {taskHistory.map((item, index) => (
-                        <div key={item.id} className="relative">
-                          <div className={`absolute -left-[30px] top-1 w-4 h-4 rounded-full border-2 border-white dark:border-navy-900 z-10 ${
-                            item.type === 'remark' ? 'bg-blue-500' : 'bg-amber-500'
-                          }`}></div>
-                          
+                        <div key={`${item.due_date}-${item.timestamp}-${index}`} className="relative">
+                          <div className="absolute -left-[30px] top-1 w-4 h-4 rounded-full border-2 border-white dark:border-navy-900 z-10 bg-emerald-500" />
                           <div className="flex flex-col gap-1">
                             <div className="flex items-center justify-between">
                               <span className="text-[10px] font-black text-gray-900 dark:text-white uppercase tracking-tight">
-                                {item.type === 'remark' ? item.username : `Status -> ${item.new_status}`}
+                                {item.new_status || "Completed"}
                               </span>
-                              <span className="text-[8px] font-bold text-gray-400">{formatDateDisplay(item.created_at)}</span>
+                              <span className="text-[8px] font-bold text-gray-400">
+                                {formatDateDisplay(item.timestamp || item.created_at)}
+                              </span>
                             </div>
-                            
-                            {item.type === 'remark' ? (
-                              <p className="text-xs text-gray-600 dark:text-slate-400 leading-relaxed font-medium bg-blue-50/30 dark:bg-blue-900/5 p-3 rounded-xl border border-blue-100/30 dark:border-blue-900/20 italic">
-                                "{item.remark}"
-                              </p>
-                            ) : (
-                              <div className="text-[10px] text-gray-500 dark:text-slate-500 bg-amber-50/30 dark:bg-amber-900/5 p-3 rounded-xl border border-amber-100/30 dark:border-amber-900/20">
-                                {item.reason && <p className="font-bold text-gray-700 dark:text-slate-300 mb-1">Reason: {item.reason}</p>}
-                                <div className="flex flex-wrap gap-x-4 gap-y-1 opacity-80">
-                                  <span>From: <b className="text-[#CE2029]">{item.old_status}</b></span>
-                                </div>
-                                {item.evidence_urls && (
-                                  <a 
-                                    href={`https://drive.google.com/file/d/${item.evidence_urls}/view`} 
-                                    target="_blank" 
-                                    className="mt-2 inline-flex items-center gap-1.5 text-[9px] font-black text-amber-600 uppercase tracking-widest hover:underline"
-                                  >
-                                    <PaperClipIcon className="w-3 h-3" /> View Evidence Attachment
-                                  </a>
-                                )}
-                              </div>
-                            )}
+                            <div className="text-[10px] text-gray-500 dark:text-slate-500 bg-emerald-50/30 dark:bg-emerald-900/5 p-3 rounded-xl border border-emerald-100/30 dark:border-emerald-900/20">
+                              Due: <b>{formatDateDisplay(item.due_date)}</b>
+                            </div>
                           </div>
                         </div>
                       ))}
@@ -1909,7 +2073,7 @@ export default function ChecklistsPage() {
                   ) : (
                     <div className="text-center py-8 opacity-30 select-none">
                       <SparklesIconOutline className="w-8 h-8 mx-auto mb-2" />
-                      <p className="text-[10px] font-black uppercase tracking-widest">No history yet</p>
+                      <p className="text-[10px] font-black uppercase tracking-widest">No completions yet</p>
                     </div>
                   )}
                 </div>
@@ -1918,34 +2082,19 @@ export default function ChecklistsPage() {
               {/* Sidebar Footer Actions */}
               <div className="p-5 px-6 border-t border-gray-200 dark:border-white/10 bg-white dark:bg-navy-900 flex gap-4 mt-auto sticky bottom-0 z-30 shadow-[0_-10px_30px_-15px_rgba(0,0,0,0.1)]">
                 <button
-                  onClick={handleUpdateStatus}
+                  onClick={handleCompleteTask}
                   disabled={
-                    !updatingStatus || 
-                    isSubmittingUpdate || 
-                    (updatingStatus === 'Completed' && selectedTask.attachment_required === 'Yes' && !evidenceFile)
+                    isSubmittingUpdate ||
+                    getDisplayStatus(selectedTask) === "Completed"
                   }
-                  className="w-[70%] px-4 py-3.5 bg-[#CE2029] hover:bg-red-700 disabled:bg-gray-300 text-white rounded-2xl text-[12px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 active:scale-95 no-underline border-none"
-                  style={{ backgroundColor: !updatingStatus || isSubmittingUpdate || (updatingStatus === 'Completed' && selectedTask.attachment_required === 'Yes' && !evidenceFile) ? '#ccc' : '#CE2029' }}
+                  className="w-full px-4 py-3.5 bg-[#CE2029] hover:bg-red-700 disabled:bg-gray-300 text-white rounded-2xl text-[12px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 active:scale-95 no-underline border-none"
                 >
-                  {isSubmittingUpdate && updatingStatus ? (
+                  {isSubmittingUpdate ? (
                     <ArrowPathIcon className="w-5 h-5 animate-spin" />
                   ) : (
                     <CheckCircleIcon className="w-5 h-5" />
                   )}
-                  Update Status
-                </button>
-                <button
-                  onClick={handleAddRemark}
-                  disabled={!remarkText.trim() || isSubmittingUpdate}
-                  className="w-[30%] px-4 py-3.5 bg-[#FFD500] hover:bg-yellow-500 disabled:bg-gray-300 text-navy-900 rounded-2xl text-[12px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 active:scale-95 no-underline border-none"
-                  style={{ backgroundColor: '#FFD500' }}
-                >
-                  {isSubmittingUpdate && remarkText.trim() ? (
-                    <ArrowPathIcon className="w-5 h-5 animate-spin" />
-                  ) : (
-                    <DocumentTextIcon className="w-5 h-5" />
-                  )}
-                  Remark
+                  Mark Completed
                 </button>
               </div>
             </div>
@@ -2055,7 +2204,7 @@ export default function ChecklistsPage() {
                         />
                       </div>
                       <div className="max-h-48 overflow-y-auto p-1 custom-scrollbar">
-                        {['Pending', 'Planned', 'Need Clarity', 'Need Revision', 'Completed', 'Approved', 'Hold', 'Re-Open', 'Overdue']
+                        {['Pending', 'Completed', 'Delayed']
                           .filter(s => s.toLowerCase().includes(modalStatusSearch.toLowerCase()))
                           .map(s => {
                             const count = statusCounts[s] || 0;
@@ -2168,7 +2317,7 @@ export default function ChecklistsPage() {
                             const count = modalCounts.assignedTo[u.username] || 0;
                             const isSelected = modalAssignedToFilter.includes(u.username);
                             return (
-                              <div key={u.id} 
+                              <div key={`filter-to-${u.username || `id-${u.id}`}`} 
                                 className={`px-3 py-2 rounded-lg text-xs font-bold cursor-pointer flex items-center justify-between group transition-colors ${
                                   isSelected ? 'bg-[#003875] text-white' : 'hover:bg-[#003875]/5 dark:hover:bg-[#FFD500]/10 text-gray-700 dark:text-gray-300'
                                 }`}
@@ -2226,7 +2375,7 @@ export default function ChecklistsPage() {
                             const count = modalCounts.assignedBy[u.username] || 0;
                             const isSelected = modalAssignedByFilter.includes(u.username);
                             return (
-                              <div key={u.id} 
+                              <div key={`filter-by-${u.username || `id-${u.id}`}`} 
                                 className={`px-3 py-2 rounded-lg text-xs font-bold cursor-pointer flex items-center justify-between group transition-colors ${
                                   isSelected ? 'bg-[#003875] text-white' : 'hover:bg-[#003875]/5 dark:hover:bg-[#FFD500]/10 text-gray-700 dark:text-gray-300'
                                 }`}

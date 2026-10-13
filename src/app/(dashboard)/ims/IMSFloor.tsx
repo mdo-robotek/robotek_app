@@ -231,11 +231,14 @@ interface AuditRow {
 
 export default function IMSFloor({ location, onBack }: { location: "1st" | "g" | "sfg", onBack: () => void }) {
   const showPacked = location === "1st" || location === "sfg";
-  const allowManualIn = location !== "sfg";
   const isSfg = location === "sfg";
   const isFirst = location === "1st";
   const [sfgTransferMode, setSfgTransferMode] = useState(false);
-  const isSfgTransfer = isSfg || sfgTransferMode;
+  const [sfgProductionInMode, setSfgProductionInMode] = useState(false);
+  /** Explicit transfer only — being on SFG page no longer forces OUT. */
+  const isSfgTransfer = sfgTransferMode;
+  const isSfgProductionIn = sfgProductionInMode;
+  const allowManualIn = location === "g" || location === "1st" || isSfgProductionIn;
   const [submitting, setSubmitting] = useState(false);
   const [statusMessage, setStatusMessage] = useState("");
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
@@ -307,6 +310,32 @@ export default function IMSFloor({ location, onBack }: { location: "1st" | "g" |
     return names.sort((a, b) => a.localeCompare(b)).map((name) => ({ id: name, label: name }));
   }, [masterItems]);
 
+  /** Unique item name + category for SFG Production IN (master catalog + ledger + IMS master). */
+  const sfgProductionItemOptions = useMemo(() => {
+    const byKey = new Map<string, { id: string; label: string; category: string }>();
+    const remember = (nameRaw?: string, categoryRaw?: string) => {
+      const name = String(nameRaw || "").trim();
+      if (!name) return;
+      const key = name.toLowerCase();
+      const category = String(categoryRaw || "").trim();
+      const existing = byKey.get(key);
+      if (!existing) {
+        byKey.set(key, {
+          id: name,
+          label: category ? `${name} · ${category}` : name,
+          category,
+        });
+      } else if (!existing.category && category) {
+        existing.category = category;
+        existing.label = `${existing.id} · ${category}`;
+      }
+    };
+    (masterCatalog || []).forEach((i) => remember(i.item_name, i.category));
+    masterItems.forEach((i: any) => remember(i.item_name, i.category));
+    rawItems.forEach((i) => remember(i.item_name, i.category));
+    return Array.from(byKey.values()).sort((a, b) => a.id.localeCompare(b.id));
+  }, [masterCatalog, masterItems, rawItems]);
+
   const sfgSourceItems = isSfg ? rawItems : sfgFloorItems;
 
   const sfgPendingItemOptions = useMemo(() => {
@@ -369,6 +398,9 @@ export default function IMSFloor({ location, onBack }: { location: "1st" | "g" |
   }, [masterItemOptions, rawItems, floorStockOptions]);
 
   const getBulkItemOptions = (row: BulkRow) => {
+    if (isSfgProductionIn) {
+      return sfgProductionItemOptions.map((o) => ({ id: o.id, label: o.label }));
+    }
     if (isSfgTransfer) return sfgPendingItemOptions;
     if (isFirst && row.type === "OUT") return floorStockOptions;
     if (isFirst) return firstFloorInOptions;
@@ -701,9 +733,20 @@ function parseDateStr(dStr: string) {
       if (row.id === id) {
         const newRow = { ...row, [field]: value };
         if (field === "item_name") {
+          const productionItem = sfgProductionItemOptions.find(
+            (i) => i.id.toLowerCase() === value.toLowerCase().trim()
+          );
           const floorItem = (isSfgTransfer ? sfgSourceItems : rawItems).find((i) => i.item_name?.toLowerCase().trim() === value.toLowerCase().trim());
           const masterItem = masterItems.find((i: any) => i.item_name?.toLowerCase() === value.toLowerCase());
-          newRow.category = floorItem?.category || masterItem?.category || newRow.category;
+          const catalogItem = (masterCatalog || []).find(
+            (i) => i.item_name?.toLowerCase().trim() === value.toLowerCase().trim()
+          );
+          newRow.category =
+            productionItem?.category ||
+            floorItem?.category ||
+            masterItem?.category ||
+            catalogItem?.category ||
+            newRow.category;
         }
         return newRow;
       }
@@ -712,7 +755,18 @@ function parseDateStr(dStr: string) {
   };
 
   const addBulkRow = () => {
-    setBulkRows(prev => [...prev, { id: Date.now().toString(), item_name: '', category: '', type: isSfgTransfer || !allowManualIn ? 'OUT' : 'IN', qty: '', date: '', packed_status: isSfgTransfer ? 'PACKED' : '' }]);
+    setBulkRows((prev) => [
+      ...prev,
+      {
+        id: Date.now().toString(),
+        item_name: "",
+        category: "",
+        type: isSfgProductionIn ? "IN" : isSfgTransfer || !allowManualIn ? "OUT" : "IN",
+        qty: "",
+        date: "",
+        packed_status: isSfgTransfer ? "PACKED" : isSfgProductionIn ? "UNPACKED" : "",
+      },
+    ]);
   };
 
   const removeBulkRow = (id: string) => {
@@ -728,10 +782,12 @@ function parseDateStr(dStr: string) {
       }
       if (!getBulkItemOptions(row).some((opt) => opt.id.toLowerCase() === row.item_name.toLowerCase().trim())) {
         showStatus(
-          isSfgTransfer
+          isSfgProductionIn
+            ? "Please select a valid unique item from the catalog"
+            : isSfgTransfer
             ? "Please select an item that still has stock pending transfer from SFG"
             : isFirst && row.type === "OUT"
-            ? "Please select an item that still has stock on 1st Floor (including SFG In)"
+            ? "Please select an item that still has stock on 1st Floor (including Out from SFG)"
             : "Please select a valid item from the master list",
           "error"
         );
@@ -746,23 +802,31 @@ function parseDateStr(dStr: string) {
 
       const items: Partial<FloorIMS>[] = bulkRows.map((row) => {
         const qty = parseFloat(row.qty) || 0;
-        const type = isSfgTransfer ? "OUT" : row.type;
+        const type = isSfgProductionIn ? "IN" : isSfgTransfer ? "OUT" : row.type;
         return {
           item_name: row.item_name.trim(),
           category: row.category,
           in_qty: type === "IN" ? qty.toString() : "0",
           out_qty: type === "OUT" ? qty.toString() : "0",
           date: row.date || today,
-          packed_status: isSfgTransfer ? (row.packed_status || "PACKED") : (row.packed_status || ""),
+          packed_status: isSfgTransfer
+            ? row.packed_status || "PACKED"
+            : isSfgProductionIn
+            ? row.packed_status || "UNPACKED"
+            : row.packed_status || "",
+          source: isSfgProductionIn ? "Production" : undefined,
           updated_at: new Date().toISOString(),
         };
       });
 
-      const postLocation = isSfgTransfer ? "sfg" : location;
+      const postLocation = isSfgTransfer || isSfgProductionIn ? "sfg" : location;
       const res = await fetch(`/api/ims/floor?location=${postLocation}`, {
         method: 'POST',
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ items }),
+        body: JSON.stringify({
+          items,
+          ...(isSfgProductionIn ? { mode: "production_in" } : {}),
+        }),
       });
       if (!res.ok) throw new Error("Save failed");
       mutate();
@@ -773,8 +837,16 @@ function parseDateStr(dStr: string) {
       globalMutate("/api/ims/time-series");
       setItemModalOpen(false);
       setSfgTransferMode(false);
+      setSfgProductionInMode(false);
       setBulkRows([]);
-      showStatus("Records Saved Successfully!", "success");
+      showStatus(
+        isSfgProductionIn
+          ? "IN from Production saved!"
+          : isSfgTransfer
+          ? "Out from SFG saved — stock IN on 1st Floor!"
+          : "Records Saved Successfully!",
+        "success"
+      );
       setTimeout(() => setIsStatusModalOpen(false), 1500);
     } catch(e) {
       showStatus("Error saving records.", "error");
@@ -1067,6 +1139,16 @@ function parseDateStr(dStr: string) {
         category: editForm.category || editingLog.category,
         in_qty: editForm.type === 'IN' ? qty.toString() : "0",
         out_qty: editForm.type === 'OUT' ? qty.toString() : "0",
+        source:
+          isSfg && editForm.type === "IN"
+            ? editingLog.source || "Production"
+            : isSfg && editForm.type === "OUT"
+            ? editingLog.source || "SFG"
+            : editingLog.source,
+        packed_status:
+          isSfg && editForm.type === "OUT"
+            ? editingLog.packed_status || "PACKED"
+            : editingLog.packed_status,
         updated_at: new Date().toISOString(),
       };
 
@@ -1078,6 +1160,10 @@ function parseDateStr(dStr: string) {
 
       if (res.ok) {
         mutate();
+        if (isSfg || isFirst) {
+          globalMutate("/api/ims/floor?location=sfg");
+          globalMutate("/api/ims/floor?location=1st");
+        }
         setIsEditModalOpen(false);
         setEditingLog(null);
         showStatus("Transaction Updated Successfully!", "success");
@@ -1268,22 +1354,50 @@ function parseDateStr(dStr: string) {
             <ClipboardDocumentCheckIcon className="w-4 h-4" /> Physical Check
           </button>
           )}
+          {isSfg && (
+          <>
+          <button
+            onClick={() => {
+              setSfgTransferMode(false);
+              setSfgProductionInMode(true);
+              setBulkRows([{ id: Date.now().toString(), item_name: '', category: '', type: 'IN', qty: '', date: '', packed_status: 'UNPACKED' }]);
+              setItemModalOpen(true);
+            }}
+            className="flex items-center gap-2 px-4 py-2 text-white rounded-lg text-[11px] font-black uppercase tracking-widest transition-all shadow-md hover:-translate-y-0.5 whitespace-nowrap bg-emerald-600 hover:bg-emerald-700"
+          >
+            <PlusIcon className="w-4 h-4 stroke-2" /> IN from Production
+          </button>
+          <button
+            onClick={() => {
+              setSfgProductionInMode(false);
+              setSfgTransferMode(true);
+              setBulkRows([{ id: Date.now().toString(), item_name: '', category: '', type: 'OUT', qty: '', date: '', packed_status: 'PACKED' }]);
+              setItemModalOpen(true);
+            }}
+            className="flex items-center gap-2 px-4 py-2 text-white rounded-lg text-[11px] font-black uppercase tracking-widest transition-all shadow-md hover:-translate-y-0.5 whitespace-nowrap bg-teal-600 hover:bg-teal-700"
+          >
+            <PlusIcon className="w-4 h-4 stroke-2" /> Out from SFG
+          </button>
+          </>
+          )}
           {isFirst && (
           <button
             onClick={() => {
+              setSfgProductionInMode(false);
               setSfgTransferMode(true);
               setBulkRows([{ id: Date.now().toString(), item_name: '', category: '', type: 'OUT', qty: '', date: '', packed_status: 'PACKED' }]);
               setItemModalOpen(true);
             }}
             className="flex items-center gap-2 px-4 py-2 text-white rounded-lg text-[11px] font-black uppercase tracking-widest transition-all shadow-md hover:-translate-y-0.5 whitespace-nowrap bg-emerald-600 hover:bg-emerald-700"
           >
-            <PlusIcon className="w-4 h-4 stroke-2" /> SFG In
+            <PlusIcon className="w-4 h-4 stroke-2" /> Out from SFG
           </button>
           )}
           {!isSfg && (
           <button
             onClick={() => {
               setSfgTransferMode(false);
+              setSfgProductionInMode(false);
               setBulkRows([{ id: Date.now().toString(), item_name: '', category: '', type: allowManualIn ? 'IN' : 'OUT', qty: '', date: '', packed_status: '' }]);
               setItemModalOpen(true);
             }}
@@ -1871,9 +1985,13 @@ function parseDateStr(dStr: string) {
               <div className="flex items-center justify-between p-5 border-b border-blue-800/20 dark:border-white/5 bg-gradient-to-r from-[#003875] to-blue-800 dark:from-[#1f2937] dark:to-[#111827] text-white shrink-0">
                 <h3 className="text-sm font-black uppercase tracking-widest flex items-center gap-2">
                   <ClipboardDocumentListIcon className="w-5 h-5 text-blue-200 dark:text-[#FFD500]" />
-                  {isSfgTransfer ? "SFG In — Transfer Packed Stock from SFG" : `Add Multiple Items - ${title}`}
+                  {isSfgProductionIn
+                    ? "IN from Production"
+                    : isSfgTransfer
+                    ? "Out from SFG — IN on 1st Floor"
+                    : `Add Multiple Items - ${title}`}
                 </h3>
-                <button onClick={() => { setItemModalOpen(false); setSfgTransferMode(false); }} className="p-1.5 text-white/70 hover:text-white bg-white/10 hover:bg-white/20 dark:bg-[#1f2937] rounded-lg shadow-sm transition-colors">
+                <button onClick={() => { setItemModalOpen(false); setSfgTransferMode(false); setSfgProductionInMode(false); }} className="p-1.5 text-white/70 hover:text-white bg-white/10 hover:bg-white/20 dark:bg-[#1f2937] rounded-lg shadow-sm transition-colors">
                   <XMarkIcon className="w-4 h-4" />
                 </button>
               </div>
@@ -1886,18 +2004,23 @@ function parseDateStr(dStr: string) {
                   >
                     <PlusIcon className="w-3.5 h-3.5" /> Add Row
                   </button>
+                  {isSfgProductionIn && (
+                    <p className="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      Select unique item + category, then mark IN qty from production.
+                    </p>
+                  )}
                   {isSfgTransfer && (
                     <p className="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       {sfgItemsLoading
                         ? "Loading pending SFG stock..."
                         : sfgPendingItemOptions.length > 0
-                        ? "Only items with pending SFG stock are listed. Remaining qty is shown in brackets. Saving books SFG OUT and 1st Floor IN."
+                        ? "Only items with pending SFG stock are listed. Remaining qty is shown in brackets. Saving books Out from SFG and IN on 1st Floor."
                         : "No items are pending transfer from SFG."}
                     </p>
                   )}
                   {isFirst && !isSfgTransfer && (
                     <p className="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      OUT lists 1st Floor live stock, including items received via SFG In. Remaining qty is shown in brackets.
+                      OUT lists 1st Floor live stock, including items received via Out from SFG. Remaining qty is shown in brackets.
                     </p>
                   )}
                 </div>
@@ -1926,7 +2049,9 @@ function parseDateStr(dStr: string) {
                               value={row.item_name}
                               onChange={(val) => handleBulkRowChange(row.id, "item_name", val)}
                               placeholder={
-                                isSfgTransfer
+                                isSfgProductionIn
+                                  ? "Select unique item..."
+                                  : isSfgTransfer
                                   ? "Select pending SFG item..."
                                   : isFirst && row.type === "OUT"
                                   ? "Select 1st Floor stock item..."
@@ -1946,20 +2071,22 @@ function parseDateStr(dStr: string) {
                           </td>
                           <td className={`${tdClass} text-center`}>
                             <div className="flex bg-gray-100 dark:bg-gray-800 p-0.5 rounded-md justify-center">
-                              {allowManualIn && !isSfgTransfer && (
+                              {(isSfgProductionIn || (allowManualIn && !isSfgTransfer)) && (
                               <button
                                 onClick={() => handleBulkRowChange(row.id, "type", "IN")}
-                                className={`px-2 py-1 rounded text-[9px] font-black uppercase tracking-wider transition-all ${row.type === "IN" ? "bg-emerald-500 text-white shadow-sm" : "text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"}`}
+                                className={`px-2 py-1 rounded text-[9px] font-black uppercase tracking-wider transition-all ${row.type === "IN" || isSfgProductionIn ? "bg-emerald-500 text-white shadow-sm" : "text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"}`}
                               >
-                                IN
+                                {isSfgProductionIn ? "PROD IN" : "IN"}
                               </button>
                               )}
+                              {!isSfgProductionIn && (
                               <button
                                 onClick={() => handleBulkRowChange(row.id, "type", "OUT")}
                                 className={`px-2 py-1 rounded text-[9px] font-black uppercase tracking-wider transition-all ${row.type === "OUT" || isSfgTransfer ? "bg-emerald-500 text-white shadow-sm" : "text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"}`}
                               >
-                                {isSfgTransfer ? "SFG IN" : "OUT"}
+                                {isSfgTransfer ? "OUT → 1st" : "OUT"}
                               </button>
+                              )}
                             </div>
                           </td>
                           {showPacked && (
@@ -2015,7 +2142,7 @@ function parseDateStr(dStr: string) {
               </div>
 
               <div className="p-4 border-t border-gray-100 dark:border-white/5 flex justify-end gap-3 bg-gray-50/50 dark:bg-[#1f2937]/50 shrink-0">
-                <button onClick={() => { setItemModalOpen(false); setSfgTransferMode(false); }} className="px-5 py-2 rounded-xl text-xs font-black text-gray-500 uppercase tracking-widest hover:bg-white dark:hover:bg-[#111827] shadow-sm border border-gray-200 dark:border-white/10 transition-colors">Cancel</button>
+                <button onClick={() => { setItemModalOpen(false); setSfgTransferMode(false); setSfgProductionInMode(false); }} className="px-5 py-2 rounded-xl text-xs font-black text-gray-500 uppercase tracking-widest hover:bg-white dark:hover:bg-[#111827] shadow-sm border border-gray-200 dark:border-white/10 transition-colors">Cancel</button>
                 <button 
                   onClick={handleSaveItem} 
                   disabled={submitting}
@@ -2244,19 +2371,19 @@ function parseDateStr(dStr: string) {
 
                 <div className="flex items-center gap-3">
                   <div className="flex bg-gray-200 dark:bg-gray-800 p-1 rounded-lg">
-                    {allowManualIn && (
+                    {(allowManualIn || (isSfg && editForm.type === "IN")) && (
                     <button
                       onClick={() => setEditForm(prev => ({ ...prev, type: 'IN' }))}
                       className={`px-4 py-2 rounded-md text-[10px] font-black uppercase tracking-wider transition-all ${editForm.type === 'IN' ? 'bg-emerald-500 text-white shadow-sm' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
                     >
-                      IN
+                      {isSfg ? "PROD IN" : "IN"}
                     </button>
                     )}
                     <button
                       onClick={() => setEditForm(prev => ({ ...prev, type: 'OUT' }))}
                       className={`px-4 py-2 rounded-md text-[10px] font-black uppercase tracking-wider transition-all ${editForm.type === 'OUT' ? 'bg-rose-500 text-white shadow-sm' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
                     >
-                      {isSfg ? "To 1st Floor" : "OUT"}
+                      {isSfg ? "Out from SFG" : "OUT"}
                     </button>
                   </div>
                   <div className="flex-1">

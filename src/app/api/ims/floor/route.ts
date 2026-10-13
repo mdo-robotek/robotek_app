@@ -127,8 +127,19 @@ export async function POST(request: NextRequest) {
 
     if (location === "sfg") {
       const list = Array.isArray(data) ? data : Array.isArray(data?.items) ? data.items : [data];
-      const outOnly = list.map(asSfgOutOnly);
-      const result = await addFloorIMSItems(location, outOnly);
+      const mode = String(data?.mode || "").toLowerCase();
+      // Production IN keeps in_qty; transfer/default posts stay OUT-only (packed to 1st Floor).
+      const normalized =
+        mode === "production_in"
+          ? list.map((item: Partial<FloorIMS>) => ({
+              ...item,
+              in_qty: String(parseFloat(String(item.in_qty || item.out_qty || 0)) || 0),
+              out_qty: "0",
+              packed_status: item.packed_status || "UNPACKED",
+              source: item.source || "Production",
+            }))
+          : list.map(asSfgOutOnly);
+      const result = await addFloorIMSItems(location, normalized);
       if (!result.success) {
         return NextResponse.json({ error: "Failed to add Floor IMS items" }, { status: 500 });
       }
@@ -180,7 +191,13 @@ export async function PUT(request: NextRequest) {
     if (isSfgToFirstVirtualId(data.id)) {
       return NextResponse.json({ error: "SFG transfers cannot be edited on 1st Floor. Edit the SFG OUT instead." }, { status: 400 });
     }
-    const payload = location === "sfg" ? asSfgOutOnly(data) : data;
+    // Keep production IN rows as IN; only force OUT for transfer-style updates.
+    const isProductionIn =
+      location === "sfg" &&
+      (String(data.source || "").toLowerCase() === "production" ||
+        (parseFloat(String(data.in_qty || 0)) > 0 && parseFloat(String(data.out_qty || 0)) === 0));
+    const payload =
+      location === "sfg" && !isProductionIn ? asSfgOutOnly(data) : data;
     const success = await updateFloorIMSItem(location, payload.id, payload as FloorIMS);
 
     if (!success) {

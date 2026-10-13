@@ -75,9 +75,9 @@ const IMS_CALC_INFO: Record<ImsLocation, ImsCalcInfo> = {
     formula: "Live Stock = IN − OUT",
     inSources: [
       {
-        label: "SFG In (1st Floor) → SFG OUT + 1st Floor IN",
+        label: "Out from SFG → 1st Floor IN",
         detail:
-          "Use SFG In on 1st Floor IMS. That books packed OUT on SFG and the same qty as IN on 1st Floor with source SFG.",
+          "Use Out from SFG on SFG or 1st Floor IMS. That books packed OUT on SFG and the same qty as IN on 1st Floor with source SFG.",
       },
       {
         label: "IMS-1st Floor Sheet (in_qty)",
@@ -98,19 +98,24 @@ const IMS_CALC_INFO: Record<ImsLocation, ImsCalcInfo> = {
     formula: "Live Stock = IN − OUT",
     inSources: [
       {
+        label: "IN from Production",
+        detail:
+          "Use IN from Production on SFG IMS. Select unique item name + category and mark IN qty from production.",
+      },
+      {
         label: "GRN Sheet — Unpacked items",
         detail:
-          "Unpacked GRN qty is auto-IN on SFG IMS. There is no manual IN. Check and verify Date-Wise rows only.",
+          "Unpacked GRN qty is auto-IN on SFG IMS. Check and verify Date-Wise rows only.",
       },
     ],
     outSources: [
       {
-        label: "IMS-SFG Floor Sheet (out_qty)",
+        label: "Out from SFG → 1st Floor IN",
         detail:
-          "Use SFG In on 1st Floor IMS. Each save books packed OUT on SFG and IN on 1st Floor (source SFG).",
+          "Use Out from SFG on SFG or 1st Floor IMS. Each save books packed OUT on SFG and IN on 1st Floor (source SFG).",
       },
     ],
-    liveHow: "Unpacked GRN IN minus packed transfers OUT to 1st Floor, aggregated per item.",
+    liveHow: "Production + unpacked GRN IN minus packed transfers OUT to 1st Floor, aggregated per item.",
   },
   final: {
     title: "Final IMS",

@@ -426,20 +426,27 @@ export async function GET(request: Request) {
         }, 0) / overdueUser.length)
         : 0;
       
-      // On-time % is (On-Time / Total Assigned) to penalize pending/overdue tasks
+      // Science of missing: the scorecard counts what is MISSED, target is zero.
+      const notDone = Math.max(0, totalAssigned - completedCount);
+      const notOnTime = Math.max(0, completedCount - onTimeCount);
+      const misses = notDone + notOnTime;
+      const status = misses === 0 ? "GOOD" : misses <= 5 ? "WATCH" : "ACT";
       const onTimePct = totalAssigned > 0 ? Math.round((onTimeCount / totalAssigned) * 100) : 0;
-      const status = onTimePct >= 80 ? "GOOD" : onTimePct >= 50 ? "WATCH" : "ACT";
 
       return {
         name: u.username,
         dept: u.department || u.role_name || "",
         assigned: totalAssigned,
         completed: completedCount,
+        notDone,
+        notOnTime,
         onTimePct,
         avgDelayHours,
         status,
       };
-    }).filter(u => u.assigned > 0).sort((a, b) => b.assigned - a.assigned).slice(0, 10);
+    }).filter(u => u.assigned > 0)
+      .sort((a, b) => (b.notDone + b.notOnTime) - (a.notDone + a.notOnTime) || b.assigned - a.assigned)
+      .slice(0, 10);
 
     return NextResponse.json({
       generatedAt: now.toISOString(),

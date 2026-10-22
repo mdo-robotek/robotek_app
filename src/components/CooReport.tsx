@@ -646,8 +646,8 @@ export default function CooReport({ data: coo, loading }: CooReportProps) {
                    <th className="text-left pb-4 font-black">Member</th>
                    <th className="text-left pb-4 font-black">Dept</th>
                    <th className="text-center pb-4 font-black">Assigned</th>
-                   <th className="text-center pb-4 font-black">Completed</th>
-                   <th className="text-left pb-4 font-black">On-Time %</th>
+                   <th className="text-center pb-4 font-black">Not Done</th>
+                   <th className="text-center pb-4 font-black">Not On-Time</th>
                    <th className="text-center pb-4 font-black">Avg Delay</th>
                    <th className="text-right pb-4 font-black">Status</th>
                  </tr>
@@ -668,16 +668,14 @@ export default function CooReport({ data: coo, loading }: CooReportProps) {
                      </td>
                      <td className="py-4 text-center font-black text-gray-900 dark:text-white">{user.assigned}</td>
                      <td className="py-4 text-center">
-                        <span className="text-xs font-black text-emerald-500">{user.completed}</span>
-                        <span className="text-[10px] text-gray-400 font-bold ml-0.5">/{user.assigned}</span>
+                        <span className={`text-sm font-black ${(user.notDone ?? Math.max(0, user.assigned - user.completed)) === 0 ? 'text-emerald-500' : 'text-red-500'}`}>
+                          {user.notDone ?? Math.max(0, user.assigned - user.completed)}
+                        </span>
                      </td>
-                     <td className="py-4">
-                        <div className="flex items-center gap-3">
-                           <div className="flex-1 h-1.5 max-w-[80px] bg-gray-100 dark:bg-white/5 rounded-full overflow-hidden">
-                             <div className={`h-full rounded-full transition-all duration-1000 ${user.onTimePct >= 90 ? 'bg-emerald-500' : user.onTimePct >= 60 ? 'bg-amber-500' : 'bg-red-500'}`} style={{ width: `${user.onTimePct}%` }} />
-                           </div>
-                           <span className={`text-[11px] font-black ${user.onTimePct >= 90 ? 'text-emerald-500' : user.onTimePct >= 60 ? 'text-amber-500' : 'text-red-500'}`}>{user.onTimePct}%</span>
-                        </div>
+                     <td className="py-4 text-center">
+                        <span className={`text-sm font-black ${(user.notOnTime ?? 0) === 0 ? 'text-emerald-500' : 'text-red-500'}`}>
+                          {user.notOnTime ?? 0}
+                        </span>
                      </td>
                      <td className="py-4 text-center font-black text-gray-400 text-xs">{user.avgDelayHours}h</td>
                      <td className="py-4 text-right">

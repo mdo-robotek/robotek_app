@@ -24,7 +24,6 @@ import {
 export const navigation = [
   // Dashboard Section
   { name: 'Dashboard', id: 'dashboard', href: '/', icon: Squares2X2Icon, section: 'Dashboard' },
-  { name: 'Management', id: 'management', href: '/management', icon: BriefcaseIcon, section: 'Dashboard' },
   { name: 'Metrix', id: 'metrix', href: '/metrix', icon: ChartBarIcon, section: 'Dashboard' },
   { name: 'Score', id: 'score', href: '/score', icon: ChartBarIcon, section: 'Dashboard' },
   { name: 'EA-MD Hub', id: 'ea-md-hub', href: '/ea-md-hub', icon: BriefcaseIcon, section: 'Dashboard' },

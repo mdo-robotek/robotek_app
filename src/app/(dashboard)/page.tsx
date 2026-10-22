@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useSession } from "next-auth/react";
 import useSWR from "swr";
 import { 
@@ -23,6 +24,7 @@ import {
   UserAssetsPanel,
   CompactPartyCelebrationCard
 } from "./DashboardComponents";
+import CooReport from "@/components/CooReport";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -33,10 +35,20 @@ export default function Dashboard() {
     refreshInterval: 300000 
   });
 
+  const [view, setView] = useState<"coo" | "me">("coo");
+
   const firstName = (session?.user as any)?.username || session?.user?.name?.split(' ')[0] || "Guest";
   const username = (session?.user as any)?.username as string | undefined;
   const userRole = (session?.user as any)?.role || 'User';
   const isAdmin = (session?.user as any)?.role === 'ADMIN' || (session?.user as any)?.role === 'EA';
+
+  // Single dashboard: admins/EA get the COO Command Center on top of the personal view.
+  // Fetched only for admins (null key = no request); current month by default.
+  const { data: cooData, isLoading: cooLoading } = useSWR(
+    isAdmin ? '/api/metrix/coo?granularity=month' : null,
+    fetcher,
+    { refreshInterval: 300000, revalidateOnFocus: false, keepPreviousData: true }
+  );
 
   // Calculate Monthly Averages
   let avgIn = "--:--";
@@ -76,7 +88,7 @@ export default function Dashboard() {
     </div>
   );
 
-  return (
+  const myDay = (
     <div className="max-w-[1600px] mx-auto space-y-6 pb-10 px-4">
       
       {/* ROW 1: MISSION CONTROL HEADER */}
@@ -199,6 +211,41 @@ export default function Dashboard() {
       </div>
 
       <BirthdayCelebrationModal birthdays={data?.birthdays} anniversaries={data?.anniversaries} partyBirthdays={data?.partyBirthdays} partyAnniversaries={data?.partyAnniversaries} currentUser={firstName} />
+    </div>
+  );
+
+  // Non-admins: personal dashboard, unchanged
+  if (!isAdmin) return myDay;
+
+  const tabs = [
+    { id: "coo" as const, label: "COO Command Center" },
+    { id: "me" as const, label: "My Day" },
+  ];
+
+  return (
+    <div>
+      <div className="max-w-[1600px] mx-auto px-4 pb-4 flex gap-2 overflow-x-auto">
+        {tabs.map((t) => (
+          <button
+            key={t.id}
+            onClick={() => setView(t.id)}
+            className={`shrink-0 rounded-full px-5 py-2 text-[11px] font-black uppercase tracking-widest transition-all active:scale-95 ${
+              view === t.id
+                ? "bg-[#003875] text-white dark:bg-[#FFD500] dark:text-[#003875] shadow-lg"
+                : "bg-white text-gray-500 ring-1 ring-black/10 dark:bg-white/5 dark:text-slate-300 dark:ring-white/10"
+            }`}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+      {view === "coo" ? (
+        <div className="max-w-[1600px] mx-auto px-4 pb-10">
+          <CooReport data={cooData} loading={cooLoading} />
+        </div>
+      ) : (
+        myDay
+      )}
     </div>
   );
 }

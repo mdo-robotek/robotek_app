@@ -150,7 +150,8 @@ export async function GET(request: Request) {
 
     // ── 2. DELEGATION PIPELINE ──
     // Use filter params if provided, otherwise default to all time ('1970-01-01')
-    const mtdStart = startDateParam || "1970-01-01";
+    // Home dashboard (no explicit dates, monthly view) defaults to the current month
+    const mtdStart = startDateParam || (granularity === "month" ? `${todayStr.slice(0, 7)}-01` : "1970-01-01");
     const mtdEnd = endDateParam || todayStr;
     const mtdDelegations = allDelegations.filter(d => {
       const created = normalizeDate(d.created_at);
@@ -430,9 +431,11 @@ export async function GET(request: Request) {
       const notDone = Math.max(0, totalAssigned - completedCount);
       const notOnTime = Math.max(0, completedCount - onTimeCount);
       const misses = notDone + notOnTime;
-      // Negative miss percentage: 0% is the target, -100% means everything missed
-      const missPct = totalAssigned > 0 ? -Math.round((misses / totalAssigned) * 100) : 0;
-      const status = misses === 0 ? "GOOD" : misses <= 5 ? "WATCH" : "ACT";
+      // Weighted science-of-missing score: Not Done carries 70%, Not On-Time 30%. 0% is the target.
+      const notDonePct = totalAssigned > 0 ? (notDone / totalAssigned) * 100 : 0;
+      const notOnTimePct = totalAssigned > 0 ? (notOnTime / totalAssigned) * 100 : 0;
+      const missPct = -Math.round(0.7 * notDonePct + 0.3 * notOnTimePct);
+      const status = missPct === 0 ? "GOOD" : missPct >= -10 ? "WATCH" : "ACT";
       const onTimePct = totalAssigned > 0 ? Math.round((onTimeCount / totalAssigned) * 100) : 0;
 
       return {
@@ -448,7 +451,7 @@ export async function GET(request: Request) {
         status,
       };
     }).filter(u => u.assigned > 0)
-      .sort((a, b) => (b.notDone + b.notOnTime) - (a.notDone + a.notOnTime) || b.assigned - a.assigned)
+      .sort((a, b) => a.missPct - b.missPct || b.assigned - a.assigned)
       .slice(0, 10);
 
     return NextResponse.json({

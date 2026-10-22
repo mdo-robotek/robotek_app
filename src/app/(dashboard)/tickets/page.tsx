@@ -377,7 +377,7 @@ export default function TicketsPage() {
 
       if (res.ok) {
         const result = await res.json();
-        setTicketHistory(prev => [result.history, ...prev]);
+        if (result.history) setTicketHistory(prev => [result.history, ...prev]);
         setNewComment("");
         setVoiceNoteFile(null);
         setRefDocFile(null);
@@ -409,7 +409,7 @@ export default function TicketsPage() {
 
       if (historyRes.ok) {
         const hr = await historyRes.json();
-        setTicketHistory([hr.history, ...ticketHistory]);
+        if (hr.history) setTicketHistory([hr.history, ...ticketHistory]);
         mutateTickets();
       }
     } catch {
@@ -1094,7 +1094,7 @@ export default function TicketsPage() {
                   <p className="text-center text-[10px] uppercase font-black tracking-widest text-gray-400 py-4">No activity yet</p>
                 ) : (
                   <div className="space-y-3 relative before:absolute before:inset-0 before:ml-[17px] before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-gray-200 dark:before:via-navy-700 before:to-transparent">
-                    {ticketHistory.map((log) => (
+                    {ticketHistory.filter(Boolean).map((log) => (
                       <div key={log.id} className="relative flex items-start gap-3">
                         <div className="flex items-center justify-center w-[34px] h-[34px] rounded-full border-[3px] border-white dark:border-navy-900 bg-[#003875] text-white shadow-sm shrink-0 z-10">
                           {log.action_type === 'STATUS_CHANGE' ? <ArrowPathIcon className="w-3 h-3" /> : <ChatBubbleLeftRightIcon className="w-3 h-3" />}

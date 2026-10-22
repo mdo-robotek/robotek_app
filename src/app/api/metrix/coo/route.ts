@@ -430,6 +430,8 @@ export async function GET(request: Request) {
       const notDone = Math.max(0, totalAssigned - completedCount);
       const notOnTime = Math.max(0, completedCount - onTimeCount);
       const misses = notDone + notOnTime;
+      // Negative miss percentage: 0% is the target, -100% means everything missed
+      const missPct = totalAssigned > 0 ? -Math.round((misses / totalAssigned) * 100) : 0;
       const status = misses === 0 ? "GOOD" : misses <= 5 ? "WATCH" : "ACT";
       const onTimePct = totalAssigned > 0 ? Math.round((onTimeCount / totalAssigned) * 100) : 0;
 
@@ -440,6 +442,7 @@ export async function GET(request: Request) {
         completed: completedCount,
         notDone,
         notOnTime,
+        missPct,
         onTimePct,
         avgDelayHours,
         status,

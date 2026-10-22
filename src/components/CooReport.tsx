@@ -648,6 +648,7 @@ export default function CooReport({ data: coo, loading }: CooReportProps) {
                    <th className="text-center pb-4 font-black">Assigned</th>
                    <th className="text-center pb-4 font-black">Not Done</th>
                    <th className="text-center pb-4 font-black">Not On-Time</th>
+                   <th className="text-center pb-4 font-black">Miss %</th>
                    <th className="text-center pb-4 font-black">Avg Delay</th>
                    <th className="text-right pb-4 font-black">Status</th>
                  </tr>
@@ -675,6 +676,11 @@ export default function CooReport({ data: coo, loading }: CooReportProps) {
                      <td className="py-4 text-center">
                         <span className={`text-sm font-black ${(user.notOnTime ?? 0) === 0 ? 'text-emerald-500' : 'text-red-500'}`}>
                           {user.notOnTime ?? 0}
+                        </span>
+                     </td>
+                     <td className="py-4 text-center">
+                        <span className={`text-base font-black ${(user.missPct ?? 0) === 0 ? 'text-emerald-500' : 'text-red-500'}`}>
+                          {user.missPct ?? 0}%
                         </span>
                      </td>
                      <td className="py-4 text-center font-black text-gray-400 text-xs">{user.avgDelayHours}h</td>

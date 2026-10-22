@@ -428,13 +428,18 @@ export async function GET(request: Request) {
         : 0;
       
       // Science of missing: the scorecard counts what is MISSED, target is zero.
-      const notDone = Math.max(0, totalAssigned - completedCount);
+      // Not Done counts only tasks whose due date has passed — a task not yet due is not a miss.
+      const overdueChecklists = userChecklists.filter(c => {
+        const due = normalizeDate(c.occurrence_due_date || c.due_date);
+        return due && due < todayStr && c.display_status !== "Completed";
+      }).length;
+      const notDone = overdueUser.length + overdueChecklists;
       const notOnTime = Math.max(0, completedCount - onTimeCount);
-      const misses = notDone + notOnTime;
-      // Weighted science-of-missing score: Not Done carries 70%, Not On-Time 30%. 0% is the target.
+      // Weighted miss score, Not Done 70 : Not On-Time 30, scaled so that
+      // "everything overdue and nothing done" = -100%. A late task weighs 3/7 of an undone one.
       const notDonePct = totalAssigned > 0 ? (notDone / totalAssigned) * 100 : 0;
       const notOnTimePct = totalAssigned > 0 ? (notOnTime / totalAssigned) * 100 : 0;
-      const missPct = -Math.round(0.7 * notDonePct + 0.3 * notOnTimePct);
+      const missPct = Math.max(-100, -Math.round((0.7 * notDonePct + 0.3 * notOnTimePct) / 0.7));
       const status = missPct === 0 ? "GOOD" : missPct >= -10 ? "WATCH" : "ACT";
       const onTimePct = totalAssigned > 0 ? Math.round((onTimeCount / totalAssigned) * 100) : 0;
 

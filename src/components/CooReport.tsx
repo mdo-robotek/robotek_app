@@ -596,7 +596,7 @@ export default function CooReport({ data: coo, loading }: CooReportProps) {
                    data: (inv.allItemsList || [])
                      .filter((x: any) => x.category === c.category)
                      .sort((a: any, b: any) => b.stockLeft - a.stockLeft),
-                   columns: [{ key: 'sku', label: 'Item' }, { key: 'category', label: 'Category' }, { key: 'stockLeft', label: 'Stock Left' }]
+                   columns: [{ key: 'sku', label: 'Item' }, { key: 'rawCategory', label: 'Category' }, { key: 'stockLeft', label: 'Stock Left' }]
                  })}
                >
                   <div className="flex justify-between text-[10px] font-black uppercase">

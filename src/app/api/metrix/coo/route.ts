@@ -571,7 +571,7 @@ export async function GET(request: Request) {
         lowStockCount: lowStock.length,
         inventoryByCategory,
         lowStockItems,
-        allItemsList: activeIMS.map((i: any) => ({ sku: i.item_name, category: rollupCategory(i.category), stockLeft: Math.round(stockOf(i)) })),
+        allItemsList: activeIMS.map((i: any) => ({ sku: i.item_name, category: rollupCategory(i.category), rawCategory: (i.category || "").trim() || "—", stockLeft: Math.round(stockOf(i)) })),
         negativeCount: negativeStock.length,
         negativeList: negativeStock.map((i: any) => ({ sku: i.item_name, category: i.category, stockLeft: Math.round(stockOf(i)) })),
         outOfStockList: outOfStock.map((i: any) => ({ sku: i.item_name, category: i.category, stockLeft: Math.round(stockOf(i)) })),

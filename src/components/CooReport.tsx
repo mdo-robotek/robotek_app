@@ -274,6 +274,16 @@ export default function CooReport({ data: coo, loading }: CooReportProps) {
                 <p className="text-[10px] font-bold text-gray-400 mt-1">{del.needRevision || 0} need revision · {del.pending || 0} pending</p>
               </div>
             )}
+            {(alerts.ledgerMismatchCount || 0) > 0 && (
+              <div
+                className="bg-fuchsia-50 dark:bg-fuchsia-500/10 border border-fuchsia-100 dark:border-fuchsia-500/20 rounded-2xl p-4 cursor-pointer hover:bg-fuchsia-100 dark:hover:bg-fuchsia-500/20 transition-colors"
+                onClick={() => setDrillDownModal({ isOpen: true, title: "Item Ledger Mismatches — Entry Errors", data: alerts.ledgerMismatchList || [], columns: [{ key: 'sku', label: 'SKU' }, { key: 'category', label: 'Category' }, { key: 'totalIn', label: 'Total IN' }, { key: 'totalOut', label: 'Total OUT' }, { key: 'stockLeft', label: 'Net' }] })}
+              >
+                <p className="text-[10px] font-black text-fuchsia-500 uppercase tracking-widest">Critical · Item Ledger</p>
+                <p className="text-sm font-black text-gray-800 dark:text-white mt-1">{alerts.ledgerMismatchCount} items with IN/OUT entry errors</p>
+                <p className="text-[10px] font-bold text-gray-400 mt-1">Negative ya bina IN ke selling — Item Ledger page par fix karein</p>
+              </div>
+            )}
             {(alerts.inactiveParties?.length || 0) > 0 && (
               <div className="bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-100 dark:border-indigo-500/20 rounded-2xl p-4">
                 <p className="text-[10px] font-black text-indigo-500 uppercase tracking-widest">Info · CRM</p>

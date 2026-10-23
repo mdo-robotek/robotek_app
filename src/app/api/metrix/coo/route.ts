@@ -453,6 +453,21 @@ export async function GET(request: Request) {
     const negativeStock = activeIMS
       .filter((i: any) => stockOf(i) < 0 && !isTouchCategory(i) && !isStale(i))
       .sort((a: any, b: any) => stockOf(a) - stockOf(b));
+
+    // Item Ledger (Module A) mismatches: net negative OR selling with zero
+    // recorded IN — the MAGLOCK/TRUMP/NOIR punching-error pattern. Surfaced
+    // in Action Required so they get fixed without opening the ledger page.
+    const ledgerMismatches = activeIMS
+      .filter((i: any) => !isTouchCategory(i) && !isStale(i) &&
+        (stockOf(i) < 0 || (Number(i.in_qty || 0) === 0 && Number(i.out_qty || 0) > 0)))
+      .sort((a: any, b: any) => stockOf(a) - stockOf(b))
+      .map((i: any) => ({
+        sku: i.item_name,
+        category: i.category,
+        totalIn: Math.round(Number(i.in_qty || 0)),
+        totalOut: Math.round(Number(i.out_qty || 0)),
+        stockLeft: Math.round(stockOf(i)),
+      }));
     const categoryStockMap: Record<string, number> = {};
     activeIMS.forEach((i: any) => {
       const cat = rollupCategory(i.category);
@@ -621,6 +636,8 @@ export async function GET(request: Request) {
         zeroTaskEmployees,
         overdueTaskCount: overdue.length,
         criticalDelayCount: delayAging.gt7.length,
+        ledgerMismatchCount: ledgerMismatches.length,
+        ledgerMismatchList: ledgerMismatches,
       },
       charts: {
         orderOtdTrend,

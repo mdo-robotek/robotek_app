@@ -44,6 +44,7 @@ export default function ItemLedgerPage() {
   );
   const [showOnlyFlagged, setShowOnlyFlagged] = useState(false);
   const [search, setSearch] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("");
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [form, setForm] = useState({
     item_name: "",
@@ -58,12 +59,34 @@ export default function ItemLedgerPage() {
   const rows = useMemo(() => {
     let r = data?.rows || [];
     if (showOnlyFlagged) r = r.filter((x) => x.flagged);
+    if (categoryFilter) r = r.filter((x) => (x.category || "").trim() === categoryFilter);
     if (search.trim()) {
       const q = search.trim().toLowerCase();
       r = r.filter((x) => x.item_name.toLowerCase().includes(q));
     }
     return r;
-  }, [data, showOnlyFlagged, search]);
+  }, [data, showOnlyFlagged, search, categoryFilter]);
+
+  const categories = useMemo(
+    () => Array.from(new Set((data?.rows || []).map((r) => (r.category || "").trim()).filter(Boolean))).sort(),
+    [data]
+  );
+
+  const exportCSV = () => {
+    const header = ["Item", "Category", "GRN IN", "Floor IN", "Local Pack (rec)", "Assembled (rec)", "Total IN", "Total OUT", "Net", "Flagged"];
+    const lines = rows.map((r) =>
+      [r.item_name, r.category, r.in_grn, r.in_floor, r.in_locally_packed, r.in_assembled, r.total_in, r.total_out, r.net, r.flagged ? "YES" : ""]
+        .map((v) => `"${String(v ?? "").replace(/"/g, '""')}"`)
+        .join(",")
+    );
+    const blob = new Blob(["﻿" + [header.join(","), ...lines].join("\n")], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `item-ledger-${new Date().toISOString().split("T")[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   const itemNames = useMemo(() => Array.from(new Set((data?.rows || []).map((r) => r.item_name))).sort(), [data]);
 
@@ -134,6 +157,22 @@ export default function ItemLedgerPage() {
         >
           <ExclamationTriangleIcon className="w-3.5 h-3.5" />
           Flagged only {data ? `(${data.flaggedCount})` : ""}
+        </button>
+        <select
+          value={categoryFilter}
+          onChange={(e) => setCategoryFilter(e.target.value)}
+          className="px-3 py-2 rounded-lg border border-gray-200 dark:border-navy-800 bg-white dark:bg-navy-900 text-[10px] font-black uppercase tracking-widest outline-none focus:border-[#FFD500]"
+        >
+          <option value="">All Categories</option>
+          {categories.map((c) => (
+            <option key={c} value={c}>{c}</option>
+          ))}
+        </select>
+        <button
+          onClick={exportCSV}
+          className="px-3 py-2 rounded-lg bg-gray-100 dark:bg-navy-800 text-gray-600 dark:text-zinc-300 text-[10px] font-black uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-navy-700 transition-colors"
+        >
+          ⬇ Export CSV
         </button>
       </div>
 

@@ -132,10 +132,16 @@ export async function GET(request: Request) {
       return { orderNo, party: firstItem.party_name, createdAt, actual7, targetDateForOTD, isOTD, isDelayed, isDispatched, totalAmount, isReconfirmed, actual4 };
     });
 
-    const totalUsers = (allUsers as any[]).filter((u: any) => u.status !== "Inactive").length;
+    // Attendance counts only the people whose attendance HO actually
+    // maintains on the ERP (Track Attendance = Yes in the Users sheet) —
+    // factory-tracked staff (Akhilesh, Vineet etc.) and left employees are
+    // excluded, same rule as the home dashboard (Sahil, 2026-10-23).
+    const trackedUsers = (allUsers as any[]).filter((u: any) => u.status !== "Inactive" && (u as any).trackAttendance !== false);
+    const trackedIds = new Set(trackedUsers.map((u: any) => String(u.id)));
+    const totalUsers = trackedUsers.length;
 
     // ── 1. ATTENDANCE SUMMARY ──
-    const todayAttendance = allAttendance.filter(r => normalizeDate(r.date) === todayStr);
+    const todayAttendance = allAttendance.filter(r => normalizeDate(r.date) === todayStr && trackedIds.has(String(r.userId)));
     const checkedInUserIds = new Set(todayAttendance.map(r => String(r.userId)));
 
     // Calculate average check-in time (in minutes from midnight IST)
@@ -159,9 +165,10 @@ export async function GET(request: Request) {
     // Late = checked in after 9:30 AM (9*60+30 = 570 mins)
     const lateArrivals = checkInTimes.filter(m => m > 570).length;
 
-    // Approved leaves covering today
+    // Approved leaves covering today (tracked users only)
     const onLeaveToday = allLeaves.filter(l => {
       if (l.status !== "Approved") return false;
+      if (!trackedIds.has(String(l.userId))) return false;
       const start = normalizeDate(l.startDate);
       const end = normalizeDate(l.endDate);
       return start <= todayStr && end >= todayStr;
@@ -581,7 +588,7 @@ export async function GET(request: Request) {
         presentPct: totalUsers > 0 ? Math.round((presentCount / totalUsers) * 100) : 0,
         presentList: Array.from(checkedInUserIds).map(id => ({ id, name: (allUsers as any[]).find((u: any) => String(u.id) === String(id))?.username || id })),
         onLeaveList: onLeaveToday.map((l: any) => ({ id: l.id, name: (allUsers as any[]).find((u: any) => String(u.id) === String(l.userId))?.username || l.userId, type: l.leaveType })),
-        absentList: (allUsers as any[]).filter((u: any) => u.status !== "Inactive" && !checkedInUserIds.has(String(u.id)) && !onLeaveUserIds.has(String(u.id))).map((u: any) => ({ id: u.id, name: u.username }))
+        absentList: trackedUsers.filter((u: any) => !checkedInUserIds.has(String(u.id)) && !onLeaveUserIds.has(String(u.id))).map((u: any) => ({ id: u.id, name: u.username }))
       },
       delegations: {
         total,

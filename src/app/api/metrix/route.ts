@@ -124,7 +124,8 @@ export async function GET(req: NextRequest) {
       const currentStep = getPendingStepIdx(items as any);
       const isHold = !!(firstItem as any).hold;
       const isCancelled = !!(firstItem as any).cancelled;
-      const isPending = !isHold && !isCancelled && currentStep !== -1;
+      const isArchived = !!(firstItem as any).is_archived;
+      const isPending = !isHold && !isCancelled && !isArchived && currentStep !== -1;
       const pendingStepName = currentStep >= 1 ? `${currentStep}. ${O2D_STEPS[currentStep - 1] || ""}` : "";
 
       const totalAmount = items.reduce((sum, item) => sum + (parseFloat(item.est_amount) || 0), 0);

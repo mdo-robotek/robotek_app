@@ -141,7 +141,8 @@ export async function GET(request: Request) {
       const pendingStepIdx = getPendingStepIdx(items as any);
       const isHold = !!firstItem.hold;
       const isCancelled = !!firstItem.cancelled;
-      const isPending = !isHold && !isCancelled && pendingStepIdx !== -1;
+      const isArchived = !!(firstItem as any).is_archived;
+      const isPending = !isHold && !isCancelled && !isArchived && pendingStepIdx !== -1;
       const pendingStepName = pendingStepIdx >= 1 ? `${pendingStepIdx}. ${O2D_STEPS[pendingStepIdx - 1] || ""}` : "";
 
       return { orderNo, party: firstItem.party_name, createdAt, actual7, targetDateForOTD, isOTD, isDelayed, isDispatched, totalAmount, isReconfirmed, actual4, isPending, pendingStepName };

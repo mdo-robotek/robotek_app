@@ -577,9 +577,14 @@ export async function getAllO2DsForAnalytics(): Promise<O2D[]> {
     return "";
   };
 
-  // Archived first, then live overwrites duplicates
+  // Archived first, then live overwrites duplicates. Archived-only rows
+  // are tagged is_archived so dashboards can keep them in revenue/history
+  // analytics but EXCLUDE them from pending-order counts — the O2D page
+  // itself never shows archived orders, so a pending count that includes
+  // them never matches what the team sees there.
   archived.forEach((row) => {
     const key = rowKey(row);
+    (row as any).is_archived = true;
     if (!key) {
       noKeyRows.push(row);
       return;

@@ -20,4 +20,6 @@ export interface IMS {
   is_pending?: boolean;
   /** Where this row originates: Details sheet, GRN, or O2D */
   source?: "Details" | "GRN" | "O2D" | "GRN, O2D";
+  /** Most recent dated movement (GRN in, Busy/Out Form/floor out) for this item, ISO date or "" if none found */
+  last_activity_date?: string;
 }

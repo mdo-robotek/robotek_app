@@ -401,16 +401,42 @@ export async function GET(request: Request) {
 
     const stockOf = (i: any) => Number(i.live_stock ?? 0);
     const activeIMS = allIMS.filter((i: any) => String(i.active_status || "").toLowerCase() !== "inactive");
-    const outOfStock = activeIMS.filter((i: any) => stockOf(i) <= 0);
+
+    // "Touch" category items are third-party: Robotek doesn't stock or reorder
+    // them — the party re-orders directly. Exclude them from every
+    // stock/restock-facing widget (but not from allItemsList, which is a plain
+    // inventory browse view, not a reorder surface).
+    const isTouchCategory = (i: any) => String(i.category || "").trim().toLowerCase() === "touch";
+
+    // Permanent staleness rule: an item not traded (no GRN/Busy/OutForm/floor
+    // movement) in the last ~8 months (within the 6-9 month window Sahil asked
+    // for) should never be suggested for restock, even if it is still marked
+    // Active in the master sheet — this is the safeguard against the
+    // suggestion list silently filling up with dead items again.
+    const STALE_MS = 8 * 30 * 24 * 60 * 60 * 1000; // ~8 months
+    const isStale = (i: any) => {
+      const lastStr = i.last_activity_date;
+      if (!lastStr) return true; // never traded at all → stale
+      const ts = Date.parse(lastStr);
+      if (isNaN(ts)) return true;
+      return Date.now() - ts > STALE_MS;
+    };
+
+    const restockEligible = (i: any) => !isTouchCategory(i) && !isStale(i);
+
+    const outOfStock = activeIMS.filter((i: any) => stockOf(i) <= 0 && restockEligible(i));
     const lowStock = activeIMS.filter((i: any) => {
+      if (!restockEligible(i)) return false;
       const qty = stockOf(i);
       const avg = Number(i.avg_daily_con || 0);
       const reorder = Math.max(5, avg * 7); // under 7 days of cover
       return qty > 0 && qty <= reorder;
     });
-    // Negative stock = ledger entry errors (more OUT than IN recorded)
+    // Negative stock = ledger entry errors (more OUT than IN recorded).
+    // Touch items are excluded here too — Robotek never maintains their
+    // stock, so a "negative" reading for them is not a real entry error.
     const negativeStock = activeIMS
-      .filter((i: any) => stockOf(i) < 0)
+      .filter((i: any) => stockOf(i) < 0 && !isTouchCategory(i))
       .sort((a: any, b: any) => stockOf(a) - stockOf(b));
     const categoryStockMap: Record<string, number> = {};
     activeIMS.forEach((i: any) => {

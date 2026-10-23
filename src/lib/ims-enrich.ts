@@ -24,6 +24,8 @@ export type IMSMovementMaps = {
   displayNameMap: Record<string, string>;
   grnKeys: Set<string>;
   o2dKeys: Set<string>;
+  /** Most recent dated movement (GRN in, Busy/Out Form/floor out) per item, epoch ms */
+  lastActivityMap: Record<string, number>;
 };
 
 function resolveMovementSource(
@@ -40,7 +42,7 @@ function resolveMovementSource(
 }
 
 export function buildIMSMovementMaps(
-  grns: { Item_Name?: string; Qty?: string; cancelled?: string | boolean; status_1?: string; Packed_Unpacked?: string }[],
+  grns: { Item_Name?: string; Qty?: string; cancelled?: string | boolean; status_1?: string; Packed_Unpacked?: string; updated_at?: string }[],
   outForm: { description?: string; qty?: string; date?: string; updated_at?: string }[],
   gFloorLedger: FloorLedgerRow[] = [],
   firstFloorLedger: FloorLedgerRow[] = [],
@@ -52,12 +54,18 @@ export function buildIMSMovementMaps(
   const displayNameMap: Record<string, string> = {};
   const grnKeys = new Set<string>();
   const o2dKeys = new Set<string>();
+  const lastActivityMap: Record<string, number> = {};
 
   const rememberName = (raw: string) => {
     const key = raw.trim().toLowerCase();
     if (!key) return "";
     if (!displayNameMap[key]) displayNameMap[key] = raw.trim();
     return key;
+  };
+
+  const bumpActivity = (key: string, ts: number) => {
+    if (!key || !(ts > 0)) return;
+    if (!lastActivityMap[key] || ts > lastActivityMap[key]) lastActivityMap[key] = ts;
   };
 
   grns.forEach((grn) => {
@@ -67,6 +75,7 @@ export function buildIMSMovementMaps(
       if (key) {
         grnKeys.add(key);
         inQtyMap[key] = (inQtyMap[key] || 0) + qty;
+        bumpActivity(key, parseDateStr(grn.updated_at || ""));
       }
     }
   });
@@ -92,6 +101,7 @@ export function buildIMSMovementMaps(
     if (ts > 0 && now - ts <= sixtyDaysMs) {
       outQty60DaysMap[key] = (outQty60DaysMap[key] || 0) + qty;
     }
+    bumpActivity(key, ts);
   });
 
   outForm.forEach((row) => {
@@ -101,6 +111,7 @@ export function buildIMSMovementMaps(
     const addQty = (desc: string, qty: number) => {
       const key = rememberName(desc);
       if (!key) return;
+      bumpActivity(key, rowDateTs);
       if (busyKeys.has(key)) return; // sales OUT already counted from Busy register
       o2dKeys.add(key);
       outQtyMap[key] = (outQtyMap[key] || 0) + qty;
@@ -138,9 +149,11 @@ export function buildIMSMovementMaps(
 
     if (inQ > 0) {
       inQtyMap[key] = (inQtyMap[key] || 0) + inQ;
+      bumpActivity(key, rowDateTs);
     }
     if (outQ > 0 && !busyKeys.has(key)) {
       outQtyMap[key] = (outQtyMap[key] || 0) + outQ;
+      bumpActivity(key, rowDateTs);
       if (isWithin60Days) {
         outQty60DaysMap[key] = (outQty60DaysMap[key] || 0) + outQ;
       }
@@ -149,13 +162,13 @@ export function buildIMSMovementMaps(
 
   applyFloorOutToGFloorInMap(firstFloorLedger, inQtyMap, rememberName);
 
-  return { inQtyMap, outQtyMap, outQty60DaysMap, displayNameMap, grnKeys, o2dKeys };
+  return { inQtyMap, outQtyMap, outQty60DaysMap, displayNameMap, grnKeys, o2dKeys, lastActivityMap };
 }
 
 function enrichQtyFields(
   nameKey: string,
   maps: IMSMovementMaps
-): Pick<IMS, "in_qty" | "out_qty" | "live_stock" | "sale_percent" | "avg_daily_con" | "lead_time" | "safety_factor" | "max_level"> {
+): Pick<IMS, "in_qty" | "out_qty" | "live_stock" | "sale_percent" | "avg_daily_con" | "lead_time" | "safety_factor" | "max_level" | "last_activity_date"> {
   const in_qty = maps.inQtyMap[nameKey] || 0;
   const out_qty = maps.outQtyMap[nameKey] || 0;
   const live_stock = in_qty - out_qty;
@@ -165,6 +178,8 @@ function enrichQtyFields(
   const lead_time = 30;
   const safety_factor = 1;
   const max_level = avg_daily_con * lead_time * safety_factor;
+  const lastTs = maps.lastActivityMap[nameKey] || 0;
+  const last_activity_date = lastTs > 0 ? new Date(lastTs).toISOString().split("T")[0] : "";
 
   return {
     in_qty,
@@ -175,6 +190,7 @@ function enrichQtyFields(
     lead_time,
     safety_factor,
     max_level: Number(max_level.toFixed(2)),
+    last_activity_date,
   };
 }
 

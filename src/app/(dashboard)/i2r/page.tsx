@@ -47,6 +47,23 @@ import IMSFormModal from "@/components/IMSFormModal";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
+// "Name not decided yet" flow (Sahil, 2026-10-23): an indent can be raised
+// before the final item name is chosen — the name is stored with a "TBD - "
+// prefix. The final name must be decided within 5 days of raising the
+// indent; until then the row carries a NAME PENDING badge (task owner:
+// HIMANSHI), turning red once the 5-day window is crossed.
+const TBD_PREFIX = "TBD - ";
+const NAME_DECIDE_DAYS = 5;
+function isTbdName(name?: string): boolean {
+  return String(name || "").trim().toUpperCase().startsWith("TBD");
+}
+function tbdDaysLeft(createdAt?: string): number {
+  const ts = Date.parse(createdAt || "");
+  if (isNaN(ts)) return 0;
+  const deadline = ts + NAME_DECIDE_DAYS * 24 * 60 * 60 * 1000;
+  return Math.ceil((deadline - Date.now()) / (24 * 60 * 60 * 1000));
+}
+
 function fileLinkUrl(val?: string): string {
   if (!val || !String(val).trim()) return "";
   const s = String(val).trim();
@@ -290,12 +307,21 @@ export default function I2RPage() {
   };
 
   const { data: imsData } = useSWR<{ item_name: string; category: string }[]>("/api/ims", fetcher);
+  // Canonical names: Busy sale register (last 6 months — the "perfect"
+  // spellings) + Master catalog, via /api/item-names. These head the
+  // dropdown so I2R indents use the exact same names as sales OUT.
+  const { data: canonicalData } = useSWR<{ names: string[] }>("/api/item-names", fetcher, { revalidateOnFocus: false });
   const imsItems = useMemo(() => {
-    if (!imsData) return [];
     const unique = new Map<string, string>();
-    imsData.forEach(i => { if (i.item_name) unique.set(i.item_name, i.category || ""); });
+    (imsData || []).forEach(i => { if (i.item_name) unique.set(i.item_name, i.category || ""); });
+    const catByKey = new Map<string, string>();
+    unique.forEach((cat, name) => catByKey.set(name.trim().toLowerCase(), cat));
+    (canonicalData?.names || []).forEach(n => {
+      if (n && !catByKey.has(n.trim().toLowerCase())) unique.set(n, "");
+    });
     return Array.from(unique.entries()).map(([name, cat]) => ({ item_name: name, category: cat })).sort((a,b) => a.item_name.localeCompare(b.item_name));
-  }, [imsData]);
+  }, [imsData, canonicalData]);
+  const canonicalNameSet = useMemo(() => new Set((canonicalData?.names || []).map(n => n.trim().toLowerCase())), [canonicalData]);
 
   const existingIMSCategories = useMemo(() => {
     if (!imsData) return [];
@@ -866,6 +892,16 @@ export default function I2RPage() {
               <button onClick={() => setDateFilter(dateFilter==='Yesterday'?null:'Yesterday')} className={`px-4 py-1 rounded-full text-[10px] font-black uppercase border-2 transition-all ${dateFilter==='Yesterday'?'bg-[#003875] dark:bg-[#FFD500] text-white dark:text-navy-950 border-[#003875] dark:border-[#FFD500] shadow-md':'bg-white dark:bg-navy-900 border-blue-50 dark:border-navy-800 text-blue-400 dark:text-blue-600 hover:border-blue-200 dark:hover:border-blue-800'}`}>YESTERDAY <span className="ml-1 opacity-50">{getDateFilterCount('Yesterday')}</span></button>
               <button onClick={() => setDateFilter(dateFilter==='Today'?null:'Today')} className={`px-4 py-1 rounded-full text-[10px] font-black uppercase border-2 transition-all ${dateFilter==='Today'?'bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400 border-orange-100 dark:border-orange-900/50 shadow-sm':'bg-white dark:bg-navy-900 border-orange-50 dark:border-navy-800 text-orange-400 dark:text-orange-600 hover:border-orange-200 dark:hover:border-orange-800'}`}>TODAY <span className="ml-1 opacity-50">{getDateFilterCount('Today')}</span></button>
               <button onClick={() => setDateFilter(dateFilter==='Tomorrow'?null:'Tomorrow')} className={`px-4 py-1 rounded-full text-[10px] font-black uppercase border-2 transition-all ${dateFilter==='Tomorrow'?'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 border-blue-100 dark:border-blue-900/50 shadow-sm':'bg-white dark:bg-navy-900 border-blue-50 dark:border-navy-800 text-blue-400 dark:text-blue-600 hover:border-blue-200 dark:hover:border-blue-800'}`}>TOMORROW <span className="ml-1 opacity-50">{getDateFilterCount('Tomorrow')}</span></button>
+              {(() => {
+                const tbdRows = items.filter(it => !it.cancelled && isTbdName(it.item_name));
+                if (tbdRows.length === 0) return null;
+                const overdue = tbdRows.filter(it => tbdDaysLeft(it.created_at) < 0).length;
+                return (
+                  <button onClick={() => setSearchTerm("TBD")} title="Naam decide karke update karna hai (HIMANSHI)" className={`px-4 py-1 rounded-full text-[10px] font-black uppercase border-2 transition-all ${overdue > 0 ? 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border-red-200 dark:border-red-900/50' : 'bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-900/50'}`}>
+                    NAME PENDING <span className="ml-1 opacity-70">{tbdRows.length}</span>{overdue > 0 && <span className="ml-1">({overdue} OVERDUE)</span>}
+                  </button>
+                );
+              })()}
             </div>
             <div className="ml-auto flex items-center gap-3">
               <p className="text-[10px] font-black text-slate-400 dark:text-navy-500 uppercase tracking-widest whitespace-nowrap">PAGE <span className="text-[#003875] dark:text-[#FFD500]">{currentPage}</span> OF {totalPages||1}</p>
@@ -902,6 +938,11 @@ export default function I2RPage() {
                               <div className="flex items-center gap-2">
                                 <span className="px-2 py-0.5 bg-blue-50 dark:bg-blue-900/20 text-[#003875] dark:text-blue-400 rounded text-[10px] font-black uppercase tracking-widest border border-blue-100 dark:border-blue-900/50">INDT - {item.id}</span>
                                 <h3 className="text-base font-black text-slate-800 dark:text-white tracking-tight uppercase leading-none">{item.item_name}</h3>
+                                {isTbdName(item.item_name) && (
+                                  <span className={`inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest border ${tbdDaysLeft(item.created_at) < 0 ? "bg-red-50 text-red-600 border-red-200 dark:bg-red-500/10 dark:border-red-500/30" : "bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-500/10 dark:border-amber-500/30"}`}>
+                                    {tbdDaysLeft(item.created_at) < 0 ? `NAME PENDING — HIMANSHI — OVERDUE ${Math.abs(tbdDaysLeft(item.created_at))}d` : `NAME PENDING — HIMANSHI — ${tbdDaysLeft(item.created_at)}d left`}
+                                  </span>
+                                )}
                               </div>
                               <div className="flex flex-wrap items-center gap-4 mt-1.5">
                                 <span className="flex items-center gap-1.5 text-[10px] font-black text-blue-500 dark:text-blue-400 uppercase"><CubeIcon className="w-3.5 h-3.5" /> Qty: {item.quantity}</span>
@@ -1142,7 +1183,14 @@ export default function I2RPage() {
                             {it.cancelled && <span className="px-2 py-0.5 bg-red-50 dark:bg-red-900/10 text-red-600 dark:text-red-400 rounded text-[8px] font-black uppercase border border-red-100 dark:border-red-900/30 text-center">CANCELLED {fmtDt(it.cancelled)} {fmtTm(it.cancelled)}</span>}
                           </div>
                         </td>
-                        <td className="p-3 font-black text-slate-800 dark:text-white uppercase max-w-[200px] truncate">{it.item_name}</td>
+                        <td className="p-3 font-black text-slate-800 dark:text-white uppercase max-w-[200px] truncate">
+                          {it.item_name}
+                          {isTbdName(it.item_name) && (
+                            <span className={`ml-1.5 px-1.5 py-0.5 rounded-full text-[8px] font-black uppercase ${tbdDaysLeft(it.created_at) < 0 ? "bg-red-50 text-red-600" : "bg-amber-50 text-amber-600"}`}>
+                              {tbdDaysLeft(it.created_at) < 0 ? "NAME OVERDUE" : `NAME ${tbdDaysLeft(it.created_at)}d`}
+                            </span>
+                          )}
+                        </td>
                         <td className="p-3 font-bold text-slate-500 dark:text-navy-400">{it.quantity}</td>
                         <td className="p-3 font-bold text-slate-400 dark:text-navy-500">{it.category}</td>
                         <td className="p-3 font-bold text-slate-500 dark:text-navy-400">{it.filled_by}</td>
@@ -1258,13 +1306,35 @@ export default function I2RPage() {
                       </ul>
                     )}
                   </div>
-                  <button 
+                  <button
                     onClick={() => setIsIMSModalOpen(true)}
                     className="p-3 bg-[#003875] dark:bg-[#FFD500] text-white dark:text-navy-950 rounded-xl hover:bg-[#002855] dark:hover:bg-[#FFE600] transition-all shadow-md active:scale-95 flex items-center justify-center shrink-0"
                     title="Add new item to IMS"
                   >
                     <PlusIcon className="w-5 h-5 stroke-[2.5]" />
                   </button>
+                </div>
+                {/* Name-not-decided (TBD) + official-list warning */}
+                <div className="mt-2 space-y-1">
+                  <label className="flex items-center gap-2 cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={isTbdName(formData.item_name)}
+                      onChange={e => {
+                        const raw = String(formData.item_name || "");
+                        if (e.target.checked) {
+                          if (!isTbdName(raw)) setFormData({ ...formData, item_name: TBD_PREFIX + raw });
+                        } else {
+                          setFormData({ ...formData, item_name: raw.replace(/^\s*TBD\s*-?\s*/i, "") });
+                        }
+                      }}
+                      className="w-4 h-4 accent-[#003875]"
+                    />
+                    <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Naam abhi decide nahi hua (TBD — {NAME_DECIDE_DAYS} din mein final karna hai)</span>
+                  </label>
+                  {!isTbdName(formData.item_name) && String(formData.item_name || "").trim() !== "" && !canonicalNameSet.has(String(formData.item_name || "").trim().toLowerCase()) && (
+                    <p className="text-[10px] font-black text-amber-600 uppercase tracking-wide">⚠ Ye naam official (Busy/Master) list mein nahi hai — spelling check karein ya TBD tick karein</p>
+                  )}
                 </div>
               </div>
               <div>

@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef, useMemo } from "react";
 import { useSession } from "next-auth/react";
 import { GRN, GRNStepConfig } from "@/types/grn";
 import useSWR from "swr";
+import ItemNamePicker from "@/components/ItemNamePicker";
 import {
   PlusIcon,
   PencilSquareIcon,
@@ -1093,7 +1094,7 @@ export default function GRNDashboard() {
                   <div className="grid grid-cols-2 gap-4">
                      <div className="space-y-1.5">
                         <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-1.5"><CubeIcon className="w-3 h-3 text-[#FFD500]" /> Item Name</label>
-                        <input type="text" value={formData.Item_Name || ""} onChange={e => setFormData({...formData, Item_Name: e.target.value})} className="w-full px-4 py-3 bg-[#FFFBF0] dark:bg-navy-800 border border-orange-100/50 dark:border-navy-800 rounded-xl font-bold text-sm text-gray-900 dark:text-white outline-none focus:border-[#003875] dark:focus:border-[#FFD500] transition-all shadow-sm" />
+                        <ItemNamePicker value={formData.Item_Name || ""} onChange={v => setFormData({...formData, Item_Name: v})} isAdmin={isAdmin} listId="grn-item-names" />
                      </div>
                      <div className="space-y-1.5">
                         <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-1.5"><QueueListIcon className="w-3 h-3 text-[#FFD500]" /> Quantity</label>

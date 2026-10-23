@@ -152,7 +152,43 @@ export async function GET(request: Request) {
       const isPostDispatchPending = hasOpenStep && pendingStepIdx >= 8;
       const pendingStepName = pendingStepIdx >= 1 ? `${pendingStepIdx}. ${O2D_STEPS[pendingStepIdx - 1] || ""}` : "";
 
-      return { orderNo, party: firstItem.party_name, createdAt, actual7, targetDateForOTD, isOTD, isDelayed, isDispatched, totalAmount, isReconfirmed, actual4, isPending, isPostDispatchPending, pendingStepName };
+      return { orderNo, party: firstItem.party_name, createdAt, actual7, targetDateForOTD, isOTD, isDelayed, isDispatched, totalAmount, isReconfirmed, actual4, isPending, isPostDispatchPending, pendingStepIdx, pendingStepName, firstItem };
+    });
+
+    // ── STEP PERFORMANCE (Sahil, 2026-10-23): OTD sirf dispatch tak hai;
+    // har step ka apna on-time% / delay alag dikhao, kyunki bilty jaise
+    // steps ka delay overall number mein chhup jata hai. planned_i vs
+    // actual_i per step, plus kitne orders abhi us step par atke hain.
+    const stepPerformance = Array.from({ length: 11 }, (_, idx) => {
+      const i = idx + 1;
+      let completed = 0, onTime = 0, late = 0, pending = 0, delaySumHrs = 0;
+      allOrders.forEach((o: any) => {
+        const fi = o.firstItem;
+        if (!fi || fi.cancelled || fi.hold || (fi as any).is_archived) return;
+        const planned = String(fi[`planned_${i}`] || "").trim();
+        if (!planned || planned === "-") return;
+        const actual = String(fi[`actual_${i}`] || "").trim();
+        if (actual && actual !== "-") {
+          const pTs = Date.parse(planned);
+          const aTs = Date.parse(actual);
+          if (!isNaN(pTs) && !isNaN(aTs)) {
+            completed++;
+            if (aTs <= pTs) onTime++;
+            else { late++; delaySumHrs += (aTs - pTs) / (1000 * 60 * 60); }
+          }
+        } else if (o.pendingStepIdx === i) {
+          pending++;
+        }
+      });
+      return {
+        step: i,
+        name: O2D_STEPS[i - 1] || `Step ${i}`,
+        completed,
+        onTimePct: completed > 0 ? Math.round((onTime / completed) * 100) : 0,
+        late,
+        pending,
+        avgDelayHours: late > 0 ? Math.round(delaySumHrs / late) : 0,
+      };
     });
 
     // Attendance counts only the people whose attendance HO actually
@@ -671,6 +707,7 @@ export async function GET(request: Request) {
         },
         topDelayedOrders: delayAging.gt7.slice(0, 5),
         gapAnalysis,
+        stepPerformance,
       },
       revenue: {
         mtdActual: mtdRevenue,

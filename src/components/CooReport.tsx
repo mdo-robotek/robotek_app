@@ -144,7 +144,7 @@ export default function CooReport({ data: coo, loading }: CooReportProps) {
         {[
           { label: "Today's Revenue", value: fmtAmount(ord.todayRevenue || 0), sub: `MTD: ${fmtAmount(rev.mtdActual || 0)}`, icon: CurrencyDollarIcon, color: "text-blue-500", border: "border-t-blue-500" },
           { label: "Orders (MTD)", value: ord.mtdOrders?.toLocaleString() || 0, sub: `${ord.mtdDispatched || 0} Dispatched`, icon: ShoppingBagIcon, color: "text-emerald-500", border: "border-t-emerald-500" },
-          { label: "OTD % (On-Time)", value: `${ord.otdRate || 0}%`, sub: `Critical Target: 85%`, icon: ClockIcon, color: ord.otdRate >= 85 ? "text-emerald-500" : "text-red-500", border: ord.otdRate >= 85 ? "border-t-emerald-500" : "border-t-red-500" },
+          { label: "OTD % (Order→Dispatch)", value: `${ord.otdRate || 0}%`, sub: `Dispatch tak ka on-time · Target: 85%`, icon: ClockIcon, color: ord.otdRate >= 85 ? "text-emerald-500" : "text-red-500", border: ord.otdRate >= 85 ? "border-t-emerald-500" : "border-t-red-500" },
           { label: "Pending Dispatch", value: ord.delayAging?.total || 0, sub: `${fmtAmount(ord.delayAging?.gt7?.revenueAtRisk || 0)} at risk · ${ord.delayAging?.postDispatchCount || 0} post-dispatch pending`, icon: ExclamationTriangleIcon, color: "text-amber-500", border: "border-t-amber-500", onClick: () => setDrillDownModal({ isOpen: true, title: "Pending Orders (O2D)", data: ord.delayAging?.undispatchedList || [], columns: [{ key: 'id', label: 'Order No' }, { key: 'party', label: 'Party' }, { key: 'step', label: 'Pending Step' }, { key: 'date', label: 'Date' }, { key: 'amount', label: 'Amount', render: (item: any) => `₹${item.amount.toLocaleString()}` }, { key: 'remark', label: 'Followup Remark', render: (item: any) => <OrderRemarkCell orderNo={item.id} initial={item.remark} /> }] }) },
           { label: "Team Miss Score", value: `${(() => { const w = scorecard.reduce((a: number, u: any) => a + (u.assigned || 0), 0); const s = scorecard.reduce((a: number, u: any) => a + (u.missPct ?? 0) * (u.assigned || 0), 0); return w ? Math.round(s / w) : 0; })()}%`, sub: `${scorecard.filter((u: any) => (u.missPct ?? 0) === 0).length}/${scorecard.length} members at 0% target`, icon: ClipboardDocumentCheckIcon, color: "text-violet-500", border: "border-t-violet-500" },
           { label: "Team Present", value: `${att.present || 0}/${att.total || 0}`, sub: `${att.absent || 0} Absent · ${att.onLeave || 0} Leave`, icon: UsersIcon, color: "text-indigo-500", border: "border-t-indigo-500", onClick: () => setDrillDownModal({ isOpen: true, title: "Team Attendance", data: [...(att.presentList || []).map((x: any) => ({ ...x, status: 'Present' })), ...(att.absentList || []).map((x: any) => ({ ...x, status: 'Absent' })), ...(att.onLeaveList || []).map((x: any) => ({ ...x, status: `On Leave (${x.type})` }))], columns: [{ key: 'id', label: 'Employee ID' }, { key: 'name', label: 'Name' }, { key: 'status', label: 'Status' }] }) },
@@ -225,6 +225,40 @@ export default function CooReport({ data: coo, loading }: CooReportProps) {
                 </div>
               );
             })}
+          </div>
+        </div>
+      )}
+
+      {/* STEP PERFORMANCE — har O2D step ka apna on-time% / pending / avg
+          delay, taaki bilty jaise slow steps alag se pakde jayein. */}
+      {(ord.stepPerformance || []).length > 0 && (
+        <div className="bg-white dark:bg-navy-800 rounded-2xl px-4 py-3 shadow-xl border border-gray-100 dark:border-white/5 ring-1 ring-black/5">
+          <p className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-zinc-400 mb-2">🪜 Step Performance — har step ka on-time % (planned vs actual)</p>
+          <div className="overflow-x-auto custom-scrollbar">
+            <table className="w-full text-xs">
+              <thead>
+                <tr className="text-[9px] font-black uppercase tracking-widest text-gray-400">
+                  <th className="text-left py-1.5 px-2">Step</th>
+                  <th className="text-right py-1.5 px-2">Done</th>
+                  <th className="text-right py-1.5 px-2">On-Time %</th>
+                  <th className="text-right py-1.5 px-2">Late</th>
+                  <th className="text-right py-1.5 px-2">Avg Delay</th>
+                  <th className="text-right py-1.5 px-2">Pending Now</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(ord.stepPerformance || []).map((s: any) => (
+                  <tr key={s.step} className={`border-t border-gray-50 dark:border-white/5 ${s.pending > 20 || (s.completed > 0 && s.onTimePct < 50) ? "bg-red-50/60 dark:bg-red-950/20" : ""}`}>
+                    <td className="py-1.5 px-2 font-black text-gray-800 dark:text-zinc-100">{s.step}. {s.name}</td>
+                    <td className="py-1.5 px-2 text-right font-bold text-gray-500">{s.completed}</td>
+                    <td className={`py-1.5 px-2 text-right font-black ${s.completed === 0 ? "text-gray-400" : s.onTimePct >= 85 ? "text-emerald-600" : s.onTimePct >= 50 ? "text-amber-600" : "text-red-600"}`}>{s.completed === 0 ? "—" : `${s.onTimePct}%`}</td>
+                    <td className="py-1.5 px-2 text-right font-bold text-gray-500">{s.late || "—"}</td>
+                    <td className="py-1.5 px-2 text-right font-bold text-gray-500">{s.avgDelayHours > 0 ? (s.avgDelayHours >= 24 ? `${Math.floor(s.avgDelayHours / 24)}d ${s.avgDelayHours % 24}h` : `${s.avgDelayHours}h`) : "—"}</td>
+                    <td className={`py-1.5 px-2 text-right font-black ${s.pending > 20 ? "text-red-600" : s.pending > 0 ? "text-amber-600" : "text-gray-400"}`}>{s.pending || "—"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
       )}

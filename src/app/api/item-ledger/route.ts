@@ -4,7 +4,7 @@ import { getIMSItems } from "@/lib/ims-sheets";
 import { getGRNItems } from "@/lib/grn-sheets";
 import { getOutFormData } from "@/lib/o2d-sheets";
 import { getFloorIMSItems } from "@/lib/ims-floor-sheets";
-import { buildIMSMovementMaps } from "@/lib/ims-enrich";
+import { buildIMSMovementMaps, ledgerItemKey } from "@/lib/ims-enrich";
 import { getIMSMasterItems, indexMasterByName, overlayFromMaster, masterItemKey } from "@/lib/ims-master-sheets";
 import { getBusySales } from "@/lib/busy-sale-sheets";
 import { getItemLedgerEntries, addItemLedgerEntry } from "@/lib/item-ledger-sheets";
@@ -30,7 +30,7 @@ export async function GET() {
     );
     const masterByName = indexMasterByName(masterRows);
 
-    const catalogKeys = new Set(items.map((i) => (i.item_name || "").trim().toLowerCase()).filter(Boolean));
+    const catalogKeys = new Set(items.map((i) => ledgerItemKey(i.item_name || "")).filter(Boolean));
     const allKeys = new Set([
       ...catalogKeys,
       ...Object.keys(maps.inQtyMap),
@@ -38,7 +38,7 @@ export async function GET() {
     ]);
 
     const rows = Array.from(allKeys).map((key) => {
-      const catalogItem = items.find((i) => (i.item_name || "").trim().toLowerCase() === key);
+      const catalogItem = items.find((i) => ledgerItemKey(i.item_name || "") === key);
       const displayName = maps.displayNameMap[key] || catalogItem?.item_name || key;
       const master = masterByName.get(masterItemKey(displayName));
       const overlaid = catalogItem

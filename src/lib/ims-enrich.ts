@@ -17,6 +17,24 @@ function parseDateStr(dStr: string) {
   return 0;
 }
 
+/**
+ * Canonical ledger key for an item name (Sahil, 2026-10-23): Busy sells the
+ * same physical item under warranty/non-warranty variant names — a trailing
+ * "W" (warranty) or "NG" (non-guarantee), sometimes in brackets: "HARMONIC"
+ * vs "HARMONIC W", "PRIMO NG" vs "PRIMO", "TWS (W)". GRN IN happens under
+ * ONE name, so the variant OUTs must land on the same ledger key or the
+ * item looks oversold while a phantom variant looks negative. Stripping is
+ * only done at the END of the name so words containing w/ng stay intact.
+ */
+export function ledgerItemKey(raw: string): string {
+  const base = raw.trim().toLowerCase();
+  let s = base;
+  s = s.replace(/\s*\(\s*(w|ng)\s*\)\s*$/, ""); // "(W)" / "(NG)" at end
+  s = s.replace(/[\s\-]+(w|ng)$/, "");            // " W" / "-NG" at end
+  s = s.trim();
+  return s || base; // never collapse to empty (e.g. an item literally named "W")
+}
+
 export type IMSMovementMaps = {
   inQtyMap: Record<string, number>;
   outQtyMap: Record<string, number>;
@@ -65,9 +83,15 @@ export function buildIMSMovementMaps(
   const inByAssembledMap: Record<string, number> = {};
 
   const rememberName = (raw: string) => {
-    const key = raw.trim().toLowerCase();
-    if (!key) return "";
-    if (!displayNameMap[key]) displayNameMap[key] = raw.trim();
+    const trimmed = raw.trim();
+    if (!trimmed) return "";
+    const key = ledgerItemKey(trimmed);
+    const isBaseForm = trimmed.toLowerCase() === key;
+    // Prefer the base (variant-free) spelling as the display name: if we
+    // first saw "HARMONIC W" and later see "HARMONIC", show "HARMONIC".
+    if (!displayNameMap[key] || (isBaseForm && displayNameMap[key].toLowerCase() !== key)) {
+      displayNameMap[key] = trimmed;
+    }
     return key;
   };
 
@@ -230,12 +254,12 @@ export function enrichIMSItems(
 ): IMS[] {
   const catalogKeys = new Set(
     catalogItems
-      .map((item) => (item.item_name || "").trim().toLowerCase())
+      .map((item) => ledgerItemKey(item.item_name || ""))
       .filter(Boolean)
   );
 
   const enrichedCatalog = catalogItems.map((item) => {
-    const nameKey = (item.item_name || "").trim().toLowerCase();
+    const nameKey = ledgerItemKey(item.item_name || "");
     return {
       ...item,
       ...enrichQtyFields(nameKey, maps),
@@ -280,7 +304,7 @@ export function summarizeIMSMovement(
 ): { totalIn: number; totalOut: number; liveStock: number } {
   const catalogKeys = new Set(
     catalogItems
-      .map((item) => (item.item_name || "").trim().toLowerCase())
+      .map((item) => ledgerItemKey(item.item_name || ""))
       .filter(Boolean)
   );
 

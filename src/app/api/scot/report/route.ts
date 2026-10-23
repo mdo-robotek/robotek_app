@@ -101,15 +101,23 @@ export async function GET(req: NextRequest) {
       callsData = Array.from(uniqueParties.values());
 
     } else {
-      const [scotFeederResult, followUpResult, allO2DsResult, activePartyResult] = await Promise.all([
+      const [scotFeederResult, followUpResult, allO2DsResult, activePartyResult, targetSheetResult] = await Promise.all([
         getScotData(),
         getFollowUpData("scot"),
         getAllO2DsForAnalytics(),
         getActivePartyData("scot"),
+        getCallData(), // "Target"/"Calls" sheet — holds the real, verified party mobile numbers
       ]);
       scotFeeder = scotFeederResult;
       followUpData = followUpResult;
       allO2Ds = allO2DsResult;
+
+      // Real party mobile numbers (as kept by the team), keyed by party name.
+      const targetMobileByName: Record<string, string> = {};
+      targetSheetResult.forEach((t) => {
+        const n = (t.partyName || "").trim().toLowerCase();
+        if (n && t.mobileNum && !targetMobileByName[n]) targetMobileByName[n] = String(t.mobileNum);
+      });
 
       // Default = every party is active/callable. Only a party explicitly
       // marked Inactive (unchecked in the Scot table) is excluded — from
@@ -126,7 +134,9 @@ export async function GET(req: NextRequest) {
       allO2Ds.forEach(o => {
         const name = (o.party_name || "").trim();
         if (name && !uniqueParties.has(name.toLowerCase())) {
-          uniqueParties.set(name.toLowerCase(), { partyName: name, mobileNum: (o as any).party_number || "", salesCoordinator: "UZEFA" });
+          const key = name.toLowerCase();
+          const mobileNum = (o as any).party_number || targetMobileByName[key] || "";
+          uniqueParties.set(key, { partyName: name, mobileNum, salesCoordinator: "UZEFA" });
         }
       });
       
@@ -158,8 +168,9 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // Backfill missing party mobile numbers from feeder call logs (match by name).
-    // O2D rows carry no party_number, so phone-based matching alone finds nothing.
+    // Fallback only: for any party still missing a mobile number (not on the
+    // Target/Calls sheet and no party_number on O2D), guess it from whichever
+    // number last called under that exact party name in the Callyzer feeder.
     const numberByName: Record<string, string> = {};
     (scotFeeder as any[]).forEach((f: any) => {
       const n = (f.toName || "").trim().toLowerCase();

@@ -61,11 +61,24 @@ export default function ScotPage() {
     fetcher
   );
 
+  // Real party mobile numbers (Target/Calls sheet) — used to recover the
+  // real customer name for calls Callyzer logged as "Unknown" (happens
+  // whenever that number isn't saved in the employee's own phone contacts).
+  const { data: partyNumbersData } = useSWR('/api/scot/party-numbers', fetcher);
+
   const o2ds: O2D[] = o2dDataRes?.data || [];
   const feeders: DataFeeder[] = feederData || [];
   const followUps = followUpsData || [];
   const frequencies = freqData?.data || [];
   const activeParties = activePartyData?.data || [];
+
+  const partyNameByNumber: Record<string, string> = useMemo(() => {
+    const map: Record<string, string> = {};
+    (partyNumbersData?.data || []).forEach((p: { partyName: string; mobileNum: string }) => {
+      if (p.partyName && p.mobileNum) map[p.partyName] = p.mobileNum;
+    });
+    return map;
+  }, [partyNumbersData]);
 
   const [isFreqModalOpen, setIsFreqModalOpen] = useState(false);
   const [freqParty, setFreqParty] = useState("");
@@ -696,7 +709,7 @@ export default function ScotPage() {
 
       {/* Dashboard Tab */}
       {activeTab === "dashboard" && (
-        <AnalyticsDashboard feeders={feeders} scotRows={scotRows} />
+        <AnalyticsDashboard feeders={feeders} scotRows={scotRows} partyNameByNumber={partyNameByNumber} />
       )}
 
       {/* Data Feeder Tab */}

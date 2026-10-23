@@ -62,7 +62,7 @@ function getWeekOptionLabel(weekKey: string) {
   return `Week ${weekNum} · ${getWeekRangeLabel(weekKey)}`;
 }
 
-export default function AnalyticsDashboard({ feeders, scotRows = [], defaultEmployeeName = "UZEFA (SC)" }: { feeders: DataFeeder[], scotRows?: any[], defaultEmployeeName?: string }) {
+export default function AnalyticsDashboard({ feeders, scotRows = [], defaultEmployeeName = "UZEFA (SC)", partyNameByNumber }: { feeders: DataFeeder[], scotRows?: any[], defaultEmployeeName?: string, partyNameByNumber?: Record<string, string> }) {
   const [filters, setFilters] = useState<AnalyticsFilters>({
     dateRange: 'all',
     customStart: '',
@@ -86,7 +86,7 @@ export default function AnalyticsDashboard({ feeders, scotRows = [], defaultEmpl
     );
   }, [feeders, searchQuery]);
 
-  const { kpi, leaderboard, charts, heatMap, insights } = useCallAnalytics(filteredFeeders, filters);
+  const { kpi, leaderboard, charts, heatMap, insights } = useCallAnalytics(filteredFeeders, filters, partyNameByNumber);
 
   const uniqueEmployees = useMemo(() => Array.from(new Set(filteredFeeders.map(f => f.employeeName).filter(Boolean))), [filteredFeeders]);
   

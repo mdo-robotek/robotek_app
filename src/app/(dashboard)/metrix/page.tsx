@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useTheme } from "next-themes";
 import CooReport from "@/components/CooReport";
 import DrillDownModal, { DrillDownColumn } from "@/components/DrillDownModal";
+import OrderRemarkCell from "@/components/OrderRemarkCell";
 import {
   ChartBarIcon,
   ShoppingBagIcon,
@@ -522,13 +523,13 @@ export default function MetrixPage() {
                     <CompactTile label="Delayed" value={data.stats.delayedCount} icon={ExclamationCircleIcon} color="bg-rose-600"
                       isClickable onClick={() => setDrillDownModal({
                         isOpen: true, title: "Delayed Orders", data: data.stats.delayedList || [],
-                        columns: [{ key: 'id', label: 'Order No' }, { key: 'party', label: 'Party' }, { key: 'date', label: 'Date' }, { key: 'amount', label: 'Amount', render: (item: any) => `₹${item.amount.toLocaleString()}` }]
+                        columns: [{ key: 'id', label: 'Order No' }, { key: 'party', label: 'Party' }, { key: 'step', label: 'Pending Step' }, { key: 'date', label: 'Date' }, { key: 'amount', label: 'Amount', render: (item: any) => `₹${item.amount.toLocaleString()}` }, { key: 'remark', label: 'Followup Remark', render: (item: any) => <OrderRemarkCell orderNo={item.id} initial={item.remark} /> }]
                       })}
                     />
                     <CompactTile label="Pending" value={data.stats.pending} icon={ArrowPathIcon} color="bg-amber-600"
                       isClickable onClick={() => setDrillDownModal({
                         isOpen: true, title: "Pending Orders", data: data.stats.pendingList || [],
-                        columns: [{ key: 'id', label: 'Order No' }, { key: 'party', label: 'Party' }, { key: 'date', label: 'Date' }, { key: 'amount', label: 'Amount', render: (item: any) => `₹${item.amount.toLocaleString()}` }]
+                        columns: [{ key: 'id', label: 'Order No' }, { key: 'party', label: 'Party' }, { key: 'step', label: 'Pending Step' }, { key: 'date', label: 'Date' }, { key: 'amount', label: 'Amount', render: (item: any) => `₹${item.amount.toLocaleString()}` }, { key: 'remark', label: 'Followup Remark', render: (item: any) => <OrderRemarkCell orderNo={item.id} initial={item.remark} /> }]
                       })}
                     />
                     <CompactTile label="OTD %" value={`${data.stats.otdRate}%`} icon={ChartBarIcon} color="bg-indigo-600" />

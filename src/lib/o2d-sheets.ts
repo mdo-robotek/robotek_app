@@ -599,7 +599,7 @@ export async function getAllO2DsForAnalytics(): Promise<O2D[]> {
 }
 
 // Helper: Get pending step index for an order
-function getPendingStepIdx(orderItems: O2D[]): number {
+export function getPendingStepIdx(orderItems: O2D[]): number {
   const firstItem = orderItems[0] as any;
   for (let i = 1; i <= 11; i++) {
     const pVal = (firstItem[`planned_${i}`] || "").toString().trim();

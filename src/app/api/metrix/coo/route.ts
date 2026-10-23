@@ -4,7 +4,9 @@ import { getDelegations } from "@/lib/delegation-sheets";
 import { getChecklistsPaginated } from "@/lib/checklist-sheets";
 import { ChecklistOccurrence } from "@/types/checklist";
 import { getUsers } from "@/lib/google-sheets";
-import { getAllO2DsForAnalytics, getOutFormData } from "@/lib/o2d-sheets";
+import { getAllO2DsForAnalytics, getOutFormData, getPendingStepIdx } from "@/lib/o2d-sheets";
+import { O2D_STEPS } from "@/types/o2d";
+import { getOrderFollowupRemarks, latestRemarkByOrder } from "@/lib/o2d-remarks-sheets";
 import { getIMSItems } from "@/lib/ims-sheets";
 import { getGRNItems } from "@/lib/grn-sheets";
 import { getFloorIMSItems } from "@/lib/ims-floor-sheets";
@@ -61,7 +63,7 @@ export async function GET(request: Request) {
     const now = new Date();
 
     // ── Parallel fetch all data sources ──
-    const [allO2Ds, allLeaves, allDelegations, checklistPage, allUsers, allAttendance, allIMS] = await Promise.all([
+    const [allO2Ds, allLeaves, allDelegations, checklistPage, allUsers, allAttendance, allIMS, allRemarks] = await Promise.all([
       getAllO2DsForAnalytics(),
       getLeaveRequests(),
       getDelegations(),
@@ -90,8 +92,10 @@ export async function GET(request: Request) {
         return enrichIMSItems(items, buildIMSMovementMaps(grns, outForm, gFloor, firstFloor, busySales, ledgerEntries))
           .map((item) => overlayFromMaster(item, masterByName.get(masterItemKey(item.item_name))));
       })(),
+      getOrderFollowupRemarks().catch(() => []),
     ]);
     const allChecklists = (checklistPage.data || []) as ChecklistOccurrence[];
+    const remarkByOrder = latestRemarkByOrder(allRemarks as any[]);
 
     // Process O2D rows into orders (same as metrix route)
     const groupedByOrder: Record<string, any[]> = {};
@@ -125,11 +129,22 @@ export async function GET(request: Request) {
 
       const isDispatched = !!firstItem.actual_7 && firstItem.status_7 !== "No";
       const totalAmount = items.reduce((sum: number, i: any) => sum + (parseFloat(i.est_amount) || 0), 0);
-      
+
       const isReconfirmed = false;
       const actual4 = firstItem.actual_4 ? new Date(firstItem.actual_4) : null;
-      
-      return { orderNo, party: firstItem.party_name, createdAt, actual7, targetDateForOTD, isOTD, isDelayed, isDispatched, totalAmount, isReconfirmed, actual4 };
+
+      // Pending = EXACTLY the O2D page's definition (shared getPendingStepIdx):
+      // not hold, not cancelled, and some planned step still without an
+      // actual. This keeps the COO "Pending Orders" list identical to what
+      // the team sees on the O2D page (Sahil's team, 2026-10-23 — the COO
+      // list was showing closed/junk orders O2D doesn't count as pending).
+      const pendingStepIdx = getPendingStepIdx(items as any);
+      const isHold = !!firstItem.hold;
+      const isCancelled = !!firstItem.cancelled;
+      const isPending = !isHold && !isCancelled && pendingStepIdx !== -1;
+      const pendingStepName = pendingStepIdx >= 1 ? `${pendingStepIdx}. ${O2D_STEPS[pendingStepIdx - 1] || ""}` : "";
+
+      return { orderNo, party: firstItem.party_name, createdAt, actual7, targetDateForOTD, isOTD, isDelayed, isDispatched, totalAmount, isReconfirmed, actual4, isPending, pendingStepName };
     });
 
     // Attendance counts only the people whose attendance HO actually
@@ -233,15 +248,23 @@ export async function GET(request: Request) {
     const mtdOTD = mtdOrders.filter((o: any) => o.isOTD).length;
     const otdRate = mtdDispatched > 0 ? Math.round((mtdOTD / mtdDispatched) * 100) : 0;
 
-    // Delay Aging — all un-dispatched orders
-    const undispatched = allOrders.filter((o: any) => !o.isDispatched);
+    // Delay Aging — pending orders only (O2D-page definition, not merely
+    // "no dispatch actual": hold/cancelled/terminated orders are excluded).
+    const undispatched = allOrders.filter((o: any) => o.isPending);
     const delayAging = { gt7: [] as any[], d4to7: [] as any[], d1to3: [] as any[], sameDay: [] as any[] };
     let revenueAtRisk = 0;
 
     undispatched.forEach((o: any) => {
       const created = new Date(normalizeDate(o.createdAt?.toISOString?.() || o.createdAt || ""));
       const diffDays = Math.floor((today.getTime() - created.getTime()) / (1000 * 60 * 60 * 24));
-      const entry = { orderNo: o.orderNo, party: o.party, days: diffDays, amount: o.totalAmount || 0 };
+      const entry = {
+        orderNo: o.orderNo,
+        party: o.party,
+        days: diffDays,
+        amount: o.totalAmount || 0,
+        step: o.pendingStepName || "",
+        remark: remarkByOrder[String(o.orderNo || "").toLowerCase()]?.remark || "",
+      };
       if (diffDays > 7) { delayAging.gt7.push(entry); revenueAtRisk += entry.amount; }
       else if (diffDays >= 4) delayAging.d4to7.push(entry);
       else if (diffDays >= 1) delayAging.d1to3.push(entry);
@@ -624,7 +647,9 @@ export async function GET(request: Request) {
             id: o.orderNo,
             party: o.party,
             amount: o.totalAmount,
-            date: o.createdAt.toISOString().split('T')[0]
+            date: o.createdAt.toISOString().split('T')[0],
+            step: o.pendingStepName || "",
+            remark: remarkByOrder[String(o.orderNo || "").toLowerCase()]?.remark || "",
           }))
         },
         topDelayedOrders: delayAging.gt7.slice(0, 5),

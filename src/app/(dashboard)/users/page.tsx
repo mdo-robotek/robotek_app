@@ -1083,6 +1083,26 @@ export default function UsersPage() {
                   </button>
                 </div>
 
+                <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-navy-950/50 rounded-xl border border-gray-100 dark:border-navy-800/50">
+                  <div>
+                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block">Track Attendance</label>
+                    <p className="text-[9px] font-bold text-gray-500 uppercase">Off for staff tracked elsewhere (e.g. factory scanner)</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, trackAttendance: formData.trackAttendance === false ? true : false })}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
+                      formData.trackAttendance !== false ? 'bg-emerald-500' : 'bg-gray-300 dark:bg-navy-700'
+                    }`}
+                  >
+                    <span
+                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                        formData.trackAttendance !== false ? 'translate-x-6' : 'translate-x-1'
+                      }`}
+                    />
+                  </button>
+                </div>
+
                 {/* Section: Professional Details */}
                 <div className="md:col-span-2 mt-2">
                   <p className="text-[10px] font-black text-[#FFD500] uppercase tracking-[0.2em] mb-1">Professional Details</p>

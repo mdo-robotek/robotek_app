@@ -467,7 +467,9 @@ export default function CustomerTargetPage() {
       list = list.filter((r) => r.sendStatus === "NOT_SENT" || r.sendStatus === "SKIPPED");
       if (selected.size > 0) list = list.filter((r) => selected.has(r.partyName));
     } else if (sendScope === "selected") {
-      list = list.filter((r) => selected.has(r.partyName) && r.sendStatus !== "SENT");
+      // ACHIEVEMENT can be re-sent any number of times (progress updates);
+      // TARGET stays guarded against duplicate sends.
+      list = list.filter((r) => selected.has(r.partyName) && (msgType === "ACHIEVEMENT" || r.sendStatus !== "SENT"));
     } else if (sendScope === "selected_force") {
       list = list.filter((r) => selected.has(r.partyName));
     }
@@ -582,7 +584,7 @@ export default function CustomerTargetPage() {
 
   const runBulkSend = async () => {
     if (!canWrite || sending) return;
-    if (sendScope === "selected_force" && forceConfirm.trim().toUpperCase() !== "FORCE") {
+    if (msgType === "TARGET" && sendScope === "selected_force" && forceConfirm.trim().toUpperCase() !== "FORCE") {
       showStatus("Type FORCE to confirm resend to already-sent parties", "error");
       return;
     }

@@ -602,6 +602,16 @@ export default function LeavePage() {
                                                                     {formatDateMMM(lv.startDate)}{lv.endDate && lv.endDate !== lv.startDate ? ` → ${formatDateMMM(lv.endDate)}` : ''}
                                                                 </div>
                                                             </div>
+                                                            {lv.createdAt && <div className="w-px h-7 bg-gray-200 dark:bg-white/10" />}
+                                                            {lv.createdAt && (
+                                                                <div className="flex flex-col">
+                                                                    <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Applied On</span>
+                                                                    <div className="inline-flex items-center gap-1 text-xs font-semibold text-gray-700 dark:text-gray-200">
+                                                                        <CalendarDaysIcon className="w-3.5 h-3.5 text-emerald-600" />
+                                                                        {formatDateMMM(lv.createdAt)}
+                                                                    </div>
+                                                                </div>
+                                                            )}
                                                             <div className="w-px h-7 bg-gray-200 dark:bg-white/10" />
                                                             <div className="flex flex-col">
                                                                 <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Emp ID</span>

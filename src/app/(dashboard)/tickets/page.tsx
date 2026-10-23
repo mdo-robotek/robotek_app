@@ -147,7 +147,7 @@ export default function TicketsPage() {
   const [categorySearch, setCategorySearch] = useState("");
   const [categoryOpen, setCategoryOpen] = useState(false);
 
-  const categories = ["Software", "Hardware/IT", "HR / Admin", "Finance", "Other"];
+  const categories = ["Software", "Hardware/IT", "HR / Admin", "Finance", "Suggestion", "Other"];
 
   useEffect(() => {
     fetchUsers();

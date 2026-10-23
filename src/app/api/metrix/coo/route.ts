@@ -357,6 +357,24 @@ export async function GET(request: Request) {
       }));
 
     // ── 5. PARTY PIPELINE & CATEGORY REVENUE ──
+    // Dashboard-level category rollup: POLY-* → POLY, ANS POLY-* → ANS POLY,
+    // DS ADD MAT. → ADD M, and case-duplicate merge (sc/SC). Sheet data untouched.
+    const CAT_CANON: Record<string, string> = {
+      "sc": "SC", "dc": "DC", "ear": "EAR", "headphone": "Headphone",
+      "chgr": "CHGR", "tws": "TWS", "spk": "SPK", "pb": "PB", "rb": "RB",
+      "add m": "ADD M", "general": "General", "long": "Long", "touch": "Touch",
+      "n band": "N Band", "n band (w)": "N Band (W)", "tws (w)": "TWS (W)",
+      "dc (w)": "DC (W)", "mic": "MIC",
+    };
+    const rollupCategory = (raw?: string): string => {
+      const c = (raw || "").trim();
+      if (!c) return "Other";
+      const l = c.toLowerCase();
+      if (l.startsWith("ans poly")) return "ANS POLY";
+      if (l.startsWith("poly")) return "POLY";
+      if (l.startsWith("ds add mat")) return "ADD M";
+      return CAT_CANON[l] || c;
+    };
     const itemToCategory: Record<string, string> = {};
     allIMS.forEach((i: any) => {
       if (i.item_name && i.category) itemToCategory[i.item_name.trim().toLowerCase()] = i.category;
@@ -366,7 +384,7 @@ export async function GET(request: Request) {
     allO2Ds.forEach((item: any) => {
       const created = normalizeDate(item.created_at);
       if (created >= mtdStart && created <= mtdEnd) {
-        const cat = itemToCategory[item.item_name?.trim().toLowerCase()] || "Other";
+        const cat = rollupCategory(itemToCategory[item.item_name?.trim().toLowerCase()]);
         const rev = parseFloat(item.est_amount) || 0;
         categoryRevenueMap[cat] = (categoryRevenueMap[cat] || 0) + rev;
       }
@@ -411,7 +429,7 @@ export async function GET(request: Request) {
       .sort((a: any, b: any) => stockOf(a) - stockOf(b));
     const categoryStockMap: Record<string, number> = {};
     activeIMS.forEach((i: any) => {
-      const cat = i.category || "Other";
+      const cat = rollupCategory(i.category);
       categoryStockMap[cat] = (categoryStockMap[cat] || 0) + Math.max(0, stockOf(i));
     });
     const inventoryByCategory = Object.entries(categoryStockMap)

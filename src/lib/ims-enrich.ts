@@ -89,13 +89,16 @@ export function buildIMSMovementMaps(
     }
   });
 
-  // Item Ledger (Module A) — Head Office entries for the two IN sources GRN
-  // doesn't cover: locally-packed/tested imports, and in-house assembled goods.
+  // Item Ledger (Module A) — Head Office record entries (Locally Packed /
+  // Assembled). IMPORTANT (Sahil, 2026-10-23): these do NOT add to stock
+  // (inQtyMap) — the same goods already enter stock via GRN and the floor
+  // ledgers (GRN → SFG → 1st floor → FG), so counting the ledger entry too
+  // would double/triple count. They are kept only as a per-item breakdown
+  // for the Item Ledger page's audit view.
   ledgerEntries.forEach((entry) => {
     const key = rememberName(entry.item_name || "");
     if (!key) return;
     const qty = Number(entry.qty) || 0;
-    inQtyMap[key] = (inQtyMap[key] || 0) + qty;
     if (String(entry.source_type || "").trim() === "Assembled") {
       inByAssembledMap[key] = (inByAssembledMap[key] || 0) + qty;
     } else {

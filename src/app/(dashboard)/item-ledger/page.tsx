@@ -16,6 +16,7 @@ type LedgerRow = {
   category: string;
   active_status: string;
   in_grn: number;
+  in_floor: number;
   in_locally_packed: number;
   in_assembled: number;
   total_in: number;
@@ -143,8 +144,9 @@ export default function ItemLedgerPage() {
               <th className="px-3 py-2 text-left font-black uppercase tracking-widest text-[10px] text-gray-500">Item</th>
               <th className="px-3 py-2 text-left font-black uppercase tracking-widest text-[10px] text-gray-500">Category</th>
               <th className="px-3 py-2 text-right font-black uppercase tracking-widest text-[10px] text-gray-500">GRN IN</th>
-              <th className="px-3 py-2 text-right font-black uppercase tracking-widest text-[10px] text-gray-500">Local Pack IN</th>
-              <th className="px-3 py-2 text-right font-black uppercase tracking-widest text-[10px] text-gray-500">Assembled IN</th>
+              <th className="px-3 py-2 text-right font-black uppercase tracking-widest text-[10px] text-gray-500">Floor IN</th>
+              <th className="px-3 py-2 text-right font-black uppercase tracking-widest text-[10px] text-gray-500" title="Record only — not added to stock (stock already comes via GRN/floor)">Local Pack (rec)</th>
+              <th className="px-3 py-2 text-right font-black uppercase tracking-widest text-[10px] text-gray-500" title="Record only — not added to stock (stock already comes via GRN/floor)">Assembled (rec)</th>
               <th className="px-3 py-2 text-right font-black uppercase tracking-widest text-[10px] text-gray-500">Total IN</th>
               <th className="px-3 py-2 text-right font-black uppercase tracking-widest text-[10px] text-gray-500">Total OUT</th>
               <th className="px-3 py-2 text-right font-black uppercase tracking-widest text-[10px] text-gray-500">Net</th>
@@ -152,10 +154,10 @@ export default function ItemLedgerPage() {
           </thead>
           <tbody>
             {isLoading && (
-              <tr><td colSpan={8} className="px-3 py-6 text-center text-gray-400 font-bold">Loading...</td></tr>
+              <tr><td colSpan={9} className="px-3 py-6 text-center text-gray-400 font-bold">Loading...</td></tr>
             )}
             {!isLoading && rows.length === 0 && (
-              <tr><td colSpan={8} className="px-3 py-6 text-center text-gray-400 font-bold">No items to show.</td></tr>
+              <tr><td colSpan={9} className="px-3 py-6 text-center text-gray-400 font-bold">No items to show.</td></tr>
             )}
             {rows.map((r) => (
               <tr
@@ -168,8 +170,9 @@ export default function ItemLedgerPage() {
                 </td>
                 <td className="px-3 py-2 text-gray-500">{r.category || "—"}</td>
                 <td className="px-3 py-2 text-right font-bold">{r.in_grn || "—"}</td>
-                <td className="px-3 py-2 text-right font-bold">{r.in_locally_packed || "—"}</td>
-                <td className="px-3 py-2 text-right font-bold">{r.in_assembled || "—"}</td>
+                <td className="px-3 py-2 text-right font-bold">{r.in_floor || "—"}</td>
+                <td className="px-3 py-2 text-right font-bold text-gray-400">{r.in_locally_packed || "—"}</td>
+                <td className="px-3 py-2 text-right font-bold text-gray-400">{r.in_assembled || "—"}</td>
                 <td className="px-3 py-2 text-right font-black">{r.total_in}</td>
                 <td className="px-3 py-2 text-right font-black">{r.total_out}</td>
                 <td className={`px-3 py-2 text-right font-black ${r.net < 0 ? "text-red-600" : "text-emerald-600"}`}>{r.net}</td>

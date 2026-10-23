@@ -46,9 +46,14 @@ export async function GET() {
         : overlayFromMaster({ item_name: displayName, category: "" }, master);
 
       const inGrn = maps.inByGrnMap[key] || 0;
+      // Record-only HO entries (not part of stock — the same goods flow in
+      // via GRN/floor ledgers; see ims-enrich.ts).
       const inLocalPack = maps.inByLocalPackMap[key] || 0;
       const inAssembled = maps.inByAssembledMap[key] || 0;
       const totalIn = maps.inQtyMap[key] || 0;
+      // Floor IN = everything that entered FG via floor ledgers / transfers
+      // (totalIn minus direct GRN IN).
+      const inFloor = Math.max(0, totalIn - inGrn);
       const totalOut = maps.outQtyMap[key] || 0;
       const net = totalIn - totalOut;
 
@@ -62,6 +67,7 @@ export async function GET() {
         category: (overlaid as any).category || "",
         active_status: (overlaid as any).active_status || "",
         in_grn: Math.round(inGrn),
+        in_floor: Math.round(inFloor),
         in_locally_packed: Math.round(inLocalPack),
         in_assembled: Math.round(inAssembled),
         total_in: Math.round(totalIn),

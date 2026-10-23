@@ -10,6 +10,7 @@ import { getGRNItems } from "@/lib/grn-sheets";
 import { getFloorIMSItems } from "@/lib/ims-floor-sheets";
 import { buildIMSMovementMaps, enrichIMSItems } from "@/lib/ims-enrich";
 import { getIMSMasterItems, indexMasterByName, overlayFromMaster, masterItemKey } from "@/lib/ims-master-sheets";
+import { rollupCategory } from "@/lib/category-rollup";
 import { auth } from "@/auth";
 import { getWorkingHoursGapMs } from "@/lib/workingHours";
 
@@ -357,24 +358,6 @@ export async function GET(request: Request) {
       }));
 
     // ── 5. PARTY PIPELINE & CATEGORY REVENUE ──
-    // Dashboard-level category rollup: POLY-* → POLY, ANS POLY-* → ANS POLY,
-    // DS ADD MAT. → ADD M, and case-duplicate merge (sc/SC). Sheet data untouched.
-    const CAT_CANON: Record<string, string> = {
-      "sc": "SC", "dc": "DC", "ear": "EAR", "headphone": "Headphone",
-      "chgr": "CHGR", "tws": "TWS", "spk": "SPK", "pb": "PB", "rb": "RB",
-      "add m": "ADD M", "general": "General", "long": "Long", "touch": "Touch",
-      "n band": "N Band", "n band (w)": "N Band (W)", "tws (w)": "TWS (W)",
-      "dc (w)": "DC (W)", "mic": "MIC",
-    };
-    const rollupCategory = (raw?: string): string => {
-      const c = (raw || "").trim();
-      if (!c) return "Other";
-      const l = c.toLowerCase();
-      if (l.startsWith("ans poly")) return "ANS POLY";
-      if (l.startsWith("poly")) return "POLY";
-      if (l.startsWith("ds add mat")) return "ADD M";
-      return CAT_CANON[l] || c;
-    };
     const itemToCategory: Record<string, string> = {};
     allIMS.forEach((i: any) => {
       if (i.item_name && i.category) itemToCategory[i.item_name.trim().toLowerCase()] = i.category;
@@ -588,6 +571,7 @@ export async function GET(request: Request) {
         lowStockCount: lowStock.length,
         inventoryByCategory,
         lowStockItems,
+        allItemsList: activeIMS.map((i: any) => ({ sku: i.item_name, category: rollupCategory(i.category), stockLeft: Math.round(stockOf(i)) })),
         negativeCount: negativeStock.length,
         negativeList: negativeStock.map((i: any) => ({ sku: i.item_name, category: i.category, stockLeft: Math.round(stockOf(i)) })),
         outOfStockList: outOfStock.map((i: any) => ({ sku: i.item_name, category: i.category, stockLeft: Math.round(stockOf(i)) })),

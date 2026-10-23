@@ -587,9 +587,20 @@ export default function CooReport({ data: coo, loading }: CooReportProps) {
           <div className="space-y-4 mb-10">
              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Inventory by Category</p>
              {(inv.inventoryByCategory || []).map((c: any, i: number) => (
-               <div key={i} className="space-y-1.5">
+               <div
+                 key={i}
+                 className="space-y-1.5 cursor-pointer rounded-lg -mx-2 px-2 py-1 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
+                 onClick={() => setDrillDownModal({
+                   isOpen: true,
+                   title: `${c.category} — ${c.qty.toLocaleString()} pcs`,
+                   data: (inv.allItemsList || [])
+                     .filter((x: any) => x.category === c.category)
+                     .sort((a: any, b: any) => b.stockLeft - a.stockLeft),
+                   columns: [{ key: 'sku', label: 'Item' }, { key: 'category', label: 'Category' }, { key: 'stockLeft', label: 'Stock Left' }]
+                 })}
+               >
                   <div className="flex justify-between text-[10px] font-black uppercase">
-                    <p className="text-gray-900 dark:text-white">{c.category}</p>
+                    <p className="text-gray-900 dark:text-white">{c.category} <span className="text-gray-400 normal-case font-bold">· click for items</span></p>
                     <p className="text-gray-400">{c.qty.toLocaleString()} PCS</p>
                   </div>
                   <div className="h-1.5 bg-gray-100 dark:bg-white/5 rounded-full overflow-hidden">

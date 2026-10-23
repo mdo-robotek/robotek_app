@@ -3,6 +3,7 @@ import { getAllO2DsForAnalytics } from "@/lib/o2d-sheets";
 import { imsService } from "@/lib/ims-sheets";
 import { auth } from "@/auth";
 import { getWorkingHoursGapMs } from "@/lib/workingHours";
+import { rollupCategory } from "@/lib/category-rollup";
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -137,7 +138,7 @@ export async function GET(req: NextRequest) {
             name,
             qty,
             amount: amt,
-            category: itemToCategory[name.toLowerCase()] || "Uncategorized"
+            category: itemToCategory[name.toLowerCase()] ? rollupCategory(itemToCategory[name.toLowerCase()]) : "Uncategorized"
           });
         });
       });

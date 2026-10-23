@@ -157,14 +157,14 @@ export default function ScotPage() {
 
   const handleGenerateWeeklyReports = async () => {
     setIsReportLoading(true);
-    toast.info("Aggregating spreadsheet metrics for last week (active parties only)...");
+    toast.info("Aggregating spreadsheet metrics for last week (excluding Inactive parties)...");
     try {
-      const res = await fetch('/api/scot/report?activeOnly=true&source=scot');
+      const res = await fetch('/api/scot/report?source=scot');
       if (res.ok) {
         const data = await res.json();
         const coordinators = data.report || [];
         if (coordinators.length === 0) {
-          toast.error("No active parties found. Mark parties as active to generate weekly report.");
+          toast.error("No parties found to report on.");
           return;
         }
         
@@ -186,10 +186,13 @@ export default function ScotPage() {
     }
   };
 
-  const activePartySet = useMemo(() => {
+  // Default = every party is active/callable. A party only lands here when
+  // explicitly marked Inactive (unchecked) — nothing to toggle on means
+  // nothing is excluded, which matches how calling/scoring should behave.
+  const inactivePartySet = useMemo(() => {
     return new Set(
       activeParties
-        .filter((record: { partyName: string; active: boolean }) => record.active)
+        .filter((record: { partyName: string; active: boolean }) => record.active === false)
         .map((record: { partyName: string }) => record.partyName.toLowerCase().trim())
     );
   }, [activeParties]);
@@ -204,7 +207,7 @@ export default function ScotPage() {
       });
       if (res.ok) {
         mutateActiveParties();
-        toast.success(active ? "Marked as active party" : "Removed from active parties");
+        toast.success(active ? "Party marked active — will be called & scored again" : "Party marked inactive — excluded from calling & scoring");
       } else {
         toast.error("Failed to update active party");
       }
@@ -494,13 +497,13 @@ export default function ScotPage() {
         isManualFrequency,
         manualFollowUpDate,
         rawOrders: orders,
-        isActive: activePartySet.has(toName.toLowerCase().trim()),
+        isActive: !inactivePartySet.has(toName.toLowerCase().trim()),
       };
     });
 
     const partyCounts = {
-      active: rows.filter((row) => activePartySet.has(row.toName.toLowerCase().trim())).length,
-      inactive: rows.filter((row) => !activePartySet.has(row.toName.toLowerCase().trim())).length,
+      active: rows.filter((row) => !inactivePartySet.has(row.toName.toLowerCase().trim())).length,
+      inactive: rows.filter((row) => inactivePartySet.has(row.toName.toLowerCase().trim())).length,
     };
 
     const searchTerm = searchScot.toLowerCase().trim();
@@ -534,7 +537,7 @@ export default function ScotPage() {
     });
 
     return { rows: filteredRows, partyCounts };
-  }, [feeders, o2ds, searchScot, showTodayOnly, followUps, frequencies, activePartySet, scotListView]);
+  }, [feeders, o2ds, searchScot, showTodayOnly, followUps, frequencies, inactivePartySet, scotListView]);
 
   const scotRows = scotRowsResult.rows;
   const scotPartyCounts = scotRowsResult.partyCounts;
@@ -1029,7 +1032,7 @@ export default function ScotPage() {
                         disabled={togglingParty === row.toName}
                         onChange={(e) => toggleActiveParty(row.toName, e.target.checked)}
                         className="h-4 w-4 cursor-pointer rounded border-emerald-300 accent-emerald-600 focus:ring-2 focus:ring-emerald-500 focus:ring-offset-0 disabled:opacity-50 dark:border-emerald-700 dark:accent-emerald-500"
-                        title={row.isActive ? "Active party (included in weekly report)" : "Mark as active party"}
+                        title={row.isActive ? "Active party — called & scored (uncheck to mark Inactive)" : "Inactive — excluded from calling & scoring (check to reactivate)"}
                       />
                     </td>
                     <td className="px-2 py-4 whitespace-nowrap sticky left-[52px] z-10 bg-white dark:bg-slate-900 border-r-2 border-slate-200 dark:border-slate-700 shadow-[4px_0_10px_-4px_rgba(0,0,0,0.1)] dark:shadow-[4px_0_10px_-4px_rgba(0,0,0,0.5)] truncate group-hover/row:bg-slate-50 dark:group-hover/row:bg-slate-800/80 transition-colors max-w-[250px]">

@@ -111,9 +111,12 @@ export async function GET(req: NextRequest) {
       followUpData = followUpResult;
       allO2Ds = allO2DsResult;
 
-      const activePartySet = new Set(
+      // Default = every party is active/callable. Only a party explicitly
+      // marked Inactive (unchecked in the Scot table) is excluded — from
+      // both the calling list and the Follow-up Score calculation below.
+      const inactivePartySet = new Set(
         activePartyResult
-          .filter((record) => record.active)
+          .filter((record) => record.active === false)
           .map((record) => record.partyName.toLowerCase().trim())
       );
 
@@ -148,11 +151,11 @@ export async function GET(req: NextRequest) {
 
       callsData = Array.from(uniqueParties.values());
 
-      if (activeOnly) {
-        callsData = callsData.filter((party) =>
-          activePartySet.has((party.partyName || "").toLowerCase().trim())
-        );
-      }
+      // Always drop inactive-marked parties — they should never be part of
+      // the calling list or count toward anyone's Follow-up Score.
+      callsData = callsData.filter((party) =>
+        !inactivePartySet.has((party.partyName || "").toLowerCase().trim())
+      );
     }
 
     // Backfill missing party mobile numbers from feeder call logs (match by name).

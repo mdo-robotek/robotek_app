@@ -50,6 +50,32 @@ export default function Dashboard() {
     { refreshInterval: 300000, revalidateOnFocus: false, keepPreviousData: true }
   );
 
+  // Busy sale register freshness — reminder for the accounts team to copy
+  // Busy -> Transaction -> Sales -> List into the sale sheet.
+  const { data: busyFresh } = useSWR('/api/ims/busy-freshness', fetcher, {
+    refreshInterval: 600000, revalidateOnFocus: false,
+  });
+  const busyBanner = busyFresh?.lastSaleDate ? (
+    <div className="max-w-[1600px] mx-auto px-4 pb-3">
+      <div
+        className={`rounded-2xl px-4 py-2.5 flex items-center gap-3 text-[11px] font-black uppercase tracking-widest border ${
+          (busyFresh.daysOld ?? 99) >= 2
+            ? "bg-rose-50 text-rose-600 border-rose-200 dark:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/20"
+            : (busyFresh.daysOld ?? 99) >= 1
+            ? "bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20"
+            : "bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20"
+        }`}
+      >
+        <span className={`w-2 h-2 rounded-full shrink-0 ${(busyFresh.daysOld ?? 99) >= 2 ? "bg-rose-500 animate-pulse" : (busyFresh.daysOld ?? 99) >= 1 ? "bg-amber-500" : "bg-emerald-500"}`} />
+        {(busyFresh.daysOld ?? 99) >= 2
+          ? `Busy sale data ${busyFresh.daysOld} din purana hai — Busy se sale list copy karo (Transaction → Sales → List)`
+          : (busyFresh.daysOld ?? 99) >= 1
+          ? `Busy sale data: kal tak ka (${busyFresh.lastSaleDate}) — aaj ki copy pending`
+          : `Busy sale data up to date (${busyFresh.lastSaleDate})`}
+      </div>
+    </div>
+  ) : null;
+
   // Calculate Monthly Averages
   let avgIn = "--:--";
   let avgOut = "--:--";
@@ -214,8 +240,13 @@ export default function Dashboard() {
     </div>
   );
 
-  // Non-admins: personal dashboard, unchanged
-  if (!isAdmin) return myDay;
+  // Non-admins: personal dashboard + Busy freshness reminder (accounts team)
+  if (!isAdmin) return (
+    <div>
+      {busyBanner}
+      {myDay}
+    </div>
+  );
 
   const tabs = [
     { id: "coo" as const, label: "COO Command Center" },
@@ -224,6 +255,7 @@ export default function Dashboard() {
 
   return (
     <div>
+      {busyBanner}
       <div className="max-w-[1600px] mx-auto px-4 pb-4 flex gap-2 overflow-x-auto">
         {tabs.map((t) => (
           <button

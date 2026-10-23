@@ -9,6 +9,7 @@ import { getIMSItems } from "@/lib/ims-sheets";
 import { getGRNItems } from "@/lib/grn-sheets";
 import { getFloorIMSItems } from "@/lib/ims-floor-sheets";
 import { buildIMSMovementMaps, enrichIMSItems } from "@/lib/ims-enrich";
+import { getIMSMasterItems, indexMasterByName, overlayFromMaster, masterItemKey } from "@/lib/ims-master-sheets";
 import { auth } from "@/auth";
 import { getWorkingHoursGapMs } from "@/lib/workingHours";
 
@@ -69,15 +70,18 @@ export async function GET(request: Request) {
       getUsers(),
       getAttendanceRecords(),
       (async () => {
-        // Live stock is derived from GRN / Out Form / floor ledgers, same as the IMS page
-        const [items, grns, outForm, gFloor, firstFloor] = await Promise.all([
+        // Live stock + category come from the same pipeline as the IMS page (Master sheet overlay)
+        const [items, grns, outForm, gFloor, firstFloor, masterRows] = await Promise.all([
           getIMSItems(),
           getGRNItems(),
           getOutFormData(),
           getFloorIMSItems("g"),
           getFloorIMSItems("1st"),
+          getIMSMasterItems(),
         ]);
-        return enrichIMSItems(items, buildIMSMovementMaps(grns, outForm, gFloor, firstFloor));
+        const masterByName = indexMasterByName(masterRows);
+        return enrichIMSItems(items, buildIMSMovementMaps(grns, outForm, gFloor, firstFloor))
+          .map((item) => overlayFromMaster(item, masterByName.get(masterItemKey(item.item_name))));
       })(),
     ]);
     const allChecklists = (checklistPage.data || []) as ChecklistOccurrence[];

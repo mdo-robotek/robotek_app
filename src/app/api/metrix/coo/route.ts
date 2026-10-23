@@ -4,8 +4,11 @@ import { getDelegations } from "@/lib/delegation-sheets";
 import { getChecklistsPaginated } from "@/lib/checklist-sheets";
 import { ChecklistOccurrence } from "@/types/checklist";
 import { getUsers } from "@/lib/google-sheets";
-import { getAllO2DsForAnalytics } from "@/lib/o2d-sheets";
+import { getAllO2DsForAnalytics, getOutFormData } from "@/lib/o2d-sheets";
 import { getIMSItems } from "@/lib/ims-sheets";
+import { getGRNItems } from "@/lib/grn-sheets";
+import { getFloorIMSItems } from "@/lib/ims-floor-sheets";
+import { buildIMSMovementMaps, enrichIMSItems } from "@/lib/ims-enrich";
 import { auth } from "@/auth";
 import { getWorkingHoursGapMs } from "@/lib/workingHours";
 
@@ -65,7 +68,17 @@ export async function GET(request: Request) {
       ),
       getUsers(),
       getAttendanceRecords(),
-      getIMSItems(),
+      (async () => {
+        // Live stock is derived from GRN / Out Form / floor ledgers, same as the IMS page
+        const [items, grns, outForm, gFloor, firstFloor] = await Promise.all([
+          getIMSItems(),
+          getGRNItems(),
+          getOutFormData(),
+          getFloorIMSItems("g"),
+          getFloorIMSItems("1st"),
+        ]);
+        return enrichIMSItems(items, buildIMSMovementMaps(grns, outForm, gFloor, firstFloor));
+      })(),
     ]);
     const allChecklists = (checklistPage.data || []) as ChecklistOccurrence[];
 
@@ -380,25 +393,28 @@ export async function GET(request: Request) {
 
     // ── 6. IMS INVENTORY ──
 
-    const outOfStock = allIMS.filter((i: any) => (parseFloat(i.stock_qty) || 0) === 0);
-    const lowStock = allIMS.filter((i: any) => {
-      const qty = parseFloat(i.stock_qty) || 0;
-      const reorder = parseFloat(i.reorder_point) || 5;
+    const stockOf = (i: any) => Number(i.live_stock ?? 0);
+    const activeIMS = allIMS.filter((i: any) => String(i.active_status || "").toLowerCase() !== "inactive");
+    const outOfStock = activeIMS.filter((i: any) => stockOf(i) <= 0);
+    const lowStock = activeIMS.filter((i: any) => {
+      const qty = stockOf(i);
+      const avg = Number(i.avg_daily_con || 0);
+      const reorder = Math.max(5, avg * 7); // under 7 days of cover
       return qty > 0 && qty <= reorder;
     });
     const categoryStockMap: Record<string, number> = {};
-    allIMS.forEach((i: any) => {
+    activeIMS.forEach((i: any) => {
       const cat = i.category || "Other";
-      categoryStockMap[cat] = (categoryStockMap[cat] || 0) + (parseFloat(i.stock_qty) || 0);
+      categoryStockMap[cat] = (categoryStockMap[cat] || 0) + Math.max(0, stockOf(i));
     });
     const inventoryByCategory = Object.entries(categoryStockMap)
       .sort((a, b) => b[1] - a[1]).slice(0, 6)
-      .map(([category, qty]) => ({ category, qty }));
+      .map(([category, qty]) => ({ category, qty: Math.round(qty) }));
     const lowStockItems = [...outOfStock, ...lowStock].slice(0, 8).map((i: any) => ({
       sku: i.item_name,
       category: i.category,
-      stockLeft: parseFloat(i.stock_qty) || 0,
-      status: (parseFloat(i.stock_qty) || 0) === 0 ? "Out of Stock" : "Low",
+      stockLeft: Math.round(stockOf(i)),
+      status: stockOf(i) <= 0 ? "Out of Stock" : "Low",
     }));
 
     // ── 7. TEAM SCORE SCORECARD ──
@@ -542,13 +558,13 @@ export async function GET(request: Request) {
       },
 
       inventory: {
-        totalSKUs: allIMS.length,
+        totalSKUs: activeIMS.length,
         outOfStockCount: outOfStock.length,
         lowStockCount: lowStock.length,
         inventoryByCategory,
         lowStockItems,
-        outOfStockList: outOfStock.map((i: any) => ({ sku: i.item_name, category: i.category, stockLeft: parseFloat(i.stock_qty) || 0 })),
-        lowStockList: lowStock.map((i: any) => ({ sku: i.item_name, category: i.category, stockLeft: parseFloat(i.stock_qty) || 0 }))
+        outOfStockList: outOfStock.map((i: any) => ({ sku: i.item_name, category: i.category, stockLeft: Math.round(stockOf(i)) })),
+        lowStockList: lowStock.map((i: any) => ({ sku: i.item_name, category: i.category, stockLeft: Math.round(stockOf(i)) }))
       },
       scorecard,
     });

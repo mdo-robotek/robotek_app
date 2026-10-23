@@ -614,6 +614,44 @@ export default function CooReport({ data: coo, loading }: CooReportProps) {
              ))}
           </div>
 
+          {/* Can't Afford To Be Low — top sellers, flagged whenever one dips to
+              Low/Out/Negative. These move the most business, so restocking
+              them beats everything else on this list. */}
+          <div className="space-y-3 mb-10">
+            <div className="flex items-center justify-between">
+              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">🔥 Can't Afford To Be Low — Top Movers</p>
+              {(inv.criticalAtRiskCount || 0) > 0 && (
+                <span className="bg-orange-50 dark:bg-orange-500/10 text-orange-500 text-[9px] font-black px-3 py-1 rounded-full border border-orange-100 dark:border-orange-500/20 uppercase tracking-widest">
+                  {inv.criticalAtRiskCount} AT RISK
+                </span>
+              )}
+            </div>
+            {(inv.criticalAtRiskCount || 0) === 0 ? (
+              <p className="text-xs font-bold text-emerald-500 bg-emerald-50 dark:bg-emerald-500/10 rounded-xl px-4 py-3">All top-selling items are healthy — none of your biggest movers are low or negative right now.</p>
+            ) : (
+              <div
+                className="space-y-1 max-h-[220px] overflow-y-auto custom-scrollbar cursor-pointer"
+                onClick={() => setDrillDownModal({ isOpen: true, title: "Can't Afford To Be Low — At Risk", data: inv.criticalAtRiskList || [], columns: [{ key: 'sku', label: 'SKU' }, { key: 'category', label: 'Category' }, { key: 'totalSold', label: 'Total Sold' }, { key: 'stockLeft', label: 'Stock Left' }, { key: 'status', label: 'Status' }] })}
+              >
+                {(inv.criticalAtRiskList || []).slice(0, 6).map((item: any, i: number) => (
+                  <div key={i} className="grid grid-cols-12 items-center p-3 px-4 bg-orange-50/50 dark:bg-orange-500/5 rounded-xl border border-orange-100 dark:border-orange-500/10 hover:border-orange-300 transition-all">
+                    <div className="col-span-5 text-xs font-black text-gray-900 dark:text-white truncate">{item.sku}</div>
+                    <div className="col-span-3 text-[10px] font-bold text-gray-400 uppercase">{item.category}</div>
+                    <div className="col-span-2 text-center text-xs font-black" style={{ color: item.stockLeft <= 0 ? "#ef4444" : "#f59e0b" }}>{item.stockLeft}</div>
+                    <div className="col-span-2 text-right">
+                      <span className={`text-[9px] font-black uppercase px-2 py-1 rounded-full border ${item.status === 'Negative' ? 'bg-fuchsia-50 text-fuchsia-500 border-fuchsia-100' : item.status === 'Out of Stock' ? 'bg-red-50 text-red-500 border-red-100' : 'bg-amber-50 text-amber-500 border-amber-100'}`}>
+                        {item.status}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+                {(inv.criticalAtRiskList || []).length > 6 && (
+                  <p className="text-[10px] font-bold text-gray-400 text-center pt-1">+ {(inv.criticalAtRiskList || []).length - 6} more — click to view all</p>
+                )}
+              </div>
+            )}
+          </div>
+
           <div className="space-y-2">
              <div className="grid grid-cols-12 text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3 px-4">
                 <div className="col-span-4">SKU</div>

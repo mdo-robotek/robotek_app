@@ -60,6 +60,7 @@ export const navigation = [
   { name: 'Replace', id: 'replace', href: '/replace', icon: ArchiveBoxIcon, section: 'Operations' },
   { name: 'GRN', id: 'grn', href: '/grn', icon: ArrowDownTrayIcon, section: 'Operations' },
   { name: 'IMS', id: 'ims', href: '/ims', icon: InboxIcon, section: 'Operations' },
+  { name: 'Item Ledger', id: 'item-ledger', href: '/item-ledger', icon: ChartBarIcon, section: 'Operations' },
   { name: 'Party Management', id: 'party-management', href: '/party-management', icon: UserGroupIcon, section: 'Operations' },
   { name: 'Payment Vendor Approval', id: 'payment-vendor-approval', href: '/payment-vendor-approval', icon: DocumentTextIcon, section: 'Operations' },
 

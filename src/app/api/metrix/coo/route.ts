@@ -409,11 +409,14 @@ export async function GET(request: Request) {
     const isTouchCategory = (i: any) => String(i.category || "").trim().toLowerCase() === "touch";
 
     // Permanent staleness rule: an item not traded (no GRN/Busy/OutForm/floor
-    // movement) in the last ~8 months (within the 6-9 month window Sahil asked
-    // for) should never be suggested for restock, even if it is still marked
-    // Active in the master sheet — this is the safeguard against the
-    // suggestion list silently filling up with dead items again.
-    const STALE_MS = 8 * 30 * 24 * 60 * 60 * 1000; // ~8 months
+    // movement) in the last 6 months should never be suggested for restock,
+    // counted in Total SKUs, or flagged as negative stock, even if it is
+    // still marked Active in the master sheet — this is the safeguard
+    // against stale/dead items cluttering the live-stock widgets. Sahil
+    // asked (2026-10-23) to tighten this from 8 months to 6 months, and to
+    // also drop stale items out of the Total SKUs count and Negative Stock
+    // list (previously only Out of Stock / Low Stock honored this).
+    const STALE_MS = 6 * 30 * 24 * 60 * 60 * 1000; // ~6 months
     const isStale = (i: any) => {
       const lastStr = i.last_activity_date;
       if (!lastStr) return true; // never traded at all → stale
@@ -423,6 +426,12 @@ export async function GET(request: Request) {
     };
 
     const restockEligible = (i: any) => !isTouchCategory(i) && !isStale(i);
+
+    // Non-stale items = the universe the dashboard should actually be
+    // counting/showing as "live" SKUs. Touch items ARE kept here (they're
+    // still real SKUs moving through Robotek's books, just not restocked
+    // by us) — only dead/no-movement-6-months items are dropped.
+    const liveIMS = activeIMS.filter((i: any) => !isStale(i));
 
     const outOfStock = activeIMS.filter((i: any) => stockOf(i) <= 0 && restockEligible(i));
     const lowStock = activeIMS.filter((i: any) => {
@@ -435,8 +444,10 @@ export async function GET(request: Request) {
     // Negative stock = ledger entry errors (more OUT than IN recorded).
     // Touch items are excluded here too — Robotek never maintains their
     // stock, so a "negative" reading for them is not a real entry error.
+    // Stale (no movement in 6 months) items are excluded too — a negative
+    // reading on a dead item is not worth chasing as an active ledger error.
     const negativeStock = activeIMS
-      .filter((i: any) => stockOf(i) < 0 && !isTouchCategory(i))
+      .filter((i: any) => stockOf(i) < 0 && !isTouchCategory(i) && !isStale(i))
       .sort((a: any, b: any) => stockOf(a) - stockOf(b));
     const categoryStockMap: Record<string, number> = {};
     activeIMS.forEach((i: any) => {
@@ -452,6 +463,33 @@ export async function GET(request: Request) {
       stockLeft: Math.round(stockOf(i)),
       status: stockOf(i) <= 0 ? "Out of Stock" : "Low",
     }));
+
+    // "Can't Afford To Be Low" — Sahil's top revenue/volume movers (2026-10-23
+    // request): the items that actually keep the company's sales running.
+    // Ranked by cumulative sold quantity (out_qty) among live (non-stale,
+    // non-Touch) items; the top 15% by volume, or at least the top 10 items,
+    // become the "critical" watchlist. Any of those sitting at zero/negative
+    // or under its own reorder line is surfaced first so restocking priority
+    // goes to what's actually moving the business, not just whatever
+    // happens to hit zero.
+    const sellableForCritical = liveIMS.filter((i: any) => !isTouchCategory(i) && Number(i.out_qty || 0) > 0);
+    const rankedBySales = [...sellableForCritical].sort((a: any, b: any) => Number(b.out_qty || 0) - Number(a.out_qty || 0));
+    const criticalCount = Math.max(10, Math.ceil(rankedBySales.length * 0.15));
+    const criticalItemsSet = new Set(rankedBySales.slice(0, criticalCount).map((i: any) => i.item_name));
+    const criticalItems = rankedBySales.slice(0, criticalCount).map((i: any) => {
+      const qty = stockOf(i);
+      const avg = Number(i.avg_daily_con || 0);
+      const reorder = Math.max(5, avg * 7);
+      const status = qty < 0 ? "Negative" : qty <= 0 ? "Out of Stock" : qty <= reorder ? "Low" : "Healthy";
+      return {
+        sku: i.item_name,
+        category: i.category,
+        stockLeft: Math.round(qty),
+        totalSold: Math.round(Number(i.out_qty || 0)),
+        status,
+      };
+    });
+    const criticalAtRisk = criticalItems.filter((i: any) => i.status !== "Healthy");
 
     // ── 7. TEAM SCORE SCORECARD ──
     const scorecard = (allUsers as any[]).filter((u: any) => u.status !== "Inactive").map((u: any) => {
@@ -594,16 +632,21 @@ export async function GET(request: Request) {
       },
 
       inventory: {
-        totalSKUs: activeIMS.length,
+        totalSKUs: liveIMS.length,
         outOfStockCount: outOfStock.length,
         lowStockCount: lowStock.length,
         inventoryByCategory,
         lowStockItems,
-        allItemsList: activeIMS.map((i: any) => ({ sku: i.item_name, category: rollupCategory(i.category), rawCategory: (i.category || "").trim() || "—", stockLeft: Math.round(stockOf(i)) })),
+        allItemsList: liveIMS.map((i: any) => ({ sku: i.item_name, category: rollupCategory(i.category), rawCategory: (i.category || "").trim() || "—", stockLeft: Math.round(stockOf(i)) })),
         negativeCount: negativeStock.length,
         negativeList: negativeStock.map((i: any) => ({ sku: i.item_name, category: i.category, stockLeft: Math.round(stockOf(i)) })),
         outOfStockList: outOfStock.map((i: any) => ({ sku: i.item_name, category: i.category, stockLeft: Math.round(stockOf(i)) })),
-        lowStockList: lowStock.map((i: any) => ({ sku: i.item_name, category: i.category, stockLeft: Math.round(stockOf(i)) }))
+        lowStockList: lowStock.map((i: any) => ({ sku: i.item_name, category: i.category, stockLeft: Math.round(stockOf(i)) })),
+        // "Can't Afford To Be Low" — top sellers by volume; restocking these
+        // takes priority since they're what actually keeps revenue moving.
+        criticalItems,
+        criticalAtRiskCount: criticalAtRisk.length,
+        criticalAtRiskList: criticalAtRisk,
       },
       scorecard,
     });

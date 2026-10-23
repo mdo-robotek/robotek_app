@@ -26,6 +26,10 @@ export type IMSMovementMaps = {
   o2dKeys: Set<string>;
   /** Most recent dated movement (GRN in, Busy/Out Form/floor out) per item, epoch ms */
   lastActivityMap: Record<string, number>;
+  /** Item Ledger (Module A) IN breakdown by source, per item key */
+  inByGrnMap: Record<string, number>;
+  inByLocalPackMap: Record<string, number>;
+  inByAssembledMap: Record<string, number>;
 };
 
 function resolveMovementSource(
@@ -46,7 +50,8 @@ export function buildIMSMovementMaps(
   outForm: { description?: string; qty?: string; date?: string; updated_at?: string }[],
   gFloorLedger: FloorLedgerRow[] = [],
   firstFloorLedger: FloorLedgerRow[] = [],
-  busySales: { date?: string; item?: string; qty?: number }[] = []
+  busySales: { date?: string; item?: string; qty?: number }[] = [],
+  ledgerEntries: { item_name?: string; qty?: number; source_type?: string; date?: string }[] = []
 ): IMSMovementMaps {
   const inQtyMap: Record<string, number> = {};
   const outQtyMap: Record<string, number> = {};
@@ -55,6 +60,9 @@ export function buildIMSMovementMaps(
   const grnKeys = new Set<string>();
   const o2dKeys = new Set<string>();
   const lastActivityMap: Record<string, number> = {};
+  const inByGrnMap: Record<string, number> = {};
+  const inByLocalPackMap: Record<string, number> = {};
+  const inByAssembledMap: Record<string, number> = {};
 
   const rememberName = (raw: string) => {
     const key = raw.trim().toLowerCase();
@@ -75,9 +83,25 @@ export function buildIMSMovementMaps(
       if (key) {
         grnKeys.add(key);
         inQtyMap[key] = (inQtyMap[key] || 0) + qty;
+        inByGrnMap[key] = (inByGrnMap[key] || 0) + qty;
         bumpActivity(key, parseDateStr(grn.updated_at || ""));
       }
     }
+  });
+
+  // Item Ledger (Module A) — Head Office entries for the two IN sources GRN
+  // doesn't cover: locally-packed/tested imports, and in-house assembled goods.
+  ledgerEntries.forEach((entry) => {
+    const key = rememberName(entry.item_name || "");
+    if (!key) return;
+    const qty = Number(entry.qty) || 0;
+    inQtyMap[key] = (inQtyMap[key] || 0) + qty;
+    if (String(entry.source_type || "").trim() === "Assembled") {
+      inByAssembledMap[key] = (inByAssembledMap[key] || 0) + qty;
+    } else {
+      inByLocalPackMap[key] = (inByLocalPackMap[key] || 0) + qty;
+    }
+    bumpActivity(key, parseDateStr(entry.date || ""));
   });
 
   const now = Date.now();
@@ -162,7 +186,10 @@ export function buildIMSMovementMaps(
 
   applyFloorOutToGFloorInMap(firstFloorLedger, inQtyMap, rememberName);
 
-  return { inQtyMap, outQtyMap, outQty60DaysMap, displayNameMap, grnKeys, o2dKeys, lastActivityMap };
+  return {
+    inQtyMap, outQtyMap, outQty60DaysMap, displayNameMap, grnKeys, o2dKeys, lastActivityMap,
+    inByGrnMap, inByLocalPackMap, inByAssembledMap,
+  };
 }
 
 function enrichQtyFields(

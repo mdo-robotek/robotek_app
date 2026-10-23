@@ -1,15 +1,21 @@
 // Dashboard-level category rollup (display only — sheet data untouched).
-// POLY-* → POLY, ANS POLY-* → ANS POLY, DS ADD MAT. → ADD M,
-// TWS + TWS (W) → TWS, N Band + N Band (W) → N Band,
-// CHGR + ANS CHGR + ANS SC → ANS CHGR, plus case-duplicate merge (sc/SC).
+// POLY-* → POLY, ANS POLY-* → ANS POLY,
+// DC + DC (W) + ANS DC + ANS DC W → DC,
+// EAR + ANS EAR → EAR, N Band + N Band (W) + ANS NB → N Band,
+// TWS + TWS (W) + ANS TWS → TWS, CHGR + ANS CHGR + ANS SC → ANS CHGR,
+// Touch + ADD M + DS ADD MAT. + MIC + plain cell → General,
+// plus case-duplicate merge (sc/SC).
 const CAT_CANON: Record<string, string> = {
-  "sc": "SC", "dc": "DC", "ear": "EAR", "headphone": "Headphone",
+  "sc": "SC", "headphone": "Headphone",
   "chgr": "ANS CHGR", "ans chgr": "ANS CHGR", "ans sc": "ANS CHGR",
-  "tws": "TWS", "tws (w)": "TWS",
-  "n band": "N Band", "n band (w)": "N Band",
+  "dc": "DC", "dc (w)": "DC", "ans dc": "DC", "ans dc w": "DC",
+  "ear": "EAR", "ans ear": "EAR",
+  "tws": "TWS", "tws (w)": "TWS", "ans tws": "TWS",
+  "n band": "N Band", "n band (w)": "N Band", "ans nb": "N Band",
   "spk": "SPK", "pb": "PB", "rb": "RB",
-  "add m": "ADD M", "general": "General", "long": "Long", "touch": "Touch",
-  "dc (w)": "DC (W)", "mic": "MIC",
+  "general": "General", "add m": "General", "touch": "General",
+  "mic": "General", "plain cell": "General",
+  "long": "Long", "pro": "PRO",
 };
 
 export function rollupCategory(raw?: string): string {
@@ -18,6 +24,6 @@ export function rollupCategory(raw?: string): string {
   const l = c.toLowerCase();
   if (l.startsWith("ans poly")) return "ANS POLY";
   if (l.startsWith("poly")) return "POLY";
-  if (l.startsWith("ds add mat")) return "ADD M";
+  if (l.startsWith("ds add mat")) return "General";
   return CAT_CANON[l] || c;
 }

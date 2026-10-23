@@ -844,6 +844,9 @@ export default function I2RPage() {
                 taaki step flow ka hissa dikhe, count ke saath. */}
             {(() => {
               const tbdRows = items.filter(it => !it.cancelled && isTbdName(it.item_name));
+              // Sahil (2026-10-23): ye entry sirf tab dikhe jab koi TBD
+              // (to-be-decided) naam wala indent ho — zero par chhupi rahe.
+              if (tbdRows.length === 0) return null;
               const overdue = tbdRows.filter(it => tbdDaysLeft(it.created_at) < 0).length;
               const active = selectedStepFilter === "tbd";
               return (

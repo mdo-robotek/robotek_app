@@ -4,7 +4,7 @@ import { getIMSItems } from "@/lib/ims-sheets";
 import { getGRNItems } from "@/lib/grn-sheets";
 import { getOutFormData } from "@/lib/o2d-sheets";
 import { getFloorIMSItems } from "@/lib/ims-floor-sheets";
-import { buildIMSMovementMaps, ledgerItemKey } from "@/lib/ims-enrich";
+import { buildIMSMovementMaps, ledgerItemKey, buildItemLedgerStatement } from "@/lib/ims-enrich";
 import { getIMSMasterItems, indexMasterByName, overlayFromMaster, masterItemKey } from "@/lib/ims-master-sheets";
 import { getBusySales } from "@/lib/busy-sale-sheets";
 import { getItemLedgerEntries, addItemLedgerEntry } from "@/lib/item-ledger-sheets";
@@ -12,8 +12,11 @@ import { getItemLedgerEntries, addItemLedgerEntry } from "@/lib/item-ledger-shee
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    const { searchParams } = new URL(request.url);
+    const detailItem = (searchParams.get("item") || "").trim();
+
     const [items, grns, outForm, gFloorLedger, firstFloorLedger, masterRows, busySales, ledgerEntries] = await Promise.all([
       getIMSItems(),
       getGRNItems(),
@@ -28,6 +31,28 @@ export async function GET() {
     const maps = buildIMSMovementMaps(
       grns as any, outForm as any, gFloorLedger as any, firstFloorLedger as any, busySales as any, ledgerEntries as any
     );
+
+    // Per-item statement (Module A ledger view): entry-level IN/OUT with
+    // running balance, built from the SAME rules as the aggregate maps —
+    // the response includes a reconciliation check against them so a
+    // mismatch in logic can never go unnoticed.
+    if (detailItem) {
+      const stmt = buildItemLedgerStatement(
+        detailItem, grns as any, outForm as any, gFloorLedger as any, firstFloorLedger as any, busySales as any, ledgerEntries as any
+      );
+      const key = ledgerItemKey(detailItem);
+      const mapIn = Math.round(maps.inQtyMap[key] || 0);
+      const mapOut = Math.round(maps.outQtyMap[key] || 0);
+      return NextResponse.json({
+        item: maps.displayNameMap[key] || detailItem,
+        entries: stmt.entries,
+        totalIn: stmt.totalIn,
+        totalOut: stmt.totalOut,
+        net: stmt.net,
+        reconciled: stmt.totalIn === mapIn && stmt.totalOut === mapOut,
+        summaryTotals: { totalIn: mapIn, totalOut: mapOut },
+      }, { headers: { "Cache-Control": "no-store, max-age=0" } });
+    }
     const masterByName = indexMasterByName(masterRows);
 
     const catalogKeys = new Set(items.map((i) => ledgerItemKey(i.item_name || "")).filter(Boolean));

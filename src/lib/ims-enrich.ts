@@ -323,3 +323,118 @@ export function summarizeIMSMovement(
     liveStock: totalIn - totalOut,
   };
 }
+
+// ── Module A: per-item ledger statement ─────────────────────────────────
+// Entry-level view (kab kitna aaya / gaya, running balance) built from the
+// SAME rules as buildIMSMovementMaps, so the statement always reconciles
+// with the summary totals. Manual Item Ledger entries appear as
+// record-only rows (balance unaffected — see the double-counting fix).
+
+export type LedgerStatementEntry = {
+  date: string; // ISO yyyy-mm-dd ("" when unknown)
+  ts: number;
+  type: string; // "GRN IN" | "Floor IN (G)" | "1st→G Transfer IN" | "Sale OUT (Busy)" | "Out Form OUT" | "Floor OUT (G)" | "Record: Locally Packed" | "Record: Assembled"
+  ref: string; // GRN no / row id etc.
+  inQty: number;
+  outQty: number;
+  recordOnly: boolean;
+  balance: number; // running, record-only rows keep previous balance
+};
+
+export function buildItemLedgerStatement(
+  itemName: string,
+  grns: { Item_Name?: string; GRN_No?: string; Qty?: string; cancelled?: string | boolean; status_1?: string; Packed_Unpacked?: string; updated_at?: string }[],
+  outForm: { description?: string; qty?: string; date?: string; updated_at?: string; order_no?: string }[],
+  gFloorLedger: FloorLedgerRow[],
+  firstFloorLedger: FloorLedgerRow[],
+  busySales: { date?: string; item?: string; qty?: number }[],
+  ledgerEntries: { item_name?: string; qty?: number; source_type?: string; date?: string; id?: string }[]
+): { entries: LedgerStatementEntry[]; totalIn: number; totalOut: number; net: number } {
+  const key = ledgerItemKey(itemName);
+  const raw: Omit<LedgerStatementEntry, "balance">[] = [];
+
+  const toDate = (s: string) => {
+    const ts = parseDateStr(s || "");
+    return { ts, date: ts > 0 ? new Date(ts).toISOString().split("T")[0] : "" };
+  };
+
+  grns.forEach((g) => {
+    if (!g.Item_Name || g.cancelled || g.status_1 === "Rejected" || !isGrnForGFloor(g)) return;
+    if (ledgerItemKey(g.Item_Name) !== key) return;
+    const qty = parseFloat(g.Qty || "") || 0;
+    if (!qty) return;
+    const { ts, date } = toDate(g.updated_at || "");
+    raw.push({ date, ts, type: "GRN IN", ref: g.GRN_No || "", inQty: qty, outQty: 0, recordOnly: false });
+  });
+
+  const isBusyItem = busySales.some((r) => ledgerItemKey(r.item || "") === key && (Number(r.qty) || 0) !== 0);
+
+  busySales.forEach((r) => {
+    if (ledgerItemKey(r.item || "") !== key) return;
+    const qty = Number(r.qty) || 0;
+    if (!qty) return;
+    const { ts, date } = toDate(r.date || "");
+    raw.push({ date, ts, type: "Sale OUT (Busy)", ref: "", inQty: 0, outQty: qty, recordOnly: false });
+  });
+
+  gFloorLedger.forEach((row) => {
+    if (!row.item_name || ledgerItemKey(row.item_name) !== key) return;
+    const inQ = parseFloat(String(row.in_qty || 0)) || 0;
+    const outQ = parseFloat(String(row.out_qty || 0)) || 0;
+    const { ts, date } = toDate(row.date || row.updated_at || "");
+    if (inQ > 0) raw.push({ date, ts, type: "Floor IN (G)", ref: String(row.id || ""), inQty: inQ, outQty: 0, recordOnly: false });
+    if (outQ > 0 && !isBusyItem) raw.push({ date, ts, type: "Floor OUT (G)", ref: String(row.id || ""), inQty: 0, outQty: outQ, recordOnly: false });
+  });
+
+  firstFloorLedger.forEach((row) => {
+    if (!row.item_name || ledgerItemKey(row.item_name) !== key) return;
+    const outQ = parseFloat(String(row.out_qty ?? 0)) || 0;
+    if (outQ <= 0) return;
+    const { ts, date } = toDate(row.date || row.updated_at || "");
+    raw.push({ date, ts, type: "1st→G Transfer IN", ref: String(row.id || ""), inQty: outQ, outQty: 0, recordOnly: false });
+  });
+
+  if (!isBusyItem) {
+    outForm.forEach((row) => {
+      const { ts, date } = toDate(row.date || row.updated_at || "");
+      const push = (desc: string, qty: number) => {
+        if (ledgerItemKey(desc) !== key || !qty) return;
+        raw.push({ date, ts, type: "Out Form OUT", ref: String((row as any).order_no || ""), inQty: 0, outQty: qty, recordOnly: false });
+      };
+      const d = row.description || "";
+      if (d.trim().startsWith("[") && d.trim().endsWith("]")) {
+        try {
+          JSON.parse(d).forEach((it: any) => {
+            push((it.Description || it.description || "").trim(), parseFloat(it.Qty || it.qty || "") || 0);
+          });
+        } catch { /* ignore */ }
+      } else if (d) {
+        push(d.trim(), parseFloat(row.qty || "") || 0);
+      }
+    });
+  }
+
+  ledgerEntries.forEach((e) => {
+    if (ledgerItemKey(e.item_name || "") !== key) return;
+    const qty = Number(e.qty) || 0;
+    if (!qty) return;
+    const { ts, date } = toDate(e.date || "");
+    const t = String(e.source_type || "").trim() === "Assembled" ? "Record: Assembled" : "Record: Locally Packed";
+    raw.push({ date, ts, type: t, ref: String(e.id || ""), inQty: qty, outQty: 0, recordOnly: true });
+  });
+
+  raw.sort((a, b) => a.ts - b.ts);
+  let bal = 0;
+  let totalIn = 0;
+  let totalOut = 0;
+  const entries: LedgerStatementEntry[] = raw.map((e) => {
+    if (!e.recordOnly) {
+      bal += e.inQty - e.outQty;
+      totalIn += e.inQty;
+      totalOut += e.outQty;
+    }
+    return { ...e, balance: Math.round(bal * 100) / 100 };
+  });
+
+  return { entries, totalIn: Math.round(totalIn), totalOut: Math.round(totalOut), net: Math.round(totalIn - totalOut) };
+}

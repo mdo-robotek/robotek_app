@@ -55,6 +55,7 @@ export default function ItemLedgerPage() {
   });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [statementItem, setStatementItem] = useState<string | null>(null);
 
   const rows = useMemo(() => {
     let r = data?.rows || [];
@@ -89,6 +90,12 @@ export default function ItemLedgerPage() {
   };
 
   const itemNames = useMemo(() => Array.from(new Set((data?.rows || []).map((r) => r.item_name))).sort(), [data]);
+
+  type StatementEntry = { date: string; type: string; ref: string; inQty: number; outQty: number; recordOnly: boolean; balance: number };
+  const { data: statement, isLoading: statementLoading } = useSWR<{
+    item: string; entries: StatementEntry[]; totalIn: number; totalOut: number; net: number;
+    reconciled: boolean; summaryTotals: { totalIn: number; totalOut: number };
+  }>(statementItem ? `/api/item-ledger?item=${encodeURIComponent(statementItem)}` : null, fetcher, { revalidateOnFocus: false });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -201,7 +208,9 @@ export default function ItemLedgerPage() {
             {rows.map((r) => (
               <tr
                 key={r.item_name}
-                className={`border-t border-gray-100 dark:border-navy-800 ${r.flagged ? "bg-red-50 dark:bg-red-950/20" : ""}`}
+                onClick={() => setStatementItem(r.item_name)}
+                title="Click for full ledger statement"
+                className={`border-t border-gray-100 dark:border-navy-800 cursor-pointer hover:bg-amber-50/40 dark:hover:bg-navy-800/60 ${r.flagged ? "bg-red-50 dark:bg-red-950/20" : ""}`}
               >
                 <td className="px-3 py-2 font-bold text-gray-800 dark:text-zinc-100">
                   {r.flagged && <ExclamationTriangleIcon className="w-3.5 h-3.5 text-red-500 inline mr-1 -mt-0.5" />}
@@ -234,6 +243,64 @@ export default function ItemLedgerPage() {
                 <span className="text-gray-400">{e.entered_by}</span>
               </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {statementItem && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setStatementItem(null)}>
+          <div onClick={(e) => e.stopPropagation()} className="bg-white dark:bg-navy-900 rounded-2xl p-5 w-full max-w-3xl max-h-[85vh] flex flex-col">
+            <div className="flex items-center justify-between mb-3">
+              <div>
+                <h3 className="text-sm font-black">{statement?.item || statementItem} — Item Ledger</h3>
+                {statement && (
+                  <p className="text-[10px] font-bold mt-0.5">
+                    <span className="text-gray-500">IN {statement.totalIn} · OUT {statement.totalOut} · NET </span>
+                    <span className={statement.net < 0 ? "text-red-600 font-black" : "text-emerald-600 font-black"}>{statement.net}</span>
+                    <span className={`ml-2 px-2 py-0.5 rounded-full text-[9px] font-black uppercase ${statement.reconciled ? "bg-emerald-50 text-emerald-600" : "bg-red-50 text-red-600"}`}>
+                      {statement.reconciled ? "✓ Summary se match" : `⚠ Mismatch vs summary (IN ${statement.summaryTotals.totalIn} / OUT ${statement.summaryTotals.totalOut})`}
+                    </span>
+                  </p>
+                )}
+              </div>
+              <button type="button" onClick={() => setStatementItem(null)}><XMarkIcon className="w-5 h-5" /></button>
+            </div>
+            <div className="overflow-y-auto custom-scrollbar flex-1 rounded-xl border border-gray-100 dark:border-navy-800">
+              <table className="w-full text-xs">
+                <thead className="bg-gray-50 dark:bg-navy-950/50 sticky top-0">
+                  <tr>
+                    <th className="px-3 py-2 text-left font-black uppercase tracking-widest text-[9px] text-gray-500">Date</th>
+                    <th className="px-3 py-2 text-left font-black uppercase tracking-widest text-[9px] text-gray-500">Type</th>
+                    <th className="px-3 py-2 text-left font-black uppercase tracking-widest text-[9px] text-gray-500">Ref</th>
+                    <th className="px-3 py-2 text-right font-black uppercase tracking-widest text-[9px] text-gray-500">IN</th>
+                    <th className="px-3 py-2 text-right font-black uppercase tracking-widest text-[9px] text-gray-500">OUT</th>
+                    <th className="px-3 py-2 text-right font-black uppercase tracking-widest text-[9px] text-gray-500">Balance</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {statementLoading && (
+                    <tr><td colSpan={6} className="px-3 py-6 text-center text-gray-400 font-bold">Loading statement...</td></tr>
+                  )}
+                  {!statementLoading && (statement?.entries || []).length === 0 && (
+                    <tr><td colSpan={6} className="px-3 py-6 text-center text-gray-400 font-bold">No movement entries found.</td></tr>
+                  )}
+                  {(statement?.entries || []).map((e, i) => (
+                    <tr key={i} className={`border-t border-gray-50 dark:border-navy-800 ${e.recordOnly ? "opacity-50" : ""} ${e.balance < 0 && !e.recordOnly ? "bg-red-50/60 dark:bg-red-950/20" : ""}`}>
+                      <td className="px-3 py-1.5 font-bold text-gray-600 dark:text-zinc-300 whitespace-nowrap">{e.date || "—"}</td>
+                      <td className="px-3 py-1.5 font-bold">
+                        <span className={e.type.includes("IN") ? "text-emerald-600" : e.type.startsWith("Record") ? "text-gray-400" : "text-blue-600"}>{e.type}</span>
+                        {e.recordOnly && <span className="ml-1 text-[8px] font-black uppercase text-gray-400">(record only)</span>}
+                      </td>
+                      <td className="px-3 py-1.5 text-gray-400">{e.ref || "—"}</td>
+                      <td className="px-3 py-1.5 text-right font-black text-emerald-600">{e.inQty ? `+${Math.round(e.inQty)}` : ""}</td>
+                      <td className="px-3 py-1.5 text-right font-black text-blue-600">{e.outQty ? `-${Math.round(e.outQty)}` : ""}</td>
+                      <td className={`px-3 py-1.5 text-right font-black ${e.balance < 0 ? "text-red-600" : "text-gray-800 dark:text-zinc-100"}`}>{e.balance}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p className="text-[9px] font-bold text-gray-400 mt-2">Balance jis din negative hua, usi ke aas-paas ki entry mein galti hai — wahi se investigate karein. "Record only" rows stock mein count nahi hote.</p>
           </div>
         </div>
       )}

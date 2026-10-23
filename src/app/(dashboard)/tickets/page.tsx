@@ -55,6 +55,9 @@ interface Ticket {
   updated_at: string;
   attachment_url: string;
   voice_note: string;
+  suggestion_1?: string;
+  suggestion_2?: string;
+  suggestion_3?: string;
   latest_comment?: {
     text: string;
     actor: string;
@@ -122,8 +125,10 @@ export default function TicketsPage() {
 
   // Form States
   const [newTicket, setNewTicket] = useState({
-    title: "", description: "", category: "Software", priority: "Medium", solver_person: "", planned_resolution: ""
+    title: "", description: "", category: "Software", priority: "Medium", solver_person: "", planned_resolution: "",
+    suggestion_1: "", suggestion_2: "", suggestion_3: ""
   });
+  const [suggestionCount, setSuggestionCount] = useState(1);
   const [newComment, setNewComment] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [statusMessage, setStatusMessage] = useState("");
@@ -147,7 +152,7 @@ export default function TicketsPage() {
   const [categorySearch, setCategorySearch] = useState("");
   const [categoryOpen, setCategoryOpen] = useState(false);
 
-  const categories = ["Software", "Hardware/IT", "HR / Admin", "Finance", "Suggestion", "Other"];
+  const categories = ["Software", "Hardware/IT", "HR / Admin", "Finance", "Other"];
 
   useEffect(() => {
     fetchUsers();
@@ -291,7 +296,8 @@ export default function TicketsPage() {
 
       if (res.ok) {
         setIsNewModalOpen(false);
-        setNewTicket({ title: "", description: "", category: "Software", priority: "Medium", solver_person: "", planned_resolution: "" });
+        setNewTicket({ title: "", description: "", category: "Software", priority: "Medium", solver_person: "", planned_resolution: "", suggestion_1: "", suggestion_2: "", suggestion_3: "" });
+        setSuggestionCount(1);
         setVoiceNoteFile(null);
         setRefDocFile(null);
         setIsStatusModalOpen(false);
@@ -804,6 +810,45 @@ export default function TicketsPage() {
                   </label>
                   <textarea required aria-required="true" rows={3} value={editingTicket ? editingTicket.description : newTicket.description} onChange={e => editingTicket ? setEditingTicket({ ...editingTicket, description: e.target.value }) : setNewTicket({ ...newTicket, description: e.target.value })} className="w-full bg-[#FFFBF0] dark:bg-navy-900 px-3 py-2.5 rounded-xl border border-orange-100 dark:border-navy-700 focus:border-[#FFD500] focus:bg-white dark:focus:bg-navy-900 outline-none font-bold text-xs text-gray-800 dark:text-zinc-100 transition-all shadow-sm resize-none min-h-[80px]" placeholder="Provide details..." />
                 </div>
+                {/* Suggestions (optional, max 3) — raiser's own ideas to solve the issue */}
+                <div>
+                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5 px-1">
+                    Your Suggestions <span className="normal-case font-bold text-gray-400/70">(optional, max 3)</span>
+                  </label>
+                  {(() => {
+                    const t: any = editingTicket || newTicket;
+                    const filled = [t.suggestion_1, t.suggestion_2, t.suggestion_3].filter(Boolean).length;
+                    const showN = Math.min(3, Math.max(suggestionCount, filled || 1));
+                    const setSugg = (n: number, val: string) => {
+                      const key = `suggestion_${n}`;
+                      if (editingTicket) setEditingTicket({ ...(editingTicket as any), [key]: val } as any);
+                      else setNewTicket({ ...(newTicket as any), [key]: val } as any);
+                    };
+                    return (
+                      <div className="space-y-2">
+                        {[1, 2, 3].slice(0, showN).map((n) => (
+                          <input
+                            key={n}
+                            type="text"
+                            value={(t as any)[`suggestion_${n}`] || ""}
+                            onChange={(e) => setSugg(n, e.target.value)}
+                            className="w-full bg-[#FFFBF0] dark:bg-navy-900 px-3 py-2.5 rounded-xl border border-orange-100 dark:border-navy-700 focus:border-[#FFD500] focus:bg-white dark:focus:bg-navy-900 outline-none font-bold text-xs text-gray-800 dark:text-zinc-100 transition-all shadow-sm"
+                            placeholder={`Suggestion ${n}...`}
+                          />
+                        ))}
+                        {showN < 3 && (
+                          <button
+                            type="button"
+                            onClick={() => setSuggestionCount(showN + 1)}
+                            className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-[#003875] dark:text-[#FFD500] hover:opacity-70 transition-opacity px-1"
+                          >
+                            + Add Suggestion {showN + 1}
+                          </button>
+                        )}
+                      </div>
+                    );
+                  })()}
+                </div>
               </div>
 
               <div className="space-y-4 pt-4 border-t border-orange-50 dark:border-navy-800/50">
@@ -1005,6 +1050,16 @@ export default function TicketsPage() {
               {/* Description Block */}
               <div className="bg-red-50/50 dark:bg-red-900/10 rounded-xl p-3 border border-red-100 dark:border-red-900/30">
                 <p className="text-xs font-bold text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{selectedTicket.description}</p>
+                {[selectedTicket.suggestion_1, selectedTicket.suggestion_2, selectedTicket.suggestion_3].filter(Boolean).length > 0 && (
+                  <div className="mt-3 pt-2 border-t border-red-200/50">
+                    <p className="text-[9px] font-black uppercase tracking-widest text-gray-400 mb-1.5">💡 Suggestions by {selectedTicket.raised_by}</p>
+                    <ul className="space-y-1">
+                      {[selectedTicket.suggestion_1, selectedTicket.suggestion_2, selectedTicket.suggestion_3].filter(Boolean).map((s, i) => (
+                        <li key={i} className="text-xs font-bold text-gray-700 dark:text-gray-300 flex gap-1.5"><span className="text-[#003875] dark:text-[#FFD500] font-black">{i + 1}.</span><span className="whitespace-pre-wrap">{s}</span></li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
                 {(selectedTicket.voice_note || selectedTicket.attachment_url) && (
                   <div className="mt-3 flex flex-wrap gap-2 pt-2 border-t border-red-200/50">
                     {selectedTicket.voice_note && (

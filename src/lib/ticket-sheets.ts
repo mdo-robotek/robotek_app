@@ -18,6 +18,9 @@ export interface Ticket {
   updated_at: string;
   attachment_url: string;
   voice_note: string;
+  suggestion_1?: string;
+  suggestion_2?: string;
+  suggestion_3?: string;
 }
 
 export interface TicketHistory {
@@ -36,7 +39,7 @@ export interface TicketHistory {
 class TicketService extends BaseSheetsService<Ticket> {
   protected spreadsheetId = GOOGLE_SHEET_ID;
   protected sheetName = SHEET_NAME;
-  protected range = "A:M";
+  protected range = "A:P";
   protected idColumnIndex = 0;
 
 
@@ -56,6 +59,9 @@ class TicketService extends BaseSheetsService<Ticket> {
       updated_at: get("updated_at") || get("updatedat"),
       attachment_url: get("attachment_url") || get("attachmenturl"),
       voice_note: get("voice_note") || get("voicenote"),
+      suggestion_1: get("suggestion_1"),
+      suggestion_2: get("suggestion_2"),
+      suggestion_3: get("suggestion_3"),
     };
   }
 
@@ -79,6 +85,9 @@ class TicketService extends BaseSheetsService<Ticket> {
     set("updated_at", t.updated_at);
     set("attachment_url", t.attachment_url || "");
     set("voice_note", t.voice_note || "");
+    set("suggestion_1", t.suggestion_1 || "");
+    set("suggestion_2", t.suggestion_2 || "");
+    set("suggestion_3", t.suggestion_3 || "");
 
     const maxIdx = Math.max(...Object.values(this.hMap), 0);
     for (let i = 0; i <= maxIdx; i++) {

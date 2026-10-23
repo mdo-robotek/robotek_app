@@ -216,7 +216,7 @@ export default function I2RPage() {
   } | null>({ key: "id", direction: "desc" });
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
-  const [selectedStepFilter, setSelectedStepFilter] = useState<number | "all" | "completed">("all");
+  const [selectedStepFilter, setSelectedStepFilter] = useState<number | "all" | "completed" | "tbd">("all");
   const [formData, setFormData] = useState<Partial<I2R>>({ ...EMPTY_FORM });
   const [actionStatus, setActionStatus] = useState<"loading" | "success" | "error">("loading");
   const [actionMessage, setActionMessage] = useState("");
@@ -397,6 +397,7 @@ export default function I2RPage() {
 
     if (selectedStepFilter !== "all") {
       if (selectedStepFilter === "completed") list = list.filter(it => getActiveStep(it) === 0);
+      else if (selectedStepFilter === "tbd") list = list.filter(it => isTbdName(it.item_name) && !it.cancelled);
       else list = list.filter(it => getActiveStep(it) === selectedStepFilter);
     }
 
@@ -838,6 +839,32 @@ export default function I2RPage() {
             >
               <span className="font-black text-[11px] uppercase tracking-widest">ALL INDENTS</span>
             </button>
+            {/* Naam-decide step (Sahil, 2026-10-23): indent raise hone ke 5 din
+                ke andar final naam aana hai — ye permanent sidebar entry hai
+                taaki step flow ka hissa dikhe, count ke saath. */}
+            {(() => {
+              const tbdRows = items.filter(it => !it.cancelled && isTbdName(it.item_name));
+              const overdue = tbdRows.filter(it => tbdDaysLeft(it.created_at) < 0).length;
+              const active = selectedStepFilter === "tbd";
+              return (
+                <button
+                  onClick={() => setSelectedStepFilter("tbd")}
+                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-all border ${
+                    active
+                      ? "bg-amber-50 dark:bg-amber-900/20 border-amber-400 shadow-md"
+                      : overdue > 0
+                      ? "bg-white dark:bg-navy-900 border-red-200 dark:border-red-900/50 hover:border-red-400"
+                      : "bg-white dark:bg-navy-900 border-amber-100 dark:border-navy-800 hover:border-amber-300"
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <ClockIcon className={`w-4 h-4 ${overdue > 0 ? "text-red-500" : "text-amber-500"}`} />
+                    <span className={`text-[10px] font-black uppercase tracking-tight ${active ? "text-amber-700 dark:text-amber-400" : "text-slate-600 dark:text-navy-300"}`}>Decide Name — 5D TAT</span>
+                  </div>
+                  <span className={`min-w-5 h-5 px-1 flex items-center justify-center rounded-full text-[10px] font-black ${overdue > 0 ? "bg-red-500 text-white" : tbdRows.length > 0 ? "bg-amber-500 text-white" : "bg-slate-100 dark:bg-navy-800 text-slate-400"}`}>{tbdRows.length}</span>
+                </button>
+              );
+            })()}
             <div className="space-y-1">
               {I2R_STEP_SHORT.map((name, i) => {
                 const n = i + 1; const active = selectedStepFilter === n;

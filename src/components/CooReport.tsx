@@ -169,68 +169,63 @@ export default function CooReport({ data: coo, loading }: CooReportProps) {
         ))}
       </div>
 
-      {/* DISPATCH GAP ANALYSIS */}
+      {/* DISPATCH GAP ANALYSIS — compact strip (Sahil, 2026-10-23: the big
+          gradient cards ate too much screen; same info, one slim row).
+          Color = speed: green ≤9h (within OTD target), amber ≤24h, red >24h. */}
       {ord.gapAnalysis && ord.gapAnalysis.length > 0 && (
-        <div className="grid grid-cols-2 md:grid-cols-5 lg:grid-cols-10 gap-3">
-          {[...ord.gapAnalysis].reverse().map((gap: any, i: number) => {
-            let label = gap.date;
-            try {
-              const dateObj = new Date(gap.date);
-              const today = new Date();
-              const yesterday = new Date();
-              yesterday.setDate(today.getDate() - 1);
-              
-              if (gap.date === today.toISOString().split('T')[0]) {
-                label = "Today";
-              } else if (gap.date === yesterday.toISOString().split('T')[0]) {
-                label = "Yesterday";
-              } else {
-                label = dateObj.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
-              }
-            } catch (e) {}
+        <div className="bg-white dark:bg-navy-800 rounded-2xl px-4 py-3 shadow-xl border border-gray-100 dark:border-white/5 ring-1 ring-black/5">
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-zinc-400">⚡ Dispatch Speed — avg time order → dispatch (click a day for orders)</p>
+            <div className="hidden md:flex items-center gap-3 text-[9px] font-black uppercase text-gray-400">
+              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-emerald-500" />≤9h fast</span>
+              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-amber-500" />≤24h ok</span>
+              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-red-500" />&gt;24h slow</span>
+            </div>
+          </div>
+          <div className="flex gap-2 overflow-x-auto custom-scrollbar pb-1">
+            {[...ord.gapAnalysis].reverse().map((gap: any, i: number) => {
+              let label = gap.date;
+              try {
+                const dateObj = new Date(gap.date);
+                const today = new Date();
+                const yesterday = new Date();
+                yesterday.setDate(today.getDate() - 1);
+                if (gap.date === today.toISOString().split('T')[0]) label = "Today";
+                else if (gap.date === yesterday.toISOString().split('T')[0]) label = "Yest";
+                else label = dateObj.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+              } catch (e) {}
 
-            const tileColors = [
-              "from-slate-400 to-slate-500",
-              "from-cyan-400 to-cyan-500",
-              "from-sky-400 to-sky-500",
-              "from-blue-400 to-blue-500",
-              "from-indigo-400 to-indigo-500",
-              "from-violet-400 to-violet-500",
-              "from-purple-400 to-purple-500",
-              "from-fuchsia-400 to-fuchsia-500",
-              "from-pink-400 to-pink-500",
-              "from-rose-500 to-red-500" // Today
-            ];
+              const fmtTime = (h: number) => {
+                if (h >= 24) {
+                  const d = Math.floor(h / 24);
+                  const rh = h % 24;
+                  return rh > 0 ? `${d}d ${rh}h` : `${d}d`;
+                }
+                return `${h}h`;
+              };
 
-            const formatTime = (h: number, spanClass: string) => {
-              if (h >= 24) {
-                const d = Math.floor(h / 24);
-                const rh = h % 24;
-                return rh > 0 
-                  ? <>{d}<span className={spanClass}>d</span> {rh}<span className={spanClass}>h</span></>
-                  : <>{d}<span className={spanClass}>d</span></>;
-              }
-              return <>{h}<span className={spanClass}>h</span></>;
-            };
+              const noOrders = (gap.count || 0) === 0;
+              const speedClass = noOrders
+                ? "bg-gray-50 dark:bg-white/5 text-gray-400 border-gray-100 dark:border-white/10"
+                : gap.avgHours <= 9
+                ? "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 border-emerald-100 dark:border-emerald-500/20"
+                : gap.avgHours <= 24
+                ? "bg-amber-50 dark:bg-amber-500/10 text-amber-600 border-amber-100 dark:border-amber-500/20"
+                : "bg-red-50 dark:bg-red-500/10 text-red-600 border-red-100 dark:border-red-500/20";
 
-            return (
-              <motion.div 
-                initial={{ opacity: 0, scale: 0.95 }} 
-                animate={{ opacity: 1, scale: 1 }} 
-                transition={{ delay: i * 0.05 }}
-                key={i} 
-                onClick={() => setSelectedGapTile(gap)}
-                className={`bg-gradient-to-br ${tileColors[i] || "from-gray-400 to-gray-500"} rounded-2xl p-3 shadow-xl hover:shadow-2xl hover:scale-[1.02] cursor-pointer transition-all text-center flex flex-col justify-center text-white ring-1 ring-white/20`}
-              >
-                <p className="text-[11px] font-black uppercase tracking-widest mb-1 text-white/90">{label}</p>
-                <p className="text-3xl lg:text-4xl font-black tracking-tighter drop-shadow-md">{formatTime(gap.avgHours, "text-sm lg:text-lg opacity-80")}</p>
-                <div className="mt-2 pt-2 border-t border-white/20 flex flex-col gap-1">
-                  <span className="text-[10px] font-black uppercase tracking-wider text-white/90">{gap.count} Orders</span>
-                  <span className="text-[10px] font-black uppercase text-white drop-shadow-sm">{formatTime(gap.totalHours, "opacity-80")} total</span>
+              return (
+                <div
+                  key={i}
+                  onClick={() => !noOrders && setSelectedGapTile(gap)}
+                  className={`shrink-0 min-w-[76px] text-center rounded-xl border px-2.5 py-1.5 transition-all ${speedClass} ${noOrders ? "" : "cursor-pointer hover:scale-[1.04]"}`}
+                >
+                  <p className="text-[9px] font-black uppercase tracking-wider opacity-70">{label}</p>
+                  <p className="text-base font-black leading-tight">{noOrders ? "—" : fmtTime(gap.avgHours)}</p>
+                  <p className="text-[9px] font-black uppercase opacity-70">{gap.count} ord</p>
                 </div>
-              </motion.div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
       )}
 

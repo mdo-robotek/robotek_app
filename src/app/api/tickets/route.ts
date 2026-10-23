@@ -43,6 +43,11 @@ export async function POST(req: NextRequest) {
       ticketData.voice_note = fileId || "";
     }
 
+    // Suggestion 1 is mandatory for every new help slip (2 & 3 optional)
+    if (!String(ticketData.suggestion_1 || "").trim()) {
+      return NextResponse.json({ error: "Suggestion 1 is required" }, { status: 400 });
+    }
+
     const now = new Date().toISOString();
     ticketData.created_at = ticketData.created_at || now;
     ticketData.updated_at = now;

@@ -813,7 +813,7 @@ export default function TicketsPage() {
                 {/* Suggestions (optional, max 3) — raiser's own ideas to solve the issue */}
                 <div>
                   <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5 px-1">
-                    Your Suggestions <span className="normal-case font-bold text-gray-400/70">(optional, max 3)</span>
+                    Your Suggestions <span className="text-red-500" aria-hidden="true">*</span> <span className="normal-case font-bold text-gray-400/70">(Suggestion 1 required · 2 &amp; 3 optional)</span>
                   </label>
                   {(() => {
                     const t: any = editingTicket || newTicket;
@@ -830,10 +830,12 @@ export default function TicketsPage() {
                           <input
                             key={n}
                             type="text"
+                            required={n === 1 && !editingTicket}
+                            aria-required={n === 1 && !editingTicket}
                             value={(t as any)[`suggestion_${n}`] || ""}
                             onChange={(e) => setSugg(n, e.target.value)}
                             className="w-full bg-[#FFFBF0] dark:bg-navy-900 px-3 py-2.5 rounded-xl border border-orange-100 dark:border-navy-700 focus:border-[#FFD500] focus:bg-white dark:focus:bg-navy-900 outline-none font-bold text-xs text-gray-800 dark:text-zinc-100 transition-all shadow-sm"
-                            placeholder={`Suggestion ${n}...`}
+                            placeholder={n === 1 ? "Suggestion 1 (required)..." : `Suggestion ${n}...`}
                           />
                         ))}
                         {showN < 3 && (

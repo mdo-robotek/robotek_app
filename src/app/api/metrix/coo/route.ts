@@ -359,14 +359,14 @@ export async function GET(request: Request) {
     // ── 5. PARTY PIPELINE & CATEGORY REVENUE ──
     const itemToCategory: Record<string, string> = {};
     allIMS.forEach((i: any) => {
-      if (i.item_name && i.category) itemToCategory[i.item_name.trim()] = i.category;
+      if (i.item_name && i.category) itemToCategory[i.item_name.trim().toLowerCase()] = i.category;
     });
 
     const categoryRevenueMap: Record<string, number> = {};
     allO2Ds.forEach((item: any) => {
       const created = normalizeDate(item.created_at);
       if (created >= mtdStart && created <= mtdEnd) {
-        const cat = itemToCategory[item.item_name?.trim()] || "Other";
+        const cat = itemToCategory[item.item_name?.trim().toLowerCase()] || "Other";
         const rev = parseFloat(item.est_amount) || 0;
         categoryRevenueMap[cat] = (categoryRevenueMap[cat] || 0) + rev;
       }
@@ -374,8 +374,7 @@ export async function GET(request: Request) {
 
     const categoryRevenue = Object.entries(categoryRevenueMap)
       .map(([category, revenue]) => ({ category, revenue }))
-      .sort((a, b) => b.revenue - a.revenue)
-      .slice(0, 5);
+      .sort((a, b) => b.revenue - a.revenue);
 
     const partyOrderCount: Record<string, number> = {};
     allOrders.forEach((o: any) => {
@@ -416,7 +415,7 @@ export async function GET(request: Request) {
       categoryStockMap[cat] = (categoryStockMap[cat] || 0) + Math.max(0, stockOf(i));
     });
     const inventoryByCategory = Object.entries(categoryStockMap)
-      .sort((a, b) => b[1] - a[1]).slice(0, 6)
+      .sort((a, b) => b[1] - a[1])
       .map(([category, qty]) => ({ category, qty: Math.round(qty) }));
     const lowStockItems = [...outOfStock, ...lowStock].slice(0, 8).map((i: any) => ({
       sku: i.item_name,

@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { v4 as uuidv4 } from "uuid";
 import { getAllO2DsForAnalytics, getPendingStepIdx } from "@/lib/o2d-sheets";
 import { addMessage } from "@/lib/chat-sheets";
+import { sendWhatsAppMessage } from "@/lib/maytapi";
+import { getUsers } from "@/lib/google-sheets";
 import type { ChatMessage } from "@/types/chat";
 
 export const dynamic = "force-dynamic";
@@ -73,10 +75,35 @@ export async function GET(req: NextRequest) {
       reply_to_id: "",
       forwarded_from: "",
     };
-    const ok = await addMessage(message);
-    if (!ok) return NextResponse.json({ sent: false, error: "Failed to write chat message" }, { status: 500 });
+    const chatOk = await addMessage(message).catch(() => false);
 
-    return NextResponse.json({ sent: true, to: RECEIVER, count: pendingBilty.length });
+    // WhatsApp bhi (Sahil, 2026-10-23) — number Users sheet se, taaki
+    // badalne par code touch na karna pade. Maytapi creds .env mein
+    // pehle se hain (customer-target wala hi gateway).
+    let waOk = false;
+    let waError = "";
+    try {
+      const users = await getUsers();
+      const receiver = (users as any[]).find(
+        (u: any) => String(u.username || "").trim().toUpperCase() === RECEIVER
+      );
+      const phone = String(receiver?.phone || "").trim();
+      if (phone) {
+        const res = await sendWhatsAppMessage(phone, text);
+        waOk = !!res.success;
+        if (!waOk) waError = String((res as any).error || "send failed");
+      } else {
+        waError = "Phone number not found in Users sheet";
+      }
+    } catch (e) {
+      waError = "WhatsApp send threw";
+      console.error("Bilty reminder WhatsApp failed:", e);
+    }
+
+    if (!chatOk && !waOk) {
+      return NextResponse.json({ sent: false, error: "Both chat and WhatsApp failed", waError }, { status: 500 });
+    }
+    return NextResponse.json({ sent: true, to: RECEIVER, count: pendingBilty.length, chat: chatOk, whatsapp: waOk, ...(waOk ? {} : { waError }) });
   } catch (error) {
     console.error("Bilty reminder cron failed:", error);
     return NextResponse.json({ error: "Cron failed" }, { status: 500 });

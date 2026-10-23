@@ -6,6 +6,7 @@ import { getFloorIMSItems } from "@/lib/ims-floor-sheets";
 import { buildIMSMovementMaps, enrichIMSItems } from "@/lib/ims-enrich";
 import { getIMSMasterItems, indexMasterByName, overlayFromMaster, masterItemKey } from "@/lib/ims-master-sheets";
 import { getBusySales } from "@/lib/busy-sale-sheets";
+import { getItemLedgerEntries } from "@/lib/item-ledger-sheets";
 import { IMS } from "@/types/ims";
 
 export const dynamic = "force-dynamic";
@@ -13,7 +14,7 @@ export const revalidate = 0;
 
 export async function GET() {
   try {
-    const [items, grns, outForm, gFloorLedger, firstFloorLedger, masterRows, busySales] = await Promise.all([
+    const [items, grns, outForm, gFloorLedger, firstFloorLedger, masterRows, busySales, ledgerEntries] = await Promise.all([
       getIMSItems(),
       getGRNItems(),
       getOutFormData(),
@@ -21,9 +22,13 @@ export async function GET() {
       getFloorIMSItems("1st"),
       getIMSMasterItems(),
       getBusySales(),
+      getItemLedgerEntries(),
     ]);
 
-    const maps = buildIMSMovementMaps(grns, outForm, gFloorLedger, firstFloorLedger, busySales);
+    // Item Ledger (Module A) entries add the two IN sources GRN doesn't
+    // cover — Locally Packed and Assembled — so live stock here matches
+    // the Item Ledger page.
+    const maps = buildIMSMovementMaps(grns, outForm, gFloorLedger, firstFloorLedger, busySales, ledgerEntries);
     const masterByName = indexMasterByName(masterRows);
     const enrichedItems = enrichIMSItems(items, maps).map((item) => {
       const overlaid = overlayFromMaster(item, masterByName.get(masterItemKey(item.item_name)), {

@@ -12,6 +12,7 @@ import { buildIMSMovementMaps, enrichIMSItems } from "@/lib/ims-enrich";
 import { getIMSMasterItems, indexMasterByName, overlayFromMaster, masterItemKey } from "@/lib/ims-master-sheets";
 import { rollupCategory } from "@/lib/category-rollup";
 import { getBusySales } from "@/lib/busy-sale-sheets";
+import { getItemLedgerEntries } from "@/lib/item-ledger-sheets";
 import { auth } from "@/auth";
 import { getWorkingHoursGapMs } from "@/lib/workingHours";
 
@@ -73,7 +74,7 @@ export async function GET(request: Request) {
       getAttendanceRecords(),
       (async () => {
         // Live stock + category come from the same pipeline as the IMS page (Master sheet overlay)
-        const [items, grns, outForm, gFloor, firstFloor, masterRows, busySales] = await Promise.all([
+        const [items, grns, outForm, gFloor, firstFloor, masterRows, busySales, ledgerEntries] = await Promise.all([
           getIMSItems(),
           getGRNItems(),
           getOutFormData(),
@@ -81,9 +82,12 @@ export async function GET(request: Request) {
           getFloorIMSItems("1st"),
           getIMSMasterItems(),
           getBusySales(),
+          getItemLedgerEntries(),
         ]);
         const masterByName = indexMasterByName(masterRows);
-        return enrichIMSItems(items, buildIMSMovementMaps(grns, outForm, gFloor, firstFloor, busySales))
+        // Item Ledger (Module A) IN entries included so dashboard stock
+        // matches the IMS and Item Ledger pages.
+        return enrichIMSItems(items, buildIMSMovementMaps(grns, outForm, gFloor, firstFloor, busySales, ledgerEntries))
           .map((item) => overlayFromMaster(item, masterByName.get(masterItemKey(item.item_name))));
       })(),
     ]);

@@ -142,10 +142,17 @@ export async function GET(request: Request) {
       const isHold = !!firstItem.hold;
       const isCancelled = !!firstItem.cancelled;
       const isArchived = !!(firstItem as any).is_archived;
-      const isPending = !isHold && !isCancelled && !isArchived && pendingStepIdx !== -1;
+      // Dispatch-pending (steps 1-7) is what the business means by a
+      // "pending/delayed order". Orders already dispatched but stuck on
+      // post-dispatch paperwork (8. Bill Update / 9. Bilty / 10. Delivery
+      // Doc / 11. Clear Payment) are counted separately — mixing them in
+      // made the tile show ~2x what the team expects (Sahil, 2026-10-23).
+      const hasOpenStep = !isHold && !isCancelled && !isArchived && pendingStepIdx !== -1;
+      const isPending = hasOpenStep && pendingStepIdx <= 7;
+      const isPostDispatchPending = hasOpenStep && pendingStepIdx >= 8;
       const pendingStepName = pendingStepIdx >= 1 ? `${pendingStepIdx}. ${O2D_STEPS[pendingStepIdx - 1] || ""}` : "";
 
-      return { orderNo, party: firstItem.party_name, createdAt, actual7, targetDateForOTD, isOTD, isDelayed, isDispatched, totalAmount, isReconfirmed, actual4, isPending, pendingStepName };
+      return { orderNo, party: firstItem.party_name, createdAt, actual7, targetDateForOTD, isOTD, isDelayed, isDispatched, totalAmount, isReconfirmed, actual4, isPending, isPostDispatchPending, pendingStepName };
     });
 
     // Attendance counts only the people whose attendance HO actually
@@ -645,6 +652,15 @@ export async function GET(request: Request) {
             { label: ">7 Days", count: delayAging.gt7.length },
           ],
           undispatchedList: undispatched.map((o: any) => ({
+            id: o.orderNo,
+            party: o.party,
+            amount: o.totalAmount,
+            date: o.createdAt.toISOString().split('T')[0],
+            step: o.pendingStepName || "",
+            remark: remarkByOrder[String(o.orderNo || "").toLowerCase()]?.remark || "",
+          })),
+          postDispatchCount: allOrders.filter((o: any) => o.isPostDispatchPending).length,
+          postDispatchList: allOrders.filter((o: any) => o.isPostDispatchPending).map((o: any) => ({
             id: o.orderNo,
             party: o.party,
             amount: o.totalAmount,

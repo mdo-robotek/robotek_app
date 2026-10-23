@@ -125,7 +125,10 @@ export async function GET(req: NextRequest) {
       const isHold = !!(firstItem as any).hold;
       const isCancelled = !!(firstItem as any).cancelled;
       const isArchived = !!(firstItem as any).is_archived;
-      const isPending = !isHold && !isCancelled && !isArchived && currentStep !== -1;
+      const hasOpenStep = !isHold && !isCancelled && !isArchived && currentStep !== -1;
+      // Dispatch-pending only (steps 1-7); post-dispatch paperwork counted separately.
+      const isPending = hasOpenStep && currentStep <= 7;
+      const isPostDispatchPending = hasOpenStep && currentStep >= 8;
       const pendingStepName = currentStep >= 1 ? `${currentStep}. ${O2D_STEPS[currentStep - 1] || ""}` : "";
 
       const totalAmount = items.reduce((sum, item) => sum + (parseFloat(item.est_amount) || 0), 0);
@@ -159,6 +162,7 @@ export async function GET(req: NextRequest) {
         isDispatched,
         currentStep,
         isPending,
+        isPostDispatchPending,
         pendingStepName,
         totalAmount,
         items: processedItems,
@@ -247,6 +251,8 @@ export async function GET(req: NextRequest) {
       totalAmount: filteredOrders.reduce((sum, o) => sum + o.totalAmount, 0),
       ordersList: filteredOrders.map(mapBasicOrder),
       pendingList: filteredOrders.filter(o => o.isPending).map(mapBasicOrder),
+      postDispatchPending: filteredOrders.filter(o => o.isPostDispatchPending).length,
+      postDispatchPendingList: filteredOrders.filter(o => o.isPostDispatchPending).map(mapBasicOrder),
       otdList: filteredOrders.filter(o => o.isOTD).map(mapBasicOrder),
       delayedList: filteredOrders.filter(o => o.isDelayed).map(mapBasicOrder)
     };

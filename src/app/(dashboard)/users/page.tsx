@@ -146,6 +146,16 @@ export default function UsersPage() {
     }
   };
 
+  // Auto-generate next unique employee code (RE###) from existing users
+  const nextEmpCode = () => {
+    let max = 0;
+    users.forEach(u => {
+      const m = String(u.id || "").trim().match(/^RE\s*0*(\d+)$/i);
+      if (m) max = Math.max(max, parseInt(m[1], 10));
+    });
+    return "RE" + String(max + 1).padStart(3, "0");
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -544,7 +554,7 @@ export default function UsersPage() {
               onClick={() => {
                 setEditingUser(null);
                 setFormData({
-                  id: Date.now().toString(),
+                  id: nextEmpCode(),
                   username: "",
                   email: "",
                   password: "",
@@ -954,15 +964,25 @@ export default function UsersPage() {
                   <input
                     type="text"
                     value={formData.id}
-                    onChange={(e) => setFormData({ ...formData, id: e.target.value })}
-                    className={`w-full bg-[#FFFBF0] dark:bg-zinc-900 px-3 py-1.5 rounded-lg border focus:border-[#FFD500] focus:bg-white dark:focus:bg-zinc-900 outline-none font-bold text-xs text-gray-800 dark:text-zinc-100 transition-all shadow-sm ${
-                      users.some(u => u.id === formData.id && u.id !== editingUser?.id) 
-                        ? 'border-red-500' 
+                    readOnly={!editingUser}
+                    onChange={(e) => editingUser && setFormData({ ...formData, id: e.target.value })}
+                    className={`w-full px-3 py-1.5 rounded-lg border focus:border-[#FFD500] outline-none font-bold text-xs transition-all shadow-sm ${
+                      !editingUser
+                        ? 'bg-gray-100 dark:bg-zinc-800 text-gray-500 dark:text-zinc-400 cursor-not-allowed border-orange-100 dark:border-zinc-800'
+                        : 'bg-[#FFFBF0] dark:bg-zinc-900 focus:bg-white dark:focus:bg-zinc-900 text-gray-800 dark:text-zinc-100'
+                    } ${
+                      users.some(u => u.id === formData.id && u.id !== editingUser?.id)
+                        ? 'border-red-500'
                         : 'border-orange-100 dark:border-zinc-800'
                     }`}
-                    placeholder="Enter Unique Emp Code"
+                    placeholder="Auto-generated"
                     required
                   />
+                  {!editingUser && (
+                    <p className="mt-1 text-[9px] font-black text-gray-400 uppercase tracking-widest">
+                      🔒 Auto-generated unique code
+                    </p>
+                  )}
                   {(() => {
                     const existingUser = users.find(u => u.id === formData.id && u.id !== editingUser?.id);
                     if (existingUser) {

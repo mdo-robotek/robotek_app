@@ -155,6 +155,20 @@ export async function GET(req: NextRequest) {
       }
     }
 
+    // Backfill missing party mobile numbers from feeder call logs (match by name).
+    // O2D rows carry no party_number, so phone-based matching alone finds nothing.
+    const numberByName: Record<string, string> = {};
+    (scotFeeder as any[]).forEach((f: any) => {
+      const n = (f.toName || "").trim().toLowerCase();
+      if (n && f.toNumber && !numberByName[n]) numberByName[n] = String(f.toNumber);
+    });
+    (callsData as any[]).forEach((c: any) => {
+      if (!c.mobileNum) {
+        const n = (c.partyName || "").trim().toLowerCase();
+        if (numberByName[n]) c.mobileNum = numberByName[n];
+      }
+    });
+
     // 1. Filter calls & follow-ups in the requested date range
     const rangeCalls = scotFeeder.filter(call => {
       const dateObj = excelSerialToDate(call.callDate);
@@ -292,10 +306,12 @@ export async function GET(req: NextRequest) {
           fu.partyName && fu.partyName.trim().toLowerCase() === partyKey
         );
 
-        // Call attempts in data feeder in last week matching either employee name or party phone number
-        const partyWeekFeederCalls = rangeCalls.filter(c => 
-          matchSalesCoordinator(salesCoordinatorName, c.employeeName) && 
-          matchPartyNumber(c.toNumber, party.mobileNum)
+        // Call attempts in data feeder in last week — match by party NAME first
+        // (feeder toName == party name), phone number as fallback.
+        const partyWeekFeederCalls = rangeCalls.filter(c =>
+          matchSalesCoordinator(salesCoordinatorName, c.employeeName) &&
+          (((c.toName || "").trim().toLowerCase() === partyKey) ||
+            matchPartyNumber(c.toNumber, party.mobileNum))
         );
 
         const latestStatus = latestFollowUps[partyKey]?.status || "Pending";

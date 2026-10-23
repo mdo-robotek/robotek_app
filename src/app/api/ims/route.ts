@@ -5,6 +5,7 @@ import { getOutFormData } from "@/lib/o2d-sheets";
 import { getFloorIMSItems } from "@/lib/ims-floor-sheets";
 import { buildIMSMovementMaps, enrichIMSItems } from "@/lib/ims-enrich";
 import { getIMSMasterItems, indexMasterByName, overlayFromMaster, masterItemKey } from "@/lib/ims-master-sheets";
+import { getBusySales } from "@/lib/busy-sale-sheets";
 import { IMS } from "@/types/ims";
 
 export const dynamic = "force-dynamic";
@@ -12,16 +13,17 @@ export const revalidate = 0;
 
 export async function GET() {
   try {
-    const [items, grns, outForm, gFloorLedger, firstFloorLedger, masterRows] = await Promise.all([
+    const [items, grns, outForm, gFloorLedger, firstFloorLedger, masterRows, busySales] = await Promise.all([
       getIMSItems(),
       getGRNItems(),
       getOutFormData(),
       getFloorIMSItems("g"),
       getFloorIMSItems("1st"),
       getIMSMasterItems(),
+      getBusySales(),
     ]);
 
-    const maps = buildIMSMovementMaps(grns, outForm, gFloorLedger, firstFloorLedger);
+    const maps = buildIMSMovementMaps(grns, outForm, gFloorLedger, firstFloorLedger, busySales);
     const masterByName = indexMasterByName(masterRows);
     const enrichedItems = enrichIMSItems(items, maps).map((item) => {
       const overlaid = overlayFromMaster(item, masterByName.get(masterItemKey(item.item_name)), {

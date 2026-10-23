@@ -43,7 +43,8 @@ export function buildIMSMovementMaps(
   grns: { Item_Name?: string; Qty?: string; cancelled?: string | boolean; status_1?: string; Packed_Unpacked?: string }[],
   outForm: { description?: string; qty?: string; date?: string; updated_at?: string }[],
   gFloorLedger: FloorLedgerRow[] = [],
-  firstFloorLedger: FloorLedgerRow[] = []
+  firstFloorLedger: FloorLedgerRow[] = [],
+  busySales: { date?: string; item?: string; qty?: number }[] = []
 ): IMSMovementMaps {
   const inQtyMap: Record<string, number> = {};
   const outQtyMap: Record<string, number> = {};
@@ -73,6 +74,26 @@ export function buildIMSMovementMaps(
   const now = Date.now();
   const sixtyDaysMs = 60 * 24 * 60 * 60 * 1000;
 
+  // Busy sale register = single source of truth for sales OUT.
+  // Any item present in the Busy register takes its entire sales OUT from
+  // there; Out Form / floor OUT entries for those items are skipped to avoid
+  // double counting. Items absent from Busy (raw material, factory issues)
+  // keep using Out Form + floor OUT as before.
+  const busyKeys = new Set<string>();
+  busySales.forEach((row) => {
+    const qty = Number(row.qty) || 0;
+    if (!qty) return;
+    const key = rememberName(row.item || "");
+    if (!key) return;
+    busyKeys.add(key);
+    o2dKeys.add(key);
+    outQtyMap[key] = (outQtyMap[key] || 0) + qty;
+    const ts = parseDateStr(row.date || "");
+    if (ts > 0 && now - ts <= sixtyDaysMs) {
+      outQty60DaysMap[key] = (outQty60DaysMap[key] || 0) + qty;
+    }
+  });
+
   outForm.forEach((row) => {
     const rowDateTs = parseDateStr(row.date || row.updated_at || "");
     const isWithin60Days = rowDateTs > 0 && now - rowDateTs <= sixtyDaysMs;
@@ -80,6 +101,7 @@ export function buildIMSMovementMaps(
     const addQty = (desc: string, qty: number) => {
       const key = rememberName(desc);
       if (!key) return;
+      if (busyKeys.has(key)) return; // sales OUT already counted from Busy register
       o2dKeys.add(key);
       outQtyMap[key] = (outQtyMap[key] || 0) + qty;
       if (isWithin60Days) {
@@ -117,7 +139,7 @@ export function buildIMSMovementMaps(
     if (inQ > 0) {
       inQtyMap[key] = (inQtyMap[key] || 0) + inQ;
     }
-    if (outQ > 0) {
+    if (outQ > 0 && !busyKeys.has(key)) {
       outQtyMap[key] = (outQtyMap[key] || 0) + outQ;
       if (isWithin60Days) {
         outQty60DaysMap[key] = (outQty60DaysMap[key] || 0) + outQ;

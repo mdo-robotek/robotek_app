@@ -11,6 +11,7 @@ import { getFloorIMSItems } from "@/lib/ims-floor-sheets";
 import { buildIMSMovementMaps, enrichIMSItems } from "@/lib/ims-enrich";
 import { getIMSMasterItems, indexMasterByName, overlayFromMaster, masterItemKey } from "@/lib/ims-master-sheets";
 import { rollupCategory } from "@/lib/category-rollup";
+import { getBusySales } from "@/lib/busy-sale-sheets";
 import { auth } from "@/auth";
 import { getWorkingHoursGapMs } from "@/lib/workingHours";
 
@@ -72,16 +73,17 @@ export async function GET(request: Request) {
       getAttendanceRecords(),
       (async () => {
         // Live stock + category come from the same pipeline as the IMS page (Master sheet overlay)
-        const [items, grns, outForm, gFloor, firstFloor, masterRows] = await Promise.all([
+        const [items, grns, outForm, gFloor, firstFloor, masterRows, busySales] = await Promise.all([
           getIMSItems(),
           getGRNItems(),
           getOutFormData(),
           getFloorIMSItems("g"),
           getFloorIMSItems("1st"),
           getIMSMasterItems(),
+          getBusySales(),
         ]);
         const masterByName = indexMasterByName(masterRows);
-        return enrichIMSItems(items, buildIMSMovementMaps(grns, outForm, gFloor, firstFloor))
+        return enrichIMSItems(items, buildIMSMovementMaps(grns, outForm, gFloor, firstFloor, busySales))
           .map((item) => overlayFromMaster(item, masterByName.get(masterItemKey(item.item_name))));
       })(),
     ]);

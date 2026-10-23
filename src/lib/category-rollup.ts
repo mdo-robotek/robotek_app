@@ -3,7 +3,7 @@
 // DC + DC (W) + ANS DC + ANS DC W → DC,
 // EAR + ANS EAR → EAR, N Band + N Band (W) + ANS NB → N Band,
 // TWS + TWS (W) + ANS TWS → TWS, CHGR + ANS CHGR + ANS SC → ANS CHGR,
-// Touch + ADD M + DS ADD MAT. + MIC + plain cell → General,
+// Touch + ADD M + DS ADD MAT. + MIC + plain cell + Other/blank → General,
 // plus case-duplicate merge (sc/SC).
 const CAT_CANON: Record<string, string> = {
   "sc": "SC", "headphone": "Headphone",
@@ -14,13 +14,13 @@ const CAT_CANON: Record<string, string> = {
   "n band": "N Band", "n band (w)": "N Band", "ans nb": "N Band",
   "spk": "SPK", "pb": "PB", "rb": "RB",
   "general": "General", "add m": "General", "touch": "General",
-  "mic": "General", "plain cell": "General",
+  "mic": "General", "plain cell": "General", "other": "General",
   "long": "Long", "pro": "PRO",
 };
 
 export function rollupCategory(raw?: string): string {
   const c = (raw || "").trim();
-  if (!c) return "Other";
+  if (!c) return "General";
   const l = c.toLowerCase();
   if (l.startsWith("ans poly")) return "ANS POLY";
   if (l.startsWith("poly")) return "POLY";

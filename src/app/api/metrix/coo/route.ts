@@ -406,6 +406,10 @@ export async function GET(request: Request) {
       const reorder = Math.max(5, avg * 7); // under 7 days of cover
       return qty > 0 && qty <= reorder;
     });
+    // Negative stock = ledger entry errors (more OUT than IN recorded)
+    const negativeStock = activeIMS
+      .filter((i: any) => stockOf(i) < 0)
+      .sort((a: any, b: any) => stockOf(a) - stockOf(b));
     const categoryStockMap: Record<string, number> = {};
     activeIMS.forEach((i: any) => {
       const cat = i.category || "Other";
@@ -567,6 +571,8 @@ export async function GET(request: Request) {
         lowStockCount: lowStock.length,
         inventoryByCategory,
         lowStockItems,
+        negativeCount: negativeStock.length,
+        negativeList: negativeStock.map((i: any) => ({ sku: i.item_name, category: i.category, stockLeft: Math.round(stockOf(i)) })),
         outOfStockList: outOfStock.map((i: any) => ({ sku: i.item_name, category: i.category, stockLeft: Math.round(stockOf(i)) })),
         lowStockList: lowStock.map((i: any) => ({ sku: i.item_name, category: i.category, stockLeft: Math.round(stockOf(i)) }))
       },

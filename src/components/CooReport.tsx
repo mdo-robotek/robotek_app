@@ -552,7 +552,7 @@ export default function CooReport({ data: coo, loading }: CooReportProps) {
             </span>
           </div>
 
-          <div className="grid grid-cols-3 gap-6 mb-10">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
              <div className="bg-gray-50 dark:bg-white/5 rounded-2xl p-6 text-center border border-transparent hover:border-indigo-500/20 transition-all">
                 <p className="text-3xl font-black tracking-tighter">{inv.totalSKUs || 0}</p>
                 <p className="text-[10px] font-black text-gray-400 uppercase mt-2 tracking-widest">Total SKUs</p>
@@ -573,6 +573,14 @@ export default function CooReport({ data: coo, loading }: CooReportProps) {
                 <p className="text-3xl font-black text-amber-500 tracking-tighter">{inv.lowStockCount || 0}</p>
                 <p className="text-[10px] font-black text-amber-500 uppercase mt-2 tracking-widest">Low Stock</p>
                 <p className="text-[9px] font-bold text-amber-400 mt-1 uppercase">Reorder needed</p>
+             </div>
+             <div
+               className="bg-fuchsia-50 dark:bg-fuchsia-500/5 rounded-2xl p-6 text-center border border-fuchsia-100 dark:border-fuchsia-500/20 cursor-pointer hover:bg-fuchsia-100 dark:hover:bg-fuchsia-500/10 transition-colors"
+               onClick={() => setDrillDownModal({ isOpen: true, title: "Negative Stock — Entry Errors", data: inv.negativeList || [], columns: [{ key: 'sku', label: 'SKU' }, { key: 'category', label: 'Category' }, { key: 'stockLeft', label: 'Stock Left' }] })}
+             >
+                <p className="text-3xl font-black text-fuchsia-500 tracking-tighter">{inv.negativeCount || 0}</p>
+                <p className="text-[10px] font-black text-fuchsia-500 uppercase mt-2 tracking-widest">Negative Stock</p>
+                <p className="text-[9px] font-bold text-fuchsia-400 mt-1 uppercase">Entry error — fix</p>
              </div>
           </div>
 

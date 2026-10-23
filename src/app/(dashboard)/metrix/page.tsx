@@ -566,15 +566,10 @@ export default function MetrixPage() {
                             <Pie
                               data={data.parties.top20.slice(0, 8)}
                               cx="50%" cy="50%"
-                              innerRadius={35} outerRadius={60}
+                              innerRadius={48} outerRadius={78}
                               paddingAngle={5}
                               dataKey="count" nameKey="party"
-                              label={({ party, percent }: any) => {
-                                const safeName = String(party || "Unknown");
-                                const truncated = safeName.length > 12 ? safeName.slice(0, 12) + '...' : safeName;
-                                return `${truncated} (${(percent * 100).toFixed(0)}%)`;
-                              }}
-                              labelLine={true}
+                              labelLine={false}
                             >
                               {data.parties.top20.slice(0, 8).map((_: any, i: number) => <Cell key={i} fill={colors[i % colors.length]} />)}
                             </Pie>
@@ -583,7 +578,7 @@ export default function MetrixPage() {
                         </ResponsiveContainer>
                       </div>
                       <div className="mt-6 space-y-2 w-full">
-                        {data.parties.top20.slice(0, 5).map((p: any, i: number) => (
+                        {data.parties.top20.slice(0, 8).map((p: any, i: number) => (
                           <div key={i} className="flex items-center justify-between p-2 bg-gray-50 dark:bg-white/5 rounded-xl border border-transparent">
                             <div className="flex items-center gap-2 overflow-hidden">
                               <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: colors[i % colors.length] }} />
@@ -606,15 +601,10 @@ export default function MetrixPage() {
                             <Pie
                               data={data.categories.top20.slice(0, 8)}
                               cx="50%" cy="50%"
-                              innerRadius={35} outerRadius={60}
+                              innerRadius={48} outerRadius={78}
                               paddingAngle={5}
                               dataKey="count" nameKey="category"
-                              label={({ category, percent }: any) => {
-                                const safeName = String(category || "Unknown");
-                                const truncated = safeName.length > 12 ? safeName.slice(0, 12) + '...' : safeName;
-                                return `${truncated} (${(percent * 100).toFixed(0)}%)`;
-                              }}
-                              labelLine={true}
+                              labelLine={false}
                             >
                               {data.categories.top20.slice(0, 8).map((_: any, i: number) => <Cell key={i} fill={colors[i % colors.length]} />)}
                             </Pie>
@@ -623,7 +613,7 @@ export default function MetrixPage() {
                         </ResponsiveContainer>
                       </div>
                       <div className="mt-6 space-y-2 w-full">
-                        {data.categories.top20.slice(0, 5).map((c: any, i: number) => (
+                        {data.categories.top20.slice(0, 8).map((c: any, i: number) => (
                           <div key={i} className="flex items-center justify-between p-2 bg-gray-50 dark:bg-white/5 rounded-xl border border-transparent">
                             <div className="flex items-center gap-2 overflow-hidden">
                               <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: colors[i % colors.length] }} />

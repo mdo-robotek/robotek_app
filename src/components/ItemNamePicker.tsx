@@ -73,7 +73,7 @@ export default function ItemNamePicker({
         placeholder={placeholder}
         className={
           className ||
-          "w-full px-4 py-3 bg-[#FFFBF0] dark:bg-navy-800 border border-orange-100/50 dark:border-navy-800 rounded-xl font-bold text-sm text-gray-900 dark:text-white outline-none focus:border-[#003875] dark:focus:border-[#FFD500] transition-all shadow-sm"
+          "w-full px-4 py-3 bg-[#FFFFFF] dark:bg-navy-800 border border-orange-100/50 dark:border-navy-800 rounded-xl font-bold text-sm text-gray-900 dark:text-white outline-none focus:border-[#2563EB] dark:focus:border-[#60A5FA] transition-all shadow-sm"
         }
       />
       <datalist id={listId}>
@@ -83,7 +83,7 @@ export default function ItemNamePicker({
       </datalist>
       {!inList && (
         <div className="flex items-center gap-2 flex-wrap">
-          <p className="text-[10px] font-black text-amber-600 uppercase tracking-wide">
+          <p className="text-[13px] font-semibold text-amber-600 tracking-wide">
             ⚠ Ye naam official list mein nahi hai — spelling check karein
           </p>
           {isAdmin && (
@@ -91,14 +91,14 @@ export default function ItemNamePicker({
               type="button"
               onClick={handleAdd}
               disabled={adding}
-              className="text-[10px] font-black uppercase tracking-wide px-2.5 py-1 rounded-full bg-[#003875] text-white hover:bg-[#002a5c] disabled:opacity-50 transition-colors"
+              className="text-[13px] font-semibold tracking-wide px-2.5 py-1 rounded-full bg-[#2563EB] text-white hover:bg-[#1D4ED8] disabled:opacity-50 transition-colors"
             >
               {adding ? "Adding..." : "+ Add as new official name"}
             </button>
           )}
         </div>
       )}
-      {addMsg && <p className="text-[10px] font-black text-emerald-600 uppercase tracking-wide">{addMsg}</p>}
+      {addMsg && <p className="text-[13px] font-semibold text-emerald-600 tracking-wide">{addMsg}</p>}
     </div>
   );
 }

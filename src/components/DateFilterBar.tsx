@@ -50,7 +50,7 @@ export default function DateFilterBar({
     theme === 'emerald' ? 'text-emerald-600' :
     theme === 'black' ? 'text-gray-900 dark:text-gray-300' :
     theme === 'blue' ? 'text-blue-600' :
-    'text-[#003875]';
+    'text-[#2563EB]';
 
   const accentBg =
     theme === 'orange' ? 'bg-orange-600' :
@@ -66,7 +66,7 @@ export default function DateFilterBar({
     theme === 'emerald' ? 'border-emerald-200 focus:ring-emerald-500 text-emerald-700' :
     theme === 'black' ? 'border-gray-200 focus:ring-gray-500 text-gray-900 dark:text-gray-200' :
     theme === 'blue' ? 'border-blue-200 focus:ring-blue-500 text-blue-700' :
-    'border-gray-200 focus:ring-[#003875] text-[#003875]';
+    'border-gray-200 focus:ring-[#2563EB] text-[#2563EB]';
 
   const handlePrev = () => {
     switch (period) {
@@ -137,7 +137,7 @@ export default function DateFilterBar({
       <button onClick={handlePrev} className={`p-0.5 hover:bg-gray-100 dark:hover:bg-white/10 rounded transition-colors ${accentText}`}>
         <ChevronLeftIcon className="w-4 h-4" />
       </button>
-      <span className={`text-[10px] font-black uppercase tracking-wider px-1 whitespace-nowrap ${accentText}`}>
+      <span className={`text-[13px] font-semibold  tracking-wider px-1 whitespace-nowrap ${accentText}`}>
         {getPeriodLabel()}
       </span>
       <button onClick={handleNext} className={`p-0.5 hover:bg-gray-100 dark:hover:bg-white/10 rounded transition-colors ${accentText}`}>
@@ -162,14 +162,14 @@ export default function DateFilterBar({
         type="date"
         value={startDate ? format(startDate, 'yyyy-MM-dd') : ''}
         onChange={handleCustomStartChange}
-        className={`bg-transparent text-[10px] font-black outline-none uppercase cursor-pointer w-[108px] ${accentText}`}
+        className={`bg-transparent text-[13px] font-semibold outline-none  cursor-pointer w-[108px] ${accentText}`}
       />
-      <span className="text-[9px] font-black text-gray-400">TO</span>
+      <span className="text-[13px] font-semibold text-gray-400">TO</span>
       <input
         type="date"
         value={endDate ? format(endDate, 'yyyy-MM-dd') : ''}
         onChange={handleCustomEndChange}
-        className={`bg-transparent text-[10px] font-black outline-none uppercase cursor-pointer w-[108px] ${accentText}`}
+        className={`bg-transparent text-[13px] font-semibold outline-none  cursor-pointer w-[108px] ${accentText}`}
       />
       {period === 'CUSTOM' && (
         <button onClick={clearCustom} className="p-0.5 hover:bg-gray-200 dark:hover:bg-white/10 rounded text-gray-500 transition-colors">
@@ -186,7 +186,7 @@ export default function DateFilterBar({
           <select
             value={period}
             onChange={(e) => handlePeriodChange(e.target.value as FilterPeriod)}
-            className={`appearance-none pl-3 pr-8 py-1.5 rounded-lg border bg-gray-50 dark:bg-[#0a0f1c] text-[10px] font-black uppercase tracking-wider outline-none focus:ring-2 cursor-pointer ${selectAccent}`}
+            className={`appearance-none pl-3 pr-8 py-1.5 rounded-lg border bg-gray-50 dark:bg-[#0a0f1c] text-[13px] font-semibold  tracking-wider outline-none focus:ring-2 cursor-pointer ${selectAccent}`}
           >
             {periods.map((p) => (
               <option key={p} value={p}>{periodLabels[p]}</option>
@@ -211,7 +211,7 @@ export default function DateFilterBar({
           <button
             key={p}
             onClick={() => handlePeriodChange(p)}
-            className={`px-4 py-2 rounded-full text-[10px] font-black tracking-widest uppercase transition-all whitespace-nowrap ${
+            className={`px-4 py-2 rounded-full text-[13px] font-semibold   transition-all whitespace-nowrap ${
               period === p
                 ? `${accentBg} text-white shadow-md`
                 : (theme === 'orange' ? 'bg-white text-orange-600 border border-gray-200 hover:bg-orange-50' : 
@@ -219,7 +219,7 @@ export default function DateFilterBar({
                    theme === 'emerald' ? 'bg-white text-emerald-600 border border-gray-200 hover:bg-emerald-50' :
                    theme === 'black' ? 'bg-white text-gray-900 border border-gray-200 hover:bg-gray-100 dark:bg-transparent dark:text-gray-300 dark:border-gray-700 dark:hover:bg-gray-800' :
                    theme === 'blue' ? 'bg-white text-blue-600 border border-gray-200 hover:bg-blue-50' :
-                   'bg-white text-[#003875] border border-gray-200 hover:bg-gray-50')
+                   'bg-white text-[#2563EB] border border-gray-200 hover:bg-gray-50')
             }`}
           >
             {p}

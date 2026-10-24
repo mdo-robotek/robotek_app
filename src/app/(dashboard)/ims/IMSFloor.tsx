@@ -175,10 +175,10 @@ const computeAuditDiff = (physicalQty: number, liveStock: number) => {
 };
 
 const tableInputClass =
-  "w-full px-2 py-1.5 text-[11px] font-bold text-gray-900 dark:text-white bg-white dark:bg-[#0a0f1c] border border-gray-200 dark:border-white/10 rounded-md outline-none focus:ring-1 focus:ring-[#003875] dark:focus:ring-[#FFD500] uppercase";
+  "w-full px-2 py-1.5 text-[14px] font-bold text-gray-900 dark:text-white bg-white dark:bg-[#0a0f1c] border border-gray-200 dark:border-white/10 rounded-md outline-none focus:ring-1 focus:ring-[#2563EB] dark:focus:ring-[#60A5FA] ";
 
 const thClass =
-  "py-2 px-2 text-[9px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest text-left whitespace-nowrap bg-gray-50 dark:bg-[#1f2937] border-b border-gray-200 dark:border-white/10";
+  "py-2 px-2 text-[13px] font-semibold text-gray-500 dark:text-gray-400   text-left whitespace-nowrap bg-gray-50 dark:bg-[#1f2937] border-b border-gray-200 dark:border-white/10";
 
 const tdClass = "py-1.5 px-2 align-middle border-b border-gray-100 dark:border-white/5";
 
@@ -199,10 +199,10 @@ const FloatingInput = ({
       disabled={disabled}
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className={`block px-3 pb-2.5 pt-2.5 w-full text-[11px] font-bold text-gray-900 bg-transparent rounded-lg border-2 border-gray-200 appearance-none dark:text-white dark:border-white/10 dark:focus:border-[#FFD500] focus:outline-none focus:ring-0 focus:border-[#003875] uppercase disabled:opacity-50 disabled:bg-gray-100 dark:disabled:bg-white/5 relative z-0 ${Icon ? 'pl-9' : ''}`}
+      className={`block px-3 pb-2.5 pt-2.5 w-full text-[14px] font-bold text-gray-900 bg-transparent rounded-lg border-2 border-gray-200 appearance-none dark:text-white dark:border-white/10 dark:focus:border-[#60A5FA] focus:outline-none focus:ring-0 focus:border-[#2563EB]  disabled:opacity-50 disabled:bg-gray-100 dark:disabled:bg-white/5 relative z-0 ${Icon ? 'pl-9' : ''}`}
       placeholder=" "
     />
-    <label htmlFor={name} className="absolute text-[9px] font-black text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-white/[0.02] px-1 start-3 uppercase tracking-widest top-[-6px] z-10 leading-none">
+    <label htmlFor={name} className="absolute text-[13px] font-semibold text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-white/[0.02] px-1 start-3 top-[-6px] z-10 leading-none">
       {label}
     </label>
   </div>
@@ -1292,8 +1292,8 @@ function parseDateStr(dStr: string) {
               <ClipboardDocumentListIcon className="w-7 h-7 text-white" />
             </div>
             <div>
-              <h1 className={`text-2xl font-black uppercase tracking-tight leading-none mb-1 ${location === '1st' ? 'text-purple-600 dark:text-purple-400' : 'text-emerald-600 dark:text-emerald-400'}`}>{title}</h1>
-              <p className={`text-[10px] font-black uppercase tracking-widest ${location === '1st' ? 'text-purple-600/70 dark:text-purple-400/70' : 'text-emerald-600/70 dark:text-emerald-400/70'}`}>Inventory Management System</p>
+              <h1 className={`text-2xl font-semibold  tracking-tight leading-none mb-1 ${location === '1st' ? 'text-purple-600 dark:text-purple-400' : 'text-emerald-600 dark:text-emerald-400'}`}>{title}</h1>
+              <p className={`text-[13px] font-semibold   ${location === '1st' ? 'text-purple-600/70 dark:text-purple-400/70' : 'text-emerald-600/70 dark:text-emerald-400/70'}`}>Inventory Management System</p>
             </div>
           </div>
         </div>
@@ -1301,7 +1301,7 @@ function parseDateStr(dStr: string) {
         <div className="flex items-center gap-2 bg-gray-100 dark:bg-white/5 p-1 rounded-xl shrink-0 self-start lg:self-auto">
           <button
             onClick={() => setViewMode('default')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-black uppercase tracking-wider transition-all ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[14px] font-semibold  tracking-wider transition-all ${
               viewMode === 'default' 
                 ? `bg-white dark:bg-[#111827] shadow-sm ${location === '1st' ? 'text-purple-600 dark:text-purple-400' : 'text-emerald-600 dark:text-emerald-400'}`
                 : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
@@ -1311,9 +1311,9 @@ function parseDateStr(dStr: string) {
           </button>
           <button
             onClick={() => setViewMode('timeseries')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-black uppercase tracking-wider transition-all ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[14px] font-semibold  tracking-wider transition-all ${
               viewMode === 'timeseries' 
-                ? 'bg-white dark:bg-[#111827] text-[#003875] dark:text-[#FFD500] shadow-sm' 
+                ? 'bg-white dark:bg-[#111827] text-[#2563EB] dark:text-[#60A5FA] shadow-sm' 
                 : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
             }`}
           >
@@ -1321,7 +1321,7 @@ function parseDateStr(dStr: string) {
           </button>
           <button
             onClick={() => setViewMode('datewise')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-black uppercase tracking-wider transition-all ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[14px] font-semibold  tracking-wider transition-all ${
               viewMode === 'datewise' 
                 ? `bg-white dark:bg-[#111827] shadow-sm ${location === '1st' ? 'text-purple-600 dark:text-purple-400' : 'text-emerald-600 dark:text-emerald-400'}`
                 : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
@@ -1333,7 +1333,7 @@ function parseDateStr(dStr: string) {
 
         <div className="flex items-center gap-3 w-full lg:w-auto">
 
-          <button onClick={handleExport} className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-[11px] font-black uppercase tracking-wider transition-all border shadow-sm whitespace-nowrap ${
+          <button onClick={handleExport} className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-[14px] font-semibold  tracking-wider transition-all border shadow-sm whitespace-nowrap ${
             location === '1st' 
               ? 'bg-purple-50 hover:bg-purple-100 dark:bg-purple-500/10 dark:hover:bg-purple-500/20 text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20'
               : 'bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-500/10 dark:hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'
@@ -1346,7 +1346,7 @@ function parseDateStr(dStr: string) {
             setAuditPasteText("");
             setIsAuditModalOpen(true);
             addAuditRow(); // start with one empty row
-          }} className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-[11px] font-black uppercase tracking-wider transition-all shadow-sm border ${
+          }} className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-[14px] font-semibold  tracking-wider transition-all shadow-sm border ${
             location === '1st' 
               ? 'bg-purple-100 hover:bg-purple-200 dark:bg-purple-500/20 dark:hover:bg-purple-500/30 text-purple-700 dark:text-purple-400 border-purple-200 dark:border-purple-500/30' 
               : 'bg-emerald-100 hover:bg-emerald-200 dark:bg-emerald-500/20 dark:hover:bg-emerald-500/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/30'
@@ -1363,7 +1363,7 @@ function parseDateStr(dStr: string) {
               setBulkRows([{ id: Date.now().toString(), item_name: '', category: '', type: 'IN', qty: '', date: '', packed_status: 'UNPACKED' }]);
               setItemModalOpen(true);
             }}
-            className="flex items-center gap-2 px-4 py-2 text-white rounded-lg text-[11px] font-black uppercase tracking-widest transition-all shadow-md hover:-translate-y-0.5 whitespace-nowrap bg-emerald-600 hover:bg-emerald-700"
+            className="flex items-center gap-2 px-4 py-2 text-white rounded-lg text-[14px] font-semibold transition-all shadow-md hover:-translate-y-0.5 whitespace-nowrap bg-emerald-600 hover:bg-emerald-700"
           >
             <PlusIcon className="w-4 h-4 stroke-2" /> IN from Production
           </button>
@@ -1374,7 +1374,7 @@ function parseDateStr(dStr: string) {
               setBulkRows([{ id: Date.now().toString(), item_name: '', category: '', type: 'OUT', qty: '', date: '', packed_status: 'PACKED' }]);
               setItemModalOpen(true);
             }}
-            className="flex items-center gap-2 px-4 py-2 text-white rounded-lg text-[11px] font-black uppercase tracking-widest transition-all shadow-md hover:-translate-y-0.5 whitespace-nowrap bg-teal-600 hover:bg-teal-700"
+            className="flex items-center gap-2 px-4 py-2 text-white rounded-lg text-[14px] font-semibold transition-all shadow-md hover:-translate-y-0.5 whitespace-nowrap bg-teal-600 hover:bg-teal-700"
           >
             <PlusIcon className="w-4 h-4 stroke-2" /> Out from SFG
           </button>
@@ -1388,7 +1388,7 @@ function parseDateStr(dStr: string) {
               setBulkRows([{ id: Date.now().toString(), item_name: '', category: '', type: 'OUT', qty: '', date: '', packed_status: 'PACKED' }]);
               setItemModalOpen(true);
             }}
-            className="flex items-center gap-2 px-4 py-2 text-white rounded-lg text-[11px] font-black uppercase tracking-widest transition-all shadow-md hover:-translate-y-0.5 whitespace-nowrap bg-emerald-600 hover:bg-emerald-700"
+            className="flex items-center gap-2 px-4 py-2 text-white rounded-lg text-[14px] font-semibold transition-all shadow-md hover:-translate-y-0.5 whitespace-nowrap bg-emerald-600 hover:bg-emerald-700"
           >
             <PlusIcon className="w-4 h-4 stroke-2" /> Out from SFG
           </button>
@@ -1401,7 +1401,7 @@ function parseDateStr(dStr: string) {
               setBulkRows([{ id: Date.now().toString(), item_name: '', category: '', type: allowManualIn ? 'IN' : 'OUT', qty: '', date: '', packed_status: '' }]);
               setItemModalOpen(true);
             }}
-            className={`flex items-center gap-2 px-4 py-2 text-white rounded-lg text-[11px] font-black uppercase tracking-widest transition-all shadow-md hover:-translate-y-0.5 whitespace-nowrap ${
+            className={`flex items-center gap-2 px-4 py-2 text-white rounded-lg text-[14px] font-semibold   transition-all shadow-md hover:-translate-y-0.5 whitespace-nowrap ${
               location === '1st' ? 'bg-purple-600 hover:bg-purple-700' : 'bg-emerald-600 hover:bg-emerald-700'
             }`}
           >
@@ -1453,7 +1453,7 @@ function parseDateStr(dStr: string) {
             <select
               value={packedFilter}
               onChange={(e) => setPackedFilter(e.target.value as 'ALL' | 'PACKED' | 'UNPACKED')}
-              className="px-3 py-2 bg-gray-50 dark:bg-[#0a0f1c] border border-gray-200 dark:border-white/10 rounded-lg text-[11px] font-black uppercase tracking-wider outline-none focus:ring-2 focus:ring-purple-500 dark:text-white shadow-sm h-[42px] cursor-pointer shrink-0"
+              className="px-3 py-2 bg-gray-50 dark:bg-[#0a0f1c] border border-gray-200 dark:border-white/10 rounded-lg text-[14px] font-semibold tracking-wider outline-none focus:ring-2 focus:ring-purple-500 dark:text-white shadow-sm h-[42px] cursor-pointer shrink-0"
             >
               <option value="ALL">All Packed</option>
               <option value="PACKED">PACKED</option>
@@ -1463,7 +1463,7 @@ function parseDateStr(dStr: string) {
           <select
             value={activeFilter}
             onChange={(e) => setActiveFilter(e.target.value as ActiveStatusFilter)}
-            className={`px-3 py-2 bg-gray-50 dark:bg-[#0a0f1c] border border-gray-200 dark:border-white/10 rounded-lg text-[11px] font-black uppercase tracking-wider outline-none dark:text-white shadow-sm h-[42px] cursor-pointer shrink-0 ${
+            className={`px-3 py-2 bg-gray-50 dark:bg-[#0a0f1c] border border-gray-200 dark:border-white/10 rounded-lg text-[14px] font-semibold  tracking-wider outline-none dark:text-white shadow-sm h-[42px] cursor-pointer shrink-0 ${
               location === '1st' ? 'focus:ring-2 focus:ring-purple-500' : 'focus:ring-2 focus:ring-emerald-500'
             }`}
           >
@@ -1475,7 +1475,7 @@ function parseDateStr(dStr: string) {
             <select
               value={transferFilter}
               onChange={(e) => setTransferFilter(e.target.value as TransferFilter)}
-              className="px-3 py-2 bg-gray-50 dark:bg-[#0a0f1c] border border-gray-200 dark:border-white/10 rounded-lg text-[11px] font-black uppercase tracking-wider outline-none focus:ring-2 focus:ring-emerald-500 dark:text-white shadow-sm h-[42px] cursor-pointer shrink-0"
+              className="px-3 py-2 bg-gray-50 dark:bg-[#0a0f1c] border border-gray-200 dark:border-white/10 rounded-lg text-[14px] font-semibold tracking-wider outline-none focus:ring-2 focus:ring-emerald-500 dark:text-white shadow-sm h-[42px] cursor-pointer shrink-0"
             >
               <option value="ALL">ALL TRANSFERS</option>
               <option value="PENDING">PENDING TRANSFER</option>
@@ -1486,7 +1486,7 @@ function parseDateStr(dStr: string) {
             <select
               value={checkedFilter}
               onChange={(e) => setCheckedFilter(e.target.value as 'ALL' | 'CHECKED' | 'UNCHECKED')}
-              className={`px-3 py-2 bg-gray-50 dark:bg-[#0a0f1c] border border-gray-200 dark:border-white/10 rounded-lg text-[11px] font-black uppercase tracking-wider outline-none dark:text-white shadow-sm h-[42px] cursor-pointer shrink-0 ${
+              className={`px-3 py-2 bg-gray-50 dark:bg-[#0a0f1c] border border-gray-200 dark:border-white/10 rounded-lg text-[14px] font-semibold  tracking-wider outline-none dark:text-white shadow-sm h-[42px] cursor-pointer shrink-0 ${
                 location === '1st' ? 'focus:ring-2 focus:ring-purple-500' : 'focus:ring-2 focus:ring-emerald-500'
               }`}
             >
@@ -1504,7 +1504,7 @@ function parseDateStr(dStr: string) {
                 setActiveFilter('ALL');
                 setTransferFilter('ALL');
               }}
-              className={`mb-0.5 px-3 py-2.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition-colors shrink-0 border ${
+              className={`mb-0.5 px-3 py-2.5 rounded-lg text-[13px] font-semibold  tracking-wider transition-colors shrink-0 border ${
                 location === '1st'
                   ? 'text-purple-700 dark:text-purple-400 bg-purple-50 hover:bg-purple-100 dark:bg-purple-500/10 dark:hover:bg-purple-500/20 border-purple-200 dark:border-purple-500/20'
                   : 'text-emerald-700 dark:text-emerald-400 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-500/10 dark:hover:bg-emerald-500/20 border-emerald-200 dark:border-emerald-500/20'
@@ -1520,7 +1520,7 @@ function parseDateStr(dStr: string) {
         <div className="flex flex-wrap items-center gap-2 shrink-0 w-full bg-white dark:bg-[#111827] px-3 py-2 rounded-xl border border-gray-200 dark:border-white/5 shadow-sm">
           <div className="flex items-center gap-1.5 shrink-0 pr-1">
             <ExclamationTriangleIcon className={`w-4 h-4 ${location === '1st' ? 'text-purple-500' : 'text-emerald-500'}`} />
-            <span className="text-[10px] font-black text-gray-600 dark:text-gray-300 uppercase tracking-widest">Color Logic</span>
+            <span className="text-[13px] font-semibold text-gray-600 dark:text-gray-300">Color Logic</span>
           </div>
           <div className="flex flex-1 flex-wrap items-stretch gap-1.5 min-w-0">
             {([
@@ -1539,8 +1539,8 @@ function parseDateStr(dStr: string) {
                   onClick={() => setLegendFilter(selected ? null : chip.id)}
                   className={`flex-1 min-w-[88px] h-11 px-2.5 rounded-xl flex items-center justify-center gap-2 transition-all duration-200 cursor-pointer shadow-md ${chip.text} ${chip.fill} ${selected ? `${chip.ring} scale-[1.02]` : 'hover:scale-[1.02] hover:brightness-110 active:scale-[0.98]'}`}
                 >
-                  <span className="text-[11px] font-black uppercase tracking-wide whitespace-nowrap">{chip.label}</span>
-                  <span className={`min-w-[1.6rem] h-6 px-1.5 rounded-md text-[12px] font-black tabular-nums flex items-center justify-center ${
+                  <span className="text-[14px] font-semibold tracking-wide whitespace-nowrap">{chip.label}</span>
+                  <span className={`min-w-[1.6rem] h-6 px-1.5 rounded-md text-[14px] font-semibold tabular-nums flex items-center justify-center ${
                     chip.id === 3 || chip.id === 6
                       ? 'bg-black/15 text-inherit'
                       : 'bg-white/25 text-white'
@@ -1555,7 +1555,7 @@ function parseDateStr(dStr: string) {
             <button
               type="button"
               onClick={() => setLegendFilter(null)}
-              className="h-11 px-3 rounded-xl text-[10px] uppercase font-black tracking-wider text-gray-600 dark:text-gray-300 bg-gray-100 hover:bg-gray-200 dark:bg-white/10 dark:hover:bg-white/15 border border-gray-200 dark:border-white/10 shrink-0 transition-colors"
+              className="h-11 px-3 rounded-xl text-[13px] font-semibold tracking-wider text-gray-600 dark:text-gray-300 bg-gray-100 hover:bg-gray-200 dark:bg-white/10 dark:hover:bg-white/15 border border-gray-200 dark:border-white/10 shrink-0 transition-colors"
             >
               Clear
             </button>
@@ -1568,14 +1568,14 @@ function parseDateStr(dStr: string) {
           {filteredDatewiseItems.length > 0 && !isLoading && (
             <div className={`py-2 px-4 border-b flex items-center justify-between shrink-0 gap-3 flex-wrap ${location === '1st' ? 'border-purple-200/50 dark:border-purple-500/10 bg-purple-50/50 dark:bg-purple-500/5' : 'border-emerald-200/50 dark:border-emerald-500/10 bg-emerald-50/50 dark:bg-emerald-500/5'}`}>
               <div className="flex items-center gap-3 flex-wrap">
-                <p className={`text-[10px] font-black uppercase tracking-widest ${location === '1st' ? 'text-purple-600 dark:text-purple-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
+                <p className={`text-[13px] font-semibold   ${location === '1st' ? 'text-purple-600 dark:text-purple-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
                   Showing {Math.min((currentPage - 1) * itemsPerPage + 1, filteredDatewiseItems.length)} to {Math.min(currentPage * itemsPerPage, filteredDatewiseItems.length)} of {filteredDatewiseItems.length} transactions
                 </p>
                 {selectedVerifyIds.length > 0 && (
                   <button
                     onClick={handleMarkChecked}
                     disabled={submitting}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest text-white transition-all shadow-sm disabled:opacity-50 ${
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[13px] font-semibold   text-white transition-all shadow-sm disabled:opacity-50 ${
                       location === '1st' ? 'bg-purple-600 hover:bg-purple-700' : 'bg-emerald-600 hover:bg-emerald-700'
                     }`}
                   >
@@ -1588,14 +1588,14 @@ function parseDateStr(dStr: string) {
                 <button
                   onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                   disabled={currentPage === 1}
-                  className="px-3 py-1.5 rounded bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 text-[10px] font-black text-gray-500 uppercase tracking-widest hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
+                  className="px-3 py-1.5 rounded bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 text-[13px] font-semibold text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
                 >
                   Prev
                 </button>
                 <button
                   onClick={() => setCurrentPage(prev => Math.min(prev + 1, datewiseTotalPages))}
                   disabled={currentPage === datewiseTotalPages || datewiseTotalPages === 0}
-                  className="px-3 py-1.5 rounded bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 text-[10px] font-black text-gray-500 uppercase tracking-widest hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
+                  className="px-3 py-1.5 rounded bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 text-[13px] font-semibold text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
                 >
                   Next
                 </button>
@@ -1613,24 +1613,24 @@ function parseDateStr(dStr: string) {
               <table className="w-full text-left border-collapse relative">
                 <thead className={`sticky top-0 z-20 shadow-sm ${location === '1st' ? 'bg-purple-50 dark:bg-purple-900/20' : 'bg-emerald-50 dark:bg-emerald-900/20'}`}>
                   <tr>
-                    <th className={`py-2.5 px-3 text-[10px] font-black uppercase tracking-widest border-b text-center w-10 ${location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20' : 'text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'}`}></th>
-                    <th className={`py-2.5 px-4 text-[10px] font-black uppercase tracking-widest border-b ${location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20' : 'text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'}`}>Date</th>
-                    <th className={`py-2.5 px-3 text-[10px] font-black uppercase tracking-widest border-b ${location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20' : 'text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'}`}>Category</th>
-                    <th className={`py-2.5 px-3 text-[10px] font-black uppercase tracking-widest border-b ${location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20' : 'text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'}`}>Item Name</th>
-                    <th className={`py-2.5 px-3 text-[10px] font-black uppercase tracking-widest border-b text-right ${location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20' : 'text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'}`}>In</th>
-                    <th className={`py-2.5 px-3 text-[10px] font-black uppercase tracking-widest border-b text-right ${location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20' : 'text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'}`}>Out</th>
-                    <th className={`py-2.5 px-3 text-[10px] font-black uppercase tracking-widest border-b text-right ${location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20' : 'text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'}`}>Live Stock</th>
+                    <th className={`py-2.5 px-3 text-[13px] font-semibold   border-b text-center w-10 ${location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20' : 'text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'}`}></th>
+                    <th className={`py-2.5 px-4 text-[13px] font-semibold   border-b ${location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20' : 'text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'}`}>Date</th>
+                    <th className={`py-2.5 px-3 text-[13px] font-semibold   border-b ${location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20' : 'text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'}`}>Category</th>
+                    <th className={`py-2.5 px-3 text-[13px] font-semibold   border-b ${location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20' : 'text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'}`}>Item Name</th>
+                    <th className={`py-2.5 px-3 text-[13px] font-semibold   border-b text-right ${location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20' : 'text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'}`}>In</th>
+                    <th className={`py-2.5 px-3 text-[13px] font-semibold   border-b text-right ${location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20' : 'text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'}`}>Out</th>
+                    <th className={`py-2.5 px-3 text-[13px] font-semibold   border-b text-right ${location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20' : 'text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'}`}>Live Stock</th>
                     {showPacked && (
-                      <th className={`py-2.5 px-3 text-[10px] font-black uppercase tracking-widest border-b text-center ${location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20' : 'text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'}`}>Status</th>
+                      <th className={`py-2.5 px-3 text-[13px] font-semibold   border-b text-center ${location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20' : 'text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'}`}>Status</th>
                     )}
                     {isSfg && (
-                      <th className="py-2.5 px-3 text-[10px] font-black uppercase tracking-widest border-b text-center text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20">Transfer</th>
+                      <th className="py-2.5 px-3 text-[13px] font-semibold border-b text-center text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20">Transfer</th>
                     )}
                     {location === "1st" && (
-                      <th className="py-2.5 px-3 text-[10px] font-black uppercase tracking-widest border-b text-center text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20">Source</th>
+                      <th className="py-2.5 px-3 text-[13px] font-semibold border-b text-center text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20">Source</th>
                     )}
-                    <th className={`py-2.5 px-3 text-[10px] font-black uppercase tracking-widest border-b text-center ${location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20' : 'text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'}`}>Checked</th>
-                    <th className={`py-2.5 px-4 text-[10px] font-black uppercase tracking-widest border-b text-center w-24 ${location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20' : 'text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'}`}>Act</th>
+                    <th className={`py-2.5 px-3 text-[13px] font-semibold   border-b text-center ${location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20' : 'text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'}`}>Checked</th>
+                    <th className={`py-2.5 px-4 text-[13px] font-semibold   border-b text-center w-24 ${location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20' : 'text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'}`}>Act</th>
                   </tr>
                 </thead>
                 <tbody className={`divide-y ${location === '1st' ? 'divide-purple-100 dark:divide-purple-500/10' : 'divide-emerald-100 dark:divide-emerald-500/10'}`}>
@@ -1664,46 +1664,46 @@ function parseDateStr(dStr: string) {
                           <span className="text-gray-300 dark:text-gray-600">-</span>
                         )}
                       </td>
-                      <td className="py-2 px-4 text-[11px] font-bold text-gray-500">{formatDate(log.date || log.updated_at)}</td>
-                      <td className="py-2 px-3 text-[11px] font-bold text-gray-500 uppercase">{log.category}</td>
-                      <td className="py-2 px-3 text-[11px] font-black text-gray-900 dark:text-white uppercase">{log.item_name}</td>
-                      <td className="py-2 px-3 text-[11px] font-black text-emerald-600 dark:text-emerald-400 text-right">{log.in_qty !== "0" && log.in_qty !== "" ? `+${log.in_qty}` : "-"}</td>
-                      <td className="py-2 px-3 text-[11px] font-black text-rose-600 dark:text-rose-400 text-right">{log.out_qty !== "0" && log.out_qty !== "" ? `-${log.out_qty}` : "-"}</td>
-                      <td className="py-2 px-3 text-[11px] font-black text-[#003875] dark:text-[#FFD500] text-right">{(log as any).running_stock}</td>
+                      <td className="py-2 px-4 text-[14px] font-bold text-gray-500">{formatDate(log.date || log.updated_at)}</td>
+                      <td className="py-2 px-3 text-[14px] font-bold text-gray-500">{log.category}</td>
+                      <td className="py-2 px-3 text-[14px] font-semibold text-gray-900 dark:text-white">{log.item_name}</td>
+                      <td className="py-2 px-3 text-[14px] font-semibold text-emerald-600 dark:text-emerald-400 text-right">{log.in_qty !== "0" && log.in_qty !== "" ? `+${log.in_qty}` : "-"}</td>
+                      <td className="py-2 px-3 text-[14px] font-semibold text-rose-600 dark:text-rose-400 text-right">{log.out_qty !== "0" && log.out_qty !== "" ? `-${log.out_qty}` : "-"}</td>
+                      <td className="py-2 px-3 text-[14px] font-semibold text-[#2563EB] dark:text-[#60A5FA] text-right">{(log as any).running_stock}</td>
                       {showPacked && (
                         <td className="py-2 px-3 text-center">
                           {log.packed_status === 'PACKED' ? (
-                            <span className="px-2 py-0.5 bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400 rounded-md text-[9px] font-black uppercase">Packed</span>
+                            <span className="px-2 py-0.5 bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400 rounded-md text-[13px] font-semibold">Packed</span>
                           ) : log.packed_status === 'UNPACKED' ? (
-                            <span className="px-2 py-0.5 bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400 rounded-md text-[9px] font-black uppercase">Unpacked</span>
+                            <span className="px-2 py-0.5 bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400 rounded-md text-[13px] font-semibold">Unpacked</span>
                           ) : <span className="text-gray-300">-</span>}
                         </td>
                       )}
                       {isSfg && (
                         <td className="py-2 px-3 text-center">
                           {transferStatus === 'TRANSFERRED' ? (
-                            <span className="px-2 py-0.5 bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400 rounded-md text-[9px] font-black uppercase">Transferred</span>
+                            <span className="px-2 py-0.5 bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400 rounded-md text-[13px] font-semibold">Transferred</span>
                           ) : transferStatus === 'PARTIAL' ? (
-                            <span className="px-2 py-0.5 bg-sky-100 text-sky-700 dark:bg-sky-500/20 dark:text-sky-400 rounded-md text-[9px] font-black uppercase" title={`${formatQty((log as FloorTxItem).transfer_pending_qty || 0)} still pending`}>
+                            <span className="px-2 py-0.5 bg-sky-100 text-sky-700 dark:bg-sky-500/20 dark:text-sky-400 rounded-md text-[13px] font-semibold" title={`${formatQty((log as FloorTxItem).transfer_pending_qty || 0)} still pending`}>
                               Partial
                             </span>
                           ) : (
-                            <span className="px-2 py-0.5 bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400 rounded-md text-[9px] font-black uppercase">Pending</span>
+                            <span className="px-2 py-0.5 bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400 rounded-md text-[13px] font-semibold">Pending</span>
                           )}
                         </td>
                       )}
                       {location === "1st" && (
                         <td className="py-2 px-3 text-center">
                           {firstFloorSourceLabel(log) === "SFG" ? (
-                            <span className="px-2 py-0.5 bg-teal-100 text-teal-700 dark:bg-teal-500/20 dark:text-teal-300 rounded-md text-[9px] font-black uppercase">SFG</span>
+                            <span className="px-2 py-0.5 bg-teal-100 text-teal-700 dark:bg-teal-500/20 dark:text-teal-300 rounded-md text-[13px] font-semibold">SFG</span>
                           ) : (
-                            <span className="px-2 py-0.5 bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-300 rounded-md text-[9px] font-black uppercase">1st Floor</span>
+                            <span className="px-2 py-0.5 bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-300 rounded-md text-[13px] font-semibold">1st Floor</span>
                           )}
                         </td>
                       )}
                       <td className="py-2 px-3 text-center">
                         {checked ? (
-                          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[9px] font-black uppercase ${
+                          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[13px] font-semibold  ${
                             location === '1st'
                               ? 'bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-300'
                               : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300'
@@ -1712,7 +1712,7 @@ function parseDateStr(dStr: string) {
                             Checked
                           </span>
                         ) : (
-                          <span className="px-2 py-0.5 bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400 rounded-md text-[9px] font-black uppercase">
+                          <span className="px-2 py-0.5 bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400 rounded-md text-[13px] font-semibold">
                             Pending
                           </span>
                         )}
@@ -1744,7 +1744,7 @@ function parseDateStr(dStr: string) {
                   })}
                   {filteredDatewiseItems.length === 0 && (
                     <tr>
-                      <td colSpan={showPacked ? (isSfg || location === "1st" ? 11 : 10) : 9} className="py-8 text-center text-gray-400 text-[11px] font-black uppercase">No items found</td>
+                      <td colSpan={showPacked ? (isSfg || location === "1st" ? 11 : 10) : 9} className="py-8 text-center text-gray-400 text-[14px] font-semibold">No items found</td>
                     </tr>
                   )}
                 </tbody>
@@ -1764,21 +1764,21 @@ function parseDateStr(dStr: string) {
         <div className="flex-1 bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/5 rounded-xl overflow-hidden flex flex-col shadow-sm min-h-0 mt-2">
         {filteredItems.length > 0 && !isLoading && (
           <div className={`py-2 px-4 border-b flex items-center justify-between shrink-0 ${location === '1st' ? 'border-purple-200/50 dark:border-purple-500/10 bg-purple-50/50 dark:bg-purple-500/5' : 'border-emerald-200/50 dark:border-emerald-500/10 bg-emerald-50/50 dark:bg-emerald-500/5'}`}>
-            <p className={`text-[10px] font-black uppercase tracking-widest ${location === '1st' ? 'text-purple-600 dark:text-purple-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
+            <p className={`text-[13px] font-semibold   ${location === '1st' ? 'text-purple-600 dark:text-purple-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
               Showing {Math.min((currentPage - 1) * itemsPerPage + 1, filteredItems.length)} to {Math.min(currentPage * itemsPerPage, filteredItems.length)} of {filteredItems.length} unique items
             </p>
             <div className="flex gap-1">
               <button
                 onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                 disabled={currentPage === 1}
-                className="px-3 py-1.5 rounded bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 text-[10px] font-black text-gray-500 uppercase tracking-widest hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
+                className="px-3 py-1.5 rounded bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 text-[13px] font-semibold text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
               >
                 Prev
               </button>
               <button
                 onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                 disabled={currentPage === totalPages || totalPages === 0}
-                className="px-3 py-1.5 rounded bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 text-[10px] font-black text-gray-500 uppercase tracking-widest hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
+                className="px-3 py-1.5 rounded bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 text-[13px] font-semibold text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
               >
                 Next
               </button>
@@ -1803,22 +1803,22 @@ function parseDateStr(dStr: string) {
               <thead className={`sticky top-0 z-20 shadow-sm ${location === '1st' ? 'bg-purple-50 dark:bg-purple-900/20' : 'bg-emerald-50 dark:bg-emerald-900/20'}`}>
                 <tr>
                   <th className={`py-2.5 px-3 border-b text-center sticky left-0 z-30 w-12 ${location === '1st' ? 'border-purple-200 dark:border-purple-500/20 bg-purple-50 dark:bg-purple-900/20 shadow-[1px_0_0_0_#e9d5ff] dark:shadow-[1px_0_0_0_rgba(168,85,247,0.2)]' : 'border-emerald-200 dark:border-emerald-500/20 bg-emerald-50 dark:bg-emerald-900/20 shadow-[1px_0_0_0_#a7f3d0] dark:shadow-[1px_0_0_0_rgba(16,185,129,0.2)]'}`}>
-                    <span className={`text-[10px] font-black uppercase tracking-widest ${location === '1st' ? 'text-purple-600 dark:text-purple-400' : 'text-emerald-600 dark:text-emerald-400'}`}>#</span>
+                    <span className={`text-[13px] font-semibold   ${location === '1st' ? 'text-purple-600 dark:text-purple-400' : 'text-emerald-600 dark:text-emerald-400'}`}>#</span>
                   </th>
-                  <th className={`py-2.5 px-3 text-[10px] font-black uppercase tracking-widest border-b whitespace-nowrap ${location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20' : 'text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'}`}>Category</th>
-                  <th className={`py-2.5 px-3 text-[10px] font-black uppercase tracking-widest border-b min-w-[200px] ${location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20' : 'text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'}`}>Item Name</th>
-                  <th className={`py-2.5 px-3 text-[10px] font-black uppercase tracking-widest border-b whitespace-nowrap ${location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20' : 'text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'}`}>SKU</th>
-                  <th className={`py-2.5 px-3 text-[10px] font-black uppercase tracking-widest border-b text-center whitespace-nowrap ${location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20' : 'text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'}`}>Active</th>
-                  <th className={`py-2.5 px-4 text-[10px] font-black uppercase tracking-widest border-b text-left w-56 ${location === '1st' ? 'text-purple-700 dark:text-purple-400 border-purple-200 dark:border-purple-500/20 bg-purple-100/50 dark:bg-purple-500/10' : 'text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20 bg-emerald-100/50 dark:bg-emerald-500/10'}`}>Stock Health</th>
-                  <th className={`py-2.5 px-3 text-[10px] font-black uppercase tracking-widest border-b text-right ${location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20' : 'text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'}`}>Max</th>
-                  <th className={`py-2.5 px-3 text-[10px] font-black uppercase tracking-widest border-b text-right ${location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20' : 'text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'}`}>IN Qty</th>
-                  <th className={`py-2.5 px-3 text-[10px] font-black uppercase tracking-widest border-b text-right ${location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20' : 'text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'}`}>OUT Qty</th>
-                  <th className={`py-2.5 px-3 text-[10px] font-black uppercase tracking-widest border-b text-right ${location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20' : 'text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'}`}>Sale %</th>
-                  <th className={`py-2.5 px-3 text-[10px] font-black uppercase tracking-widest border-b text-right whitespace-nowrap ${location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20' : 'text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'}`}>Avg. Con</th>
-                  <th className={`py-2.5 px-3 text-[10px] font-black uppercase tracking-widest border-b text-right ${location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20' : 'text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'}`}>Lead</th>
-                  <th className={`py-2.5 px-3 text-[10px] font-black uppercase tracking-widest border-b text-right ${location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20' : 'text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'}`}>SF</th>
+                  <th className={`py-2.5 px-3 text-[13px] font-semibold   border-b whitespace-nowrap ${location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20' : 'text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'}`}>Category</th>
+                  <th className={`py-2.5 px-3 text-[13px] font-semibold   border-b min-w-[200px] ${location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20' : 'text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'}`}>Item Name</th>
+                  <th className={`py-2.5 px-3 text-[13px] font-semibold   border-b whitespace-nowrap ${location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20' : 'text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'}`}>SKU</th>
+                  <th className={`py-2.5 px-3 text-[13px] font-semibold   border-b text-center whitespace-nowrap ${location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20' : 'text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'}`}>Active</th>
+                  <th className={`py-2.5 px-4 text-[13px] font-semibold   border-b text-left w-56 ${location === '1st' ? 'text-purple-700 dark:text-purple-400 border-purple-200 dark:border-purple-500/20 bg-purple-100/50 dark:bg-purple-500/10' : 'text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20 bg-emerald-100/50 dark:bg-emerald-500/10'}`}>Stock Health</th>
+                  <th className={`py-2.5 px-3 text-[13px] font-semibold   border-b text-right ${location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20' : 'text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'}`}>Max</th>
+                  <th className={`py-2.5 px-3 text-[13px] font-semibold   border-b text-right ${location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20' : 'text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'}`}>IN Qty</th>
+                  <th className={`py-2.5 px-3 text-[13px] font-semibold   border-b text-right ${location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20' : 'text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'}`}>OUT Qty</th>
+                  <th className={`py-2.5 px-3 text-[13px] font-semibold   border-b text-right ${location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20' : 'text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'}`}>Sale %</th>
+                  <th className={`py-2.5 px-3 text-[13px] font-semibold   border-b text-right whitespace-nowrap ${location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20' : 'text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'}`}>Avg. Con</th>
+                  <th className={`py-2.5 px-3 text-[13px] font-semibold   border-b text-right ${location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20' : 'text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'}`}>Lead</th>
+                  <th className={`py-2.5 px-3 text-[13px] font-semibold   border-b text-right ${location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20' : 'text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'}`}>SF</th>
                   {showPacked && (
-                    <th className={`py-2.5 px-4 text-[10px] font-black uppercase tracking-widest border-b text-center w-24 ${location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20' : 'text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'}`}>Status</th>
+                    <th className={`py-2.5 px-4 text-[13px] font-semibold   border-b text-center w-24 ${location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-500/20' : 'text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'}`}>Status</th>
                   )}
                 </tr>
               </thead>
@@ -1841,21 +1841,21 @@ function parseDateStr(dStr: string) {
                           <button onClick={() => { 
                             setSelectedLogItem(item.item_name);
                             setIsLogModalOpen(true);
-                          }} className="text-gray-400 hover:text-[#003875] dark:hover:text-[#FFD500] transition-colors" title="View Transactions">
+                          }} className="text-gray-400 hover:text-[#2563EB] dark:hover:text-[#60A5FA] transition-colors" title="View Transactions">
                             <EyeIcon className="w-4 h-4" />
                           </button>
                         </div>
                       </td>
                       <td className="py-2 px-3">
-                        <span className="inline-block px-2 py-0.5 rounded border border-gray-200 dark:border-white/10 bg-gray-100 dark:bg-white/5 text-[10px] font-black text-gray-600 dark:text-gray-300 uppercase tracking-wider">
+                        <span className="inline-block px-2 py-0.5 rounded border border-gray-200 dark:border-white/10 bg-gray-100 dark:bg-white/5 text-[13px] font-semibold text-gray-600 dark:text-gray-300 tracking-wider">
                           {item.category}
                         </span>
                       </td>
-                      <td className="py-2 px-3 text-[11px] font-black text-[#003875] dark:text-[#FFD500] uppercase whitespace-normal break-words min-w-[200px] max-w-[320px] leading-snug">{item.item_name}</td>
-                      <td className="py-2 px-3 text-[11px] font-bold text-gray-600 dark:text-gray-300 uppercase whitespace-nowrap">{item.sku_code || "—"}</td>
+                      <td className="py-2 px-3 text-[14px] font-semibold text-[#2563EB] dark:text-[#60A5FA] whitespace-normal break-words min-w-[200px] max-w-[320px] leading-snug">{item.item_name}</td>
+                      <td className="py-2 px-3 text-[14px] font-bold text-gray-600 dark:text-gray-300 whitespace-nowrap">{item.sku_code || "—"}</td>
                       <td className="py-2 px-3 text-center">
                         {item.active_status ? (
-                          <span className={`inline-block px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider ${
+                          <span className={`inline-block px-2 py-0.5 rounded-md text-[13px] font-semibold  tracking-wider ${
                             item.active_status.toLowerCase() === "active"
                               ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400"
                               : "bg-gray-200 text-gray-600 dark:bg-white/10 dark:text-gray-400"
@@ -1863,33 +1863,33 @@ function parseDateStr(dStr: string) {
                             {item.active_status}
                           </span>
                         ) : (
-                          <span className="text-[9px] font-black uppercase tracking-wider text-amber-600 dark:text-amber-400">Not set</span>
+                          <span className="text-[13px] font-semibold tracking-wider text-amber-600 dark:text-amber-400">Not set</span>
                         )}
                       </td>
                       <td className="py-1 px-4 bg-gray-50/50 dark:bg-white/[0.02]">
                         <div className="flex flex-col gap-1 w-full max-w-[180px]">
                           <div className="flex justify-between items-baseline leading-none">
-                            <span className={`text-xs font-black ${health.text}`}>{(item.live_stock || 0).toLocaleString()}</span>
-                            <span className="text-[9px] font-bold text-gray-400 uppercase">{health.label}</span>
+                            <span className={`text-[14px] font-semibold ${health.text}`}>{(item.live_stock || 0).toLocaleString()}</span>
+                            <span className="text-[13px] font-bold text-gray-400">{health.label}</span>
                           </div>
                           <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 overflow-hidden flex">
                             <div className={`h-full ${health.color} transition-all duration-500`} style={{ width: `${health.pct}%` }} />
                           </div>
                         </div>
                       </td>
-                      <td className="py-2 px-3 text-[11px] font-bold text-[#003875] dark:text-[#FFD500] text-right">{item.max_level || "—"}</td>
-                      <td className="py-2 px-3 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 text-right">{inQty !== 0 ? inQty.toLocaleString() : "—"}</td>
-                      <td className="py-2 px-3 text-[11px] font-bold text-rose-600 dark:text-rose-400 text-right">{outQty !== 0 ? outQty.toLocaleString() : "—"}</td>
-                      <td className="py-2 px-3 text-[11px] font-bold text-indigo-600 dark:text-indigo-400 text-right">{item.sale_percent}%</td>
-                      <td className="py-2 px-3 text-[11px] font-bold text-gray-600 dark:text-gray-400 text-right">{item.avg_daily_con || "—"}</td>
-                      <td className="py-2 px-3 text-[11px] font-bold text-gray-600 dark:text-gray-400 text-right">{item.lead_time}</td>
-                      <td className="py-2 px-3 text-[11px] font-bold text-gray-600 dark:text-gray-400 text-right">{item.safety_factor}</td>
+                      <td className="py-2 px-3 text-[14px] font-bold text-[#2563EB] dark:text-[#60A5FA] text-right">{item.max_level || "—"}</td>
+                      <td className="py-2 px-3 text-[14px] font-bold text-emerald-600 dark:text-emerald-400 text-right">{inQty !== 0 ? inQty.toLocaleString() : "—"}</td>
+                      <td className="py-2 px-3 text-[14px] font-bold text-rose-600 dark:text-rose-400 text-right">{outQty !== 0 ? outQty.toLocaleString() : "—"}</td>
+                      <td className="py-2 px-3 text-[14px] font-bold text-indigo-600 dark:text-indigo-400 text-right">{item.sale_percent}%</td>
+                      <td className="py-2 px-3 text-[14px] font-bold text-gray-600 dark:text-gray-400 text-right">{item.avg_daily_con || "—"}</td>
+                      <td className="py-2 px-3 text-[14px] font-bold text-gray-600 dark:text-gray-400 text-right">{item.lead_time}</td>
+                      <td className="py-2 px-3 text-[14px] font-bold text-gray-600 dark:text-gray-400 text-right">{item.safety_factor}</td>
                       {showPacked && (
                         <td className="py-2 px-4 text-center">
                           {item.packed_status === 'PACKED' ? (
-                            <span className="px-2 py-0.5 bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400 rounded-md text-[9px] font-black uppercase">Packed</span>
+                            <span className="px-2 py-0.5 bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400 rounded-md text-[13px] font-semibold">Packed</span>
                           ) : item.packed_status === 'UNPACKED' ? (
-                            <span className="px-2 py-0.5 bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400 rounded-md text-[9px] font-black uppercase">Unpacked</span>
+                            <span className="px-2 py-0.5 bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400 rounded-md text-[13px] font-semibold">Unpacked</span>
                           ) : <span className="text-gray-300">-</span>}
                         </td>
                       )}
@@ -1898,7 +1898,7 @@ function parseDateStr(dStr: string) {
                 })}
                 {filteredItems.length === 0 && (
                   <tr>
-                    <td colSpan={showPacked ? 14 : 13} className="py-8 text-center text-gray-400 text-[11px] font-black uppercase">No items found</td>
+                    <td colSpan={showPacked ? 14 : 13} className="py-8 text-center text-gray-400 text-[14px] font-semibold">No items found</td>
                   </tr>
                 )}
               </tbody>
@@ -1925,7 +1925,7 @@ function parseDateStr(dStr: string) {
               className="bg-white dark:bg-[#111827] rounded-2xl shadow-[0_0_40px_rgba(0,0,0,0.2)] w-full max-w-4xl overflow-hidden border border-gray-200 dark:border-white/10 flex flex-col max-h-[90vh]"
             >
               <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-white/5 bg-gray-50 dark:bg-[#1f2937]/50 shrink-0">
-                <h3 className="text-sm font-black uppercase tracking-widest flex items-center gap-2 text-gray-900 dark:text-white">
+                <h3 className="text-sm font-semibold flex items-center gap-2 text-gray-900 dark:text-white">
                   <EyeIcon className="w-5 h-5 text-gray-400" />
                   Transaction Logs - {selectedLogItem}
                 </h3>
@@ -1938,18 +1938,18 @@ function parseDateStr(dStr: string) {
                 <table className="w-full text-left border-collapse">
                   <thead className="bg-gray-100 dark:bg-[#1f2937] sticky top-0 z-20">
                     <tr>
-                      <th className="py-2.5 px-4 text-[10px] font-black text-gray-500 uppercase tracking-widest border-b border-gray-200 dark:border-white/10">Date</th>
-                      <th className="py-2.5 px-4 text-[10px] font-black text-gray-500 uppercase tracking-widest border-b border-gray-200 dark:border-white/10 text-right">In Qty</th>
-                      <th className="py-2.5 px-4 text-[10px] font-black text-gray-500 uppercase tracking-widest border-b border-gray-200 dark:border-white/10 text-right">Out Qty</th>
-                      <th className="py-2.5 px-4 text-[10px] font-black text-gray-500 uppercase tracking-widest border-b border-gray-200 dark:border-white/10 text-center w-20">Act</th>
+                      <th className="py-2.5 px-4 text-[13px] font-semibold text-gray-500 border-b border-gray-200 dark:border-white/10">Date</th>
+                      <th className="py-2.5 px-4 text-[13px] font-semibold text-gray-500 border-b border-gray-200 dark:border-white/10 text-right">In Qty</th>
+                      <th className="py-2.5 px-4 text-[13px] font-semibold text-gray-500 border-b border-gray-200 dark:border-white/10 text-right">Out Qty</th>
+                      <th className="py-2.5 px-4 text-[13px] font-semibold text-gray-500 border-b border-gray-200 dark:border-white/10 text-center w-20">Act</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100 dark:divide-white/5">
                     {transactionLogs.map((log, index) => (
                       <tr key={`${log.id || "row"}-${index}`} className="hover:bg-gray-50 dark:hover:bg-white/[0.02]">
-                        <td className="py-2 px-4 text-[11px] font-bold text-gray-500">{formatDate(log.date || log.updated_at)}</td>
-                        <td className="py-2 px-4 text-[11px] font-black text-emerald-600 dark:text-emerald-400 text-right">{log.in_qty !== "0" && log.in_qty !== "" ? `+${log.in_qty}` : "-"}</td>
-                        <td className="py-2 px-4 text-[11px] font-black text-rose-600 dark:text-rose-400 text-right">{log.out_qty !== "0" && log.out_qty !== "" ? `-${log.out_qty}` : "-"}</td>
+                        <td className="py-2 px-4 text-[14px] font-bold text-gray-500">{formatDate(log.date || log.updated_at)}</td>
+                        <td className="py-2 px-4 text-[14px] font-semibold text-emerald-600 dark:text-emerald-400 text-right">{log.in_qty !== "0" && log.in_qty !== "" ? `+${log.in_qty}` : "-"}</td>
+                        <td className="py-2 px-4 text-[14px] font-semibold text-rose-600 dark:text-rose-400 text-right">{log.out_qty !== "0" && log.out_qty !== "" ? `-${log.out_qty}` : "-"}</td>
                         <td className="py-2 px-4 text-center">
                           {!String(log.id).startsWith("outform-") && (
                             <button onClick={() => confirmDelete(log.id.toString())} className="text-rose-400 hover:text-rose-600 transition-colors">
@@ -1961,7 +1961,7 @@ function parseDateStr(dStr: string) {
                     ))}
                     {transactionLogs.length === 0 && (
                       <tr>
-                        <td colSpan={4} className="py-8 text-center text-gray-400 text-[11px] font-black uppercase">No logs found</td>
+                        <td colSpan={4} className="py-8 text-center text-gray-400 text-[14px] font-semibold">No logs found</td>
                       </tr>
                     )}
                   </tbody>
@@ -1980,11 +1980,11 @@ function parseDateStr(dStr: string) {
               initial={{ opacity: 0, scale: 0.95, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              className="bg-white dark:bg-[#111827] rounded-2xl shadow-[0_0_40px_rgba(0,56,117,0.3)] dark:shadow-[0_0_40px_rgba(255,213,0,0.1)] w-full max-w-5xl overflow-hidden border border-[#003875]/30 dark:border-[#FFD500]/20 flex flex-col max-h-[90vh]"
+              className="bg-white dark:bg-[#111827] rounded-2xl shadow-[0_0_40px_rgba(0,56,117,0.3)] dark:shadow-[0_0_40px_rgba(255,213,0,0.1)] w-full max-w-5xl overflow-hidden border border-[#2563EB]/30 dark:border-[#60A5FA]/20 flex flex-col max-h-[90vh]"
             >
-              <div className="flex items-center justify-between p-5 border-b border-blue-800/20 dark:border-white/5 bg-gradient-to-r from-[#003875] to-blue-800 dark:from-[#1f2937] dark:to-[#111827] text-white shrink-0">
-                <h3 className="text-sm font-black uppercase tracking-widest flex items-center gap-2">
-                  <ClipboardDocumentListIcon className="w-5 h-5 text-blue-200 dark:text-[#FFD500]" />
+              <div className="flex items-center justify-between p-5 border-b border-blue-800/20 dark:border-white/5 bg-gradient-to-r from-[#2563EB] to-blue-800 dark:from-[#1f2937] dark:to-[#111827] text-white shrink-0">
+                <h3 className="text-sm font-semibold flex items-center gap-2">
+                  <ClipboardDocumentListIcon className="w-5 h-5 text-blue-200 dark:text-[#60A5FA]" />
                   {isSfgProductionIn
                     ? "IN from Production"
                     : isSfgTransfer
@@ -2000,17 +2000,17 @@ function parseDateStr(dStr: string) {
                 <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
                   <button 
                     onClick={addBulkRow}
-                    className="flex items-center gap-2 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-[#003875] dark:text-[#FFD500] hover:bg-blue-50 dark:hover:bg-[#FFD500]/10 rounded-lg transition-colors border border-dashed border-[#003875]/30 dark:border-[#FFD500]/30"
+                    className="flex items-center gap-2 px-3 py-1.5 text-[13px] font-semibold text-[#2563EB] dark:text-[#60A5FA] hover:bg-blue-50 dark:hover:bg-[#60A5FA]/10 rounded-lg transition-colors border border-dashed border-[#2563EB]/30 dark:border-[#60A5FA]/30"
                   >
                     <PlusIcon className="w-3.5 h-3.5" /> Add Row
                   </button>
                   {isSfgProductionIn && (
-                    <p className="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    <p className="text-[13px] font-bold text-gray-500 dark:text-gray-400 tracking-wider">
                       Select unique item + category, then mark IN qty from production.
                     </p>
                   )}
                   {isSfgTransfer && (
-                    <p className="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    <p className="text-[13px] font-bold text-gray-500 dark:text-gray-400 tracking-wider">
                       {sfgItemsLoading
                         ? "Loading pending SFG stock..."
                         : sfgPendingItemOptions.length > 0
@@ -2019,7 +2019,7 @@ function parseDateStr(dStr: string) {
                     </p>
                   )}
                   {isFirst && !isSfgTransfer && (
-                    <p className="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    <p className="text-[13px] font-bold text-gray-500 dark:text-gray-400 tracking-wider">
                       OUT lists 1st Floor live stock, including items received via Out from SFG. Remaining qty is shown in brackets.
                     </p>
                   )}
@@ -2057,7 +2057,7 @@ function parseDateStr(dStr: string) {
                                   ? "Select 1st Floor stock item..."
                                   : "Select item..."
                               }
-                              className="bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 py-1.5 px-2 rounded-md text-[11px] min-h-[34px]"
+                              className="bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 py-1.5 px-2 rounded-md text-[14px] min-h-[34px]"
                             />
                           </td>
                           <td className={tdClass}>
@@ -2074,7 +2074,7 @@ function parseDateStr(dStr: string) {
                               {(isSfgProductionIn || (allowManualIn && !isSfgTransfer)) && (
                               <button
                                 onClick={() => handleBulkRowChange(row.id, "type", "IN")}
-                                className={`px-2 py-1 rounded text-[9px] font-black uppercase tracking-wider transition-all ${row.type === "IN" || isSfgProductionIn ? "bg-emerald-500 text-white shadow-sm" : "text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"}`}
+                                className={`px-2 py-1 rounded text-[13px] font-semibold  tracking-wider transition-all ${row.type === "IN" || isSfgProductionIn ? "bg-emerald-500 text-white shadow-sm" : "text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"}`}
                               >
                                 {isSfgProductionIn ? "PROD IN" : "IN"}
                               </button>
@@ -2082,7 +2082,7 @@ function parseDateStr(dStr: string) {
                               {!isSfgProductionIn && (
                               <button
                                 onClick={() => handleBulkRowChange(row.id, "type", "OUT")}
-                                className={`px-2 py-1 rounded text-[9px] font-black uppercase tracking-wider transition-all ${row.type === "OUT" || isSfgTransfer ? "bg-emerald-500 text-white shadow-sm" : "text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"}`}
+                                className={`px-2 py-1 rounded text-[13px] font-semibold  tracking-wider transition-all ${row.type === "OUT" || isSfgTransfer ? "bg-emerald-500 text-white shadow-sm" : "text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"}`}
                               >
                                 {isSfgTransfer ? "OUT → 1st" : "OUT"}
                               </button>
@@ -2094,13 +2094,13 @@ function parseDateStr(dStr: string) {
                               <div className="flex bg-gray-100 dark:bg-gray-800 p-0.5 rounded-md justify-center">
                                 <button
                                   onClick={() => handleBulkRowChange(row.id, "packed_status", "PACKED")}
-                                  className={`px-2 py-1 rounded text-[9px] font-black uppercase tracking-wider transition-all ${row.packed_status === "PACKED" ? "bg-purple-500 text-white shadow-sm" : "text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"}`}
+                                  className={`px-2 py-1 rounded text-[13px] font-semibold  tracking-wider transition-all ${row.packed_status === "PACKED" ? "bg-purple-500 text-white shadow-sm" : "text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"}`}
                                 >
                                   PACKED
                                 </button>
                                 <button
                                   onClick={() => handleBulkRowChange(row.id, "packed_status", "UNPACKED")}
-                                  className={`px-2 py-1 rounded text-[9px] font-black uppercase tracking-wider transition-all ${row.packed_status === "UNPACKED" ? "bg-gray-500 text-white shadow-sm dark:bg-gray-600" : "text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"}`}
+                                  className={`px-2 py-1 rounded text-[13px] font-semibold  tracking-wider transition-all ${row.packed_status === "UNPACKED" ? "bg-gray-500 text-white shadow-sm dark:bg-gray-600" : "text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"}`}
                                 >
                                   UNPACKED
                                 </button>
@@ -2142,11 +2142,11 @@ function parseDateStr(dStr: string) {
               </div>
 
               <div className="p-4 border-t border-gray-100 dark:border-white/5 flex justify-end gap-3 bg-gray-50/50 dark:bg-[#1f2937]/50 shrink-0">
-                <button onClick={() => { setItemModalOpen(false); setSfgTransferMode(false); setSfgProductionInMode(false); }} className="px-5 py-2 rounded-xl text-xs font-black text-gray-500 uppercase tracking-widest hover:bg-white dark:hover:bg-[#111827] shadow-sm border border-gray-200 dark:border-white/10 transition-colors">Cancel</button>
+                <button onClick={() => { setItemModalOpen(false); setSfgTransferMode(false); setSfgProductionInMode(false); }} className="px-5 py-2 rounded-xl text-[14px] font-semibold text-gray-500 hover:bg-white dark:hover:bg-[#111827] shadow-sm border border-gray-200 dark:border-white/10 transition-colors">Cancel</button>
                 <button 
                   onClick={handleSaveItem} 
                   disabled={submitting}
-                  className="px-6 py-2 rounded-xl text-xs font-black text-white bg-gradient-to-r from-[#003875] to-blue-600 dark:from-[#FFD500] dark:to-yellow-400 dark:text-[#003875] uppercase tracking-widest hover:brightness-110 shadow-lg shadow-blue-500/20 dark:shadow-yellow-500/20 transition-all disabled:opacity-50"
+                  className="px-6 py-2 rounded-xl text-[14px] font-semibold text-white bg-gradient-to-r from-[#2563EB] to-blue-600 dark:from-[#60A5FA] dark:to-yellow-400 dark:text-[#60A5FA] hover:brightness-110 shadow-lg shadow-blue-500/20 dark:shadow-yellow-500/20 transition-all disabled:opacity-50"
                 >
                   {submitting ? 'Saving...' : 'Save Record(s)'}
                 </button>
@@ -2171,7 +2171,7 @@ function parseDateStr(dStr: string) {
               <div className={`flex items-center justify-between p-5 border-b bg-gradient-to-r text-white shrink-0 ${
                 location === '1st' ? 'from-purple-600 to-fuchsia-800 border-purple-800/20' : 'from-emerald-600 to-teal-800 border-emerald-800/20'
               }`}>
-                <h3 className="text-sm font-black uppercase tracking-widest flex items-center gap-2">
+                <h3 className="text-sm font-semibold flex items-center gap-2">
                   <ClipboardDocumentCheckIcon className="w-5 h-5 text-white/90" />
                   Physical Stock Audit
                 </h3>
@@ -2192,11 +2192,11 @@ function parseDateStr(dStr: string) {
                       onChange={(e) => setAuditPasteText(e.target.value)}
                       rows={3}
                       placeholder={"Item Name\tPhysical Qty\n10 LITE HONOR...\t10\nANS DC W\t25"}
-                      className="flex-1 min-w-[200px] rounded-lg border border-gray-200 dark:border-white/10 bg-white dark:bg-[#111827] px-3 py-2 text-[11px] font-mono font-bold text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:border-[#003875] dark:focus:border-[#FFD500] custom-scrollbar"
+                      className="flex-1 min-w-[200px] rounded-lg border border-gray-200 dark:border-white/10 bg-white dark:bg-[#111827] px-3 py-2 text-[14px] font-mono font-bold text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:border-[#2563EB] dark:focus:border-[#60A5FA] custom-scrollbar"
                     />
                     <button
                       onClick={handleAuditPaste}
-                      className={`shrink-0 px-4 py-2 h-fit rounded-lg text-[10px] font-black uppercase tracking-widest text-white transition-all shadow-sm ${
+                      className={`shrink-0 px-4 py-2 h-fit rounded-lg text-[13px] font-semibold   text-white transition-all shadow-sm ${
                         location === '1st' ? 'bg-purple-600 hover:bg-purple-700' : 'bg-emerald-600 hover:bg-emerald-700'
                       }`}
                     >
@@ -2207,7 +2207,7 @@ function parseDateStr(dStr: string) {
 
                 <button 
                   onClick={addAuditRow}
-                  className={`px-3 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-lg transition-colors border border-dashed ${
+                  className={`px-3 py-1.5 text-[13px] font-semibold   rounded-lg transition-colors border border-dashed ${
                     location === '1st' ? 'text-purple-600 dark:text-purple-400 border-purple-300 dark:border-purple-500/30 hover:bg-purple-50 dark:hover:bg-purple-500/10' : 'text-emerald-600 dark:text-emerald-400 border-emerald-300 dark:border-emerald-500/30 hover:bg-emerald-50 dark:hover:bg-emerald-500/10'
                   }`}
                 >
@@ -2231,11 +2231,11 @@ function parseDateStr(dStr: string) {
                           <td className={tdClass}>
                             {row.fromPaste ? (
                               <div className="px-2 py-1.5 rounded-md border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-[#0a0f1c]">
-                                <p className="text-[11px] font-black text-gray-900 dark:text-white uppercase leading-snug break-words" title={row.item_name}>
+                                <p className="text-[14px] font-semibold text-gray-900 dark:text-white leading-snug break-words" title={row.item_name}>
                                   {row.item_name}
                                 </p>
                                 {row.category && (
-                                  <p className="text-[9px] font-bold text-gray-500 uppercase mt-0.5 truncate" title={row.category}>
+                                  <p className="text-[13px] font-bold text-gray-500 mt-0.5 truncate" title={row.category}>
                                     {row.category}
                                   </p>
                                 )}
@@ -2247,18 +2247,18 @@ function parseDateStr(dStr: string) {
                                 value={row.item_name}
                                 onChange={(val) => handleAuditRowChange(row.id, "item_name", val)}
                                 placeholder="Select item..."
-                                className="bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 py-1.5 px-2 rounded-md text-[11px] min-h-[34px]"
+                                className="bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 py-1.5 px-2 rounded-md text-[14px] min-h-[34px]"
                               />
                             )}
                           </td>
                           <td className={`${tdClass} text-right`}>
-                            <span className={`text-[11px] font-black ${getHealthColors(row.live_stock).text}`}>
+                            <span className={`text-[14px] font-semibold ${getHealthColors(row.live_stock).text}`}>
                               {formatQty(row.live_stock)}
                             </span>
                           </td>
                           <td className={tdClass}>
                             {row.fromPaste ? (
-                              <span className="block text-right text-[11px] font-black text-gray-900 dark:text-white px-2">
+                              <span className="block text-right text-[14px] font-semibold text-gray-900 dark:text-white px-2">
                                 {row.physical_qty ? formatQty(row.physical_qty) : "-"}
                               </span>
                             ) : (
@@ -2274,20 +2274,20 @@ function parseDateStr(dStr: string) {
                           </td>
                           <td className={`${tdClass} text-center`}>
                             {row.diff_type === "IN" && (
-                              <span className="text-[10px] font-black uppercase text-emerald-600 dark:text-emerald-400">
+                              <span className="text-[13px] font-semibold text-emerald-600 dark:text-emerald-400">
                                 IN {formatQty(row.diff_qty)}
                               </span>
                             )}
                             {row.diff_type === "OUT" && (
-                              <span className="text-[10px] font-black uppercase text-rose-600 dark:text-rose-400">
+                              <span className="text-[13px] font-semibold text-rose-600 dark:text-rose-400">
                                 OUT {formatQty(row.diff_qty)}
                               </span>
                             )}
                             {row.diff_type === "NONE" && row.physical_qty && row.item_name && (
-                              <span className="text-[10px] font-black uppercase text-gray-500">Matched</span>
+                              <span className="text-[13px] font-semibold text-gray-500">Matched</span>
                             )}
                             {row.diff_type === "NONE" && (!row.physical_qty || !row.item_name) && (
-                              <span className="text-[10px] font-bold text-gray-400">—</span>
+                              <span className="text-[13px] font-bold text-gray-400">—</span>
                             )}
                           </td>
                           <td className={`${tdClass} text-center`}>
@@ -2307,11 +2307,11 @@ function parseDateStr(dStr: string) {
               </div>
 
               <div className="p-4 border-t border-gray-100 dark:border-white/5 flex justify-end gap-3 bg-gray-50/50 dark:bg-[#1f2937]/50 shrink-0">
-                <button onClick={() => setIsAuditModalOpen(false)} className="px-5 py-2 rounded-xl text-xs font-black text-gray-500 uppercase tracking-widest hover:bg-white dark:hover:bg-[#111827] shadow-sm border border-gray-200 dark:border-white/10 transition-colors">Cancel</button>
+                <button onClick={() => setIsAuditModalOpen(false)} className="px-5 py-2 rounded-xl text-[14px] font-semibold text-gray-500 hover:bg-white dark:hover:bg-[#111827] shadow-sm border border-gray-200 dark:border-white/10 transition-colors">Cancel</button>
                 <button 
                   onClick={handleSaveAudit} 
                   disabled={submitting || auditRows.filter(r => r.diff_type !== 'NONE').length === 0}
-                  className={`px-6 py-2 rounded-xl text-xs font-black text-white uppercase tracking-widest hover:brightness-110 shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
+                  className={`px-6 py-2 rounded-xl text-[14px] font-semibold text-white   hover:brightness-110 shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
                     location === '1st' ? 'bg-gradient-to-r from-purple-600 to-fuchsia-600 shadow-purple-500/20' : 'bg-gradient-to-r from-emerald-600 to-teal-600 shadow-emerald-500/20'
                   }`}
                 >
@@ -2334,7 +2334,7 @@ function parseDateStr(dStr: string) {
               className="bg-white dark:bg-[#111827] rounded-2xl shadow-[0_0_40px_rgba(0,0,0,0.2)] w-full max-w-md overflow-hidden border border-gray-200 dark:border-white/10"
             >
               <div className={`flex items-center justify-between p-5 border-b border-gray-100 dark:border-white/5 shrink-0 ${location === '1st' ? 'bg-purple-50 dark:bg-purple-900/20' : 'bg-emerald-50 dark:bg-emerald-900/20'}`}>
-                <h3 className="text-sm font-black uppercase tracking-widest flex items-center gap-2 text-gray-900 dark:text-white">
+                <h3 className="text-sm font-semibold flex items-center gap-2 text-gray-900 dark:text-white">
                   <PencilSquareIcon className={`w-5 h-5 ${location === '1st' ? 'text-purple-500' : 'text-emerald-500'}`} />
                   Edit Transaction
                 </h3>
@@ -2348,7 +2348,7 @@ function parseDateStr(dStr: string) {
 
               <div className="p-6 space-y-4 bg-white dark:bg-[#111827]">
                 <div className="p-3 rounded-xl bg-gray-50 dark:bg-white/[0.02] border border-gray-100 dark:border-white/5 space-y-2">
-                  <p className="text-[9px] font-black uppercase tracking-widest text-gray-400">Item Name</p>
+                  <p className="text-[13px] font-semibold text-gray-400">Item Name</p>
                   <SearchableSelect
                     label=""
                     options={editItemOptions}
@@ -2364,9 +2364,9 @@ function parseDateStr(dStr: string) {
                       }));
                     }}
                     placeholder="Select item..."
-                    className="bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 py-2 px-3 rounded-lg text-[11px] min-h-[38px]"
+                    className="bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 py-2 px-3 rounded-lg text-[14px] min-h-[38px]"
                   />
-                  <p className="text-[10px] font-bold text-gray-500 uppercase">{editForm.category || editingLog.category} · {formatDate(editingLog.date || editingLog.updated_at)}</p>
+                  <p className="text-[13px] font-bold text-gray-500">{editForm.category || editingLog.category} · {formatDate(editingLog.date || editingLog.updated_at)}</p>
                 </div>
 
                 <div className="flex items-center gap-3">
@@ -2374,14 +2374,14 @@ function parseDateStr(dStr: string) {
                     {(allowManualIn || (isSfg && editForm.type === "IN")) && (
                     <button
                       onClick={() => setEditForm(prev => ({ ...prev, type: 'IN' }))}
-                      className={`px-4 py-2 rounded-md text-[10px] font-black uppercase tracking-wider transition-all ${editForm.type === 'IN' ? 'bg-emerald-500 text-white shadow-sm' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
+                      className={`px-4 py-2 rounded-md text-[13px] font-semibold  tracking-wider transition-all ${editForm.type === 'IN' ? 'bg-emerald-500 text-white shadow-sm' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
                     >
                       {isSfg ? "PROD IN" : "IN"}
                     </button>
                     )}
                     <button
                       onClick={() => setEditForm(prev => ({ ...prev, type: 'OUT' }))}
-                      className={`px-4 py-2 rounded-md text-[10px] font-black uppercase tracking-wider transition-all ${editForm.type === 'OUT' ? 'bg-rose-500 text-white shadow-sm' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
+                      className={`px-4 py-2 rounded-md text-[13px] font-semibold  tracking-wider transition-all ${editForm.type === 'OUT' ? 'bg-rose-500 text-white shadow-sm' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
                     >
                       {isSfg ? "Out from SFG" : "OUT"}
                     </button>
@@ -2403,14 +2403,14 @@ function parseDateStr(dStr: string) {
               <div className="p-4 border-t border-gray-100 dark:border-white/5 flex justify-end gap-3 bg-gray-50/50 dark:bg-[#1f2937]/50">
                 <button
                   onClick={() => { setIsEditModalOpen(false); setEditingLog(null); }}
-                  className="px-5 py-2 rounded-xl text-xs font-black text-gray-500 uppercase tracking-widest hover:bg-white dark:hover:bg-[#111827] shadow-sm border border-gray-200 dark:border-white/10 transition-colors"
+                  className="px-5 py-2 rounded-xl text-[14px] font-semibold text-gray-500 hover:bg-white dark:hover:bg-[#111827] shadow-sm border border-gray-200 dark:border-white/10 transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleSaveEdit}
                   disabled={submitting}
-                  className={`px-6 py-2 rounded-xl text-xs font-black text-white uppercase tracking-widest hover:brightness-110 shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
+                  className={`px-6 py-2 rounded-xl text-[14px] font-semibold text-white   hover:brightness-110 shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
                     location === '1st'
                       ? 'bg-gradient-to-r from-purple-600 to-fuchsia-600 shadow-purple-500/20'
                       : 'bg-gradient-to-r from-emerald-600 to-teal-600 shadow-emerald-500/20'

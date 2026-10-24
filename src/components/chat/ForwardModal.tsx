@@ -111,7 +111,7 @@ export default function ForwardModal({ message, onClose, onForward }: ForwardMod
                   <div className="flex-1 min-w-0">
                     <p className="font-semibold text-gray-800 truncate">{user.username}</p>
                     {user.role_name && (
-                      <p className="text-xs text-gray-500 truncate">{user.role_name}</p>
+                      <p className="text-[14px] text-gray-500 truncate">{user.role_name}</p>
                     )}
                   </div>
                 </label>

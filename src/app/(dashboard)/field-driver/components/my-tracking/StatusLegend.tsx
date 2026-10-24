@@ -17,14 +17,14 @@ export default function StatusLegend() {
           <div key={label} className="flex items-start gap-2">
             <span className={`w-3 h-3 rounded-full shrink-0 mt-0.5 ${color}`} />
             <div>
-              <p className="text-xs font-black uppercase text-gray-800 dark:text-white">{label}</p>
-              <p className="text-[10px] text-gray-500">{desc}</p>
+              <p className="text-[14px] font-semibold text-gray-800 dark:text-white">{label}</p>
+              <p className="text-[13px] text-gray-500">{desc}</p>
             </div>
           </div>
         ))}
         <div className="mt-4 pt-3 border-t border-gray-100 dark:border-white/10 flex items-center gap-2 text-green-600">
           <CheckCircleIcon className="w-4 h-4" />
-          <span className="text-[10px] font-bold">All data synced in real-time</span>
+          <span className="text-[13px] font-bold">All data synced in real-time</span>
         </div>
       </div>
     </FieldCard>

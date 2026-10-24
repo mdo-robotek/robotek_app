@@ -109,23 +109,23 @@ export default function PremiumDatePicker({
   return (
     <div>
       {label && (
-        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2">
+        <label className="text-[13px] font-semibold text-gray-400 block mb-2">
           {label}
         </label>
       )}
       <div 
         onClick={() => setIsOpen(true)}
-        className="w-full bg-[#FFFBF0] dark:bg-navy-900 px-3 py-1.5 rounded-lg border border-orange-100 dark:border-navy-700 focus-within:border-[#FFD500] cursor-pointer flex items-center justify-between gap-4 group transition-all shadow-sm"
+        className="w-full bg-[#FFFFFF] dark:bg-navy-900 px-3 py-1.5 rounded-lg border border-orange-100 dark:border-navy-700 focus-within:border-[#2563EB] cursor-pointer flex items-center justify-between gap-4 group transition-all shadow-sm"
       >
         <div className="flex-1 min-w-0">
-          <span className="font-bold text-xs text-gray-800 dark:text-zinc-100 block">
+          <span className="font-bold text-[14px] text-gray-800 dark:text-zinc-100 block">
             {value ? new Date(value.split(',')[0]).toLocaleDateString('en-GB') : "Select Date"}
           </span>
         </div>
 
         {multiSelect && selectedDates.length > 1 && (
           <div className="flex-1 min-w-0 border-l border-orange-100 dark:border-navy-800 pl-3 py-0.5 max-h-[40px] overflow-y-auto custom-scrollbar no-scrollbar">
-            <span className="text-[9px] text-gray-400 font-bold block leading-relaxed">
+            <span className="text-[13px] text-gray-400 font-bold block leading-relaxed">
               {selectedDates.slice(1).map(d => {
                 const [y, m, day] = d.split('-').map(Number);
                 return new Date(y, m - 1, day).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' });
@@ -134,7 +134,7 @@ export default function PremiumDatePicker({
           </div>
         )}
 
-        <CalendarIcon className="w-4 h-4 text-gray-400 group-hover:text-[#CE2029] dark:group-hover:text-[#FFD500] flex-shrink-0 transition-colors" />
+        <CalendarIcon className="w-4 h-4 text-gray-400 group-hover:text-[#DC2626] dark:group-hover:text-[#60A5FA] flex-shrink-0 transition-colors" />
       </div>
 
       {isOpen && (
@@ -163,7 +163,7 @@ export default function PremiumDatePicker({
                     setShowMonthPicker(!showMonthPicker);
                     setShowYearPicker(false);
                   }}
-                  className="text-[10px] font-black text-gray-900 dark:text-white uppercase tracking-wider hover:bg-gray-50 dark:hover:bg-white/5 px-2 py-1 rounded-md transition-all"
+                  className="text-[13px] font-semibold text-gray-900 dark:text-white tracking-wider hover:bg-gray-50 dark:hover:bg-white/5 px-2 py-1 rounded-md transition-all"
                 >
                   {monthNames[currentMonth]}
                 </button>
@@ -173,7 +173,7 @@ export default function PremiumDatePicker({
                     setShowYearPicker(!showYearPicker);
                     setShowMonthPicker(false);
                   }}
-                  className="text-[10px] font-black text-gray-900 dark:text-white uppercase tracking-wider hover:bg-gray-50 dark:hover:bg-white/5 px-2 py-1 rounded-md transition-all"
+                  className="text-[13px] font-semibold text-gray-900 dark:text-white tracking-wider hover:bg-gray-50 dark:hover:bg-white/5 px-2 py-1 rounded-md transition-all"
                 >
                   {currentYear}
                 </button>
@@ -198,7 +198,7 @@ export default function PremiumDatePicker({
                       setViewDate(new Date(currentYear, i, 1));
                       setShowMonthPicker(false);
                     }}
-                    className={`text-[9px] font-black uppercase p-2 rounded-lg transition-all ${i === currentMonth ? 'bg-[#CE2029] text-white' : 'hover:bg-gray-50 dark:hover:bg-white/5 text-gray-500'}`}
+                    className={`text-[13px] font-semibold  p-2 rounded-lg transition-all ${i === currentMonth ? 'bg-[#DC2626] text-white' : 'hover:bg-gray-50 dark:hover:bg-white/5 text-gray-500'}`}
                   >
                     {name.substring(0, 3)}
                   </button>
@@ -216,7 +216,7 @@ export default function PremiumDatePicker({
                       setViewDate(new Date(year, currentMonth, 1));
                       setShowYearPicker(false);
                     }}
-                    className={`text-[10px] font-bold p-2 rounded-lg transition-all ${year === currentYear ? 'bg-[#FFD500] text-black' : 'hover:bg-gray-50 dark:hover:bg-white/5 text-gray-500'}`}
+                    className={`text-[13px] font-bold p-2 rounded-lg transition-all ${year === currentYear ? 'bg-[#2563EB] text-black' : 'hover:bg-gray-50 dark:hover:bg-white/5 text-gray-500'}`}
                   >
                     {year}
                   </button>
@@ -227,7 +227,7 @@ export default function PremiumDatePicker({
             {/* Weekdays */}
             <div className="grid grid-cols-7 mb-2">
               {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map(day => (
-                <div key={day} className="text-center text-[9px] font-black text-gray-300 dark:text-gray-600 uppercase">
+                <div key={day} className="text-center text-[13px] font-semibold text-gray-300 dark:text-gray-600">
                   {day}
                 </div>
               ))}
@@ -259,11 +259,11 @@ export default function PremiumDatePicker({
                     disabled={isDisabled}
                     onClick={() => handleDateSelect(d)}
                     className={`
-                      h-8 flex items-center justify-center rounded-lg text-xs font-bold transition-all
+                      h-8 flex items-center justify-center rounded-lg text-[14px] font-bold transition-all
                       ${isSelected 
-                        ? "bg-[#CE2029] text-white shadow-lg scale-105" 
+                        ? "bg-[#DC2626] text-white shadow-lg scale-105" 
                         : isToday 
-                          ? "bg-[#FFD500]/20 text-[#CE2029] dark:text-[#FFD500] border border-[#FFD500]/30" 
+                          ? "bg-[#2563EB]/20 text-[#DC2626] dark:text-[#60A5FA] border border-[#2563EB]/30" 
                           : isDisabled
                             ? "opacity-20 cursor-not-allowed grayscale"
                             : "text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-white/5"
@@ -285,7 +285,7 @@ export default function PremiumDatePicker({
                   onChange(today);
                   setIsOpen(false);
                 }}
-                className="text-[9px] font-black text-[#003875] dark:text-[#FFD500] uppercase tracking-widest hover:underline"
+                className="text-[13px] font-semibold text-[#2563EB] dark:text-[#60A5FA] hover:underline"
               >
                 Today
               </button>
@@ -295,7 +295,7 @@ export default function PremiumDatePicker({
                   onChange("");
                   setIsOpen(false);
                 }}
-                className="text-[9px] font-black text-gray-400 uppercase tracking-widest hover:underline text-right"
+                className="text-[13px] font-semibold text-gray-400 hover:underline text-right"
               >
                 Clear
               </button>

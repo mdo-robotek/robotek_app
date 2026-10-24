@@ -29,7 +29,7 @@ export function FieldCard({
         >
           <div className="flex items-center gap-2">
             {icon}
-            <h3 className="text-[10px] font-black uppercase tracking-widest text-[#062B6F] dark:text-[#FFD500]">
+            <h3 className="text-[13px] font-semibold text-[#1D4ED8] dark:text-[#60A5FA]">
               {title}
             </h3>
           </div>

@@ -94,7 +94,7 @@ export default function SemiCircleGauge({ value, label = "Overall Avg", isNegati
           ))}
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-end pb-2">
-           <div className="text-3xl font-black text-gray-900 dark:text-white leading-none tracking-tighter flex items-center justify-center">
+           <div className="text-3xl font-semibold text-gray-900 dark:text-white leading-none tracking-tighter flex items-center justify-center">
              {hasNoTasks ? (
                <span>—</span>
              ) : (
@@ -104,7 +104,7 @@ export default function SemiCircleGauge({ value, label = "Overall Avg", isNegati
                </>
              )}
            </div>
-           <div className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mt-1">
+           <div className="text-[13px] font-bold text-gray-400 mt-1">
              {label}
            </div>
         </div>

@@ -35,9 +35,9 @@ export default function FieldTabs({
             key={id}
             type="button"
             onClick={() => onChange(id)}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[13px] font-semibold  tracking-wider transition-all ${
               isActive
-                ? 'bg-[#062B6F] text-white'
+                ? 'bg-[#1D4ED8] text-white'
                 : 'text-gray-500 hover:bg-gray-100 dark:hover:bg-white/5'
             }`}
           >

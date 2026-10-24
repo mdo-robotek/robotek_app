@@ -73,10 +73,10 @@ export default function AdminLogsView() {
     <div className="flex flex-col h-[calc(100vh-220px)] min-h-[560px] bg-white dark:bg-slate-900 rounded-2xl overflow-hidden border border-gray-200/80 dark:border-white/10 shadow-sm">
       <div className="p-5 border-b border-gray-100 dark:border-white/10 bg-[#F8FAFC] dark:bg-slate-800/50 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-lg font-black uppercase text-[#062B6F] dark:text-[#FFD500]">
+          <h2 className="text-lg font-semibold text-[#1D4ED8] dark:text-[#60A5FA]">
             Attendance & Verification Logs
           </h2>
-          <p className="text-xs font-bold text-gray-500">Cross-reference Odometer readings with Live GPS data</p>
+          <p className="text-[14px] font-bold text-gray-500">Cross-reference Odometer readings with Live GPS data</p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
           <input
@@ -96,7 +96,7 @@ export default function AdminLogsView() {
       </div>
 
       {filtered.length > 0 && (
-        <div className="px-5 py-2 border-b border-gray-100 flex justify-between items-center text-xs">
+        <div className="px-5 py-2 border-b border-gray-100 flex justify-between items-center text-[14px]">
           <span className="text-gray-500 font-bold">
             {filtered.length} entries
           </span>
@@ -109,7 +109,7 @@ export default function AdminLogsView() {
             >
               <ChevronLeftIcon className="w-4 h-4" />
             </button>
-            <span className="font-black">Page {currentPage} / {totalPages}</span>
+            <span className="font-semibold">Page {currentPage} / {totalPages}</span>
             <button
               type="button"
               onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
@@ -132,7 +132,7 @@ export default function AdminLogsView() {
             <thead className="bg-white dark:bg-slate-900 sticky top-0 z-10 shadow-sm">
               <tr>
                 {['Driver', 'Date', 'Timeline', 'ODO Proof', 'ODO KM', 'GPS KM', 'Diff %', 'Status'].map((h) => (
-                  <th key={h} className="p-3 text-[10px] font-black uppercase tracking-wider text-gray-400 border-b">
+                  <th key={h} className="p-3 text-[13px] font-semibold tracking-wider text-gray-400 border-b">
                     {h}
                   </th>
                 ))}
@@ -142,11 +142,11 @@ export default function AdminLogsView() {
               {paginated.map((r, idx) => (
                 <tr key={r.id || idx} className="hover:bg-gray-50/50">
                   <td className="p-3">
-                    <div className="font-black text-xs uppercase">{r.userName}</div>
-                    <div className="text-[10px] text-gray-400">{r.userId}</div>
+                    <div className="font-semibold text-[14px]">{r.userName}</div>
+                    <div className="text-[13px] text-gray-400">{r.userId}</div>
                   </td>
-                  <td className="p-3 text-xs font-bold">{r.date}</td>
-                  <td className="p-3 text-xs min-w-[160px]">
+                  <td className="p-3 text-[14px] font-bold">{r.date}</td>
+                  <td className="p-3 text-[14px] min-w-[160px]">
                     <div>In: {formatTime(r.inTime)}</div>
                     <div>Out: {formatTime(r.outTime)}</div>
                   </td>
@@ -156,7 +156,7 @@ export default function AdminLogsView() {
                         <button
                           type="button"
                           onClick={() => setSelectedPhoto(drivePhotoUrl(r.odometerPhotoIn))}
-                          className="flex items-center gap-1 px-2 py-1 bg-gray-100 rounded-lg text-[10px] font-bold"
+                          className="flex items-center gap-1 px-2 py-1 bg-gray-100 rounded-lg text-[13px] font-bold"
                         >
                           <PhotoIcon className="w-3 h-3 text-green-600" /> IN
                         </button>
@@ -165,20 +165,20 @@ export default function AdminLogsView() {
                         <button
                           type="button"
                           onClick={() => setSelectedPhoto(drivePhotoUrl(r.odometerPhotoOut))}
-                          className="flex items-center gap-1 px-2 py-1 bg-gray-100 rounded-lg text-[10px] font-bold"
+                          className="flex items-center gap-1 px-2 py-1 bg-gray-100 rounded-lg text-[13px] font-bold"
                         >
                           <PhotoIcon className="w-3 h-3 text-red-600" /> OUT
                         </button>
                       )}
                     </div>
                   </td>
-                  <td className="p-3 text-right font-mono font-black">
+                  <td className="p-3 text-right font-mono font-semibold">
                     {r.status === 'COMPLETED' ? r.odoKm.toFixed(1) : '--'}
                   </td>
-                  <td className="p-3 text-right font-mono font-black text-[#062B6F] dark:text-[#FFD500]">
+                  <td className="p-3 text-right font-mono font-semibold text-[#1D4ED8] dark:text-[#60A5FA]">
                     {r.gpsKm.toFixed(1)}
                   </td>
-                  <td className="p-3 text-right font-mono text-xs">
+                  <td className="p-3 text-right font-mono text-[14px]">
                     {r.percentDiff != null ? `${r.percentDiff.toFixed(1)}%` : '--'}
                   </td>
                   <td className="p-3 text-center">

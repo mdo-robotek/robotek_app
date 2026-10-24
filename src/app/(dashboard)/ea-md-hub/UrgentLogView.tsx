@@ -177,8 +177,8 @@ export default function UrgentLogView() {
       {/* Header section matching exact design */}
       <div className="flex items-start justify-between px-2 pt-2">
         <div>
-          <h2 className="text-2xl font-bold text-[#001736] dark:text-white tracking-tight" style={{ fontFamily: 'Georgia, serif' }}>Urgent / Escalation Log</h2>
-          <p className="text-[12px] text-gray-500 mt-1">Flag via ERP Chat (or WhatsApp during transition) → phone if no response</p>
+          <h2 className="text-2xl font-bold text-[#1D4ED8] dark:text-white tracking-tight" style={{ fontFamily: 'Georgia, serif' }}>Urgent / Escalation Log</h2>
+          <p className="text-[14px] text-gray-500 mt-1">Flag via ERP Chat (or WhatsApp during transition) → phone if no response</p>
         </div>
         <button 
           onClick={openModal}
@@ -191,7 +191,7 @@ export default function UrgentLogView() {
       {/* Escalation Protocol Banner */}
       <div className="mx-2 bg-rose-50 dark:bg-rose-900/10 border border-rose-200 dark:border-rose-800/50 rounded-xl p-4">
         <h3 className="text-rose-700 dark:text-rose-400 font-bold text-sm mb-1">Escalation protocol</h3>
-        <p className="text-rose-600/80 dark:text-rose-400/80 text-xs">Urgent (same-day) → ERP Chat [URGENT] | Critical (immediate) → Phone call | Only flag genuine urgencies</p>
+        <p className="text-rose-600/80 dark:text-rose-400/80 text-[14px]">Urgent (same-day) → ERP Chat [URGENT] | Critical (immediate) → Phone call | Only flag genuine urgencies</p>
       </div>
 
       {/* Main Table */}
@@ -200,15 +200,15 @@ export default function UrgentLogView() {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-[#001736] text-white text-[9px] uppercase tracking-wider font-extrabold">
-                  <th className="p-4 rounded-tl-xl w-12 border-b border-[#001736]">#</th>
-                  <th className="p-4 border-b border-[#001736]">ISSUE</th>
-                  <th className="p-4 border-b border-[#001736]">LEVEL</th>
-                  <th className="p-4 border-b border-[#001736]">CHANNEL</th>
-                  <th className="p-4 border-b border-[#001736]">REQUIRED FROM MD</th>
-                  <th className="p-4 border-b border-[#001736]">DEADLINE</th>
-                  <th className="p-4 border-b border-[#001736]">STATUS</th>
-                  <th className="p-4 rounded-tr-xl border-b border-[#001736] text-right pr-6">ACTION</th>
+                <tr className="bg-[#1D4ED8] text-white text-[13px] tracking-wider font-extrabold">
+                  <th className="p-4 rounded-tl-xl w-12 border-b border-[#1D4ED8]">#</th>
+                  <th className="p-4 border-b border-[#1D4ED8]">ISSUE</th>
+                  <th className="p-4 border-b border-[#1D4ED8]">LEVEL</th>
+                  <th className="p-4 border-b border-[#1D4ED8]">CHANNEL</th>
+                  <th className="p-4 border-b border-[#1D4ED8]">REQUIRED FROM MD</th>
+                  <th className="p-4 border-b border-[#1D4ED8]">DEADLINE</th>
+                  <th className="p-4 border-b border-[#1D4ED8]">STATUS</th>
+                  <th className="p-4 rounded-tr-xl border-b border-[#1D4ED8] text-right pr-6">ACTION</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 dark:divide-navy-700">
@@ -221,18 +221,18 @@ export default function UrgentLogView() {
                 ) : (
                   logs.map((log, idx) => (
                     <tr key={log.id} className="hover:bg-gray-50 dark:hover:bg-navy-900/50 transition-colors">
-                      <td className="p-4 text-[11px] font-bold text-gray-500">{idx + 1}</td>
-                      <td className="p-4 text-[12px] font-bold text-gray-800 dark:text-gray-200">{log.issueSummary}</td>
+                      <td className="p-4 text-[14px] font-bold text-gray-500">{idx + 1}</td>
+                      <td className="p-4 text-[14px] font-bold text-gray-800 dark:text-gray-200">{log.issueSummary}</td>
                       <td className="p-4">
-                        <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[9px] font-black uppercase tracking-widest border ${getUrgencyColor(log.urgencyLevel)}`}>
+                        <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[13px] font-semibold   border ${getUrgencyColor(log.urgencyLevel)}`}>
                           {log.urgencyLevel.split(' - ')[0]}
                         </span>
                       </td>
-                      <td className="p-4 text-[12px] text-gray-600 dark:text-gray-300">{log.channelUsed}</td>
-                      <td className="p-4 text-[12px] text-gray-600 dark:text-gray-300">{log.requiredFromMD}</td>
-                      <td className="p-4 text-[11px] font-medium text-gray-500">{formatDisplayDate(log.deadline)}</td>
+                      <td className="p-4 text-[14px] text-gray-600 dark:text-gray-300">{log.channelUsed}</td>
+                      <td className="p-4 text-[14px] text-gray-600 dark:text-gray-300">{log.requiredFromMD}</td>
+                      <td className="p-4 text-[14px] font-medium text-gray-500">{formatDisplayDate(log.deadline)}</td>
                       <td className="p-4">
-                        <span className={`px-2.5 py-1 rounded-md text-[10px] font-bold ${
+                        <span className={`px-2.5 py-1 rounded-md text-[13px] font-bold ${
                           log.status === 'Resolved' 
                             ? 'bg-emerald-50 text-emerald-600' 
                             : 'bg-rose-50 text-rose-600'
@@ -244,7 +244,7 @@ export default function UrgentLogView() {
                         {log.status !== 'Resolved' && (
                           <button 
                             onClick={() => resolveLog(log.id, log)}
-                            className="px-3 py-1 text-[11px] font-bold text-emerald-600 border border-emerald-600 rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors"
+                            className="px-3 py-1 text-[14px] font-bold text-emerald-600 border border-emerald-600 rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors"
                           >
                             Resolve
                           </button>
@@ -267,7 +267,7 @@ export default function UrgentLogView() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="absolute inset-0 bg-[#001736]/30 backdrop-blur-sm"
+                className="absolute inset-0 bg-[#1D4ED8]/30 backdrop-blur-sm"
                 onClick={() => setIsModalOpen(false)}
               />
               <motion.div
@@ -277,14 +277,14 @@ export default function UrgentLogView() {
                 className="relative w-full max-w-2xl bg-white dark:bg-navy-900 rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-white/20"
               >
                 {/* Modal Header */}
-                <div className="px-8 py-6 border-b border-gray-100 dark:border-navy-800 flex justify-between items-center bg-[#FFFBF0] dark:bg-navy-900">
+                <div className="px-8 py-6 border-b border-gray-100 dark:border-navy-800 flex justify-between items-center bg-[#FFFFFF] dark:bg-navy-900">
                   <div>
-                    <h2 className="text-xl font-black text-gray-900 dark:text-white tracking-tight uppercase">
+                    <h2 className="text-xl font-semibold text-gray-900 dark:text-white tracking-tight">
                       Flag urgent matter
                     </h2>
                     <div className="flex items-center gap-2 mt-1">
-                      <p className="text-gray-400 dark:text-slate-400 font-bold text-[8px] uppercase tracking-widest">Triage & Escalate Workspace</p>
-                      <span className="px-2 py-0.5 bg-rose-50 dark:bg-navy-800 text-[8px] font-black text-rose-700 dark:text-rose-400 rounded border border-rose-100 dark:border-navy-700 uppercase">
+                      <p className="text-gray-400 dark:text-slate-400 font-bold text-[12px]">Triage & Escalate Workspace</p>
+                      <span className="px-2 py-0.5 bg-rose-50 dark:bg-navy-800 text-[12px] font-semibold text-rose-700 dark:text-rose-400 rounded border border-rose-100 dark:border-navy-700">
                         Immediate Action
                       </span>
                     </div>
@@ -298,24 +298,24 @@ export default function UrgentLogView() {
                 <div className="p-8 space-y-6 overflow-y-auto max-h-[80vh] custom-scrollbar bg-white dark:bg-navy-800/50">
                   {/* Section Header */}
                   <div>
-                    <p className="text-[10px] font-black text-rose-700 dark:text-rose-400 uppercase tracking-[0.2em] mb-1">Escalation Details</p>
+                    <p className="text-[13px] font-semibold text-rose-700 dark:text-rose-400 mb-1">Escalation Details</p>
                     <div className="h-0.5 w-10 bg-rose-700 dark:bg-rose-400 rounded-full mb-4"></div>
                   </div>
                   
                   {/* Issue Summary */}
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Issue Summary *</label>
+                    <label className="text-[13px] font-semibold text-gray-500">Issue Summary *</label>
                     <textarea 
                       value={issueSummary}
                       onChange={e => setIssueSummary(e.target.value)}
                       placeholder="Brief description..."
-                      className="w-full bg-[#FFFBF0] dark:bg-navy-900 border border-orange-100 dark:border-navy-700/50 rounded-xl px-4 py-3 text-[13px] text-gray-800 dark:text-gray-200 outline-none focus:border-[#003875] dark:focus:border-[#FFD500] min-h-[100px] resize-none shadow-sm transition-all"
+                      className="w-full bg-[#FFFFFF] dark:bg-navy-900 border border-orange-100 dark:border-navy-700/50 rounded-xl px-4 py-3 text-[13px] text-gray-800 dark:text-gray-200 outline-none focus:border-[#2563EB] dark:focus:border-[#60A5FA] min-h-[100px] resize-none shadow-sm transition-all"
                     />
                   </div>
 
                   {/* Urgency Level Buttons */}
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Urgency Level *</label>
+                    <label className="text-[13px] font-semibold text-gray-500">Urgency Level *</label>
                     <div className="flex flex-wrap gap-2">
                       {[
                         "CRITICAL - immediate",
@@ -325,7 +325,7 @@ export default function UrgentLogView() {
                         <button
                           key={level}
                           onClick={() => setUrgencyLevel(level)}
-                          className={`flex items-center gap-2 px-4 py-2 border rounded-xl text-[11px] font-bold transition-all ${
+                          className={`flex items-center gap-2 px-4 py-2 border rounded-xl text-[14px] font-bold transition-all ${
                             urgencyLevel === level
                               ? `${getUrgencyColor(level)} shadow-sm ring-1 ring-offset-1 ring-current`
                               : 'bg-white dark:bg-navy-800 border-gray-200 text-gray-500 hover:bg-gray-50'
@@ -340,7 +340,7 @@ export default function UrgentLogView() {
 
                   {/* Channel Used Buttons */}
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Channel Used</label>
+                    <label className="text-[13px] font-semibold text-gray-500">Channel Used</label>
                     <div className="flex flex-wrap gap-2">
                       {[
                         "WhatsApp",
@@ -350,7 +350,7 @@ export default function UrgentLogView() {
                         <button
                           key={channel}
                           onClick={() => setChannelUsed(channel)}
-                          className={`flex items-center gap-2 px-4 py-2 border rounded-xl text-[11px] font-bold transition-all ${
+                          className={`flex items-center gap-2 px-4 py-2 border rounded-xl text-[14px] font-bold transition-all ${
                             channelUsed === channel
                               ? `${getChannelColor(channel)} shadow-sm ring-1 ring-offset-1 ring-current`
                               : 'bg-white dark:bg-navy-800 border-gray-200 text-gray-500 hover:bg-gray-50'
@@ -366,23 +366,23 @@ export default function UrgentLogView() {
                   {/* Required From MD & Deadline Grid */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
-                      <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Required From MD</label>
+                      <label className="text-[13px] font-semibold text-gray-500">Required From MD</label>
                       <input 
                         type="text"
                         value={requiredFromMD}
                         onChange={e => setRequiredFromMD(e.target.value)}
                         placeholder="Decision / approval / call back..."
-                        className="w-full bg-[#FFFBF0] dark:bg-navy-900 border border-orange-100 dark:border-navy-700/50 rounded-xl px-4 py-2.5 text-[12px] text-gray-800 dark:text-gray-200 outline-none focus:border-[#003875] dark:focus:border-[#FFD500] shadow-sm transition-all"
+                        className="w-full bg-[#FFFFFF] dark:bg-navy-900 border border-orange-100 dark:border-navy-700/50 rounded-xl px-4 py-2.5 text-[14px] text-gray-800 dark:text-gray-200 outline-none focus:border-[#2563EB] dark:focus:border-[#60A5FA] shadow-sm transition-all"
                       />
                     </div>
                     
                     <div className="space-y-2">
-                      <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Deadline</label>
+                      <label className="text-[13px] font-semibold text-gray-500">Deadline</label>
                       <input 
                         type="datetime-local"
                         value={deadline}
                         onChange={e => setDeadline(e.target.value)}
-                        className="w-full bg-[#FFFBF0] dark:bg-navy-900 border border-orange-100 dark:border-navy-700/50 rounded-xl px-4 py-2.5 text-[12px] font-bold text-gray-800 dark:text-gray-200 outline-none focus:border-[#003875] dark:focus:border-[#FFD500] shadow-sm transition-all"
+                        className="w-full bg-[#FFFFFF] dark:bg-navy-900 border border-orange-100 dark:border-navy-700/50 rounded-xl px-4 py-2.5 text-[14px] font-bold text-gray-800 dark:text-gray-200 outline-none focus:border-[#2563EB] dark:focus:border-[#60A5FA] shadow-sm transition-all"
                       />
                     </div>
                   </div>
@@ -391,13 +391,13 @@ export default function UrgentLogView() {
 
                 {/* Modal Footer */}
                 <div className="px-8 py-4 bg-white dark:bg-navy-800/50 flex justify-end gap-5">
-                  <button type="button" onClick={() => setIsModalOpen(false)} className="px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-gray-900 transition-colors">
+                  <button type="button" onClick={() => setIsModalOpen(false)} className="px-8 py-3 rounded-xl text-[13px] font-semibold text-gray-400 hover:text-gray-900 transition-colors">
                     Dismiss
                   </button>
                   <button type="button"
                     onClick={submitLog}
                     disabled={isSaving}
-                    className="px-12 py-3 rounded-xl text-[11px] font-black uppercase tracking-widest text-white bg-rose-600 dark:bg-rose-500 hover:bg-rose-700 dark:hover:bg-rose-600 hover:shadow-xl transition-all active:scale-95 shadow-lg border-b-4 border-black/20"
+                    className="px-12 py-3 rounded-xl text-[14px] font-semibold text-white bg-rose-600 dark:bg-rose-500 hover:bg-rose-700 dark:hover:bg-rose-600 hover:shadow-xl transition-all active:scale-95 shadow-lg border-b-4 border-black/20"
                   >
                     {isSaving ? "Saving..." : "Log Escalation"}
                   </button>

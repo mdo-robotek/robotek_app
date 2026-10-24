@@ -487,8 +487,8 @@ export default function UsersPage() {
   const SortIcon = ({ column }: { column: keyof User }) => {
     if (sortConfig?.key !== column) return <div className="w-3 h-3 ml-1 opacity-20" />;
     return sortConfig.direction === 'asc' ? 
-      <ChevronUpIcon className="w-3 h-3 ml-1 text-[#FFD500]" /> : 
-      <ChevronDownIcon className="w-3 h-3 ml-1 text-[#FFD500]" />;
+      <ChevronUpIcon className="w-3 h-3 ml-1 text-[#2563EB]" /> : 
+      <ChevronDownIcon className="w-3 h-3 ml-1 text-[#2563EB]" />;
   };
 
   const totalPages = Math.ceil(sortedUsers.length / itemsPerPage);
@@ -502,19 +502,19 @@ export default function UsersPage() {
         {/* Standalone Title Row */}
         <div className="flex flex-col lg:flex-row items-center gap-4 px-1">
         <div className="w-full lg:w-1/3 text-center lg:text-left min-w-0">
-          <h1 className="text-xl md:text-2xl font-black text-gray-900 dark:text-white tracking-tight">Users</h1>
-          <p className="text-gray-500 dark:text-slate-300 font-bold text-[8px] md:text-[10px] uppercase tracking-wider">System Access Control</p>
+          <h1 className="text-xl md:text-2xl font-semibold text-gray-900 dark:text-white tracking-tight">Users</h1>
+          <p className="text-gray-500 dark:text-slate-300 font-bold text-[12px] md:text-[10px] tracking-wider">System Access Control</p>
         </div>
         
         <div className="w-full lg:w-1/3 flex justify-center flex-shrink-0 min-w-0">
           {/* Single Cylinder Container for All Actions */}
-          <div className="flex items-center gap-1 rounded-full border-2 border-b-4 border-[#003875] dark:border-[#FFD500] bg-white dark:bg-navy-800 shadow-sm transition-all active:translate-y-[2px] active:border-b-2 p-1 overflow-x-auto no-scrollbar max-w-full">
+          <div className="flex items-center gap-1 rounded-full border-2 border-b-4 border-[#2563EB] dark:border-[#60A5FA] bg-white dark:bg-navy-800 shadow-sm transition-all active:translate-y-[2px] active:border-b-2 p-1 overflow-x-auto no-scrollbar max-w-full">
             {/* Tab: User List */}
             <button
               onClick={() => setActiveTab('list')}
-              className={`flex items-center gap-2 px-3 md:px-5 py-1.5 font-black uppercase tracking-widest text-[9px] md:text-[10px] transition-all rounded-full whitespace-nowrap ${
+              className={`flex items-center gap-2 px-3 md:px-5 py-1.5 font-semibold   text-[13px] md:text-[10px] transition-all rounded-full whitespace-nowrap ${
                 activeTab === 'list' 
-                ? 'bg-[#003875] dark:bg-[#FFD500] text-white dark:text-black shadow-md' 
+                ? 'bg-[#2563EB] dark:bg-[#60A5FA] text-white dark:text-black shadow-md' 
                 : 'text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300'
               }`}
               title="User List"
@@ -527,9 +527,9 @@ export default function UsersPage() {
             {/* Tab: Page Visibility */}
             <button
               onClick={() => setActiveTab('visibility')}
-              className={`flex items-center gap-2 px-3 md:px-5 py-1.5 font-black uppercase tracking-widest text-[9px] md:text-[10px] transition-all rounded-full whitespace-nowrap ${
+              className={`flex items-center gap-2 px-3 md:px-5 py-1.5 font-semibold   text-[13px] md:text-[10px] transition-all rounded-full whitespace-nowrap ${
                 activeTab === 'visibility' 
-                ? 'bg-[#003875] dark:bg-[#FFD500] text-white dark:text-black shadow-md' 
+                ? 'bg-[#2563EB] dark:bg-[#60A5FA] text-white dark:text-black shadow-md' 
                 : 'text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300'
               }`}
               title="Page Visibility"
@@ -542,7 +542,7 @@ export default function UsersPage() {
             {/* Action: Export */}
             <button
               onClick={handleExport}
-              className="flex items-center justify-center gap-2 text-[#003875] dark:text-[#FFD500] px-3 md:px-5 py-1.5 font-black transition-colors hover:bg-gray-100 dark:hover:bg-navy-700 uppercase tracking-widest text-[9px] md:text-[10px] rounded-full whitespace-nowrap"
+              className="flex items-center justify-center gap-2 text-[#2563EB] dark:text-[#60A5FA] px-3 md:px-5 py-1.5 font-semibold transition-colors hover:bg-gray-100 dark:hover:bg-navy-700 text-[13px] md:text-[10px] rounded-full whitespace-nowrap"
               title="Export to CSV"
             >
               <ArrowDownTrayIcon className="w-4 h-4" />
@@ -565,7 +565,7 @@ export default function UsersPage() {
                 });
                 setIsModalOpen(true);
               }}
-              className="flex items-center justify-center hover:bg-gray-100 dark:hover:bg-navy-700 text-[#003875] dark:text-[#FFD500] px-3 py-1.5 transition-colors rounded-full"
+              className="flex items-center justify-center hover:bg-gray-100 dark:hover:bg-navy-700 text-[#2563EB] dark:text-[#60A5FA] px-3 py-1.5 transition-colors rounded-full"
               title="Add User"
             >
               <PlusIcon className="w-5 h-5" />
@@ -590,35 +590,35 @@ export default function UsersPage() {
             className="px-3 md:px-4 py-3 flex flex-col lg:flex-row lg:items-center justify-between gap-4"
           >
             <div className="relative group flex-1 max-w-full lg:max-w-sm">
-              <MagnifyingGlassIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-[#FFD500] transition-colors" />
+              <MagnifyingGlassIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-[#2563EB] transition-colors" />
               <input
                 type="text"
                 placeholder="Search database..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-1.5 bg-gray-50 dark:bg-navy-900 border border-gray-100 dark:border-navy-700/50 rounded-lg focus:border-[#FFD500] outline-none font-bold text-[13px] text-gray-700 dark:text-white transition-all shadow-sm"
+                className="w-full pl-10 pr-4 py-1.5 bg-gray-50 dark:bg-navy-900 border border-gray-100 dark:border-navy-700/50 rounded-lg focus:border-[#2563EB] outline-none font-bold text-[13px] text-gray-700 dark:text-white transition-all shadow-sm"
               />
             </div>
 
             <div className="flex flex-wrap items-center gap-3 md:gap-4">
               <div className="flex items-center gap-2">
-                <p className="text-[9px] md:text-[10px] font-black text-gray-400 uppercase tracking-widest whitespace-nowrap">
-                  Page <span className="text-[#003875] dark:text-[#FFD500]">{currentPage}</span> of {totalPages || 1}
+                <p className="text-[13px] md:text-[10px] font-semibold text-gray-400 whitespace-nowrap">
+                  Page <span className="text-[#2563EB] dark:text-[#60A5FA]">{currentPage}</span> of {totalPages || 1}
                 </p>
                 <div className="flex gap-0.5">
-                  <button onClick={() => setCurrentPage(1)} disabled={currentPage === 1} className="px-1.5 py-1 text-[9px] md:text-[10px] font-bold text-gray-400 hover:text-black dark:hover:text-white hover:bg-white dark:hover:bg-white/5 disabled:opacity-30 rounded-md transition-all whitespace-nowrap">First</button>
+                  <button onClick={() => setCurrentPage(1)} disabled={currentPage === 1} className="px-1.5 py-1 text-[13px] md:text-[10px] font-bold text-gray-400 hover:text-black dark:hover:text-white hover:bg-white dark:hover:bg-white/5 disabled:opacity-30 rounded-md transition-all whitespace-nowrap">First</button>
                   <button onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))} disabled={currentPage === 1} className="p-1 text-gray-400 hover:text-black dark:hover:text-white hover:bg-white dark:hover:bg-white/5 disabled:opacity-30 rounded-md transition-all"><ChevronLeftIcon className="w-3.5 h-3.5" /></button>
                   <button onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))} disabled={currentPage === totalPages || totalPages === 0} className="p-1 text-gray-400 hover:text-black dark:hover:text-white hover:bg-white dark:hover:bg-white/5 disabled:opacity-30 rounded-md transition-all"><ChevronRightIcon className="w-3.5 h-3.5" /></button>
-                  <button onClick={() => setCurrentPage(totalPages)} disabled={currentPage === totalPages || totalPages === 0} className="px-1.5 py-1 text-[9px] md:text-[10px] font-bold text-gray-400 hover:text-black dark:hover:text-white hover:bg-white dark:hover:bg-white/5 disabled:opacity-30 rounded-md transition-all whitespace-nowrap">Last</button>
+                  <button onClick={() => setCurrentPage(totalPages)} disabled={currentPage === totalPages || totalPages === 0} className="px-1.5 py-1 text-[13px] md:text-[10px] font-bold text-gray-400 hover:text-black dark:hover:text-white hover:bg-white dark:hover:bg-white/5 disabled:opacity-30 rounded-md transition-all whitespace-nowrap">Last</button>
                 </div>
               </div>
               <div className="hidden xs:block h-4 w-[1px] bg-gray-200 dark:bg-white/10" />
               <div className="flex items-center gap-2">
-                <label className="text-[9px] md:text-[10px] font-black text-gray-400 uppercase tracking-widest">Show</label>
+                <label className="text-[13px] md:text-[10px] font-semibold text-gray-400">Show</label>
                 <select 
                   value={itemsPerPage}
                   onChange={(e) => { setItemsPerPage(Number(e.target.value)); setCurrentPage(1); }}
-                  className="bg-transparent border-none p-0 text-[10px] font-bold outline-none dark:text-white cursor-pointer"
+                  className="bg-transparent border-none p-0 text-[13px] font-bold outline-none dark:text-white cursor-pointer"
                 >
                   <option value={10}>10</option>
                   <option value={25}>25</option>
@@ -635,63 +635,63 @@ export default function UsersPage() {
           <table className="w-full text-left border-collapse table-auto">
             <thead>
               <tr 
-                className="bg-[#003875] dark:bg-navy-950 text-white dark:text-slate-200"
+                className="bg-[#2563EB] dark:bg-navy-950 text-white dark:text-slate-200"
               >
-                <th onClick={() => handleSort('id')} className="px-3 md:px-4 py-3 text-[9px] md:text-[10px] font-black uppercase tracking-widest cursor-pointer hover:bg-white/5 transition-colors">
+                <th onClick={() => handleSort('id')} className="px-3 md:px-4 py-3 text-[13px] md:text-[10px] font-semibold cursor-pointer hover:bg-white/5 transition-colors">
                   <div className="flex items-center">Emp. Code <SortIcon column="id" /></div>
                 </th>
-                <th onClick={() => handleSort('username')} className="px-3 md:px-4 py-3 text-[9px] md:text-[10px] font-black uppercase tracking-widest cursor-pointer hover:bg-white/5 transition-colors">
+                <th onClick={() => handleSort('username')} className="px-3 md:px-4 py-3 text-[13px] md:text-[10px] font-semibold cursor-pointer hover:bg-white/5 transition-colors">
                   <div className="flex items-center">Details <SortIcon column="username" /></div>
                 </th>
-                <th onClick={() => handleSort('phone')} className="px-3 md:px-4 py-3 text-[9px] md:text-[10px] font-black uppercase tracking-widest cursor-pointer hover:bg-white/5 transition-colors hidden md:table-cell">
+                <th onClick={() => handleSort('phone')} className="px-3 md:px-4 py-3 text-[13px] md:text-[10px] font-semibold cursor-pointer hover:bg-white/5 transition-colors hidden md:table-cell">
                   <div className="flex items-center">Contact <SortIcon column="phone" /></div>
                 </th>
-                <th onClick={() => handleSort('office')} className="px-3 md:px-4 py-3 text-[9px] md:text-[10px] font-black uppercase tracking-widest cursor-pointer hover:bg-white/5 transition-colors hidden lg:table-cell">
+                <th onClick={() => handleSort('office')} className="px-3 md:px-4 py-3 text-[13px] md:text-[10px] font-semibold cursor-pointer hover:bg-white/5 transition-colors hidden lg:table-cell">
                   <div className="flex items-center">Office <SortIcon column="office" /></div>
                 </th>
-                <th onClick={() => handleSort('role_name')} className="px-3 md:px-4 py-3 text-[9px] md:text-[10px] font-black uppercase tracking-widest cursor-pointer hover:bg-white/5 transition-colors hidden lg:table-cell">
+                <th onClick={() => handleSort('role_name')} className="px-3 md:px-4 py-3 text-[13px] md:text-[10px] font-semibold cursor-pointer hover:bg-white/5 transition-colors hidden lg:table-cell">
                   <div className="flex items-center">Role <SortIcon column="role_name" /></div>
                 </th>
-                <th onClick={() => handleSort('department')} className="px-3 md:px-4 py-3 text-[9px] md:text-[10px] font-black uppercase tracking-widest cursor-pointer hover:bg-white/5 transition-colors hidden xl:table-cell">
+                <th onClick={() => handleSort('department')} className="px-3 md:px-4 py-3 text-[13px] md:text-[10px] font-semibold cursor-pointer hover:bg-white/5 transition-colors hidden xl:table-cell">
                   <div className="flex items-center">Dept/Desig <SortIcon column="department" /></div>
                 </th>
-                <th onClick={() => handleSort('dob')} className="px-3 md:px-4 py-3 text-[9px] md:text-[10px] font-black uppercase tracking-widest cursor-pointer hover:bg-white/5 transition-colors hidden lg:table-cell">
+                <th onClick={() => handleSort('dob')} className="px-3 md:px-4 py-3 text-[13px] md:text-[10px] font-semibold cursor-pointer hover:bg-white/5 transition-colors hidden lg:table-cell">
                   <div className="flex items-center">DOB <SortIcon column="dob" /></div>
                 </th>
-                <th onClick={() => handleSort('anniversary_date')} className="px-3 md:px-4 py-3 text-[9px] md:text-[10px] font-black uppercase tracking-widest cursor-pointer hover:bg-white/5 transition-colors hidden lg:table-cell">
+                <th onClick={() => handleSort('anniversary_date')} className="px-3 md:px-4 py-3 text-[13px] md:text-[10px] font-semibold cursor-pointer hover:bg-white/5 transition-colors hidden lg:table-cell">
                   <div className="flex items-center">Anniv. <SortIcon column="anniversary_date" /></div>
                 </th>
-                <th onClick={() => handleSort('doj')} className="px-3 md:px-4 py-3 text-[9px] md:text-[10px] font-black uppercase tracking-widest cursor-pointer hover:bg-white/5 transition-colors hidden lg:table-cell">
+                <th onClick={() => handleSort('doj')} className="px-3 md:px-4 py-3 text-[13px] md:text-[10px] font-semibold cursor-pointer hover:bg-white/5 transition-colors hidden lg:table-cell">
                   <div className="flex items-center">DOJ <SortIcon column="doj" /></div>
                 </th>
-                <th onClick={() => handleSort('late_long')} className="px-3 md:px-4 py-3 text-[9px] md:text-[10px] font-black uppercase tracking-widest cursor-pointer hover:bg-white/5 transition-colors hidden xl:table-cell">
+                <th onClick={() => handleSort('late_long')} className="px-3 md:px-4 py-3 text-[13px] md:text-[10px] font-semibold cursor-pointer hover:bg-white/5 transition-colors hidden xl:table-cell">
                   <div className="flex items-center">Site Locations <SortIcon column="late_long" /></div>
                 </th>
-                <th onClick={() => handleSort('isActive')} className="px-3 md:px-4 py-3 text-[9px] md:text-[10px] font-black uppercase tracking-widest cursor-pointer hover:bg-white/5 transition-colors">
+                <th onClick={() => handleSort('isActive')} className="px-3 md:px-4 py-3 text-[13px] md:text-[10px] font-semibold cursor-pointer hover:bg-white/5 transition-colors">
                   <div className="flex items-center">Status <SortIcon column="isActive" /></div>
                 </th>
-                <th className="px-3 md:px-4 py-3 text-[9px] md:text-[10px] font-black uppercase tracking-widest text-right">Actions</th>
+                <th className="px-3 md:px-4 py-3 text-[13px] md:text-[10px] font-semibold text-right">Actions</th>
               </tr>
             </thead>
           <tbody className="divide-y divide-orange-50/30">
             {isLoading ? (
               <tr>
                 <td colSpan={9} className="px-4 py-10 text-center">
-                  <div className="w-6 h-6 border-2 border-gray-100 border-t-[#FFD500] rounded-full animate-spin mx-auto mb-2" />
-                  <p className="text-gray-400 font-bold uppercase tracking-widest text-[8px]">Syncing...</p>
+                  <div className="w-6 h-6 border-2 border-gray-100 border-t-[#2563EB] rounded-full animate-spin mx-auto mb-2" />
+                  <p className="text-gray-400 font-bold text-[12px]">Syncing...</p>
                 </td>
               </tr>
             ) : paginatedUsers.length === 0 ? (
               <tr>
                 <td colSpan={9} className="px-4 py-10 text-center">
-                  <p className="text-xs text-gray-400 font-bold uppercase tracking-widest">No entries found</p>
+                  <p className="text-[14px] text-gray-400 font-bold">No entries found</p>
                 </td>
               </tr>
             ) : (
               paginatedUsers.map((user) => (
                 <tr key={user.id} className="hover:bg-orange-50/10 border-b-2 border-gray-200 dark:border-white/10 last:border-0 transition-colors group">
                   <td className="px-3 md:px-4 py-3">
-                    <span className="font-mono text-[10px] md:text-sm text-gray-900 dark:text-white font-black">{user.id}</span>
+                    <span className="font-mono text-[13px] md:text-sm text-gray-900 dark:text-white font-semibold">{user.id}</span>
                   </td>
                   <td className="px-3 md:px-4 py-3">
                     <div className="flex items-center gap-2 md:gap-3">
@@ -707,44 +707,44 @@ export default function UsersPage() {
                             }}
                           />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center font-black text-gray-400 dark:text-zinc-500 text-[10px]">
+                          <div className="w-full h-full flex items-center justify-center font-semibold text-gray-400 dark:text-zinc-500 text-[13px]">
                             {user.username?.substring(0, 2).toUpperCase()}
                           </div>
                         )}
                       </div>
                       <div className="min-w-0">
-                        <p className="font-black text-[11px] md:text-xs text-gray-900 dark:text-white leading-tight truncate">{user.username}</p>
-                        <p className="text-[9px] md:text-[10px] text-gray-400 dark:text-slate-400 font-bold lowercase truncate max-w-[80px] md:max-w-[120px]">{user.email}</p>
+                        <p className="font-semibold text-[14px] md:text-xs text-gray-900 dark:text-white leading-tight truncate">{user.username}</p>
+                        <p className="text-[13px] md:text-[10px] text-gray-400 dark:text-slate-400 font-bold lowercase truncate max-w-[80px] md:max-w-[120px]">{user.email}</p>
                       </div>
                     </div>
                   </td>
                   <td className="px-3 md:px-4 py-3 hidden md:table-cell">
-                    <p className="text-[11px] md:text-xs font-bold text-gray-600 dark:text-slate-300">{user.phone || "—"}</p>
+                    <p className="text-[14px] md:text-xs font-bold text-gray-600 dark:text-slate-300">{user.phone || "—"}</p>
                   </td>
                   <td className="px-3 md:px-4 py-3 hidden lg:table-cell">
-                    <span className="px-1.5 md:px-2 py-0.5 bg-[#003875]/5 dark:bg-[#FFD500]/10 text-[#003875] dark:text-[#FFD500] text-[8px] md:text-[9px] font-black rounded uppercase tracking-widest border border-orange-100/50 dark:border-[#FFD500]/20">
+                    <span className="px-1.5 md:px-2 py-0.5 bg-[#2563EB]/5 dark:bg-[#60A5FA]/10 text-white dark:text-[#60A5FA] text-[12px] md:text-[9px] font-semibold rounded border border-orange-100/50 dark:border-[#60A5FA]/20">
                       {user.office || "—"}
                     </span>
                   </td>
                   <td className="px-3 md:px-4 py-3 hidden lg:table-cell">
-                    <span className="inline-flex items-center px-1.5 md:px-2 py-0.5 bg-orange-50 dark:bg-[#FFD500]/10 text-[#CE2029] dark:text-[#FFD500] text-[8px] md:text-[10px] font-black uppercase tracking-widest rounded-md border border-orange-100 dark:border-[#FFD500]/20">
+                    <span className="inline-flex items-center px-1.5 md:px-2 py-0.5 bg-orange-50 dark:bg-[#60A5FA]/10 text-[#DC2626] dark:text-[#60A5FA] text-[12px] md:text-[10px] font-semibold rounded-md border border-orange-100 dark:border-[#60A5FA]/20">
                       {user.role_name || "MEMBER"}
                     </span>
                   </td>
                   <td className="px-3 md:px-4 py-3 hidden xl:table-cell">
                     <div className="min-w-0">
-                      <p className="font-black text-[10px] md:text-[11px] text-gray-900 dark:text-white leading-tight truncate">{user.department || "—"}</p>
-                      <p className="text-[9px] text-[#003875] dark:text-[#FFD500] font-bold uppercase tracking-wider truncate">{user.designation || "—"}</p>
+                      <p className="font-semibold text-[13px] md:text-[11px] text-gray-900 dark:text-white leading-tight truncate">{user.department || "—"}</p>
+                      <p className="text-[13px] text-[#2563EB] dark:text-[#60A5FA] font-bold tracking-wider truncate">{user.designation || "—"}</p>
                     </div>
                   </td>
                   <td className="px-3 md:px-4 py-3 hidden lg:table-cell">
-                    <p className="text-[11px] md:text-xs font-bold text-gray-600 dark:text-slate-300">{user.dob || "—"}</p>
+                    <p className="text-[14px] md:text-xs font-bold text-gray-600 dark:text-slate-300">{user.dob || "—"}</p>
                   </td>
                   <td className="px-3 md:px-4 py-3 hidden lg:table-cell">
-                    <p className="text-[11px] md:text-xs font-bold text-gray-600 dark:text-slate-300">{user.anniversary_date || "—"}</p>
+                    <p className="text-[14px] md:text-xs font-bold text-gray-600 dark:text-slate-300">{user.anniversary_date || "—"}</p>
                   </td>
                   <td className="px-3 md:px-4 py-3 hidden lg:table-cell">
-                    <p className="text-[11px] md:text-xs font-bold text-gray-600 dark:text-slate-300">{user.doj || "—"}</p>
+                    <p className="text-[14px] md:text-xs font-bold text-gray-600 dark:text-slate-300">{user.doj || "—"}</p>
                   </td>
                   <td className="px-3 md:px-4 py-3 hidden xl:table-cell">
                     <div className="flex flex-col gap-1">
@@ -753,21 +753,21 @@ export default function UsersPage() {
                           if (user.late_long && (user.late_long.startsWith('[') || user.late_long.startsWith('{'))) {
                             const locs = JSON.parse(user.late_long);
                             return locs.map((l: any, i: number) => (
-                              <p key={i} className="text-[9px] font-bold text-gray-400 dark:text-slate-500 font-mono italic truncate max-w-[150px]">
-                                <span className="text-[#003875] dark:text-[#FFD500] not-italic mr-1">{l.name}:</span>
+                              <p key={i} className="text-[13px] font-bold text-gray-400 dark:text-slate-500 font-mono italic truncate max-w-[150px]">
+                                <span className="text-[#2563EB] dark:text-[#60A5FA] not-italic mr-1">{l.name}:</span>
                                 {l.coords || "—"}
                               </p>
                             ));
                           }
-                          return <p className="text-[11px] md:text-xs font-bold text-gray-400 dark:text-slate-500 font-mono italic">{user.late_long || "—"}</p>;
+                          return <p className="text-[14px] md:text-xs font-bold text-gray-400 dark:text-slate-500 font-mono italic">{user.late_long || "—"}</p>;
                         } catch (e) {
-                          return <p className="text-[11px] md:text-xs font-bold text-gray-400 dark:text-slate-500 font-mono italic">{user.late_long || "—"}</p>;
+                          return <p className="text-[14px] md:text-xs font-bold text-gray-400 dark:text-slate-500 font-mono italic">{user.late_long || "—"}</p>;
                         }
                       })()}
                     </div>
                   </td>
                   <td className="px-3 md:px-4 py-3">
-                    <span className={`px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest border ${
+                    <span className={`px-2 py-0.5 rounded-full text-[12px] font-semibold   border ${
                       user.isActive 
                         ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' 
                         : 'bg-rose-500/10 text-rose-500 border-rose-500/20'
@@ -779,14 +779,14 @@ export default function UsersPage() {
                     <div className="flex items-center justify-end gap-1">
                       <button
                         onClick={() => handleEdit(user)}
-                        className="p-1.5 bg-[#003875]/10 text-[#003875] dark:bg-[#FFD500]/10 dark:text-[#FFD500] hover:bg-[#003875] hover:text-white dark:hover:bg-[#FFD500] dark:hover:text-black rounded-lg transition-all"
+                        className="p-1.5 bg-[#2563EB]/10 text-white dark:bg-[#60A5FA]/10 dark:text-[#60A5FA] hover:bg-[#2563EB] hover:text-white dark:hover:bg-[#60A5FA] dark:hover:text-black rounded-lg transition-all"
                         title="Edit User"
                       >
                         <PencilSquareIcon className="w-3.5 h-3.5" />
                       </button>
                       <button
                         onClick={() => handleDeleteClick(user.id)}
-                        className="p-1.5 bg-[#CE2029]/10 text-[#CE2029] hover:bg-[#CE2029] hover:text-white rounded-lg transition-all"
+                        className="p-1.5 bg-[#DC2626]/10 text-[#DC2626] hover:bg-[#DC2626] hover:text-white rounded-lg transition-all"
                         title="Delete User"
                       >
                         <TrashIcon className="w-3.5 h-3.5" />
@@ -815,23 +815,23 @@ export default function UsersPage() {
             className="px-3 md:px-4 py-3 flex flex-col lg:flex-row lg:items-center justify-between gap-4"
           >
             <div className="relative group flex-1 max-w-full lg:max-w-sm">
-              <MagnifyingGlassIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-[#FFD500] transition-colors" />
+              <MagnifyingGlassIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-[#2563EB] transition-colors" />
               <input
                 type="text"
                 placeholder="Search user..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-1.5 bg-gray-50 dark:bg-navy-900 border border-gray-100 dark:border-navy-700/50 rounded-lg focus:border-[#FFD500] outline-none font-bold text-[13px] text-gray-700 dark:text-white transition-all shadow-sm"
+                className="w-full pl-10 pr-4 py-1.5 bg-gray-50 dark:bg-navy-900 border border-gray-100 dark:border-navy-700/50 rounded-lg focus:border-[#2563EB] outline-none font-bold text-[13px] text-gray-700 dark:text-white transition-all shadow-sm"
               />
             </div>
           </div>
           <div className="overflow-x-auto overflow-y-auto max-h-[70vh] no-scrollbar">
             <table className="w-full text-left border-collapse table-auto">
               <thead>
-                <tr className="bg-[#003875] dark:bg-navy-950 text-white dark:text-slate-200">
-                  <th className="px-3 md:px-6 py-3 md:py-4 text-[9px] md:text-[10px] font-black uppercase tracking-widest border-r border-white/10 w-40 md:w-64 sticky left-0 top-0 bg-[#003875] dark:bg-navy-950 z-30">User Name</th>
+                <tr className="bg-[#2563EB] dark:bg-navy-950 text-white dark:text-slate-200">
+                  <th className="px-3 md:px-6 py-3 md:py-4 text-[13px] md:text-[10px] font-semibold border-r border-white/10 w-40 md:w-64 sticky left-0 top-0 bg-[#2563EB] dark:bg-navy-950 z-30">User Name</th>
                   {navigation.map(page => (
-                    <th key={page.id} className="px-3 md:px-6 py-3 md:py-4 text-[9px] md:text-[10px] font-black uppercase tracking-widest text-center whitespace-nowrap sticky top-0 bg-[#003875] dark:bg-navy-950 z-20">
+                    <th key={page.id} className="px-3 md:px-6 py-3 md:py-4 text-[13px] md:text-[10px] font-semibold text-center whitespace-nowrap sticky top-0 bg-[#2563EB] dark:bg-navy-950 z-20">
                       {page.name}
                     </th>
                   ))}
@@ -851,14 +851,14 @@ export default function UsersPage() {
                               referrerPolicy="no-referrer"
                             />
                           ) : (
-                            <div className="w-full h-full flex items-center justify-center font-black text-gray-400 dark:text-zinc-500 text-[10px]">
+                            <div className="w-full h-full flex items-center justify-center font-semibold text-gray-400 dark:text-zinc-500 text-[13px]">
                               {user.username?.substring(0, 2).toUpperCase()}
                             </div>
                           )}
                         </div>
                         <div className="min-w-0">
-                          <p className="font-black text-[11px] md:text-sm text-gray-900 dark:text-white leading-tight truncate">{user.username}</p>
-                          <p className="text-[9px] text-gray-400 font-bold uppercase tracking-wider truncate">{user.role_name || "MEMBER"}</p>
+                          <p className="font-semibold text-[14px] md:text-sm text-gray-900 dark:text-white leading-tight truncate">{user.username}</p>
+                          <p className="text-[13px] text-gray-400 font-bold tracking-wider truncate">{user.role_name || "MEMBER"}</p>
                         </div>
                       </div>
                     </td>
@@ -890,16 +890,16 @@ export default function UsersPage() {
       {isModalOpen && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-sm" onClick={() => setIsModalOpen(false)} />
-          <div className="relative bg-[#FFFBF0] dark:bg-navy-900 w-full max-w-xl rounded-2xl shadow-2xl border border-orange-100/50 dark:border-white/10 overflow-hidden animate-in fade-in zoom-in duration-300">
+          <div className="relative bg-[#FFFFFF] dark:bg-navy-900 w-full max-w-xl rounded-2xl shadow-2xl border border-orange-100/50 dark:border-white/10 overflow-hidden animate-in fade-in zoom-in duration-300">
             <div className="p-4 border-b border-orange-100/50 dark:border-zinc-800 flex items-center justify-between">
               <div>
-                <h2 className="text-lg font-black text-gray-900 dark:text-white tracking-tight">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white tracking-tight">
                   {editingUser ? "Edit User" : "Add New User"}
                 </h2>
                 <div className="flex items-center gap-2 mt-1">
-                  <p className="text-gray-400 dark:text-slate-400 font-bold text-[8px] uppercase tracking-widest">Profile Configuration</p>
+                  <p className="text-gray-400 dark:text-slate-400 font-bold text-[12px]">Profile Configuration</p>
                   {editingUser && (
-                    <span className="px-2 py-0.5 bg-orange-50 dark:bg-zinc-800 text-[8px] font-black text-gray-500 rounded border border-orange-100 dark:border-zinc-700">
+                    <span className="px-2 py-0.5 bg-orange-50 dark:bg-zinc-800 text-[12px] font-semibold text-gray-500 rounded border border-orange-100 dark:border-zinc-700">
                       User Profile
                     </span>
                   )}
@@ -929,7 +929,7 @@ export default function UsersPage() {
                       referrerPolicy="no-referrer"
                     />
                   ) : (
-                    <div className="w-full h-full bg-orange-100 dark:bg-navy-800 flex items-center justify-center text-orange-300 dark:text-navy-700 font-black text-3xl">
+                    <div className="w-full h-full bg-orange-100 dark:bg-navy-800 flex items-center justify-center text-orange-300 dark:text-navy-700 font-semibold text-3xl">
                       {formData.username?.substring(0, 2).toUpperCase() || "UR"}
                     </div>
                   )}
@@ -949,27 +949,27 @@ export default function UsersPage() {
                     />
                   </label>
                 </div>
-                <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mt-3">Click Avatar to Update Photo</p>
+                <p className="text-[13px] font-semibold text-gray-400 mt-3">Click Avatar to Update Photo</p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
                 {/* Section: basic Info */}
                 <div className="md:col-span-2">
-                  <p className="text-[10px] font-black text-[#FFD500] uppercase tracking-[0.2em] mb-1">Basic Information</p>
-                  <div className="h-0.5 w-10 bg-[#FFD500] rounded-full mb-4"></div>
+                  <p className="text-[13px] font-semibold text-[#2563EB] mb-1">Basic Information</p>
+                  <div className="h-0.5 w-10 bg-[#2563EB] rounded-full mb-4"></div>
                 </div>
 
                 <div>
-                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2">Employee Code</label>
+                  <label className="text-[13px] font-semibold text-gray-400 block mb-2">Employee Code</label>
                   <input
                     type="text"
                     value={formData.id}
                     readOnly={!editingUser}
                     onChange={(e) => editingUser && setFormData({ ...formData, id: e.target.value })}
-                    className={`w-full px-3 py-1.5 rounded-lg border focus:border-[#FFD500] outline-none font-bold text-xs transition-all shadow-sm ${
+                    className={`w-full px-3 py-1.5 rounded-lg border focus:border-[#2563EB] outline-none font-bold text-[14px] transition-all shadow-sm ${
                       !editingUser
                         ? 'bg-gray-100 dark:bg-zinc-800 text-gray-500 dark:text-zinc-400 cursor-not-allowed border-orange-100 dark:border-zinc-800'
-                        : 'bg-[#FFFBF0] dark:bg-zinc-900 focus:bg-white dark:focus:bg-zinc-900 text-gray-800 dark:text-zinc-100'
+                        : 'bg-[#FFFFFF] dark:bg-zinc-900 focus:bg-white dark:focus:bg-zinc-900 text-gray-800 dark:text-zinc-100'
                     } ${
                       users.some(u => u.id === formData.id && u.id !== editingUser?.id)
                         ? 'border-red-500'
@@ -979,7 +979,7 @@ export default function UsersPage() {
                     required
                   />
                   {!editingUser && (
-                    <p className="mt-1 text-[9px] font-black text-gray-400 uppercase tracking-widest">
+                    <p className="mt-1 text-[13px] font-semibold text-gray-400">
                       🔒 Auto-generated unique code
                     </p>
                   )}
@@ -987,7 +987,7 @@ export default function UsersPage() {
                     const existingUser = users.find(u => u.id === formData.id && u.id !== editingUser?.id);
                     if (existingUser) {
                       return (
-                        <p className="mt-1 text-[10px] font-black text-red-500 uppercase tracking-widest animate-pulse">
+                        <p className="mt-1 text-[13px] font-semibold text-red-500 animate-pulse">
                           ⚠️ This ID is already used by {existingUser.username}
                         </p>
                       );
@@ -997,47 +997,47 @@ export default function UsersPage() {
                 </div>
 
                 <div>
-                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2">Username</label>
+                  <label className="text-[13px] font-semibold text-gray-400 block mb-2">Username</label>
                   <input
                     type="text"
                     value={formData.username}
                     onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                    className="w-full bg-[#FFFBF0] dark:bg-zinc-900 px-3 py-1.5 rounded-lg border border-orange-100 dark:border-zinc-800 focus:border-[#FFD500] focus:bg-white dark:focus:bg-zinc-900 outline-none font-bold text-xs text-gray-800 dark:text-zinc-100 transition-all shadow-sm"
+                    className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-3 py-1.5 rounded-lg border border-orange-100 dark:border-zinc-800 focus:border-[#2563EB] focus:bg-white dark:focus:bg-zinc-900 outline-none font-bold text-[14px] text-gray-800 dark:text-zinc-100 transition-all shadow-sm"
                     placeholder="Enter Username"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2">Email Address</label>
+                  <label className="text-[13px] font-semibold text-gray-400 block mb-2">Email Address</label>
                   <input
                     type="email"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full bg-[#FFFBF0] dark:bg-zinc-900 px-3 py-1.5 rounded-lg border border-orange-100 dark:border-zinc-800 focus:border-[#FFD500] focus:bg-white dark:focus:bg-zinc-900 outline-none font-bold text-xs text-gray-800 dark:text-zinc-100 transition-all shadow-sm"
+                    className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-3 py-1.5 rounded-lg border border-orange-100 dark:border-zinc-800 focus:border-[#2563EB] focus:bg-white dark:focus:bg-zinc-900 outline-none font-bold text-[14px] text-gray-800 dark:text-zinc-100 transition-all shadow-sm"
                     placeholder="example@domain.com"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2">Password</label>
+                  <label className="text-[13px] font-semibold text-gray-400 block mb-2">Password</label>
                   <input
                     type="text"
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    className="w-full bg-[#FFFBF0] dark:bg-zinc-900 px-3 py-1.5 rounded-lg border border-orange-100 dark:border-zinc-800 focus:border-[#FFD500] focus:bg-white dark:focus:bg-zinc-900 outline-none font-bold text-xs text-gray-800 dark:text-zinc-100 transition-all shadow-sm"
+                    className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-3 py-1.5 rounded-lg border border-orange-100 dark:border-zinc-800 focus:border-[#2563EB] focus:bg-white dark:focus:bg-zinc-900 outline-none font-bold text-[14px] text-gray-800 dark:text-zinc-100 transition-all shadow-sm"
                     placeholder="••••••••"
                   />
                 </div>
 
                 <div>
-                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2">Phone Number</label>
+                  <label className="text-[13px] font-semibold text-gray-400 block mb-2">Phone Number</label>
                   <input
                     type="text"
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    className="w-full bg-[#FFFBF0] dark:bg-zinc-900 px-3 py-1.5 rounded-lg border border-orange-100 dark:border-zinc-800 focus:border-[#FFD500] focus:bg-white dark:focus:bg-zinc-900 outline-none font-bold text-xs text-gray-800 dark:text-zinc-100 transition-all shadow-sm"
+                    className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-3 py-1.5 rounded-lg border border-orange-100 dark:border-zinc-800 focus:border-[#2563EB] focus:bg-white dark:focus:bg-zinc-900 outline-none font-bold text-[14px] text-gray-800 dark:text-zinc-100 transition-all shadow-sm"
                     placeholder="+91-0000000000"
                   />
                 </div>
@@ -1065,8 +1065,8 @@ export default function UsersPage() {
 
                 <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-navy-950/50 rounded-xl border border-gray-100 dark:border-navy-800/50">
                   <div>
-                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block">Account Status</label>
-                    <p className="text-[9px] font-bold text-gray-500 uppercase">Active / Inactive</p>
+                    <label className="text-[13px] font-semibold text-gray-400 block">Account Status</label>
+                    <p className="text-[13px] font-bold text-gray-500">Active / Inactive</p>
                   </div>
                   <button
                     type="button"
@@ -1085,8 +1085,8 @@ export default function UsersPage() {
 
                 <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-navy-950/50 rounded-xl border border-gray-100 dark:border-navy-800/50">
                   <div>
-                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block">Track Attendance</label>
-                    <p className="text-[9px] font-bold text-gray-500 uppercase">Off for staff tracked elsewhere (e.g. factory scanner)</p>
+                    <label className="text-[13px] font-semibold text-gray-400 block">Track Attendance</label>
+                    <p className="text-[13px] font-bold text-gray-500">Off for staff tracked elsewhere (e.g. factory scanner)</p>
                   </div>
                   <button
                     type="button"
@@ -1105,16 +1105,16 @@ export default function UsersPage() {
 
                 {/* Section: Professional Details */}
                 <div className="md:col-span-2 mt-2">
-                  <p className="text-[10px] font-black text-[#FFD500] uppercase tracking-[0.2em] mb-1">Professional Details</p>
-                  <div className="h-0.5 w-10 bg-[#FFD500] rounded-full mb-4"></div>
+                  <p className="text-[13px] font-semibold text-[#2563EB] mb-1">Professional Details</p>
+                  <div className="h-0.5 w-10 bg-[#2563EB] rounded-full mb-4"></div>
                 </div>
 
                 <div>
-                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2">Office Branch</label>
+                  <label className="text-[13px] font-semibold text-gray-400 block mb-2">Office Branch</label>
                   <select
                     value={formData.office}
                     onChange={(e) => setFormData({ ...formData, office: e.target.value })}
-                    className="w-full bg-[#FFFBF0] dark:bg-zinc-900 px-3 py-1.5 rounded-lg border border-orange-100 dark:border-zinc-800 focus:border-[#FFD500] focus:bg-white dark:focus:bg-zinc-900 outline-none font-bold text-xs text-gray-800 dark:text-zinc-100 transition-all shadow-sm"
+                    className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-3 py-1.5 rounded-lg border border-orange-100 dark:border-zinc-800 focus:border-[#2563EB] focus:bg-white dark:focus:bg-zinc-900 outline-none font-bold text-[14px] text-gray-800 dark:text-zinc-100 transition-all shadow-sm"
                   >
                     <option value="">Select Office</option>
                     <option value="GTK">GTK</option>
@@ -1125,11 +1125,11 @@ export default function UsersPage() {
                 </div>
 
                 <div>
-                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2">Role Name</label>
+                  <label className="text-[13px] font-semibold text-gray-400 block mb-2">Role Name</label>
                   <select
                     value={formData.role_name}
                     onChange={(e) => setFormData({ ...formData, role_name: e.target.value })}
-                    className="w-full bg-[#FFFBF0] dark:bg-zinc-900 px-3 py-1.5 rounded-lg border border-orange-100 dark:border-zinc-800 focus:border-[#FFD500] focus:bg-white dark:focus:bg-zinc-900 outline-none font-bold text-xs text-gray-800 dark:text-zinc-100 transition-all shadow-sm"
+                    className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-3 py-1.5 rounded-lg border border-orange-100 dark:border-zinc-800 focus:border-[#2563EB] focus:bg-white dark:focus:bg-zinc-900 outline-none font-bold text-[14px] text-gray-800 dark:text-zinc-100 transition-all shadow-sm"
                   >
                     <option value="">Select Role</option>
                     <option value="ADMIN">Admin</option>
@@ -1141,14 +1141,14 @@ export default function UsersPage() {
                 </div>
 
                 <div>
-                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2 flex items-center justify-between">
+                  <label className="text-[13px] font-semibold text-gray-400 block mb-2 flex items-center justify-between">
                     Department
-                    <button type="button" onClick={() => setIsAddingOption({ type: 'department', isOpen: true })} className="p-1 hover:bg-[#003875]/10 rounded-full transition-colors"><PlusIcon className="w-3 h-3 text-[#003875] dark:text-[#FFD500]" /></button>
+                    <button type="button" onClick={() => setIsAddingOption({ type: 'department', isOpen: true })} className="p-1 hover:bg-[#2563EB]/10 rounded-full transition-colors"><PlusIcon className="w-3 h-3 text-[#2563EB] dark:text-[#60A5FA]" /></button>
                   </label>
                   <select
                     value={formData.department}
                     onChange={(e) => setFormData({ ...formData, department: e.target.value })}
-                    className="w-full bg-[#FFFBF0] dark:bg-zinc-900 px-3 py-1.5 rounded-lg border border-orange-100 dark:border-zinc-800 focus:border-[#FFD500] focus:bg-white dark:focus:bg-zinc-900 outline-none font-bold text-xs text-gray-800 dark:text-zinc-100 transition-all shadow-sm"
+                    className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-3 py-1.5 rounded-lg border border-orange-100 dark:border-zinc-800 focus:border-[#2563EB] focus:bg-white dark:focus:bg-zinc-900 outline-none font-bold text-[14px] text-gray-800 dark:text-zinc-100 transition-all shadow-sm"
                   >
                     <option value="">Select Department</option>
                     {dropdowns.departments.map((dept, i) => (
@@ -1158,14 +1158,14 @@ export default function UsersPage() {
                 </div>
 
                 <div>
-                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2 flex items-center justify-between">
+                  <label className="text-[13px] font-semibold text-gray-400 block mb-2 flex items-center justify-between">
                     Designation
-                    <button type="button" onClick={() => setIsAddingOption({ type: 'designation', isOpen: true })} className="p-1 hover:bg-[#003875]/10 rounded-full transition-colors"><PlusIcon className="w-3 h-3 text-[#003875] dark:text-[#FFD500]" /></button>
+                    <button type="button" onClick={() => setIsAddingOption({ type: 'designation', isOpen: true })} className="p-1 hover:bg-[#2563EB]/10 rounded-full transition-colors"><PlusIcon className="w-3 h-3 text-[#2563EB] dark:text-[#60A5FA]" /></button>
                   </label>
                   <select
                     value={formData.designation}
                     onChange={(e) => setFormData({ ...formData, designation: e.target.value })}
-                    className="w-full bg-[#FFFBF0] dark:bg-zinc-900 px-3 py-1.5 rounded-lg border border-orange-100 dark:border-zinc-800 focus:border-[#FFD500] focus:bg-white dark:focus:bg-zinc-900 outline-none font-bold text-xs text-gray-800 dark:text-zinc-100 transition-all shadow-sm"
+                    className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-3 py-1.5 rounded-lg border border-orange-100 dark:border-zinc-800 focus:border-[#2563EB] focus:bg-white dark:focus:bg-zinc-900 outline-none font-bold text-[14px] text-gray-800 dark:text-zinc-100 transition-all shadow-sm"
                   >
                     <option value="">Select Designation</option>
                     {dropdowns.designations.map((desig, i) => (
@@ -1178,11 +1178,11 @@ export default function UsersPage() {
                 {/* Full Width Fields: Multiple Locations */}
                 <div className="md:col-span-2 space-y-4">
                   <div className="flex items-center justify-between">
-                    <p className="text-[10px] font-black text-[#FFD500] uppercase tracking-[0.2em]">User Site Locations</p>
+                    <p className="text-[13px] font-semibold text-[#2563EB]">User Site Locations</p>
                     <button
                       type="button"
                       onClick={addLocation}
-                      className="px-3 py-1 bg-[#003875] dark:bg-[#FFD500] text-white dark:text-black rounded-lg font-black uppercase text-[8px] tracking-widest shadow-sm active:scale-95 transition-all"
+                      className="px-3 py-1 bg-[#2563EB] dark:bg-[#60A5FA] text-white dark:text-black rounded-lg font-semibold text-[12px] shadow-sm active:scale-95 transition-all"
                     >
                       + Add Site
                     </button>
@@ -1193,30 +1193,30 @@ export default function UsersPage() {
                       <div key={index} className="p-3 bg-gray-50 dark:bg-navy-950/50 rounded-xl border border-gray-100 dark:border-navy-800/50">
                         <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
                           <div className="md:col-span-4">
-                            <label className="text-[8px] font-black text-gray-400 uppercase tracking-widest block mb-1.5">Site Name</label>
+                            <label className="text-[12px] font-semibold text-gray-400 block mb-1.5">Site Name</label>
                             <input
                               type="text"
                               value={loc.name}
                               onChange={(e) => updateLocation(index, 'name', e.target.value)}
                               placeholder="e.g. Work, Site A"
-                              className="w-full bg-white dark:bg-zinc-900 px-3 py-1.5 rounded-lg border border-gray-100 dark:border-zinc-800 focus:border-[#FFD500] outline-none font-bold text-[11px] text-gray-800 dark:text-zinc-100 transition-all shadow-sm"
+                              className="w-full bg-white dark:bg-zinc-900 px-3 py-1.5 rounded-lg border border-gray-100 dark:border-zinc-800 focus:border-[#2563EB] outline-none font-bold text-[14px] text-gray-800 dark:text-zinc-100 transition-all shadow-sm"
                             />
                           </div>
                           <div className="md:col-span-8 flex gap-2">
                             <div className="flex-1">
-                              <label className="text-[8px] font-black text-gray-400 uppercase tracking-widest block mb-1.5">Coordinates</label>
+                              <label className="text-[12px] font-semibold text-gray-400 block mb-1.5">Coordinates</label>
                               <div className="relative">
                                 <input
                                   type="text"
                                   value={loc.coords}
                                   onChange={(e) => updateLocation(index, 'coords', e.target.value)}
-                                  className="w-full bg-white dark:bg-zinc-900 pl-3 pr-8 py-1.5 rounded-lg border border-gray-100 dark:border-zinc-800 focus:border-[#FFD500] outline-none font-bold text-[11px] text-gray-800 dark:text-zinc-100 transition-all shadow-sm"
+                                  className="w-full bg-white dark:bg-zinc-900 pl-3 pr-8 py-1.5 rounded-lg border border-gray-100 dark:border-zinc-800 focus:border-[#2563EB] outline-none font-bold text-[14px] text-gray-800 dark:text-zinc-100 transition-all shadow-sm"
                                   placeholder="e.g., 28.6139, 77.2090"
                                 />
                                 <button
                                   type="button"
                                   onClick={() => handleViewOnMap(loc.coords)}
-                                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-[#003875] dark:hover:text-[#FFD500] transition-colors"
+                                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-[#2563EB] dark:hover:text-[#60A5FA] transition-colors"
                                 >
                                   <GlobeAmericasIcon className="w-4 h-4" />
                                 </button>
@@ -1226,7 +1226,7 @@ export default function UsersPage() {
                               <button
                                 type="button"
                                 onClick={() => handleFetchLocation(index)}
-                                className="p-2 bg-[#003875]/10 text-[#003875] dark:bg-[#FFD500]/10 dark:text-[#FFD500] hover:bg-[#003875] hover:text-white dark:hover:bg-[#FFD500] dark:hover:text-black rounded-lg transition-all"
+                                className="p-2 bg-[#2563EB]/10 text-white dark:bg-[#60A5FA]/10 dark:text-[#60A5FA] hover:bg-[#2563EB] hover:text-white dark:hover:bg-[#60A5FA] dark:hover:text-black rounded-lg transition-all"
                                 title="Auto Fetch"
                               >
                                 <MapPinIcon className="w-4 h-4" />
@@ -1256,13 +1256,13 @@ export default function UsersPage() {
                     setSelectedImage(null);
                     setImagePreview(null);
                   }}
-                  className="flex-1 px-4 py-2 rounded-xl font-black text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-all uppercase tracking-widest text-[10px]"
+                  className="flex-1 px-4 py-2 rounded-xl font-semibold text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-all text-[13px]"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 bg-[#CE2029] hover:bg-[#8E161D] text-white px-4 py-2 rounded-xl font-black transition-all shadow-lg active:scale-95 uppercase tracking-widest text-[10px]"
+                  className="flex-1 bg-[#DC2626] hover:bg-[#8E161D] text-white px-4 py-2 rounded-xl font-semibold transition-all shadow-lg active:scale-95 text-[13px]"
                 >
                   {editingUser ? "Save" : "Create"}
                 </button>
@@ -1276,7 +1276,7 @@ export default function UsersPage() {
         <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setIsAddingOption({ ...isAddingOption, isOpen: false })} />
           <div className="relative bg-white dark:bg-navy-900 w-full max-w-sm rounded-2xl shadow-2xl p-6 border border-gray-100 dark:border-white/10 animate-in fade-in zoom-in duration-200">
-            <h3 className="text-lg font-black text-gray-900 dark:text-white uppercase tracking-tight mb-4">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white tracking-tight mb-4">
               Add New {isAddingOption.type}
             </h3>
             <input 
@@ -1284,19 +1284,19 @@ export default function UsersPage() {
               value={newOptionValue}
               onChange={(e) => setNewOptionValue(e.target.value)}
               placeholder={`Enter new ${isAddingOption.type} name`}
-              className="w-full bg-gray-50 dark:bg-zinc-950 px-4 py-2 rounded-xl border border-gray-100 dark:border-zinc-800 focus:border-[#FFD500] outline-none font-bold text-sm mb-4"
+              className="w-full bg-gray-50 dark:bg-zinc-950 px-4 py-2 rounded-xl border border-gray-100 dark:border-zinc-800 focus:border-[#2563EB] outline-none font-bold text-sm mb-4"
               autoFocus
             />
             <div className="flex gap-2">
               <button 
                 onClick={() => setIsAddingOption({ ...isAddingOption, isOpen: false })}
-                className="flex-1 py-2 font-black text-[10px] uppercase tracking-widest text-gray-400 hover:text-gray-600"
+                className="flex-1 py-2 font-semibold text-[13px] text-gray-400 hover:text-gray-600"
               >
                 Cancel
               </button>
               <button 
                 onClick={handleAddDropdownOption}
-                className="flex-1 bg-[#003875] dark:bg-[#FFD500] text-white dark:text-black py-2 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-lg"
+                className="flex-1 bg-[#2563EB] dark:bg-[#60A5FA] text-white dark:text-black py-2 rounded-xl font-semibold text-[13px] shadow-lg"
               >
                 Add Option
               </button>

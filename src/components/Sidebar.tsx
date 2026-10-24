@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { navigation } from "@/lib/navigation";
 
 import { useSession, signOut } from "next-auth/react";
-import { XMarkIcon, ArrowRightOnRectangleIcon, UserCircleIcon } from "@heroicons/react/24/outline";
+import { XMarkIcon, ArrowRightOnRectangleIcon, UserCircleIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
 import { usePermissions } from "@/hooks/usePermissions";
 
 interface SidebarProps {
@@ -172,9 +172,55 @@ export default function Sidebar({ mobileOpen, setMobileOpen }: SidebarProps) {
     return 0;
   };
 
-  // Theme Step 1 (Oct 2026): the menu always shows names next to icons
-  // (before, desktop showed icons only until you hovered). Calm white
-  // panel, one blue for the active page, red only for pending counts.
+  // Sections open/close (Sahil, 24 Oct): the menu has many items, so each
+  // section is a folder. The section holding the current page opens by
+  // itself; what you open or close is remembered for next time.
+  const sections = useMemo(() => {
+    const out: { name: string; items: typeof filteredNavigation }[] = [];
+    filteredNavigation.forEach(item => {
+      const sectionName = (item as any).section || 'Other';
+      let section = out.find(s => s.name === sectionName);
+      if (!section) { section = { name: sectionName, items: [] }; out.push(section); }
+      section.items.push(item);
+    });
+    return out;
+  }, [filteredNavigation]);
+
+  const activeSection = useMemo(() => {
+    const hit = filteredNavigation.find(item =>
+      pathname === item.href || (item.href !== '/' && (pathname + '/').startsWith(item.href + '/'))
+    );
+    return (hit as any)?.section || 'Dashboard';
+  }, [filteredNavigation, pathname]);
+
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
+  const [restored, setRestored] = useState(false);
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('erp_menu_sections');
+      if (saved) setOpenSections(JSON.parse(saved));
+    } catch { /* ignore */ }
+    setRestored(true);
+  }, []);
+
+  useEffect(() => {
+    if (!restored || !activeSection) return;
+    setOpenSections(prev => (prev[activeSection] ? prev : { ...prev, [activeSection]: true }));
+  }, [restored, activeSection]);
+
+  const toggleSection = (name: string) => {
+    setOpenSections(prev => {
+      const next = { ...prev, [name]: !prev[name] };
+      try { localStorage.setItem('erp_menu_sections', JSON.stringify(next)); } catch { /* ignore */ }
+      return next;
+    });
+  };
+
+  // Pending count shown on a closed section, so nothing stays hidden.
+  const sectionCount = (items: typeof filteredNavigation) =>
+    items.reduce((sum, it) => sum + badgeFor(it as any), 0);
+
   return (
     <>
       {/* Mobile Overlay */}
@@ -215,54 +261,61 @@ export default function Sidebar({ mobileOpen, setMobileOpen }: SidebarProps) {
         </div>
 
         <nav className="flex-1 px-3 py-3 overflow-y-auto overflow-x-hidden custom-scrollbar">
-          {(() => {
-            const sections: { name: string; items: typeof filteredNavigation }[] = [];
-            filteredNavigation.forEach(item => {
-              const sectionName = (item as any).section || 'Other';
-              let section = sections.find(s => s.name === sectionName);
-              if (!section) {
-                section = { name: sectionName, items: [] };
-                sections.push(section);
-              }
-              section.items.push(item);
-            });
+          {sections.map((section) => {
+            const isOpen = !!openSections[section.name];
+            const closedCount = sectionCount(section.items);
+            return (
+              <div key={section.name} className="mb-1">
+                <button
+                  type="button"
+                  onClick={() => toggleSection(section.name)}
+                  aria-expanded={isOpen}
+                  className="w-full flex items-center gap-2 px-3 min-h-[44px] md:min-h-[38px] rounded-lg text-[14px] font-semibold text-[#5B6472] dark:text-slate-400 hover:bg-[#F7F8FA] dark:hover:bg-white/5 transition-colors"
+                >
+                  <ChevronDownIcon
+                    className={`w-4 h-4 shrink-0 transition-transform duration-150 ${isOpen ? '' : '-rotate-90'}`}
+                  />
+                  <span className="flex-1 text-left truncate">{section.name}</span>
+                  {!isOpen && closedCount > 0 && (
+                    <span className="shrink-0 min-w-[22px] text-center text-[13px] font-semibold text-white bg-[#DC2626] rounded-full px-1.5 py-px tabular-nums">
+                      {closedCount}
+                    </span>
+                  )}
+                </button>
 
-            return sections.map((section, sIdx) => (
-              <div key={section.name} className={sIdx > 0 ? "mt-4" : ""}>
-                <div className="px-3 pb-1 text-[12px] font-semibold text-[#5B6472] dark:text-slate-500">
-                  {section.name}
-                </div>
-                <div className="space-y-0.5">
-                  {section.items.map((item) => {
-                    const isActive = pathname === item.href || (item.href !== '/' && (pathname + '/').startsWith(item.href + '/'));
-                    const count = badgeFor(item);
-                    return (
-                      <Link
-                        key={item.name}
-                        href={item.href}
-                        onClick={() => setMobileOpen?.(false)}
-                        aria-current={isActive ? 'page' : undefined}
-                        className={`
-                          flex items-center gap-3 px-3 min-h-[44px] md:min-h-[40px] rounded-lg transition-colors text-[15px]
-                          ${isActive
-                            ? 'bg-[#EFF4FF] text-[#2563EB] font-semibold dark:bg-white/10 dark:text-white'
-                            : 'text-[#1A1D21] dark:text-slate-300 hover:bg-[#F7F8FA] dark:hover:bg-white/5'}
-                        `}
-                      >
-                        <item.icon className={`w-5 h-5 shrink-0 ${isActive ? 'text-[#2563EB] dark:text-white' : 'text-[#5B6472] dark:text-slate-400'}`} />
-                        <span className="flex-1 min-w-0 truncate">{item.name}</span>
-                        {count > 0 && (
-                          <span className="shrink-0 min-w-[22px] text-center text-[12px] font-semibold text-white bg-[#DC2626] rounded-full px-1.5 py-px tabular-nums">
-                            {count}
-                          </span>
-                        )}
-                      </Link>
-                    );
-                  })}
-                </div>
+                {isOpen && (
+                  <div className="space-y-0.5 mt-0.5">
+                    {section.items.map((item) => {
+                      const isActive = pathname === item.href || (item.href !== '/' && (pathname + '/').startsWith(item.href + '/'));
+                      const count = badgeFor(item as any);
+                      return (
+                        <Link
+                          key={item.name}
+                          href={item.href}
+                          onClick={() => setMobileOpen?.(false)}
+                          aria-current={isActive ? 'page' : undefined}
+                          className={`
+                            flex items-center gap-3 pl-6 pr-3 min-h-[44px] md:min-h-[40px] rounded-lg transition-colors text-[15px]
+                            ${isActive
+                              ? 'bg-[#EFF4FF] text-[#2563EB] font-semibold dark:bg-white/10 dark:text-white'
+                              : 'text-[#1A1D21] dark:text-slate-300 hover:bg-[#F7F8FA] dark:hover:bg-white/5'}
+                          `}
+                        >
+                          <item.icon className={`w-5 h-5 shrink-0 ${isActive ? 'text-[#2563EB] dark:text-white' : 'text-[#5B6472] dark:text-slate-400'}`} />
+                          <span className="flex-1 min-w-0 truncate">{item.name}</span>
+                          {count > 0 && (
+                            <span className="shrink-0 min-w-[22px] text-center text-[13px] font-semibold text-white bg-[#DC2626] rounded-full px-1.5 py-px tabular-nums">
+                              {count}
+                            </span>
+                          )}
+                        </Link>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
-            ));
-          })()}
+            );
+          })}
         </nav>
 
         {/* Mobile User Profile Section */}

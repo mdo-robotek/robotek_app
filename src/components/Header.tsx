@@ -160,7 +160,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
         >
           <ChatBubbleLeftRightIcon className="w-5 h-5" />
           {chatUnreadCount > 0 && (
-            <span className="absolute top-1 right-1 inline-flex items-center justify-center px-1 py-0.5 text-[9px] font-black leading-none text-white transform translate-x-1/4 -translate-y-1/4 bg-[#CE2029] rounded-full shadow-sm ring-2 ring-amber-200 dark:ring-[#003875]">
+            <span className="absolute top-1 right-1 inline-flex items-center justify-center px-1 py-0.5 text-[13px] font-semibold leading-none text-white transform translate-x-1/4 -translate-y-1/4 bg-[#DC2626] rounded-full shadow-sm ring-2 ring-amber-200 dark:ring-[#60A5FA]">
               {chatUnreadCount}
             </span>
           )}
@@ -179,7 +179,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
                 referrerPolicy="no-referrer"
               />
             ) : (
-              <div className="w-full h-full bg-[#EFF4FF] flex items-center justify-center text-[#2563EB] font-semibold text-[13px] uppercase">
+              <div className="w-full h-full bg-[#EFF4FF] flex items-center justify-center text-[#2563EB] font-semibold text-[13px]">
                 {session?.user?.name?.substring(0, 2) || session?.user?.email?.substring(0, 2) || "UR"}
               </div>
             )}

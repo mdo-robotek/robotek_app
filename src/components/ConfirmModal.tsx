@@ -37,15 +37,15 @@ export default function ConfirmModal({
       >
         <div className="p-6">
           <div className="flex flex-col items-center gap-4 text-center">
-            <div className={`p-4 rounded-full ${type === 'danger' ? 'bg-red-50 dark:bg-red-500/10 text-red-500' : 'bg-orange-50 dark:bg-[#FFD500]/10 text-[#FFD500]'}`}>
+            <div className={`p-4 rounded-full ${type === 'danger' ? 'bg-red-50 dark:bg-red-500/10 text-red-500' : 'bg-orange-50 dark:bg-[#60A5FA]/10 text-[#2563EB]'}`}>
               <ExclamationTriangleIcon className="w-10 h-10" />
             </div>
             
             <div className="space-y-2">
-              <h3 className="text-lg font-black text-gray-900 dark:text-white uppercase tracking-tight">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white tracking-tight">
                 {title}
               </h3>
-              <p className="text-[11px] font-bold text-gray-500 dark:text-slate-400 leading-relaxed">
+              <p className="text-[14px] font-bold text-gray-500 dark:text-slate-400 leading-relaxed">
                 {message}
               </p>
             </div>
@@ -54,7 +54,7 @@ export default function ConfirmModal({
           <div className="mt-8 flex gap-3">
             <button
               onClick={onClose}
-              className="flex-1 px-4 py-2.5 rounded-xl font-black text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-all uppercase tracking-widest text-[10px] border border-gray-100"
+              className="flex-1 px-4 py-2.5 rounded-xl font-semibold text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-all text-[13px] border border-gray-100"
             >
               {cancelLabel}
             </button>
@@ -63,7 +63,7 @@ export default function ConfirmModal({
                 onConfirm();
                 onClose();
               }}
-              className={`flex-1 text-white py-2.5 rounded-xl font-black transition-all shadow-lg active:scale-95 uppercase tracking-widest text-[10px] ${type === 'danger' ? 'bg-[#CE2029] hover:bg-[#8E161D]' : 'bg-[#003875] hover:bg-[#002855]'}`}
+              className={`flex-1 text-white py-2.5 rounded-xl font-semibold transition-all shadow-lg active:scale-95   text-[13px] ${type === 'danger' ? 'bg-[#DC2626] hover:bg-[#8E161D]' : 'bg-[#2563EB] hover:bg-[#1D4ED8]'}`}
             >
               {confirmLabel}
             </button>

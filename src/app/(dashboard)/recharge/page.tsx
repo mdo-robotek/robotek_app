@@ -334,9 +334,9 @@ export default function RechargePage() {
   };
 
   const CATEGORIES = [
-    { id: "ALL", label: "All Categories", icon: BoltIcon, activeColor: "bg-[#007AFF] text-white shadow-md shadow-[#007AFF]/20", inactiveColor: "bg-white text-gray-600 border border-gray-200/70 hover:bg-gray-50 dark:bg-[#1C1C1E] dark:border-white/10 dark:hover:bg-white/5 dark:text-gray-300" },
+    { id: "ALL", label: "All Categories", icon: BoltIcon, activeColor: "bg-[#2563EB] text-white shadow-md shadow-[#2563EB]/20", inactiveColor: "bg-white text-gray-600 border border-gray-200/70 hover:bg-gray-50 dark:bg-[#1C1C1E] dark:border-white/10 dark:hover:bg-white/5 dark:text-gray-300" },
     { id: "MOBILE", label: "Staff Mobile", icon: DevicePhoneMobileIcon, activeColor: "bg-[#5856D6] text-white shadow-md shadow-[#5856D6]/20", inactiveColor: "bg-white text-[#5856D6] border border-[#5856D6]/20 hover:bg-[#5856D6]/5 dark:bg-[#1C1C1E] dark:border-[#5856D6]/20 dark:hover:bg-[#5856D6]/10" },
-    { id: "OFFICE", label: "Office Mobile", icon: PhoneIcon, activeColor: "bg-[#007AFF] text-white shadow-md shadow-[#007AFF]/20", inactiveColor: "bg-white text-[#007AFF] border border-[#007AFF]/20 hover:bg-[#007AFF]/5 dark:bg-[#1C1C1E] dark:border-[#007AFF]/20 dark:hover:bg-[#007AFF]/10" },
+    { id: "OFFICE", label: "Office Mobile", icon: PhoneIcon, activeColor: "bg-[#2563EB] text-white shadow-md shadow-[#2563EB]/20", inactiveColor: "bg-white text-[#2563EB] border border-[#2563EB]/20 hover:bg-[#2563EB]/5 dark:bg-[#1C1C1E] dark:border-[#2563EB]/20 dark:hover:bg-[#2563EB]/10" },
     { id: "WIFI", label: "WiFi & Fiber", icon: WifiIcon, activeColor: "bg-[#34C759] text-white shadow-md shadow-[#34C759]/20", inactiveColor: "bg-white text-[#34C759] border border-[#34C759]/20 hover:bg-[#34C759]/5 dark:bg-[#1C1C1E] dark:border-[#34C759]/20 dark:hover:bg-[#34C759]/10" },
     { id: "SOFTWARE", label: "Software & SaaS", icon: CloudIcon, activeColor: "bg-[#00C7BE] text-white shadow-md shadow-[#00C7BE]/20", inactiveColor: "bg-white text-[#00C7BE] border border-[#00C7BE]/20 hover:bg-[#00C7BE]/5 dark:bg-[#1C1C1E] dark:border-[#00C7BE]/20 dark:hover:bg-[#00C7BE]/10" },
     { id: "DOMAIN", label: "Domains", icon: GlobeAltIcon, activeColor: "bg-[#FF9500] text-white shadow-md shadow-[#FF9500]/20", inactiveColor: "bg-white text-[#FF9500] border border-[#FF9500]/20 hover:bg-[#FF9500]/5 dark:bg-[#1C1C1E] dark:border-[#FF9500]/20 dark:hover:bg-[#FF9500]/10" },
@@ -500,12 +500,12 @@ export default function RechargePage() {
       {/* Top Header Row */}
       <div className="flex flex-col md:flex-row items-center justify-between bg-white/80 dark:bg-[#1C1C1E]/80 backdrop-blur-xl border border-gray-200/50 dark:border-white/10 rounded-3xl p-3 shadow-sm gap-4 shrink-0">
         <div className="flex items-center gap-3 ml-2">
-          <div className="p-2.5 bg-[#007AFF] rounded-2xl shadow-inner">
+          <div className="p-2.5 bg-[#2563EB] rounded-2xl shadow-inner">
             <BoltIcon className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h1 className="text-base font-black text-gray-900 dark:text-white tracking-wide leading-none" style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>Recharge Hub</h1>
-            <p className="text-gray-500 dark:text-gray-400 font-semibold text-[10px] uppercase tracking-wider mt-1">Manage Connections & Payments</p>
+            <h1 className="text-base font-semibold text-gray-900 dark:text-white tracking-wide leading-none" style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>Recharge Hub</h1>
+            <p className="text-gray-500 dark:text-gray-400 font-semibold text-[13px] tracking-wider mt-1">Manage Connections & Payments</p>
           </div>
         </div>
 
@@ -517,13 +517,13 @@ export default function RechargePage() {
               placeholder="Search..." 
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
-              className="pl-9 pr-4 py-2 bg-gray-100/50 dark:bg-black/20 border border-gray-200/50 dark:border-white/5 rounded-full text-xs font-semibold text-gray-900 dark:text-white focus:ring-2 focus:ring-[#007AFF] focus:border-transparent outline-none transition-all w-full md:w-56"
+              className="pl-9 pr-4 py-2 bg-gray-100/50 dark:bg-black/20 border border-gray-200/50 dark:border-white/5 rounded-full text-[14px] font-semibold text-gray-900 dark:text-white focus:ring-2 focus:ring-[#2563EB] focus:border-transparent outline-none transition-all w-full md:w-56"
             />
           </div>
-          <button onClick={exportToCSV} className="flex items-center gap-1.5 px-4 py-2 bg-gray-100 dark:bg-white/10 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-white/20 rounded-full text-[11px] font-bold tracking-wide transition-all">
+          <button onClick={exportToCSV} className="flex items-center gap-1.5 px-4 py-2 bg-gray-100 dark:bg-white/10 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-white/20 rounded-full text-[14px] font-bold tracking-wide transition-all">
             <ArrowDownTrayIcon className="w-4 h-4" /> Export CSV
           </button>
-          <button onClick={openAddModal} className="flex items-center gap-1.5 px-4 py-2 bg-[#007AFF] text-white hover:bg-[#005bb5] rounded-full text-[11px] font-bold tracking-wide transition-all shadow-md shadow-[#007AFF]/20">
+          <button onClick={openAddModal} className="flex items-center gap-1.5 px-4 py-2 bg-[#2563EB] text-white hover:bg-[#005bb5] rounded-full text-[14px] font-bold tracking-wide transition-all shadow-md shadow-[#2563EB]/20">
             <PlusIcon className="w-4 h-4" /> New Recharge
           </button>
         </div>
@@ -536,11 +536,11 @@ export default function RechargePage() {
         <div className="w-full md:w-64 lg:w-72 flex flex-col gap-3 shrink-0 overflow-y-auto custom-scrollbar px-2 py-2">
           <div 
             onClick={() => setActiveFilter("ALL")}
-            className={`cursor-pointer bg-[#007AFF] text-white rounded-3xl p-4 shadow-lg shadow-[#007AFF]/20 relative overflow-hidden group transition-all transform hover:scale-[1.02] ${activeFilter === "ALL" ? 'ring-4 ring-[#007AFF]/50 ring-offset-2 dark:ring-offset-[#0a0f1c]' : ''}`}
+            className={`cursor-pointer bg-[#2563EB] text-white rounded-3xl p-4 shadow-lg shadow-[#2563EB]/20 relative overflow-hidden group transition-all transform hover:scale-[1.02] ${activeFilter === "ALL" ? 'ring-4 ring-[#2563EB]/50 ring-offset-2 dark:ring-offset-[#0a0f1c]' : ''}`}
           >
             <div className="z-10 relative">
-              <p className="text-[11px] font-bold text-white/80 tracking-wide mb-1">Total Bill Amount</p>
-              <h2 className="text-2xl font-black leading-none flex items-center gap-1" style={{ letterSpacing: '-0.02em' }}>
+              <p className="text-[14px] font-bold text-white/80 tracking-wide mb-1">Total Bill Amount</p>
+              <h2 className="text-2xl font-semibold leading-none flex items-center gap-1" style={{ letterSpacing: '-0.02em' }}>
                 <span className="text-lg font-semibold opacity-80">₹</span>{totalAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </h2>
             </div>
@@ -553,9 +553,9 @@ export default function RechargePage() {
             className={`cursor-pointer bg-[#FF3B30] text-white rounded-3xl p-4 shadow-lg shadow-[#FF3B30]/20 relative overflow-hidden group transition-all transform hover:scale-[1.02] ${activeFilter === "OVERDUE" ? 'ring-4 ring-[#FF3B30]/50 ring-offset-2 dark:ring-offset-[#0a0f1c]' : ''}`}
           >
             <div className="z-10 relative">
-              <p className="text-[11px] font-bold text-white/80 tracking-wide mb-1">Overdue Connections</p>
-              <h2 className="text-3xl font-black leading-none" style={{ letterSpacing: '-0.02em' }}>
-                {overdueCount} <span className="text-xs font-semibold opacity-80">Conns</span>
+              <p className="text-[14px] font-bold text-white/80 tracking-wide mb-1">Overdue Connections</p>
+              <h2 className="text-3xl font-semibold leading-none" style={{ letterSpacing: '-0.02em' }}>
+                {overdueCount} <span className="text-[14px] font-semibold opacity-80">Conns</span>
               </h2>
             </div>
             <ExclamationTriangleIcon className="w-16 h-16 absolute -right-3 -bottom-3 text-white/10 rotate-12 transition-transform group-hover:scale-110" />
@@ -567,9 +567,9 @@ export default function RechargePage() {
             className={`cursor-pointer bg-[#FF2D55] text-white rounded-3xl p-4 shadow-lg shadow-[#FF2D55]/20 relative overflow-hidden group transition-all transform hover:scale-[1.02] ${activeFilter === "TODAY" ? 'ring-4 ring-[#FF2D55]/50 ring-offset-2 dark:ring-offset-[#0a0f1c]' : ''}`}
           >
             <div className="z-10 relative">
-              <p className="text-[11px] font-bold text-white/80 tracking-wide mb-1">Expiring Today</p>
-              <h2 className="text-3xl font-black leading-none" style={{ letterSpacing: '-0.02em' }}>
-                {expiringToday} <span className="text-xs font-semibold opacity-80">Conns</span>
+              <p className="text-[14px] font-bold text-white/80 tracking-wide mb-1">Expiring Today</p>
+              <h2 className="text-3xl font-semibold leading-none" style={{ letterSpacing: '-0.02em' }}>
+                {expiringToday} <span className="text-[14px] font-semibold opacity-80">Conns</span>
               </h2>
             </div>
             <ClockIcon className="w-16 h-16 absolute -right-3 -bottom-3 text-white/10 rotate-12 transition-transform group-hover:scale-110" />
@@ -581,9 +581,9 @@ export default function RechargePage() {
             className={`cursor-pointer bg-[#FF9500] text-white rounded-3xl p-4 shadow-lg shadow-[#FF9500]/20 relative overflow-hidden group transition-all transform hover:scale-[1.02] ${activeFilter === "TOMORROW" ? 'ring-4 ring-[#FF9500]/50 ring-offset-2 dark:ring-offset-[#0a0f1c]' : ''}`}
           >
             <div className="z-10 relative">
-              <p className="text-[11px] font-bold text-white/80 tracking-wide mb-1">Expiring Tomorrow</p>
-              <h2 className="text-3xl font-black leading-none" style={{ letterSpacing: '-0.02em' }}>
-                {expiringTomorrow} <span className="text-xs font-semibold opacity-80">Conns</span>
+              <p className="text-[14px] font-bold text-white/80 tracking-wide mb-1">Expiring Tomorrow</p>
+              <h2 className="text-3xl font-semibold leading-none" style={{ letterSpacing: '-0.02em' }}>
+                {expiringTomorrow} <span className="text-[14px] font-semibold opacity-80">Conns</span>
               </h2>
             </div>
             <ClockIcon className="w-16 h-16 absolute -right-3 -bottom-3 text-white/10 rotate-12 transition-transform group-hover:scale-110" />
@@ -595,9 +595,9 @@ export default function RechargePage() {
             className={`cursor-pointer bg-[#34C759] text-white rounded-3xl p-4 shadow-lg shadow-[#34C759]/20 relative overflow-hidden group transition-all transform hover:scale-[1.02] ${activeFilter === "DAY_AFTER" ? 'ring-4 ring-[#34C759]/50 ring-offset-2 dark:ring-offset-[#0a0f1c]' : ''}`}
           >
             <div className="z-10 relative">
-              <p className="text-[11px] font-bold text-white/80 tracking-wide mb-1">Expiring Day After Tomorrow</p>
-              <h2 className="text-3xl font-black leading-none" style={{ letterSpacing: '-0.02em' }}>
-                {expiringDayAfter} <span className="text-xs font-semibold opacity-80">Conns</span>
+              <p className="text-[14px] font-bold text-white/80 tracking-wide mb-1">Expiring Day After Tomorrow</p>
+              <h2 className="text-3xl font-semibold leading-none" style={{ letterSpacing: '-0.02em' }}>
+                {expiringDayAfter} <span className="text-[14px] font-semibold opacity-80">Conns</span>
               </h2>
             </div>
             <CalendarIcon className="w-16 h-16 absolute -right-3 -bottom-3 text-white/10 rotate-12 transition-transform group-hover:scale-110" />
@@ -609,9 +609,9 @@ export default function RechargePage() {
             className={`cursor-pointer bg-[#8E8E93] text-white rounded-3xl p-4 shadow-lg shadow-[#8E8E93]/20 relative overflow-hidden group transition-all transform hover:scale-[1.02] ${activeFilter === "DISCONTINUED" ? 'ring-4 ring-[#8E8E93]/50 ring-offset-2 dark:ring-offset-[#0a0f1c]' : ''}`}
           >
             <div className="z-10 relative">
-              <p className="text-[11px] font-bold text-white/80 tracking-wide mb-1">Discontinued</p>
-              <h2 className="text-3xl font-black leading-none" style={{ letterSpacing: '-0.02em' }}>
-                {discontinuedCount} <span className="text-xs font-semibold opacity-80">Conns</span>
+              <p className="text-[14px] font-bold text-white/80 tracking-wide mb-1">Discontinued</p>
+              <h2 className="text-3xl font-semibold leading-none" style={{ letterSpacing: '-0.02em' }}>
+                {discontinuedCount} <span className="text-[14px] font-semibold opacity-80">Conns</span>
               </h2>
             </div>
             <XMarkIcon className="w-16 h-16 absolute -right-3 -bottom-3 text-white/10 rotate-12 transition-transform group-hover:scale-110" />
@@ -628,7 +628,7 @@ export default function RechargePage() {
               <button 
                 key={c.id} 
                 onClick={() => setActiveCategory(c.id)}
-                className={`px-4 py-2 rounded-full text-[11px] font-bold tracking-wide whitespace-nowrap transition-all ${activeCategory === c.id ? c.activeColor : c.inactiveColor}`}
+                className={`px-4 py-2 rounded-full text-[14px] font-bold tracking-wide whitespace-nowrap transition-all ${activeCategory === c.id ? c.activeColor : c.inactiveColor}`}
               >
                 <div className="flex items-center gap-1.5">
                   <c.icon className="w-4 h-4" />
@@ -647,7 +647,7 @@ export default function RechargePage() {
           ) : (
             <div className="flex flex-col gap-3">
               {filteredGroups.length > 0 && (
-                <div className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 px-1">
+                <div className="text-[13px] font-semibold text-gray-500 mb-1 px-1">
                   {activeFilter === "ALL" ? "All Connections" : `Filtered: ${activeFilter.replace("_", " ")}`}
                 </div>
               )}
@@ -687,14 +687,14 @@ export default function RechargePage() {
                   <div key={`${r.id || 'group'}-${groupIndex}`} className="flex flex-col gap-2">
                     {/* Main Tile */}
                     <div className={`bg-white/90 dark:bg-[#1C1C1E]/90 backdrop-blur-xl border ${isDiscontinued ? 'border-gray-200/50 dark:border-white/5 opacity-75' : 'border-gray-200/50 dark:border-white/5'} rounded-3xl p-4 shadow-sm flex flex-col md:flex-row items-center gap-4 transition-all hover:shadow-md group relative overflow-hidden`}>
-                    {!isDiscontinued && <div className="absolute left-0 top-0 bottom-0 w-[5px] bg-[#007AFF] dark:bg-[#0A84FF]"></div>}
+                    {!isDiscontinued && <div className="absolute left-0 top-0 bottom-0 w-[5px] bg-[#2563EB] dark:bg-[#0A84FF]"></div>}
                     
                     {/* Icon & Status */}
                     <div className="flex flex-col items-center justify-center gap-2 min-w-[100px] shrink-0 pl-3">
                       <div className={`p-4 rounded-2xl shadow-sm ${iconColor}`}>
                         {isDiscontinued ? <XMarkIcon className="w-8 h-8" /> : <IconComponent className="w-8 h-8" />}
                       </div>
-                      <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider text-center ${
+                      <span className={`px-3 py-1 rounded-full text-[13px] font-bold  tracking-wider text-center ${
                         isDiscontinued 
                           ? 'bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400' 
                           : 'bg-green-100 text-green-700 dark:bg-[#34C759]/20 dark:text-[#34C759]'
@@ -711,7 +711,7 @@ export default function RechargePage() {
                           <PhoneIcon className="w-4 h-4" />
                           <p className="text-sm font-semibold tracking-wide">{r.phone_wifi_num}</p>
                         </div>
-                        <div className="text-[11px] font-semibold text-gray-400 tracking-wide mt-1">
+                        <div className="text-[14px] font-semibold text-gray-400 tracking-wide mt-1">
                           Filled By: <span className="text-gray-600 dark:text-gray-300">{r.filled_by}</span>
                         </div>
                       </div>
@@ -720,11 +720,11 @@ export default function RechargePage() {
                     {/* Dates */}
                     <div className="flex gap-8 min-w-[250px] border-l border-gray-100 dark:border-white/5 pl-6 shrink-0">
                       <div>
-                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Recharge Date</p>
+                        <p className="text-[13px] font-bold text-gray-400 mb-1.5">Recharge Date</p>
                         <p className="text-base font-semibold text-gray-800 dark:text-gray-200">{formatDate(r.date_of_recharge)}</p>
                       </div>
                       <div>
-                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Expiry Date <span className="lowercase font-bold opacity-70">({r.validity}d)</span></p>
+                        <p className="text-[13px] font-bold text-gray-400 mb-1.5">Expiry Date <span className="lowercase font-bold opacity-70">({r.validity}d)</span></p>
                         <p className={`text-base font-bold ${isDiscontinued ? 'text-gray-500' : 'text-[#FF3B30] dark:text-[#FF453A]'}`}>
                           {expiryDate ? formatDate(expiryDate.toISOString()) : "-"}
                         </p>
@@ -733,14 +733,14 @@ export default function RechargePage() {
 
                     {/* Amount */}
                     <div className="min-w-[150px] text-right border-l border-gray-100 dark:border-white/5 pl-6 pr-4 shrink-0">
-                       <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Amount</p>
-                       <p className="text-3xl font-black text-[#007AFF] dark:text-[#0A84FF] tracking-tight">₹{r.amount}</p>
+                       <p className="text-[13px] font-bold text-gray-400 mb-1.5">Amount</p>
+                       <p className="text-3xl font-semibold text-[#2563EB] dark:text-[#0A84FF] tracking-tight">₹{r.amount}</p>
                     </div>
 
                     {/* Actions */}
                     <div className="flex items-center justify-end gap-3 min-w-[180px] border-l-2 border-gray-100 dark:border-white/5 pl-6 shrink-0">
                       {!isDiscontinued && (
-                        <button onClick={() => openQuickRechargeModal(r)} title="Quick Recharge" className="p-2 bg-[#007AFF]/10 text-[#007AFF] hover:bg-[#007AFF]/20 dark:text-[#0A84FF] dark:hover:bg-[#0A84FF]/20 rounded-lg transition-colors">
+                        <button onClick={() => openQuickRechargeModal(r)} title="Quick Recharge" className="p-2 bg-[#2563EB]/10 text-[#2563EB] hover:bg-[#2563EB]/20 dark:text-[#0A84FF] dark:hover:bg-[#0A84FF]/20 rounded-lg transition-colors">
                           <BoltIcon className="w-4 h-4" />
                         </button>
                       )}
@@ -749,7 +749,7 @@ export default function RechargePage() {
                           <EyeIcon className="w-4 h-4" />
                         </a>
                       )}
-                      <button onClick={() => openEditModal(r)} className="p-2 text-[#003875] bg-blue-50 hover:bg-blue-100 dark:text-[#FFD500] dark:bg-yellow-500/10 dark:hover:bg-yellow-500/20 rounded-lg transition-colors">
+                      <button onClick={() => openEditModal(r)} className="p-2 text-[#2563EB] bg-blue-50 hover:bg-blue-100 dark:text-[#60A5FA] dark:bg-yellow-500/10 dark:hover:bg-yellow-500/20 rounded-lg transition-colors">
                         <PencilSquareIcon className="w-4 h-4" />
                       </button>
                       <button onClick={() => requestDelete(r.id)} className="p-2 text-rose-500 bg-rose-50 hover:bg-rose-100 dark:bg-rose-500/10 dark:hover:bg-rose-500/20 rounded-lg transition-colors">
@@ -777,18 +777,18 @@ export default function RechargePage() {
                              
                              <div className="flex items-center gap-6 flex-1">
                                <div>
-                                 <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Recharge Date</p>
+                                 <p className="text-[13px] font-semibold text-gray-400 mb-0.5">Recharge Date</p>
                                  <p className="text-sm font-bold text-gray-800 dark:text-gray-300">{formatDate(hist.date_of_recharge)}</p>
                                </div>
                                <div>
-                                 <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Expiry <span className="lowercase font-bold opacity-70">({hist.validity}d)</span></p>
-                                 <p className="text-sm font-black text-gray-500">{histExpiry ? formatDate(histExpiry.toISOString()) : "-"}</p>
+                                 <p className="text-[13px] font-semibold text-gray-400 mb-0.5">Expiry <span className="lowercase font-bold opacity-70">({hist.validity}d)</span></p>
+                                 <p className="text-sm font-semibold text-gray-500">{histExpiry ? formatDate(histExpiry.toISOString()) : "-"}</p>
                                </div>
                              </div>
 
                              <div className="text-right min-w-[100px]">
-                               <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Amount</p>
-                               <p className="text-lg font-black text-gray-600 dark:text-gray-400 tracking-tight">₹{hist.amount}</p>
+                               <p className="text-[13px] font-semibold text-gray-400 mb-0.5">Amount</p>
+                               <p className="text-lg font-semibold text-gray-600 dark:text-gray-400 tracking-tight">₹{hist.amount}</p>
                              </div>
 
                              <div className="flex items-center gap-2 pl-4 border-l border-gray-200 dark:border-white/10">
@@ -797,7 +797,7 @@ export default function RechargePage() {
                                     <EyeIcon className="w-3.5 h-3.5" />
                                   </a>
                                 )}
-                                <button onClick={() => openEditModal(hist)} className="p-1.5 text-gray-400 hover:text-[#003875] hover:bg-blue-50 dark:hover:text-[#FFD500] dark:hover:bg-yellow-500/10 rounded-md transition-colors">
+                                <button onClick={() => openEditModal(hist)} className="p-1.5 text-gray-400 hover:text-[#2563EB] hover:bg-blue-50 dark:hover:text-[#60A5FA] dark:hover:bg-yellow-500/10 rounded-md transition-colors">
                                   <PencilSquareIcon className="w-3.5 h-3.5" />
                                 </button>
                                 <button onClick={() => requestDelete(hist.id)} className="p-1.5 text-gray-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-md transition-colors">
@@ -813,7 +813,7 @@ export default function RechargePage() {
                 );
               })}
               {filteredGroups.length === 0 && (
-                <div className="col-span-full p-8 text-center text-xs font-bold text-gray-400 uppercase tracking-widest bg-white dark:bg-[#111827] rounded-2xl border border-gray-200 dark:border-white/5">
+                <div className="col-span-full p-8 text-center text-[14px] font-bold text-gray-400 bg-white dark:bg-[#111827] rounded-2xl border border-gray-200 dark:border-white/5">
                   No records found for this filter
                 </div>
               )}
@@ -826,7 +826,7 @@ export default function RechargePage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
           <div className="bg-white/95 dark:bg-[#1C1C1E]/95 backdrop-blur-xl w-full max-w-xl rounded-3xl shadow-2xl border border-gray-200/50 dark:border-white/10 overflow-hidden flex flex-col max-h-[90vh]">
             {/* Header */}
-            <div className={`p-5 flex items-center justify-between shrink-0 ${isQuickRecharge ? 'bg-emerald-500' : 'bg-[#007AFF]'}`}>
+            <div className={`p-5 flex items-center justify-between shrink-0 ${isQuickRecharge ? 'bg-emerald-500' : 'bg-[#2563EB]'}`}>
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-white/20 rounded-2xl">
                   {isQuickRecharge ? (
@@ -836,10 +836,10 @@ export default function RechargePage() {
                   )}
                 </div>
                 <div>
-                  <h2 className="text-sm font-black text-white tracking-wide leading-none">
+                  <h2 className="text-sm font-semibold text-white tracking-wide leading-none">
                     {isQuickRecharge ? "Quick Recharge" : isEditing ? "Edit Record" : "New Recharge"}
                   </h2>
-                  <p className="text-[10px] font-semibold text-white/70 mt-0.5 uppercase tracking-wider">
+                  <p className="text-[13px] font-semibold text-white/70 mt-0.5 tracking-wider">
                     {isQuickRecharge ? "Add quick recharge for this connection" : isEditing ? "Update connection details" : "Add new connection"}
                   </p>
                 </div>
@@ -855,7 +855,7 @@ export default function RechargePage() {
 
               {isQuickRecharge && (
                 <div className="bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/30 rounded-2xl p-4">
-                  <p className="text-[11px] font-bold text-emerald-700 dark:text-emerald-300 uppercase tracking-wide">
+                  <p className="text-[14px] font-bold text-emerald-700 dark:text-emerald-300 tracking-wide">
                     ✓ Connection Details (Read-Only)
                   </p>
                 </div>
@@ -867,9 +867,9 @@ export default function RechargePage() {
                   <button
                     type="button"
                     onClick={() => setFormData({...formData, type: "Recharge"})}
-                    className={`flex-1 py-2.5 px-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
+                    className={`flex-1 py-2.5 px-3 rounded-xl text-[13px] font-semibold   transition-all ${
                       formData.type === "Recharge"
-                        ? "bg-[#007AFF] text-white shadow-md shadow-[#007AFF]/30"
+                        ? "bg-[#2563EB] text-white shadow-md shadow-[#2563EB]/30"
                         : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
                     }`}
                   >
@@ -878,7 +878,7 @@ export default function RechargePage() {
                   <button
                     type="button"
                     onClick={() => setFormData({...formData, type: "Discontinued"})}
-                    className={`flex-1 py-2.5 px-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
+                    className={`flex-1 py-2.5 px-3 rounded-xl text-[13px] font-semibold   transition-all ${
                       formData.type === "Discontinued"
                         ? "bg-[#FF3B30] text-white shadow-md shadow-[#FF3B30]/30"
                         : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
@@ -892,14 +892,14 @@ export default function RechargePage() {
               <div className="grid grid-cols-2 gap-4">
                 {/* Doer / WiFi Name */}
                 <div className="col-span-2 md:col-span-1">
-                  <label className="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1.5">Doer / WiFi Name</label>
+                  <label className="block text-[13px] font-semibold text-gray-400 dark:text-gray-500 mb-1.5">Doer / WiFi Name</label>
                   <input
                     required
                     disabled={isQuickRecharge}
                     list={!isQuickRecharge ? "doers-list" : undefined}
                     value={formData.doer_wifi_name}
                     onChange={e => setFormData({...formData, doer_wifi_name: e.target.value})}
-                    className={`w-full bg-gray-50 dark:bg-black/30 border border-gray-200 dark:border-white/10 rounded-2xl px-4 py-2.5 text-xs font-bold text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-[#007AFF] focus:border-transparent outline-none transition-all uppercase ${isQuickRecharge ? 'opacity-70 cursor-not-allowed' : ''}`}
+                    className={`w-full bg-gray-50 dark:bg-black/30 border border-gray-200 dark:border-white/10 rounded-2xl px-4 py-2.5 text-[14px] font-bold text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-[#2563EB] focus:border-transparent outline-none transition-all  ${isQuickRecharge ? 'opacity-70 cursor-not-allowed' : ''}`}
                     placeholder="Enter or Select Name"
                   />
                   {!isQuickRecharge && (
@@ -913,50 +913,50 @@ export default function RechargePage() {
 
                 {/* Phone / WiFi Number */}
                 <div className="col-span-2 md:col-span-1">
-                  <label className="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1.5">Phone / WiFi Number</label>
+                  <label className="block text-[13px] font-semibold text-gray-400 dark:text-gray-500 mb-1.5">Phone / WiFi Number</label>
                   <input
                     required
                     disabled={isQuickRecharge}
                     type="text"
                     value={formData.phone_wifi_num}
                     onChange={e => setFormData({...formData, phone_wifi_num: e.target.value})}
-                    className={`w-full bg-gray-50 dark:bg-black/30 border border-gray-200 dark:border-white/10 rounded-2xl px-4 py-2.5 text-xs font-bold text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-[#007AFF] focus:border-transparent outline-none transition-all ${isQuickRecharge ? 'opacity-70 cursor-not-allowed' : ''}`}
+                    className={`w-full bg-gray-50 dark:bg-black/30 border border-gray-200 dark:border-white/10 rounded-2xl px-4 py-2.5 text-[14px] font-bold text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-[#2563EB] focus:border-transparent outline-none transition-all ${isQuickRecharge ? 'opacity-70 cursor-not-allowed' : ''}`}
                     placeholder="Enter Number"
                   />
                 </div>
 
                 {/* Date of Recharge */}
                 <div className="col-span-2 md:col-span-1">
-                  <label className="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1.5">Date of Recharge</label>
+                  <label className="block text-[13px] font-semibold text-gray-400 dark:text-gray-500 mb-1.5">Date of Recharge</label>
                   <input
                     required
                     type="date"
                     value={formData.date_of_recharge}
                     onChange={e => setFormData({...formData, date_of_recharge: e.target.value})}
-                    className="w-full bg-gray-50 dark:bg-black/30 border border-gray-200 dark:border-white/10 rounded-2xl px-4 py-2.5 text-xs font-bold text-gray-900 dark:text-white focus:ring-2 focus:ring-[#007AFF] focus:border-transparent outline-none transition-all"
+                    className="w-full bg-gray-50 dark:bg-black/30 border border-gray-200 dark:border-white/10 rounded-2xl px-4 py-2.5 text-[14px] font-bold text-gray-900 dark:text-white focus:ring-2 focus:ring-[#2563EB] focus:border-transparent outline-none transition-all"
                   />
                 </div>
 
                 {/* Validity */}
                 <div className="col-span-2 md:col-span-1">
-                  <label className="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1.5">Validity (Days)</label>
+                  <label className="block text-[13px] font-semibold text-gray-400 dark:text-gray-500 mb-1.5">Validity (Days)</label>
                   <input
                     required
                     type="number"
                     min="1"
                     value={formData.validity}
                     onChange={e => setFormData({...formData, validity: e.target.value})}
-                    className="w-full bg-gray-50 dark:bg-black/30 border border-gray-200 dark:border-white/10 rounded-2xl px-4 py-2.5 text-xs font-bold text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-[#007AFF] focus:border-transparent outline-none transition-all"
+                    className="w-full bg-gray-50 dark:bg-black/30 border border-gray-200 dark:border-white/10 rounded-2xl px-4 py-2.5 text-[14px] font-bold text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-[#2563EB] focus:border-transparent outline-none transition-all"
                     placeholder="e.g. 30"
                   />
                 </div>
 
                 {/* Amount */}
                 <div className="col-span-2 md:col-span-1">
-                  <label className="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1.5">Amount</label>
+                  <label className="block text-[13px] font-semibold text-gray-400 dark:text-gray-500 mb-1.5">Amount</label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                      <span className="text-[#007AFF] font-black text-sm">₹</span>
+                      <span className="text-[#2563EB] font-semibold text-sm">₹</span>
                     </div>
                     <input
                       required
@@ -964,7 +964,7 @@ export default function RechargePage() {
                       step="0.01"
                       value={formData.amount}
                       onChange={e => setFormData({...formData, amount: e.target.value})}
-                      className="w-full bg-gray-50 dark:bg-black/30 border border-gray-200 dark:border-white/10 rounded-2xl px-4 py-2.5 pl-9 text-xs font-bold text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-[#007AFF] focus:border-transparent outline-none transition-all"
+                      className="w-full bg-gray-50 dark:bg-black/30 border border-gray-200 dark:border-white/10 rounded-2xl px-4 py-2.5 pl-9 text-[14px] font-bold text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-[#2563EB] focus:border-transparent outline-none transition-all"
                       placeholder="0.00"
                     />
                   </div>
@@ -972,11 +972,11 @@ export default function RechargePage() {
 
                 {/* Attach Bill */}
                 <div className="col-span-2 md:col-span-1">
-                  <label className="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1.5">Attach Bill</label>
+                  <label className="block text-[13px] font-semibold text-gray-400 dark:text-gray-500 mb-1.5">Attach Bill</label>
                   <div className="flex items-center gap-2">
-                    <label className="flex-1 flex items-center justify-center gap-2 border-2 border-dashed border-gray-200 dark:border-white/10 rounded-2xl p-2.5 cursor-pointer hover:border-[#007AFF] hover:bg-[#007AFF]/5 transition-all group">
-                      <DocumentArrowUpIcon className="w-4 h-4 text-gray-400 group-hover:text-[#007AFF] transition-colors" />
-                      <span className="text-[10px] font-bold text-gray-400 group-hover:text-[#007AFF] uppercase truncate max-w-[100px] transition-colors">
+                    <label className="flex-1 flex items-center justify-center gap-2 border-2 border-dashed border-gray-200 dark:border-white/10 rounded-2xl p-2.5 cursor-pointer hover:border-[#2563EB] hover:bg-[#2563EB]/5 transition-all group">
+                      <DocumentArrowUpIcon className="w-4 h-4 text-gray-400 group-hover:text-[#2563EB] transition-colors" />
+                      <span className="text-[13px] font-bold text-gray-400 group-hover:text-[#2563EB] truncate max-w-[100px] transition-colors">
                         {pendingFile ? pendingFile.name : 'Choose File'}
                       </span>
                       <input type="file" className="hidden" onChange={handleFileUpload} />
@@ -984,7 +984,7 @@ export default function RechargePage() {
                     {(pendingFile || formData.attach_bill) && (
                       <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 text-sm font-bold ${
                         pendingFile
-                          ? 'bg-[#007AFF]/10 text-[#007AFF]'
+                          ? 'bg-[#2563EB]/10 text-[#2563EB]'
                           : 'bg-[#34C759]/10 text-[#34C759]'
                       }`} title={pendingFile ? `Ready: ${pendingFile.name}` : 'Bill attached'}>
                         {pendingFile ? '📎' : '✓'}
@@ -992,7 +992,7 @@ export default function RechargePage() {
                     )}
                   </div>
                   {pendingFile && (
-                    <p className="text-[9px] font-semibold text-[#007AFF] mt-1.5 pl-1">Will upload when you save ↑</p>
+                    <p className="text-[13px] font-semibold text-[#2563EB] mt-1.5 pl-1">Will upload when you save ↑</p>
                   )}
                 </div>
               </div>
@@ -1002,17 +1002,17 @@ export default function RechargePage() {
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="px-5 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 transition-all"
+                  className="px-5 py-2.5 rounded-2xl text-[13px] font-semibold text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 transition-all"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={submitting || uploading}
-                  className={`flex items-center gap-2 text-white px-6 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 disabled:opacity-50 disabled:pointer-events-none ${
+                  className={`flex items-center gap-2 text-white px-6 py-2.5 rounded-2xl text-[13px] font-semibold   transition-all active:scale-95 disabled:opacity-50 disabled:pointer-events-none ${
                     isQuickRecharge
                       ? 'bg-emerald-500 hover:bg-emerald-600 shadow-md shadow-emerald-500/20'
-                      : 'bg-[#007AFF] hover:bg-[#005bb5] shadow-md shadow-[#007AFF]/20'
+                      : 'bg-[#2563EB] hover:bg-[#005bb5] shadow-md shadow-[#2563EB]/20'
                   }`}
                 >
                   {(submitting || uploading) && (

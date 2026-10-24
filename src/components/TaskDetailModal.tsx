@@ -50,8 +50,8 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ isOpen, onClose, titl
           className="px-8 py-4 border-b flex items-center justify-between"
         >
           <div>
-            <h2 className="text-xl font-black text-gray-900 dark:text-white uppercase tracking-tight">{title}</h2>
-            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Detailed Task Breakdown</p>
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white tracking-tight">{title}</h2>
+            <p className="text-[13px] font-bold text-gray-400">Detailed Task Breakdown</p>
           </div>
           <button 
             onClick={onClose} 
@@ -68,7 +68,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ isOpen, onClose, titl
         >
           <div className="grid grid-cols-1 gap-3">
             {tasks.length === 0 ? (
-              <div className="py-20 text-center text-gray-400 italic font-bold uppercase tracking-widest">No tasks found for this period</div>
+              <div className="py-20 text-center text-gray-400 italic font-bold">No tasks found for this period</div>
             ) : (
               tasks.map((task, idx) => (
                 <div 
@@ -79,14 +79,14 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ isOpen, onClose, titl
                   }`}
                 >
                   <div className="flex-1 min-w-0">
-                    <h4 className="font-black text-gray-900 dark:text-white text-xs uppercase truncate mb-1">{task.title}</h4>
+                    <h4 className="font-semibold text-gray-900 dark:text-white text-[14px] truncate mb-1">{task.title}</h4>
                     <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
-                      <div className="flex items-center gap-1.5 text-[10px] text-gray-500">
+                      <div className="flex items-center gap-1.5 text-[13px] text-gray-500">
                         <ClockIcon className="w-3 h-3 text-blue-400" />
                         <span>Planned: <span className="font-bold text-gray-700 dark:text-slate-300">{formatDate(task.plannedDate)}</span></span>
                       </div>
                       {task.actualDate && (
-                        <div className="flex items-center gap-1.5 text-[10px] text-gray-500">
+                        <div className="flex items-center gap-1.5 text-[13px] text-gray-500">
                           <CheckCircleIcon className="w-3 h-3 text-emerald-400" />
                           <span>Actual: <span className="font-bold text-gray-700 dark:text-slate-300">{formatDate(task.actualDate)}</span></span>
                         </div>
@@ -94,7 +94,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ isOpen, onClose, titl
                     </div>
                   </div>
                   <div className="shrink-0 flex items-center">
-                    <span className={`text-[10px] font-black px-3 py-1 rounded-full uppercase ${
+                    <span className={`text-[13px] font-semibold px-3 py-1 rounded-full  ${
                       task.isLate ? 'bg-rose-50 text-rose-500 dark:bg-rose-900/20' : 
                       task.actualDate ? 'bg-emerald-50 text-emerald-500 dark:bg-emerald-900/20' : 
                       'bg-amber-50 text-amber-500 dark:bg-amber-900/20'
@@ -115,23 +115,23 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ isOpen, onClose, titl
         >
           <div className="flex gap-6">
             <div className="text-center">
-              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Total</p>
-              <p className="text-sm font-black text-gray-900 dark:text-white">{tasks.length}</p>
+              <p className="text-[13px] font-semibold text-gray-400">Total</p>
+              <p className="text-sm font-semibold text-gray-900 dark:text-white">{tasks.length}</p>
             </div>
             <div className="text-center">
-              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Late</p>
-              <p className="text-sm font-black text-rose-500">{tasks.filter(t => t.isLate).length}</p>
+              <p className="text-[13px] font-semibold text-gray-400">Late</p>
+              <p className="text-sm font-semibold text-rose-500">{tasks.filter(t => t.isLate).length}</p>
             </div>
             <div className="text-center">
-              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Success</p>
-              <p className="text-sm font-black text-emerald-500">
+              <p className="text-[13px] font-semibold text-gray-400">Success</p>
+              <p className="text-sm font-semibold text-emerald-500">
                 {tasks.length > 0 ? Math.round((tasks.filter(t => t.actualDate && !t.isLate).length / tasks.length) * 100) : 0}%
               </p>
             </div>
           </div>
           <button 
             onClick={onClose}
-            className="px-6 py-2 bg-gray-900 dark:bg-navy-800 text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-gray-800 transition-colors"
+            className="px-6 py-2 bg-gray-900 dark:bg-navy-800 text-white rounded-xl text-[14px] font-semibold hover:bg-gray-800 transition-colors"
           >
             Close
           </button>

@@ -11,7 +11,7 @@ export default function PhotoModal({ url, onClose }: { url: string | null; onClo
         <img src={url} alt="Odometer" className="w-full h-auto rounded-2xl shadow-2xl" />
         <button
           type="button"
-          className="absolute -top-3 -right-3 w-10 h-10 bg-white text-black font-black rounded-full shadow-lg"
+          className="absolute -top-3 -right-3 w-10 h-10 bg-white text-black font-semibold rounded-full shadow-lg"
           onClick={onClose}
         >
           X

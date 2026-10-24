@@ -162,7 +162,7 @@ export default function ChatSidebar({ currentUsername, activeChatId, onSelectCha
                     <div className="flex justify-between items-baseline">
                       <h3 className="font-medium text-[17px] text-gray-900 truncate">{group.name}</h3>
                       {group.lastMessage && (
-                        <span className="text-xs text-gray-500 shrink-0 ml-2">
+                        <span className="text-[14px] text-gray-500 shrink-0 ml-2">
                           {formatChatTime(group.lastMessage.created_at)}
                         </span>
                       )}
@@ -176,7 +176,7 @@ export default function ChatSidebar({ currentUsername, activeChatId, onSelectCha
                           : `${(group.participants || "").split(",").filter(Boolean).length} members`}
                       </p>
                       {group.unreadCount > 0 && (
-                        <span className="bg-[#25D366] text-white text-xs font-medium rounded-full min-w-[20px] h-5 flex items-center justify-center px-1.5 shrink-0">
+                        <span className="bg-[#25D366] text-white text-[14px] font-medium rounded-full min-w-[20px] h-5 flex items-center justify-center px-1.5 shrink-0">
                           {group.unreadCount > 99 ? "99+" : group.unreadCount}
                         </span>
                       )}
@@ -213,7 +213,7 @@ export default function ChatSidebar({ currentUsername, activeChatId, onSelectCha
                   <div className="flex justify-between items-baseline">
                     <h3 className="font-medium text-[17px] text-gray-900 truncate">{user.username}</h3>
                     {user.lastMessage && (
-                      <span className={`text-xs shrink-0 ml-2 ${user.unreadCount > 0 ? "text-[#25D366] font-medium" : "text-gray-500"}`}>
+                      <span className={`text-[14px] shrink-0 ml-2 ${user.unreadCount > 0 ? "text-[#25D366] font-medium" : "text-gray-500"}`}>
                         {formatChatTime(user.lastMessage.created_at)}
                       </span>
                     )}
@@ -232,7 +232,7 @@ export default function ChatSidebar({ currentUsername, activeChatId, onSelectCha
                       </p>
                     </div>
                     {user.unreadCount > 0 && (
-                      <span className="bg-[#25D366] text-white text-xs font-medium rounded-full min-w-[20px] h-5 flex items-center justify-center px-1.5 shrink-0 ml-2">
+                      <span className="bg-[#25D366] text-white text-[14px] font-medium rounded-full min-w-[20px] h-5 flex items-center justify-center px-1.5 shrink-0 ml-2">
                         {user.unreadCount > 99 ? "99+" : user.unreadCount}
                       </span>
                     )}

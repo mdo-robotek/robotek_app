@@ -66,9 +66,9 @@ export default function SalesCalendar({ followUps, selectedDate, onSelectDate }:
               onSelectDate(new Date(currentMonth.getFullYear(), currentMonth.getMonth(), i));
             }
           }}
-          className={`h-8 w-8 rounded-full flex items-center justify-center text-[10px] font-bold transition-all ${
+          className={`h-8 w-8 rounded-full flex items-center justify-center text-[13px] font-bold transition-all ${
             isSelected
-              ? 'bg-[#003875] dark:bg-[#FFD500] text-white dark:text-black shadow-md'
+              ? 'bg-[#2563EB] dark:bg-[#60A5FA] text-white dark:text-black shadow-md'
               : isHighlighted
               ? 'bg-orange-100 text-orange-600 dark:bg-yellow-500/20 dark:text-yellow-400 border border-orange-200 dark:border-yellow-500/50 hover:bg-orange-200'
               : 'text-gray-600 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-zinc-700'
@@ -77,7 +77,7 @@ export default function SalesCalendar({ followUps, selectedDate, onSelectDate }:
           {i}
         </button>
         {isHighlighted && (
-          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[7px] font-black w-3.5 h-3.5 flex items-center justify-center rounded-full shadow-sm">
+          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[12px] font-semibold w-3.5 h-3.5 flex items-center justify-center rounded-full shadow-sm">
             {count > 9 ? '9+' : count}
           </span>
         )}
@@ -88,9 +88,9 @@ export default function SalesCalendar({ followUps, selectedDate, onSelectDate }:
   const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
   return (
-    <div className="bg-[#FFFBF0] dark:bg-navy-900 rounded-2xl p-4 shadow-[inset_0_4px_12px_rgba(0,0,0,0.08)] dark:shadow-[inset_0_4px_12px_rgba(0,0,0,0.5)] border border-orange-200/60 dark:border-white/10">
+    <div className="bg-[#FFFFFF] dark:bg-navy-900 rounded-2xl p-4 shadow-[inset_0_4px_12px_rgba(0,0,0,0.08)] dark:shadow-[inset_0_4px_12px_rgba(0,0,0,0.5)] border border-orange-200/60 dark:border-white/10">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-[12px] font-black text-gray-900 dark:text-white uppercase tracking-widest">
+        <h3 className="text-[14px] font-semibold text-gray-900 dark:text-white">
           {monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}
         </h3>
         <div className="flex gap-1">
@@ -105,7 +105,7 @@ export default function SalesCalendar({ followUps, selectedDate, onSelectDate }:
       
       <div className="grid grid-cols-7 gap-1 mb-2">
         {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(day => (
-          <div key={day} className="h-6 flex items-center justify-center text-[8px] font-black text-gray-400 uppercase tracking-widest">
+          <div key={day} className="h-6 flex items-center justify-center text-[12px] font-semibold text-gray-400">
             {day}
           </div>
         ))}
@@ -118,10 +118,10 @@ export default function SalesCalendar({ followUps, selectedDate, onSelectDate }:
       <div className="mt-4 pt-4 border-t border-orange-100 dark:border-white/5 flex items-center gap-3">
         <div className="flex items-center gap-1.5">
           <div className="w-2.5 h-2.5 rounded-full bg-orange-100 border border-orange-200 dark:bg-yellow-500/20 dark:border-yellow-500/50" />
-          <span className="text-[9px] font-bold text-gray-500 uppercase tracking-widest">Follow Up Scheduled</span>
+          <span className="text-[13px] font-bold text-gray-500">Follow Up Scheduled</span>
         </div>
         {selectedDate && (
-          <button onClick={() => onSelectDate(null)} className="text-[9px] font-bold text-[#003875] dark:text-[#FFD500] hover:underline uppercase tracking-widest ml-auto">
+          <button onClick={() => onSelectDate(null)} className="text-[13px] font-bold text-[#2563EB] dark:text-[#60A5FA] hover:underline ml-auto">
             Clear Filter
           </button>
         )}

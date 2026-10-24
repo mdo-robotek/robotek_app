@@ -55,11 +55,11 @@ function GrnCheckBadge({ actual, status }: { actual?: string; status?: string })
   if (state === "done") {
     return (
       <div className="flex flex-col items-center gap-1">
-        <span className="inline-flex items-center gap-1 px-2 py-1 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-md text-[10px] font-black uppercase tracking-widest shadow-sm">
+        <span className="inline-flex items-center gap-1 px-2 py-1 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-md text-[13px] font-semibold shadow-sm">
           <CheckCircleIcon className="w-3.5 h-3.5 shrink-0" /> Done
         </span>
         {actual && (
-          <span className="text-[9px] font-bold text-gray-500 dark:text-slate-400 whitespace-nowrap">
+          <span className="text-[13px] font-bold text-gray-500 dark:text-slate-400 whitespace-nowrap">
             {formatDate(actual)}
           </span>
         )}
@@ -68,13 +68,13 @@ function GrnCheckBadge({ actual, status }: { actual?: string; status?: string })
   }
   if (state === "rejected") {
     return (
-      <span className="inline-flex items-center gap-1 px-2 py-1 bg-gradient-to-r from-rose-500 to-red-600 text-white rounded-md text-[10px] font-black uppercase tracking-widest shadow-sm">
+      <span className="inline-flex items-center gap-1 px-2 py-1 bg-gradient-to-r from-rose-500 to-red-600 text-white rounded-md text-[13px] font-semibold shadow-sm">
         <XCircleIcon className="w-3.5 h-3.5 shrink-0" /> Rejected
       </span>
     );
   }
   return (
-    <span className="inline-flex items-center gap-1 px-2 py-1 bg-gradient-to-r from-amber-400 to-orange-500 text-white rounded-md text-[10px] font-black uppercase tracking-widest shadow-sm">
+    <span className="inline-flex items-center gap-1 px-2 py-1 bg-gradient-to-r from-amber-400 to-orange-500 text-white rounded-md text-[13px] font-semibold shadow-sm">
       <ClockIcon className="w-3.5 h-3.5 shrink-0" /> Pending
     </span>
   );
@@ -98,7 +98,7 @@ function PaymentStatusPill({ status }: { status: string }) {
           ? "bg-gradient-to-r from-rose-500 to-red-600 text-white border-rose-400 shadow-sm shadow-rose-500/20"
           : "bg-gradient-to-r from-amber-400 to-orange-500 text-white border-amber-400 shadow-sm shadow-amber-500/20";
   return (
-    <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wide border whitespace-nowrap ${styles}`}>
+    <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[13px] font-semibold  tracking-wide border whitespace-nowrap ${styles}`}>
       {label}
     </span>
   );
@@ -448,7 +448,7 @@ export default function PaymentVendorApprovalPage() {
       {/* Page header */}
       <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-black text-gray-900 dark:text-white tracking-tight">
+          <h1 className="text-2xl font-semibold text-gray-900 dark:text-white tracking-tight">
             Vendor Payment Tracker
           </h1>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
@@ -456,11 +456,11 @@ export default function PaymentVendorApprovalPage() {
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2.5">
-          <span className="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-xs font-bold shadow-md shadow-emerald-500/25">
+          <span className="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-[14px] font-bold shadow-md shadow-emerald-500/25">
             <DevicePhoneMobileIcon className="w-4 h-4" />
             WhatsApp Alerts On
           </span>
-          <span className="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-xs font-bold shadow-md shadow-blue-500/25">
+          <span className="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-[14px] font-bold shadow-md shadow-blue-500/25">
             <ArrowPathIcon className="w-4 h-4 animate-spin" style={{ animationDuration: "3s" }} />
             Auto Refresh · 5s
           </span>
@@ -482,9 +482,9 @@ export default function PaymentVendorApprovalPage() {
               <DocumentTextIcon className="w-5 h-5" />
             </div>
             <div>
-              <p className="text-[10px] font-black uppercase tracking-widest text-blue-100">Step 1</p>
-              <p className="text-sm font-black mt-0.5">GRN Created / Edited</p>
-              <p className="text-[11px] text-blue-100/90 mt-1">WhatsApp alert sent to MD Sir</p>
+              <p className="text-[13px] font-semibold text-blue-100">Step 1</p>
+              <p className="text-sm font-semibold mt-0.5">GRN Created / Edited</p>
+              <p className="text-[14px] text-blue-100/90 mt-1">WhatsApp alert sent to MD Sir</p>
             </div>
           </div>
         </div>
@@ -494,11 +494,11 @@ export default function PaymentVendorApprovalPage() {
               <UserIcon className="w-5 h-5" />
             </div>
             <div className="flex-1">
-              <p className="text-[10px] font-black uppercase tracking-widest text-violet-100">Step 2</p>
-              <p className="text-sm font-black mt-0.5">MD / Admin Approval</p>
+              <p className="text-[13px] font-semibold text-violet-100">Step 2</p>
+              <p className="text-sm font-semibold mt-0.5">MD / Admin Approval</p>
               <div className="flex gap-2 mt-2">
-                <span className="px-2 py-0.5 rounded-lg bg-rose-500/40 text-[9px] font-black uppercase">Rejected</span>
-                <span className="px-2 py-0.5 rounded-lg bg-emerald-500/50 text-[9px] font-black uppercase">Approved</span>
+                <span className="px-2 py-0.5 rounded-lg bg-rose-500/40 text-[13px] font-semibold">Rejected</span>
+                <span className="px-2 py-0.5 rounded-lg bg-emerald-500/50 text-[13px] font-semibold">Approved</span>
               </div>
             </div>
           </div>
@@ -509,9 +509,9 @@ export default function PaymentVendorApprovalPage() {
               <BanknotesIcon className="w-5 h-5" />
             </div>
             <div>
-              <p className="text-[10px] font-black uppercase tracking-widest text-emerald-100">Step 3</p>
-              <p className="text-sm font-black mt-0.5">User Marks Paid</p>
-              <p className="text-[11px] text-emerald-100/90 mt-1">After MD approval only</p>
+              <p className="text-[13px] font-semibold text-emerald-100">Step 3</p>
+              <p className="text-sm font-semibold mt-0.5">User Marks Paid</p>
+              <p className="text-[14px] text-emerald-100/90 mt-1">After MD approval only</p>
             </div>
           </div>
         </div>
@@ -532,14 +532,14 @@ export default function PaymentVendorApprovalPage() {
                 <button
                   key={tab.id}
                   onClick={() => { setStatusFilter(tab.id); setCurrentPage(1); }}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-xl text-[11px] font-black uppercase tracking-wide transition-all whitespace-nowrap ${
+                  className={`flex items-center gap-2 px-3 py-2 rounded-xl text-[14px] font-semibold  tracking-wide transition-all whitespace-nowrap ${
                     statusFilter === tab.id
                       ? `bg-gradient-to-r ${tab.color} text-white shadow-lg ring-2 ${tab.ring}`
                       : "bg-white dark:bg-slate-950/50 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200 dark:border-white/10"
                   }`}
                 >
                   {tab.id === "Payed" ? "Paid" : tab.id}
-                  <span className={`px-1.5 py-0.5 rounded-md text-[10px] ${statusFilter === tab.id ? "bg-white/20" : "bg-slate-100 dark:bg-slate-800"}`}>
+                  <span className={`px-1.5 py-0.5 rounded-md text-[13px] ${statusFilter === tab.id ? "bg-white/20" : "bg-slate-100 dark:bg-slate-800"}`}>
                     {statusCounts[tab.id]}
                   </span>
                 </button>
@@ -563,7 +563,7 @@ export default function PaymentVendorApprovalPage() {
 
               <div className="flex flex-wrap items-end gap-2">
                 <div>
-                  <label className="block text-[9px] font-black uppercase tracking-widest text-indigo-500 dark:text-indigo-400 mb-1">Planned Date</label>
+                  <label className="block text-[13px] font-semibold text-indigo-500 dark:text-indigo-400 mb-1">Planned Date</label>
                   <select
                     value={filterPeriod}
                     onChange={(e) => handlePeriodChange(e.target.value as FilterPeriod)}
@@ -584,7 +584,7 @@ export default function PaymentVendorApprovalPage() {
                     <button type="button" onClick={handlePeriodPrev} className="p-1 rounded-lg hover:bg-white/70 dark:hover:bg-white/10 text-blue-600">
                       <ChevronLeftIcon className="w-4 h-4" />
                     </button>
-                    <span className="text-[11px] font-black text-blue-700 dark:text-blue-300 px-2 whitespace-nowrap min-w-[120px] text-center">
+                    <span className="text-[14px] font-semibold text-blue-700 dark:text-blue-300 px-2 whitespace-nowrap min-w-[120px] text-center">
                       {getPlannedPeriodLabel(filterPeriod, currentDate)}
                     </span>
                     <button type="button" onClick={handlePeriodNext} className="p-1 rounded-lg hover:bg-white/70 dark:hover:bg-white/10 text-blue-600">
@@ -600,14 +600,14 @@ export default function PaymentVendorApprovalPage() {
                       type="date"
                       value={startDate ? format(startDate, "yyyy-MM-dd") : ""}
                       onChange={(e) => { if (e.target.value) { setStartDate(new Date(e.target.value)); setCurrentPage(1); } }}
-                      className="bg-transparent text-xs font-bold outline-none dark:text-white"
+                      className="bg-transparent text-[14px] font-bold outline-none dark:text-white"
                     />
-                    <span className="text-[10px] font-black text-slate-400">to</span>
+                    <span className="text-[13px] font-semibold text-slate-400">to</span>
                     <input
                       type="date"
                       value={endDate ? format(endDate, "yyyy-MM-dd") : ""}
                       onChange={(e) => { if (e.target.value) { setEndDate(new Date(e.target.value)); setCurrentPage(1); } }}
-                      className="bg-transparent text-xs font-bold outline-none dark:text-white"
+                      className="bg-transparent text-[14px] font-bold outline-none dark:text-white"
                     />
                     {(startDate || endDate) && (
                       <button type="button" onClick={() => handlePeriodChange("ALL")} className="p-1 text-slate-400 hover:text-rose-500">
@@ -621,13 +621,13 @@ export default function PaymentVendorApprovalPage() {
               <div className="flex items-center gap-2 shrink-0">
                 <button
                   onClick={() => setCurrentPage(1)}
-                  className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-xs font-black uppercase tracking-wide shadow-md shadow-blue-500/25 hover:brightness-105"
+                  className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-[14px] font-semibold tracking-wide shadow-md shadow-blue-500/25 hover:brightness-105"
                 >
                   Apply
                 </button>
                 <button
                   onClick={exportToCSV}
-                  className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 text-white text-xs font-black uppercase tracking-wide shadow-md shadow-orange-500/25 hover:brightness-105 flex items-center gap-2"
+                  className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 text-white text-[14px] font-semibold tracking-wide shadow-md shadow-orange-500/25 hover:brightness-105 flex items-center gap-2"
                 >
                   <ArrowDownTrayIcon className="w-4 h-4" />
                   Export CSV
@@ -639,25 +639,25 @@ export default function PaymentVendorApprovalPage() {
           {grnLoading || vendorLoading ? (
             <div className="flex flex-col items-center justify-center py-24 flex-1">
               <div className="w-10 h-10 border-3 border-slate-100 border-t-blue-600 rounded-full animate-spin mb-4" />
-              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Loading payments...</p>
+              <p className="text-[13px] font-semibold text-slate-400">Loading payments...</p>
             </div>
           ) : (
             <div className="overflow-x-auto overflow-y-auto flex-1 min-h-0">
               <table className="w-full text-left border-collapse min-w-[1240px]">
                 <thead className="sticky top-0 z-10">
-                  <tr className="bg-gradient-to-r from-[#003875] via-blue-600 to-indigo-600 text-white">
-                    <th className="px-3 py-3 text-[10px] font-black uppercase tracking-wider w-10">#</th>
-                    <th className="px-3 py-3 text-[10px] font-black uppercase tracking-wider">GRN No. / PO No.</th>
-                    <th className="px-3 py-3 text-[10px] font-black uppercase tracking-wider">Dates</th>
-                    <th className="px-3 py-3 text-[10px] font-black uppercase tracking-wider">Vendor</th>
-                    <th className="px-3 py-3 text-[10px] font-black uppercase tracking-wider">Item</th>
-                    <th className="px-3 py-3 text-[10px] font-black uppercase tracking-wider text-right">Qty</th>
-                    <th className="px-3 py-3 text-[10px] font-black uppercase tracking-wider">Terms</th>
-                    <th className="px-3 py-3 text-[10px] font-black uppercase tracking-wider text-center">Qty Check</th>
-                    <th className="px-3 py-3 text-[10px] font-black uppercase tracking-wider text-center">Quality Check</th>
-                    <th className="px-3 py-3 text-[10px] font-black uppercase tracking-wider text-center">Status</th>
-                    <th className="px-3 py-3 text-[10px] font-black uppercase tracking-wider">Remarks</th>
-                    <th className="px-3 py-3 text-[10px] font-black uppercase tracking-wider text-center">Action</th>
+                  <tr className="bg-gradient-to-r from-[#2563EB] via-blue-600 to-indigo-600 text-white">
+                    <th className="px-3 py-3 text-[13px] font-semibold tracking-wider w-10">#</th>
+                    <th className="px-3 py-3 text-[13px] font-semibold tracking-wider">GRN No. / PO No.</th>
+                    <th className="px-3 py-3 text-[13px] font-semibold tracking-wider">Dates</th>
+                    <th className="px-3 py-3 text-[13px] font-semibold tracking-wider">Vendor</th>
+                    <th className="px-3 py-3 text-[13px] font-semibold tracking-wider">Item</th>
+                    <th className="px-3 py-3 text-[13px] font-semibold tracking-wider text-right">Qty</th>
+                    <th className="px-3 py-3 text-[13px] font-semibold tracking-wider">Terms</th>
+                    <th className="px-3 py-3 text-[13px] font-semibold tracking-wider text-center">Qty Check</th>
+                    <th className="px-3 py-3 text-[13px] font-semibold tracking-wider text-center">Quality Check</th>
+                    <th className="px-3 py-3 text-[13px] font-semibold tracking-wider text-center">Status</th>
+                    <th className="px-3 py-3 text-[13px] font-semibold tracking-wider">Remarks</th>
+                    <th className="px-3 py-3 text-[13px] font-semibold tracking-wider text-center">Action</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 dark:divide-white/5">
@@ -680,81 +680,81 @@ export default function PaymentVendorApprovalPage() {
                         ref={isHighlighted ? highlightRowRef : undefined}
                         className={`transition-colors ${isHighlighted ? "bg-amber-50 dark:bg-amber-900/20 ring-2 ring-amber-400 ring-inset" : "hover:bg-slate-50/80 dark:hover:bg-white/5"}`}
                       >
-                        <td className="px-3 py-3 text-xs font-bold text-slate-400">{rowNum}</td>
+                        <td className="px-3 py-3 text-[14px] font-bold text-slate-400">{rowNum}</td>
                         <td className="px-3 py-3">
                           <div className="flex flex-col gap-1">
-                            <span className="text-xs font-black text-blue-600 dark:text-blue-400">{item.GRN_No}</span>
-                            <span className="text-[10px] font-bold text-slate-500">{item.PO_Number || "—"}</span>
+                            <span className="text-[14px] font-semibold text-blue-600 dark:text-blue-400">{item.GRN_No}</span>
+                            <span className="text-[13px] font-bold text-slate-500">{item.PO_Number || "—"}</span>
                           </div>
                         </td>
                         <td className="px-3 py-3">
-                          <div className="space-y-1 text-[10px] font-semibold text-slate-600 dark:text-slate-300">
+                          <div className="space-y-1 text-[13px] font-semibold text-slate-600 dark:text-slate-300">
                             <p><span className="text-slate-400">GRN:</span> {item.grnDate}</p>
                             <p><span className="text-slate-400">I2R:</span> {item.createdAt}</p>
                             <p><span className="text-emerald-600 font-bold">Plan:</span> {item.calculatedPlannedDate}</p>
                           </div>
                         </td>
                         <td className="px-3 py-3">
-                          <p className="text-xs font-bold text-slate-800 dark:text-white max-w-[120px] truncate" title={item.vendorName}>{item.vendorName}</p>
+                          <p className="text-[14px] font-bold text-slate-800 dark:text-white max-w-[120px] truncate" title={item.vendorName}>{item.vendorName}</p>
                         </td>
                         <td className="px-3 py-3">
                           <div className="max-w-[140px]">
-                            <p className="text-xs font-semibold text-slate-700 dark:text-slate-200 truncate" title={item.Item_Name}>{item.Item_Name}</p>
-                            <p className="text-[10px] text-slate-400 truncate">{item.Category} · {item.Country || "—"}</p>
+                            <p className="text-[14px] font-semibold text-slate-700 dark:text-slate-200 truncate" title={item.Item_Name}>{item.Item_Name}</p>
+                            <p className="text-[13px] text-slate-400 truncate">{item.Category} · {item.Country || "—"}</p>
                           </div>
                         </td>
                         <td className="px-3 py-3 text-right">
-                          <span className="text-xs font-black text-slate-800 dark:text-white tabular-nums">
+                          <span className="text-[14px] font-semibold text-slate-800 dark:text-white tabular-nums">
                             {item.Qty != null && String(item.Qty).trim() !== "" ? item.Qty : "—"}
                           </span>
                         </td>
-                        <td className="px-3 py-3 text-xs font-bold text-slate-700 dark:text-slate-200 whitespace-nowrap">
+                        <td className="px-3 py-3 text-[14px] font-bold text-slate-700 dark:text-slate-200 whitespace-nowrap">
                           {item.Payment_Terms_In_days ? `${item.Payment_Terms_In_days} Days` : "—"}
                         </td>
                         <td className="px-3 py-3 text-center"><GrnCheckBadge actual={item.actual_1} status={item.status_1} /></td>
                         <td className="px-3 py-3 text-center"><GrnCheckBadge actual={item.actual_3} status={item.status_3} /></td>
                         <td className="px-3 py-3 text-center"><PaymentStatusPill status={status || ""} /></td>
                         <td className="px-3 py-3">
-                          <p className="text-[10px] font-semibold text-slate-600 dark:text-slate-300 line-clamp-2 max-w-[140px]" title={combinedRemarks}>{combinedRemarks}</p>
+                          <p className="text-[13px] font-semibold text-slate-600 dark:text-slate-300 line-clamp-2 max-w-[140px]" title={combinedRemarks}>{combinedRemarks}</p>
                         </td>
                         <td className="px-3 py-3">
                           <div className="flex flex-col items-center gap-1.5 min-w-[100px]">
                             {isPayed ? (
-                              <span className="text-[10px] font-black uppercase text-emerald-600">Completed</span>
+                              <span className="text-[13px] font-semibold text-emerald-600">Completed</span>
                             ) : isRejected ? (
-                              <span className="text-[10px] font-black uppercase text-rose-600">Blocked</span>
+                              <span className="text-[13px] font-semibold text-rose-600">Blocked</span>
                             ) : isApproved && isUser ? (
                               <button
                                 onClick={() => openActionModal(item.GRN_No, "Payed")}
                                 disabled={actionLoading === item.GRN_No}
-                                className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-[10px] font-black uppercase shadow-sm disabled:opacity-50"
+                                className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-[13px] font-semibold shadow-sm disabled:opacity-50"
                               >
                                 {actionLoading === item.GRN_No ? "..." : "Mark Paid"}
                               </button>
                             ) : isApproved ? (
-                              <span className="text-[10px] font-bold text-blue-600 uppercase">Ready</span>
+                              <span className="text-[13px] font-bold text-blue-600">Ready</span>
                             ) : isAdmin ? (
                               <div className="flex flex-col gap-1 w-full">
                                 <button
                                   onClick={() => openActionModal(item.GRN_No, "Approved")}
                                   disabled={actionLoading === item.GRN_No}
-                                  className="px-2 py-1 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-[10px] font-black uppercase shadow-sm disabled:opacity-50"
+                                  className="px-2 py-1 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-[13px] font-semibold shadow-sm disabled:opacity-50"
                                 >
                                   Approve
                                 </button>
                                 <button
                                   onClick={() => openActionModal(item.GRN_No, "Rejected")}
                                   disabled={actionLoading === item.GRN_No}
-                                  className="px-2 py-1 rounded-lg bg-gradient-to-r from-rose-500 to-red-600 text-white text-[10px] font-black uppercase shadow-sm disabled:opacity-50"
+                                  className="px-2 py-1 rounded-lg bg-gradient-to-r from-rose-500 to-red-600 text-white text-[13px] font-semibold shadow-sm disabled:opacity-50"
                                 >
                                   Reject
                                 </button>
                               </div>
                             ) : (
-                              <span className="text-[10px] font-bold text-slate-400 uppercase">Awaiting MD</span>
+                              <span className="text-[13px] font-bold text-slate-400">Awaiting MD</span>
                             )}
                             {item.Attach_Bill && (
-                              <a href={item.Attach_Bill} target="_blank" rel="noopener noreferrer" className="text-[10px] font-bold text-blue-600 hover:underline">
+                              <a href={item.Attach_Bill} target="_blank" rel="noopener noreferrer" className="text-[13px] font-bold text-blue-600 hover:underline">
                                 View Bill
                               </a>
                             )}
@@ -765,7 +765,7 @@ export default function PaymentVendorApprovalPage() {
                   })}
                   {paginatedItems.length === 0 && (
                     <tr>
-                      <td colSpan={12} className="py-16 text-center text-xs font-black text-slate-400 uppercase tracking-widest">
+                      <td colSpan={12} className="py-16 text-center text-[14px] font-semibold text-slate-400">
                         No records match your filters
                       </td>
                     </tr>
@@ -777,21 +777,21 @@ export default function PaymentVendorApprovalPage() {
 
           {/* Pagination */}
           <div className="px-4 py-3 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-slate-900/30 shrink-0">
-            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+            <p className="text-[13px] font-semibold text-slate-400">
               Showing {paginatedItems.length > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0}–{Math.min(currentPage * itemsPerPage, filteredItems.length)} of {filteredItems.length}
             </p>
             <div className="flex items-center gap-2">
               <button onClick={() => setCurrentPage((p) => Math.max(1, p - 1))} disabled={currentPage === 1} className="p-1.5 rounded-lg border border-slate-200 dark:border-white/10 disabled:opacity-30">
                 <ChevronLeftIcon className="w-4 h-4" />
               </button>
-              <span className="text-xs font-bold text-slate-600 dark:text-slate-300">Page {currentPage} / {totalPages || 1}</span>
+              <span className="text-[14px] font-bold text-slate-600 dark:text-slate-300">Page {currentPage} / {totalPages || 1}</span>
               <button onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages || totalPages === 0} className="p-1.5 rounded-lg border border-slate-200 dark:border-white/10 disabled:opacity-30">
                 <ChevronRightIcon className="w-4 h-4" />
               </button>
               <select
                 value={itemsPerPage}
                 onChange={(e) => { setItemsPerPage(Number(e.target.value)); setCurrentPage(1); }}
-                className="ml-2 px-2 py-1 rounded-lg border border-slate-200 dark:border-white/10 text-xs font-bold bg-white dark:bg-slate-950"
+                className="ml-2 px-2 py-1 rounded-lg border border-slate-200 dark:border-white/10 text-[14px] font-bold bg-white dark:bg-slate-950"
               >
                 <option value={10}>10</option>
                 <option value={20}>20</option>
@@ -804,24 +804,24 @@ export default function PaymentVendorApprovalPage() {
         {/* Footer info panels */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           <div className="rounded-2xl border border-blue-200/60 dark:border-blue-500/20 bg-gradient-to-br from-blue-50/80 via-white to-indigo-50/60 dark:from-blue-950/30 dark:via-slate-900 dark:to-indigo-950/20 p-4 shadow-md shadow-blue-500/5">
-            <h3 className="text-xs font-black uppercase tracking-widest text-blue-600 dark:text-blue-400 mb-3">Approval Workflow</h3>
-            <ul className="space-y-2 text-[11px] text-slate-600 dark:text-slate-300">
+            <h3 className="text-[14px] font-semibold text-blue-600 dark:text-blue-400 mb-3">Approval Workflow</h3>
+            <ul className="space-y-2 text-[14px] text-slate-600 dark:text-slate-300">
               <li className="flex items-start gap-2"><CheckCircleIcon className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" /> GRN created → WhatsApp to MD</li>
               <li className="flex items-start gap-2"><CheckCircleIcon className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" /> MD approves or rejects payment</li>
               <li className="flex items-start gap-2"><CheckCircleIcon className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" /> User marks paid after approval</li>
             </ul>
           </div>
           <div className="rounded-2xl border border-emerald-200/60 dark:border-emerald-500/20 bg-gradient-to-br from-emerald-50/80 via-white to-teal-50/60 dark:from-emerald-950/30 dark:via-slate-900 dark:to-teal-950/20 p-4 shadow-md shadow-emerald-500/5">
-            <h3 className="text-xs font-black uppercase tracking-widest text-emerald-600 mb-3">WhatsApp Notifications</h3>
-            <ul className="space-y-2 text-[11px] text-slate-600 dark:text-slate-300">
+            <h3 className="text-[14px] font-semibold text-emerald-600 mb-3">WhatsApp Notifications</h3>
+            <ul className="space-y-2 text-[14px] text-slate-600 dark:text-slate-300">
               <li>• New / edited GRN → MD Sir (9899444530)</li>
               <li>• MD approval → Himanshi (8766272040)</li>
               <li>• Includes GRN Qty, quantity & quality check status</li>
             </ul>
           </div>
           <div className="rounded-2xl border border-violet-200/60 dark:border-violet-500/20 bg-gradient-to-br from-violet-50/80 via-white to-purple-50/60 dark:from-violet-950/30 dark:via-slate-900 dark:to-purple-950/20 p-4 shadow-md shadow-violet-500/5">
-            <h3 className="text-xs font-black uppercase tracking-widest text-violet-600 mb-3">Notes</h3>
-            <ul className="space-y-2 text-[11px] text-slate-600 dark:text-slate-300">
+            <h3 className="text-[14px] font-semibold text-violet-600 mb-3">Notes</h3>
+            <ul className="space-y-2 text-[14px] text-slate-600 dark:text-slate-300">
               <li>• Planned date = I2R Created At + Payment Terms</li>
               <li>• Qty check = GRN Step 1 · Quality = Step 3</li>
               <li>• Rejected payments cannot be marked paid</li>
@@ -834,7 +834,7 @@ export default function PaymentVendorApprovalPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="bg-white dark:bg-[#131C2E] w-full max-w-md rounded-2xl shadow-xl overflow-hidden border border-gray-100 dark:border-white/10 animate-in zoom-in-95 duration-200">
             <div className="flex items-center justify-between p-4 border-b border-gray-100 dark:border-white/5">
-              <h2 className="text-sm font-black text-gray-900 dark:text-white uppercase tracking-widest">
+              <h2 className="text-sm font-semibold text-gray-900 dark:text-white">
                 Confirm Action
               </h2>
               <button
@@ -846,12 +846,12 @@ export default function PaymentVendorApprovalPage() {
             </div>
 
             <div className="p-6 flex flex-col gap-4">
-              <p className="text-xs font-bold text-gray-600 dark:text-slate-300">
-                You are about to mark GRN <span className="font-mono bg-gray-100 dark:bg-white/5 px-1.5 py-0.5 rounded text-[#003875] dark:text-[#FFD500]">{modalGrnNo}</span> as <span className="font-black text-gray-900 dark:text-white uppercase">{modalActionType}</span>.
+              <p className="text-[14px] font-bold text-gray-600 dark:text-slate-300">
+                You are about to mark GRN <span className="font-mono bg-gray-100 dark:bg-white/5 px-1.5 py-0.5 rounded text-[#2563EB] dark:text-[#60A5FA]">{modalGrnNo}</span> as <span className="font-semibold text-gray-900 dark:text-white">{modalActionType}</span>.
               </p>
 
               <div className="flex flex-col gap-1.5">
-                <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">
+                <label className="text-[13px] font-semibold text-gray-400">
                   Remarks (Optional)
                 </label>
                 <textarea
@@ -859,7 +859,7 @@ export default function PaymentVendorApprovalPage() {
                   value={modalRemarks}
                   onChange={(e) => setModalRemarks(e.target.value)}
                   placeholder="Enter any remarks..."
-                  className="w-full bg-gray-50 dark:bg-navy-900/50 border border-gray-200 dark:border-white/10 rounded-lg p-3 text-sm font-bold text-gray-800 dark:text-white focus:border-[#FFD500] focus:ring-1 focus:ring-[#FFD500] outline-none transition-all resize-none h-24"
+                  className="w-full bg-gray-50 dark:bg-navy-900/50 border border-gray-200 dark:border-white/10 rounded-lg p-3 text-sm font-bold text-gray-800 dark:text-white focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] outline-none transition-all resize-none h-24"
                 />
               </div>
             </div>
@@ -867,16 +867,16 @@ export default function PaymentVendorApprovalPage() {
             <div className="p-4 bg-gray-50/50 dark:bg-[#0B101E]/50 border-t border-gray-100 dark:border-white/5 flex items-center justify-end gap-3">
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="px-4 py-2 text-xs font-black uppercase tracking-widest text-gray-500 hover:text-gray-800 dark:text-slate-400 dark:hover:text-white transition-colors"
+                className="px-4 py-2 text-[14px] font-semibold text-gray-500 hover:text-gray-800 dark:text-slate-400 dark:hover:text-white transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={confirmAction}
-                className={`px-6 py-2 text-xs font-black uppercase tracking-widest text-white rounded-lg shadow-md transition-all
+                className={`px-6 py-2 text-[14px] font-semibold   text-white rounded-lg shadow-md transition-all
                   ${modalActionType === 'Approved' ? 'bg-emerald-600 hover:bg-emerald-700'
                     : modalActionType === 'Rejected' ? 'bg-red-600 hover:bg-red-700'
-                      : 'bg-[#003875] hover:bg-[#002855] dark:bg-[#FFD500] dark:hover:bg-[#E6C000] dark:text-black'}
+                      : 'bg-[#2563EB] hover:bg-[#1D4ED8] dark:bg-[#60A5FA] dark:hover:bg-[#E6C000] dark:text-black'}
                 `}
               >
                 Confirm
@@ -892,18 +892,18 @@ export default function PaymentVendorApprovalPage() {
           <div className="bg-white dark:bg-[#0B101E] w-full max-w-4xl max-h-[90vh] rounded-3xl shadow-2xl overflow-hidden border border-gray-100 dark:border-white/10 flex flex-col">
             {/* Header */}
             <div className="relative overflow-hidden shrink-0">
-              <div className="absolute inset-0 bg-gradient-to-r from-[#003875] via-[#0056b3] to-[#0077cc]" />
-              <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_top_right,_#FFD500_0%,_transparent_50%)]" />
+              <div className="absolute inset-0 bg-gradient-to-r from-[#2563EB] via-[#0056b3] to-[#0077cc]" />
+              <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_top_right,_#2563EB_0%,_transparent_50%)]" />
               <div className="relative flex items-center justify-between p-5">
                 <div className="flex items-center gap-3">
                   <div className="p-2.5 bg-white/15 backdrop-blur rounded-xl border border-white/20">
-                    <InformationCircleIcon className="w-6 h-6 text-[#FFD500]" />
+                    <InformationCircleIcon className="w-6 h-6 text-[#2563EB]" />
                   </div>
                   <div>
-                    <h2 className="text-base font-black text-white uppercase tracking-widest">
+                    <h2 className="text-base font-semibold text-white">
                       Payment Vendor Approval
                     </h2>
-                    <p className="text-[10px] font-bold text-blue-100 uppercase tracking-widest mt-0.5">
+                    <p className="text-[13px] font-bold text-blue-100 mt-0.5">
                       Visual guide · workflow · filters
                     </p>
                   </div>
@@ -920,15 +920,15 @@ export default function PaymentVendorApprovalPage() {
             <div className="p-5 overflow-y-auto flex-1 space-y-5">
               {/* Purpose banner */}
               <div className="rounded-2xl border border-blue-100 dark:border-blue-900/40 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/20 p-4">
-                <p className="text-xs leading-relaxed text-gray-700 dark:text-slate-300">
-                  Track vendor payments for GRN entries. Each row merges GRN data with approval status and calculates the <strong className="text-[#003875] dark:text-[#FFD500]">Planned Payment Date</strong> from I2R creation date + payment terms.
+                <p className="text-[14px] leading-relaxed text-gray-700 dark:text-slate-300">
+                  Track vendor payments for GRN entries. Each row merges GRN data with approval status and calculates the <strong className="text-[#2563EB] dark:text-[#60A5FA]">Planned Payment Date</strong> from I2R creation date + payment terms.
                 </p>
               </div>
 
               {/* Workflow Diagram */}
               <section>
-                <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mb-3 flex items-center gap-2">
-                  <span className="w-6 h-0.5 bg-[#FFD500] rounded-full" />
+                <h3 className="text-[13px] font-semibold text-gray-400 mb-3 flex items-center gap-2">
+                  <span className="w-6 h-0.5 bg-[#2563EB] rounded-full" />
                   Approval Workflow Diagram
                 </h3>
                 <div className="rounded-2xl border border-gray-100 dark:border-white/10 bg-gray-50/80 dark:bg-navy-900/40 p-4 md:p-5">
@@ -939,40 +939,40 @@ export default function PaymentVendorApprovalPage() {
                         <DocumentTextIcon className="w-5 h-5" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-[9px] font-black uppercase tracking-widest opacity-80">Step 1</p>
-                        <p className="text-xs font-black">GRN Created / Edited</p>
+                        <p className="text-[13px] font-semibold opacity-80">Step 1</p>
+                        <p className="text-[14px] font-semibold">GRN Created / Edited</p>
                       </div>
                     </div>
                     <div className="flex justify-center">
                       <div className="flex flex-col items-center text-emerald-600 dark:text-emerald-400">
                         <ArrowRightIcon className="w-4 h-4 rotate-90" />
-                        <span className="text-[9px] font-black uppercase tracking-wider flex items-center gap-1">
+                        <span className="text-[13px] font-semibold tracking-wider flex items-center gap-1">
                           <BellIcon className="w-3 h-3" /> WhatsApp → MD Sir
                         </span>
-                        <span className="text-[9px] font-bold opacity-70">9899444530</span>
+                        <span className="text-[13px] font-bold opacity-70">9899444530</span>
                       </div>
                     </div>
                     {/* Step 2 */}
-                    <div className="flex items-center gap-3 p-3 rounded-xl bg-gradient-to-r from-[#003875] to-[#0056b3] text-white shadow-lg shadow-blue-900/20">
+                    <div className="flex items-center gap-3 p-3 rounded-xl bg-gradient-to-r from-[#2563EB] to-[#0056b3] text-white shadow-lg shadow-blue-900/20">
                       <div className="p-2 bg-white/20 rounded-lg shrink-0">
                         <UserIcon className="w-5 h-5" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-[9px] font-black uppercase tracking-widest opacity-80">Step 2 · MD / Admin</p>
-                        <p className="text-xs font-black">Approve or Reject on this page</p>
+                        <p className="text-[13px] font-semibold opacity-80">Step 2 · MD / Admin</p>
+                        <p className="text-[14px] font-semibold">Approve or Reject on this page</p>
                       </div>
                     </div>
                     {/* Branch */}
                     <div className="grid grid-cols-2 gap-2 pl-2 pr-2">
                       <div className="flex flex-col items-center gap-1 p-2 rounded-xl bg-red-50 dark:bg-red-950/30 border border-red-100 dark:border-red-900/40">
                         <XCircleIcon className="w-4 h-4 text-red-500" />
-                        <span className="text-[9px] font-black uppercase text-red-600 dark:text-red-400">Rejected</span>
-                        <span className="text-[8px] text-center text-red-500/80">Payment blocked</span>
+                        <span className="text-[13px] font-semibold text-red-600 dark:text-red-400">Rejected</span>
+                        <span className="text-[12px] text-center text-red-500/80">Payment blocked</span>
                       </div>
                       <div className="flex flex-col items-center gap-1 p-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/40">
                         <CheckCircleIcon className="w-4 h-4 text-emerald-500" />
-                        <span className="text-[9px] font-black uppercase text-emerald-600 dark:text-emerald-400">Approved</span>
-                        <span className="text-[8px] text-center text-emerald-600/80 flex items-center gap-0.5">
+                        <span className="text-[13px] font-semibold text-emerald-600 dark:text-emerald-400">Approved</span>
+                        <span className="text-[12px] text-center text-emerald-600/80 flex items-center gap-0.5">
                           <BellIcon className="w-2.5 h-2.5" /> WhatsApp Himanshi
                         </span>
                       </div>
@@ -980,17 +980,17 @@ export default function PaymentVendorApprovalPage() {
                     <div className="flex justify-center">
                       <div className="flex flex-col items-center text-emerald-600 dark:text-emerald-400">
                         <ArrowRightIcon className="w-4 h-4 rotate-90" />
-                        <span className="text-[9px] font-black uppercase tracking-wider">8766272040</span>
+                        <span className="text-[13px] font-semibold tracking-wider">8766272040</span>
                       </div>
                     </div>
                     {/* Step 3 */}
-                    <div className="flex items-center gap-3 p-3 rounded-xl bg-gradient-to-r from-amber-400 to-[#FFD500] text-[#003875] shadow-lg shadow-amber-400/20">
-                      <div className="p-2 bg-[#003875]/10 rounded-lg shrink-0">
+                    <div className="flex items-center gap-3 p-3 rounded-xl bg-gradient-to-r from-amber-400 to-[#2563EB] text-[#2563EB] shadow-lg shadow-amber-400/20">
+                      <div className="p-2 bg-[#2563EB]/10 rounded-lg shrink-0">
                         <BanknotesIcon className="w-5 h-5" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-[9px] font-black uppercase tracking-widest opacity-70">Step 3 · User</p>
-                        <p className="text-xs font-black">Mark Payed (after MD approval only)</p>
+                        <p className="text-[13px] font-semibold opacity-70">Step 3 · User</p>
+                        <p className="text-[14px] font-semibold">Mark Payed (after MD approval only)</p>
                       </div>
                     </div>
                     <div className="flex justify-center">
@@ -1002,8 +1002,8 @@ export default function PaymentVendorApprovalPage() {
                         <ClipboardDocumentCheckIcon className="w-5 h-5" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-[9px] font-black uppercase tracking-widest opacity-80">Complete</p>
-                        <p className="text-xs font-black">Status = Payed · Payment recorded</p>
+                        <p className="text-[13px] font-semibold opacity-80">Complete</p>
+                        <p className="text-[14px] font-semibold">Status = Payed · Payment recorded</p>
                       </div>
                     </div>
                   </div>
@@ -1012,8 +1012,8 @@ export default function PaymentVendorApprovalPage() {
 
               {/* Status Filter Cards */}
               <section>
-                <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mb-3 flex items-center gap-2">
-                  <span className="w-6 h-0.5 bg-[#FFD500] rounded-full" />
+                <h3 className="text-[13px] font-semibold text-gray-400 mb-3 flex items-center gap-2">
+                  <span className="w-6 h-0.5 bg-[#2563EB] rounded-full" />
                   Status Filter Tabs
                 </h3>
                 <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
@@ -1025,8 +1025,8 @@ export default function PaymentVendorApprovalPage() {
                     { label: "Rejected", desc: "MD declined", color: "from-red-500 to-rose-600" },
                   ].map((tab) => (
                     <div key={tab.label} className={`rounded-xl p-3 bg-gradient-to-br ${tab.color} text-white shadow-md`}>
-                      <p className="text-[9px] font-black uppercase tracking-wide leading-tight">{tab.label}</p>
-                      <p className="text-[8px] font-bold opacity-80 mt-1">{tab.desc}</p>
+                      <p className="text-[13px] font-semibold tracking-wide leading-tight">{tab.label}</p>
+                      <p className="text-[12px] font-bold opacity-80 mt-1">{tab.desc}</p>
                     </div>
                   ))}
                 </div>
@@ -1034,52 +1034,52 @@ export default function PaymentVendorApprovalPage() {
 
               {/* Data & Notifications */}
               <section>
-                <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mb-3 flex items-center gap-2">
-                  <span className="w-6 h-0.5 bg-[#FFD500] rounded-full" />
+                <h3 className="text-[13px] font-semibold text-gray-400 mb-3 flex items-center gap-2">
+                  <span className="w-6 h-0.5 bg-[#2563EB] rounded-full" />
                   Data & Notifications
                 </h3>
                 <div className="grid md:grid-cols-3 gap-3">
                   <div className="rounded-xl border border-gray-100 dark:border-white/10 p-3 bg-white dark:bg-navy-900/50">
                     <div className="flex items-center gap-2 mb-2">
                       <ArrowPathIcon className="w-4 h-4 text-blue-500 animate-spin" style={{ animationDuration: "3s" }} />
-                      <span className="text-[10px] font-black uppercase text-[#003875] dark:text-[#FFD500]">Auto Refresh</span>
+                      <span className="text-[13px] font-semibold text-[#2563EB] dark:text-[#60A5FA]">Auto Refresh</span>
                     </div>
-                    <p className="text-[10px] text-gray-600 dark:text-slate-400 leading-relaxed">GRN + payment status reload every <strong>5 sec</strong></p>
+                    <p className="text-[13px] text-gray-600 dark:text-slate-400 leading-relaxed">GRN + payment status reload every <strong>5 sec</strong></p>
                   </div>
                   <div className="rounded-xl border border-gray-100 dark:border-white/10 p-3 bg-white dark:bg-navy-900/50">
                     <div className="flex items-center gap-2 mb-2">
                       <DevicePhoneMobileIcon className="w-4 h-4 text-emerald-500" />
-                      <span className="text-[10px] font-black uppercase text-emerald-600">WhatsApp Alerts</span>
+                      <span className="text-[13px] font-semibold text-emerald-600">WhatsApp Alerts</span>
                     </div>
-                    <p className="text-[10px] text-gray-600 dark:text-slate-400 leading-relaxed">New/edit GRN → MD · Approve → Himanshi · Includes ERP link + due date</p>
+                    <p className="text-[13px] text-gray-600 dark:text-slate-400 leading-relaxed">New/edit GRN → MD · Approve → Himanshi · Includes ERP link + due date</p>
                   </div>
                   <div className="rounded-xl border border-gray-100 dark:border-white/10 p-3 bg-white dark:bg-navy-900/50">
                     <div className="flex items-center gap-2 mb-2">
                       <ClockIcon className="w-4 h-4 text-violet-500" />
-                      <span className="text-[10px] font-black uppercase text-violet-600">Planned Date</span>
+                      <span className="text-[13px] font-semibold text-violet-600">Planned Date</span>
                     </div>
-                    <p className="text-[10px] text-gray-600 dark:text-slate-400 leading-relaxed">I2R Created At + Payment Terms (days)</p>
+                    <p className="text-[13px] text-gray-600 dark:text-slate-400 leading-relaxed">I2R Created At + Payment Terms (days)</p>
                   </div>
                 </div>
               </section>
 
               {/* Roles */}
               <section className="grid md:grid-cols-2 gap-3">
-                <div className="rounded-2xl border-2 border-[#003875]/20 dark:border-[#FFD500]/20 p-4 bg-gradient-to-br from-blue-50/80 to-white dark:from-navy-900/60 dark:to-navy-950/40">
-                  <h4 className="text-[10px] font-black uppercase tracking-widest text-[#003875] dark:text-[#FFD500] mb-2 flex items-center gap-2">
+                <div className="rounded-2xl border-2 border-[#2563EB]/20 dark:border-[#60A5FA]/20 p-4 bg-gradient-to-br from-blue-50/80 to-white dark:from-navy-900/60 dark:to-navy-950/40">
+                  <h4 className="text-[13px] font-semibold text-[#2563EB] dark:text-[#60A5FA] mb-2 flex items-center gap-2">
                     <UserIcon className="w-4 h-4" /> MD / Admin
                   </h4>
-                  <ul className="text-[10px] space-y-1.5 text-gray-600 dark:text-slate-400">
+                  <ul className="text-[13px] space-y-1.5 text-gray-600 dark:text-slate-400">
                     <li>• <strong>Approve / Reject</strong> on pending entries</li>
                     <li>• Remarks saved with <strong>Admin:</strong> prefix</li>
                     <li>• Reject blocks user from marking Payed</li>
                   </ul>
                 </div>
                 <div className="rounded-2xl border-2 border-amber-200 dark:border-amber-900/40 p-4 bg-gradient-to-br from-amber-50/80 to-white dark:from-amber-950/20 dark:to-navy-950/40">
-                  <h4 className="text-[10px] font-black uppercase tracking-widest text-amber-700 dark:text-amber-400 mb-2 flex items-center gap-2">
+                  <h4 className="text-[13px] font-semibold text-amber-700 dark:text-amber-400 mb-2 flex items-center gap-2">
                     <BanknotesIcon className="w-4 h-4" /> User
                   </h4>
-                  <ul className="text-[10px] space-y-1.5 text-gray-600 dark:text-slate-400">
+                  <ul className="text-[13px] space-y-1.5 text-gray-600 dark:text-slate-400">
                     <li>• <strong>Mark Payed</strong> only when MD approved</li>
                     <li>• Shows <strong>Awaiting MD</strong> until then</li>
                     <li>• Remarks saved with <strong>User:</strong> prefix</li>
@@ -1092,22 +1092,22 @@ export default function PaymentVendorApprovalPage() {
                 <div className="flex items-start gap-2 p-3 rounded-xl bg-gray-50 dark:bg-navy-900/40 border border-gray-100 dark:border-white/5">
                   <MagnifyingGlassIcon className="w-4 h-4 text-gray-400 shrink-0 mt-0.5" />
                   <div>
-                    <p className="text-[10px] font-black uppercase text-gray-700 dark:text-slate-300">Search</p>
-                    <p className="text-[9px] text-gray-500 dark:text-slate-500 mt-0.5">GRN, PO, item, category, country…</p>
+                    <p className="text-[13px] font-semibold text-gray-700 dark:text-slate-300">Search</p>
+                    <p className="text-[13px] text-gray-500 dark:text-slate-500 mt-0.5">GRN, PO, item, category, country…</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-2 p-3 rounded-xl bg-gray-50 dark:bg-navy-900/40 border border-gray-100 dark:border-white/5">
                   <CalendarIcon className="w-4 h-4 text-gray-400 shrink-0 mt-0.5" />
                   <div>
-                    <p className="text-[10px] font-black uppercase text-gray-700 dark:text-slate-300">Date Filters</p>
-                    <p className="text-[9px] text-gray-500 dark:text-slate-500 mt-0.5">Day / Week / Month / Custom range on Planned Date</p>
+                    <p className="text-[13px] font-semibold text-gray-700 dark:text-slate-300">Date Filters</p>
+                    <p className="text-[13px] text-gray-500 dark:text-slate-500 mt-0.5">Day / Week / Month / Custom range on Planned Date</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-2 p-3 rounded-xl bg-gray-50 dark:bg-navy-900/40 border border-gray-100 dark:border-white/5">
                   <ArrowDownTrayIcon className="w-4 h-4 text-gray-400 shrink-0 mt-0.5" />
                   <div>
-                    <p className="text-[10px] font-black uppercase text-gray-700 dark:text-slate-300">Export CSV</p>
-                    <p className="text-[9px] text-gray-500 dark:text-slate-500 mt-0.5">Download filtered list with remarks</p>
+                    <p className="text-[13px] font-semibold text-gray-700 dark:text-slate-300">Export CSV</p>
+                    <p className="text-[13px] text-gray-500 dark:text-slate-500 mt-0.5">Download filtered list with remarks</p>
                   </div>
                 </div>
               </section>
@@ -1116,7 +1116,7 @@ export default function PaymentVendorApprovalPage() {
             <div className="p-4 bg-gradient-to-r from-gray-50 to-blue-50/50 dark:from-[#0B101E] dark:to-navy-900/50 border-t border-gray-100 dark:border-white/5 flex justify-end shrink-0">
               <button
                 onClick={() => setIsInfoModalOpen(false)}
-                className="px-8 py-2.5 text-xs font-black uppercase tracking-widest bg-gradient-to-r from-[#003875] to-[#0056b3] hover:from-[#002855] hover:to-[#003875] dark:from-[#FFD500] dark:to-amber-400 dark:hover:from-[#E6C000] dark:hover:to-[#FFD500] dark:text-[#003875] text-white rounded-xl shadow-lg transition-all"
+                className="px-8 py-2.5 text-[14px] font-semibold bg-gradient-to-r from-[#2563EB] to-[#0056b3] hover:from-[#1D4ED8] hover:to-[#2563EB] dark:from-[#60A5FA] dark:to-amber-400 dark:hover:from-[#E6C000] dark:hover:to-[#60A5FA] dark:text-[#60A5FA] text-white rounded-xl shadow-lg transition-all"
               >
                 Got it
               </button>

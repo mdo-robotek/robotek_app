@@ -38,12 +38,12 @@ export default function EaMdHubPage() {
         {/* Header Section */}
         <div className="flex flex-col lg:flex-row items-center justify-between gap-4 px-1 pb-2">
           <div className="text-center lg:text-left min-w-0">
-            <h1 className="text-xl md:text-2xl font-black text-gray-900 dark:text-white tracking-tight truncate uppercase">EA–MD Hub</h1>
-            <p className="text-gray-500 dark:text-slate-300 font-bold text-[8px] md:text-[10px] uppercase tracking-wider">Executive Assistant & Managing Director Workspace</p>
+            <h1 className="text-xl md:text-2xl font-semibold text-gray-900 dark:text-white tracking-tight truncate">EA–MD Hub</h1>
+            <p className="text-gray-500 dark:text-slate-300 font-bold text-[12px] md:text-[10px] tracking-wider">Executive Assistant & Managing Director Workspace</p>
           </div>
           <div className="flex bg-gray-100 dark:bg-navy-900 rounded-full p-1 border border-gray-200 dark:border-navy-700/50 shadow-inner shrink-0">
-            <button onClick={() => setViewMode('EA')} className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${viewMode === 'EA' ? 'bg-white dark:bg-navy-800 text-[#003875] dark:text-[#FFD500] shadow-sm ring-1 ring-black/5' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}>EA Workspace</button>
-            <button onClick={() => setViewMode('MD')} className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${viewMode === 'MD' ? 'bg-white dark:bg-navy-800 text-[#003875] dark:text-[#FFD500] shadow-sm ring-1 ring-black/5' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}>MD View</button>
+            <button onClick={() => setViewMode('EA')} className={`px-4 py-1.5 rounded-full text-[13px] font-semibold   transition-all ${viewMode === 'EA' ? 'bg-white dark:bg-navy-800 text-[#2563EB] dark:text-[#60A5FA] shadow-sm ring-1 ring-black/5' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}>EA Workspace</button>
+            <button onClick={() => setViewMode('MD')} className={`px-4 py-1.5 rounded-full text-[13px] font-semibold   transition-all ${viewMode === 'MD' ? 'bg-white dark:bg-navy-800 text-[#2563EB] dark:text-[#60A5FA] shadow-sm ring-1 ring-black/5' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}>MD View</button>
           </div>
         </div>
 
@@ -55,7 +55,7 @@ export default function EaMdHubPage() {
               const isActive = activeTab === tab.id;
               return (
                 <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${isActive ? 'bg-[#003875] dark:bg-[#FFD500] text-white dark:text-black border-[#003875] dark:border-[#FFD500] shadow-md scale-105' : 'bg-white text-gray-700 border-gray-300 dark:bg-navy-800 dark:text-gray-300 dark:border-navy-600 hover:scale-[1.02] hover:shadow-sm'
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-[13px] font-semibold   transition-all whitespace-nowrap ${isActive ? 'bg-[#2563EB] dark:bg-[#60A5FA] text-white dark:text-black border-[#2563EB] dark:border-[#60A5FA] shadow-md scale-105' : 'bg-white text-gray-700 border-gray-300 dark:bg-navy-800 dark:text-gray-300 dark:border-navy-600 hover:scale-[1.02] hover:shadow-sm'
                     }`}
                 >
                   {tab.icon} {tab.label}
@@ -110,8 +110,8 @@ export default function EaMdHubPage() {
                   ) : (
                     <div key={tab.id} className="flex-1 flex flex-col items-center justify-center text-center opacity-50 py-20">
                        <div className="scale-[3] mb-8 text-gray-400">{tab.icon}</div>
-                       <h2 className="text-xl font-black text-gray-900 dark:text-white uppercase tracking-tight">{tab.label}</h2>
-                       <p className="text-xs font-bold text-gray-500 mt-2 uppercase tracking-widest">Workspace Module in Development</p>
+                       <h2 className="text-xl font-semibold text-gray-900 dark:text-white tracking-tight">{tab.label}</h2>
+                       <p className="text-[14px] font-bold text-gray-500 mt-2">Workspace Module in Development</p>
                     </div>
                   )
                )

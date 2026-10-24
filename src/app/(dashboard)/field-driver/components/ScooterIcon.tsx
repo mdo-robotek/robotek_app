@@ -1,6 +1,6 @@
 export default function ScooterIcon({
   className = 'w-20 h-20',
-  color = '#062B6F',
+  color = '#1D4ED8',
 }: {
   className?: string;
   color?: string;

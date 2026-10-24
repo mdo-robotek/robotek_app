@@ -206,7 +206,7 @@ export default function ChatInput({
   return (
     <div className="relative bg-[#F0F2F5] px-3 py-2 shrink-0">
       {uploading && (
-        <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-gray-800 text-white px-3 py-1 rounded-full text-xs z-50">
+        <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-gray-800 text-white px-3 py-1 rounded-full text-[14px] z-50">
           Sending voice note...
         </div>
       )}
@@ -214,7 +214,7 @@ export default function ChatInput({
       {replyTo && !isRecording && !isPreview && (
         <div className="flex items-center gap-2 mb-2 bg-white rounded-lg px-3 py-2 border-l-4 border-[#25D366]">
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-medium text-[#25D366]">{replyTo.sender_id}</p>
+            <p className="text-[14px] font-medium text-[#25D366]">{replyTo.sender_id}</p>
             <p className="text-sm text-gray-600 truncate">
               {replyTo.type === "text" ? replyTo.text : `[${replyTo.type}]`}
             </p>

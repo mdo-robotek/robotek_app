@@ -527,6 +527,7 @@ export default function O2DPage() {
     onUpdate: (incremental) => {
       const updates = incremental.find((m) => m.module === "o2d");
       if (!updates) return;
+      // Patch immediately so open rows update at once…
       globalMutate(
         tableQueryKey,
         (current: any) => applyPaginatedIncrementalUpdate(current, updates.upserts, updates.currentIds),
@@ -539,6 +540,14 @@ export default function O2DPage() {
           { revalidate: false }
         );
       }
+      // …then re-fetch the filtered lists and step counts. The lists are
+      // filtered on the server (by step, pending, page), so a patch alone
+      // can't ADD an order that just moved into my step — that's why the
+      // next person (e.g. Verify SO) had to press refresh before.
+      globalMutate(tableQueryKey);
+      if (sidebarQueryKey !== tableQueryKey) globalMutate(sidebarQueryKey);
+      globalMutate("/api/o2d/summary");
+      globalMutate("/api/o2d?type=ordernumbers");
     },
   });
 
@@ -1405,9 +1414,8 @@ export default function O2DPage() {
         optimisticO2Ds = [...updatedItems.flatMap(expandO2DItem), ...optimisticO2Ds];
 
         // Optimistic UI removed for data integrity
-        
-        setIsModalOpen(false);
-        resetForm();
+        // Form stays open until the save is confirmed — on failure the
+        // team keeps what they typed instead of losing it.
 
         const formData = new FormData();
         formData.append("o2dData", JSON.stringify(updatedItems));
@@ -1417,10 +1425,14 @@ export default function O2DPage() {
           method: "PUT",
           body: formData,
         });
-        if (!res.ok) throw new Error("Update failed");
+        if (!res.ok) throw new Error("Update failed. Please try again — your changes are still in the form.");
+        setIsModalOpen(false);
+        resetForm();
       } else {
         const tat1 = globalConfigs[0]?.tat || "24 Hrs";
-        const finalOrderNo = generateOrderNo(allOrderNumbers || []);
+        // Provisional only — the server assigns the real order number
+        // (prevents two quick orders getting the same number / merging).
+        let finalOrderNo = generateOrderNo(allOrderNumbers || []);
         let initRecord: any = { planned_1: calculatePlannedDate(now, tat1) };
         for (let i = 2; i <= 11; i++) initRecord[`planned_${i}`] = "";
 
@@ -1444,15 +1456,17 @@ export default function O2DPage() {
         optimisticO2Ds = [...newItems.flatMap(expandO2DItem), ...optimisticO2Ds];
 
         // Optimistic UI removed for data integrity
-
-        setIsModalOpen(false);
-        resetForm();
+        // Form stays open until the server confirms the order is saved.
 
         const formData = new FormData();
         formData.append("o2dData", JSON.stringify(newItems));
         if (screenshotFile) formData.append("order_screenshot", screenshotFile);
         const res = await fetch("/api/o2d", { method: "POST", body: formData });
-        if (!res.ok) throw new Error("Creation failed");
+        const created = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(created?.error || "Order could not be saved. Please try again — your order is still in the form.");
+        if (created?.order_no) finalOrderNo = created.order_no;
+        setIsModalOpen(false);
+        resetForm();
 
         // IF we have a NEW PARTY draft, submit it now with the actual finalOrderNo
         if (newPartyDraft) {
@@ -1473,6 +1487,7 @@ export default function O2DPage() {
       }
       setActionStatus("success");
       setActionMessage(editingOrderNo ? "Order Updated!" : "Order Created!");
+      globalMutate("/api/o2d?type=ordernumbers");
       
       // Revalidate all relevant keys
       globalMutate(tableQueryKey);

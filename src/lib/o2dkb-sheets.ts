@@ -109,6 +109,23 @@ class O2DKBService extends BaseSheetsService<O2DKB> {
     return row;
   }
 
+  /** Order numbers straight from the sheet (no cache) — for allocation. */
+  async getFreshOrderNumbers(): Promise<string[]> {
+    await this.ensureHeaders();
+    const idx = this.hMap["order no."] !== undefined ? this.hMap["order no."]
+      : this.hMap["order no"] !== undefined ? this.hMap["order no"]
+      : this.hMap["order_no."] !== undefined ? this.hMap["order_no."]
+      : this.hMap["order_no"];
+    if (idx === undefined) return [];
+    const sheets = await this.getSheetsClient();
+    const col = getColumnLetter(idx);
+    const res = await sheets.spreadsheets.values.get({
+      spreadsheetId: this.spreadsheetId,
+      range: `${this.sheetName}!${col}:${col}`,
+    });
+    return (res.data.values || []).slice(1).map((r) => String(r[0] || "").trim()).filter(Boolean);
+  }
+
   // Override to handle multi-row updates and broadcast all affected items
   async updateOrder(orderNo: string, o2dkbs: O2DKB[]): Promise<boolean> {
     await this.ensureHeaders();
@@ -490,6 +507,29 @@ class O2DKBService extends BaseSheetsService<O2DKB> {
 }
 
 export const o2dkbService = new O2DKBService();
+
+// ── Order number allocation (Karol Bagh, SH- series) ────────────────────
+// Same fix as main O2D: the server hands out the next number one at a
+// time from a fresh sheet read, so quick back-to-back orders can't share
+// a number and look merged.
+let kbOrderNoLock: Promise<unknown> = Promise.resolve();
+let kbLastIssued = 0;
+
+export async function allocateO2DKBOrderNo(): Promise<string> {
+  const run = async () => {
+    const nos: string[] = await (o2dkbService as any).getFreshOrderNumbers();
+    const max = nos.reduce((m, no) => {
+      const n = parseInt(String(no || "").replace(/^SH-/i, ""), 10);
+      return !isNaN(n) && n > m ? n : m;
+    }, 0);
+    const next = Math.max(max, kbLastIssued) + 1;
+    kbLastIssued = next;
+    return `SH-${next.toString().padStart(2, "0")}`;
+  };
+  const p = kbOrderNoLock.then(run, run);
+  kbOrderNoLock = p.catch(() => undefined);
+  return p;
+}
 
 // Helper: Get pending step index for an order
 export function getPendingStepIdx(orderItems: O2DKB[]): number {

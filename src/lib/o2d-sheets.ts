@@ -10,6 +10,20 @@ const ARCHIVED_SHEET_NAME = "O2D Archived";
 const CONFIG_SHEET_NAME = "Step Configuration";
 
 class O2DService extends BaseSheetsService<O2D> {
+  /** Order numbers straight from the sheet (no cache) — for allocation. */
+  async getFreshOrderNumbers(): Promise<string[]> {
+    await this.ensureHeaders();
+    const idx = this.hMap["order_no."];
+    if (idx === undefined) return [];
+    const sheets = await this.getSheetsClient();
+    const col = getColumnLetter(idx);
+    const res = await sheets.spreadsheets.values.get({
+      spreadsheetId: this.spreadsheetId,
+      range: `${this.sheetName}!${col}:${col}`,
+    });
+    return (res.data.values || []).slice(1).map((r) => String(r[0] || "").trim()).filter(Boolean);
+  }
+
   protected spreadsheetId = GOOGLE_SHEET_ID;
   protected sheetName: string;
   protected range = "A:BI";
@@ -553,6 +567,42 @@ class O2DService extends BaseSheetsService<O2D> {
 
 export const o2dService = new O2DService(SHEET_NAME);
 export const o2dArchivedService = new O2DService(ARCHIVED_SHEET_NAME);
+
+// ── Order number allocation (fix: orders "merging") ─────────────────────
+// Previously the browser picked the next order number from its own cached
+// list (max + 1). Two orders punched back-to-back — or by two people at
+// once — got the SAME number, and since orders are grouped by number they
+// looked merged (e.g. AR Patel + Sumit Faizabad under one OR-no). Now the
+// server hands out numbers: one at a time (in-process lock), from a FRESH
+// read of the sheet, never lower than the last number it issued.
+let orderNoLock: Promise<unknown> = Promise.resolve();
+let lastIssuedOrderNum = 0;
+
+async function readFreshOrderNumbers(service: O2DService): Promise<string[]> {
+  return (service as any).getFreshOrderNumbers();
+}
+
+function maxOrderNum(nos: string[]): number {
+  return nos.reduce((max, no) => {
+    const n = parseInt(String(no || "").replace(/^OR-/i, ""), 10);
+    return !isNaN(n) && n > max ? n : max;
+  }, 0);
+}
+
+export async function allocateO2DOrderNo(): Promise<string> {
+  const run = async () => {
+    const [live, archived] = await Promise.all([
+      readFreshOrderNumbers(o2dService),
+      o2dArchivedService.getAll().then((rows) => rows.map((r) => r.order_no || "")).catch(() => [] as string[]),
+    ]);
+    const next = Math.max(maxOrderNum(live), maxOrderNum(archived), lastIssuedOrderNum) + 1;
+    lastIssuedOrderNum = next;
+    return `OR-${next.toString().padStart(2, "0")}`;
+  };
+  const p = orderNoLock.then(run, run);
+  orderNoLock = p.catch(() => undefined);
+  return p;
+}
 
 /** Live O2D + O2D Archived combined for analytics/metrix (prefer live row on same id). */
 export async function getAllO2DsForAnalytics(): Promise<O2D[]> {

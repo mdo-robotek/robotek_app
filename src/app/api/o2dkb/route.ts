@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getO2DKBsPaginated, o2dkbService } from "@/lib/o2dkb-sheets";
+import { getO2DKBsPaginated, o2dkbService, allocateO2DKBOrderNo } from "@/lib/o2dkb-sheets";
 import { auth } from "@/auth";
 
 export const dynamic = 'force-dynamic';
@@ -127,15 +127,19 @@ export async function POST(req: NextRequest) {
     } else {
       const o2dkbData = await req.json();
       const timestamp = new Date().toISOString();
+      // New order → server assigns the SH- number (no duplicate numbers
+      // when two orders are punched quickly).
+      const assignedOrderNo = await allocateO2DKBOrderNo();
       const record = {
         ...o2dkbData,
+        order_no: assignedOrderNo,
         id: o2dkbData.id || `O2DKB-${Date.now()}`,
         created_at: o2dkbData.created_at || timestamp,
         updated_at: timestamp
       };
-      await Promise.all([record].map((i: any) => o2dkbService.add(i)));
-      
-      return NextResponse.json({ message: "O2DKB record added successfully" });
+      await o2dkbService.add(record);
+
+      return NextResponse.json({ message: "O2DKB record added successfully", order_no: assignedOrderNo });
     }
   } catch (error: any) {
     console.error("POST /api/o2dkb error:", error);

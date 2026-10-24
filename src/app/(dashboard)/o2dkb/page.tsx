@@ -493,6 +493,11 @@ export default function O2DPage() {
           { revalidate: false }
         );
       }
+      // Re-fetch the server-filtered lists so an order that just moved
+      // into my step shows up without pressing refresh.
+      globalMutate(tableQueryKey);
+      if (sidebarQueryKey !== tableQueryKey) globalMutate(sidebarQueryKey);
+      globalMutate((key: unknown) => typeof key === "string" && key.startsWith("/api/o2dkb/summary"));
     },
   });
 
@@ -1353,7 +1358,8 @@ export default function O2DPage() {
         if (!res.ok) throw new Error("Update failed");
       } else {
         const tat1 = globalConfigs[0]?.tat || "24 Hrs";
-        const finalOrderNo = generateOrderNo(allOrderNumbers || []);
+        // Provisional only — the server assigns the real SH- number.
+        let finalOrderNo = generateOrderNo(allOrderNumbers || []);
         let initRecord: any = { planned_1: calculatePlannedDate(now, tat1) };
         for (let i = 2; i <= 11; i++) initRecord[`planned_${i}`] = "";
 
@@ -1374,16 +1380,18 @@ export default function O2DPage() {
         optimisticO2Ds = [...newItems, ...optimisticO2Ds];
 
         // Optimistic UI removed for data integrity
-
-        setIsModalOpen(false);
-        resetForm();
+        // Form stays open until the server confirms the order is saved.
 
         const res = await fetch("/api/o2dkb", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(newItems[0]),
         });
-        if (!res.ok) throw new Error("Creation failed");
+        const created = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(created?.error || "Order could not be saved. Please try again — your order is still in the form.");
+        if (created?.order_no) finalOrderNo = created.order_no;
+        setIsModalOpen(false);
+        resetForm();
 
         // IF we have a NEW PARTY draft, submit it now with the actual finalOrderNo
         if (newPartyDraft) {

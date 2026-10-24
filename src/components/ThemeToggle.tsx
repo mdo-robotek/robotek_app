@@ -1,62 +1,30 @@
 "use client";
 
+// Theme Step 1 (Oct 2026): plain light/dark switch (was an animated
+// sun/moon/comet toggle). One 44px button with a clear label.
 import { useTheme } from "next-themes";
-import { useCallback, useEffect, useRef, useState } from "react";
-
-const STARS = [
-  { top: 5, left: 38, delay: 0 },
-  { top: 12, left: 47, delay: 0.4 },
-  { top: 22, left: 40, delay: 0.9 },
-  { top: 8, left: 55, delay: 1.3 },
-  { top: 18, left: 52, delay: 1.8 },
-];
+import { useEffect, useState } from "react";
+import { SunIcon, MoonIcon } from "@heroicons/react/24/outline";
 
 export default function ThemeToggle() {
   const { theme, setTheme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
-  const [cometFly, setCometFly] = useState(false);
-  const cometTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
   useEffect(() => setMounted(true), []);
 
-  useEffect(() => {
-    return () => {
-      if (cometTimer.current) clearTimeout(cometTimer.current);
-    };
-  }, []);
+  if (!mounted) return <div className="w-11 h-11" aria-hidden />;
 
   const isDark = (resolvedTheme || theme) === "dark";
-
-  const toggle = useCallback(() => {
-    setTheme(isDark ? "light" : "dark");
-    setCometFly(true);
-    if (cometTimer.current) clearTimeout(cometTimer.current);
-    cometTimer.current = setTimeout(() => setCometFly(false), 650);
-  }, [isDark, setTheme]);
-
-  if (!mounted) {
-    return <div className="celestial-toggle-placeholder" aria-hidden />;
-  }
+  const label = isDark ? "Switch to light mode" : "Switch to dark mode";
 
   return (
     <button
       type="button"
-      className={`celestial-toggle${isDark ? " is-dark" : ""}`}
-      onClick={toggle}
-      aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
-      title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
+      onClick={() => setTheme(isDark ? "light" : "dark")}
+      title={label}
+      aria-label={label}
+      className="w-11 h-11 flex items-center justify-center text-[#5B6472] hover:text-[#1A1D21] hover:bg-gray-100 dark:text-white/70 dark:hover:text-white dark:hover:bg-white/10 rounded-lg transition-colors"
     >
-      <div className="ct-stars" aria-hidden>
-        {STARS.map((s, i) => (
-          <span
-            key={i}
-            className="ct-star"
-            style={{ top: s.top, left: s.left, animationDelay: `${s.delay}s` }}
-          />
-        ))}
-      </div>
-      <span className={`ct-comet${cometFly ? " fly" : ""}`} aria-hidden />
-      <div className="ct-orb" aria-hidden />
+      {isDark ? <SunIcon className="w-5 h-5" /> : <MoonIcon className="w-5 h-5" />}
     </button>
   );
 }

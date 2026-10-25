@@ -298,8 +298,8 @@ export default function SyncMeetingView() {
                         {meetingId ? 'Edit Meeting Record' : 'New Meeting Record'}
                     </h2>
                     <div className="flex items-center gap-2 mt-1">
-                      <p className="text-[#5B6472] dark:text-slate-400 font-bold text-[12px]">EA-MD Hub</p>
-                      <span className="px-2 py-0.5 bg-[#F7F8FA] dark:bg-navy-800 text-[12px] font-semibold text-[#2563EB] dark:text-[#60A5FA] rounded border border-[#E5E7EB] dark:border-navy-700">
+                      <p className="text-[#5B6472] dark:text-slate-400 font-bold text-[14px]">EA-MD Hub</p>
+                      <span className="px-2 py-0.5 bg-[#F7F8FA] dark:bg-navy-800 text-[14px] font-semibold text-[#2563EB] dark:text-[#60A5FA] rounded border border-[#E5E7EB] dark:border-navy-700">
                         Sync Meeting
                       </span>
                     </div>
@@ -397,7 +397,7 @@ export default function SyncMeetingView() {
                                 <button
                                   key={o}
                                   onClick={() => updateAgendaItem(item.id, { owner: o })}
-                                  className={`px-2 py-1 rounded-md text-[12px] font-semibold  transition-all ${item.owner === o ? 'bg-[#1D4ED8] text-white shadow-sm scale-105' : 'text-[#5B6472] hover:text-gray-600'
+                                  className={`px-2 py-1 rounded-md text-[14px] font-semibold  transition-all ${item.owner === o ? 'bg-[#1D4ED8] text-white shadow-sm scale-105' : 'text-[#5B6472] hover:text-gray-600'
                                     }`}
                                 >
                                   {o}

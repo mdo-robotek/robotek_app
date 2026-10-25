@@ -528,7 +528,7 @@ export default function LeadDetailView({ lead, initialTab, onClose, onUpdate }: 
                           }`}>
                           {event.status || 'Status Not Provided'}
                         </span>
-                        {idx === 0 && <span className="text-[12px] font-semibold text-white bg-[#2563EB]/10 px-1.5 rounded">Latest</span>}
+                        {idx === 0 && <span className="text-[14px] font-semibold text-white bg-[#2563EB]/10 px-1.5 rounded">Latest</span>}
                       </div>
                       <p className="text-[13px] font-semibold text-[#5B6472] mb-3">
                         {event.timestamp ? new Date(event.timestamp).toLocaleString("en-GB", { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }) : "—"}

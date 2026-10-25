@@ -151,7 +151,7 @@ export default function CreateLeadModal({ isOpen, onClose, onSuccess, leadToEdit
             <div>
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white tracking-tight">{leadToEdit ? `Edit Lead (${leadToEdit.id})` : 'Create New Lead'}</h2>
               <div className="flex items-center gap-2 mt-1">
-                <p className="text-[#5B6472] dark:text-slate-400 font-bold text-[12px]">Stage 1: Lead Details</p>
+                <p className="text-[#5B6472] dark:text-slate-400 font-bold text-[14px]">Stage 1: Lead Details</p>
               </div>
             </div>
             <button onClick={onClose} className="p-2 text-[#5B6472] hover:text-gray-600 dark:hover:text-zinc-200 transition-colors">

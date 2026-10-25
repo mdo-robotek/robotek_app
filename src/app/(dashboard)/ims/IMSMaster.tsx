@@ -1881,7 +1881,7 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
                       </td>
                       <td className="py-2 px-3 text-[14px] font-bold text-gray-500">{log.category}</td>
                       <td className="py-2 px-3">
-                        <span className={`inline-flex px-1.5 py-0.5 rounded text-[12px] font-semibold  tracking-wider ${getTxSourceBadgeClass(log.source)}`}>
+                        <span className={`inline-flex px-1.5 py-0.5 rounded text-[14px] font-semibold  tracking-wider ${getTxSourceBadgeClass(log.source)}`}>
                           {formatTxSourceLabel(log.source)}
                         </span>
                       </td>

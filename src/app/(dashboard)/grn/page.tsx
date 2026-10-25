@@ -756,7 +756,7 @@ export default function GRNDashboard() {
                                     <span>STEP {step} PENDING</span>
                                     {(item as any)[`planned_${step}`] && (
                                       <span className="flex items-center gap-1.5 ml-1 pl-2 border-l border-[#2563EB]/20 dark:border-[#60A5FA]/20 animate-pulse">
-                                        <span className="text-[12px] text-[#D97706] dark:text-[#D97706] font-bold">DUE</span>
+                                        <span className="text-[14px] text-[#D97706] dark:text-[#D97706] font-bold">DUE</span>
                                         <span className="text-[13px] font-semibold text-[#D97706] dark:text-[#D97706]">
                                           {fmtDt((item as any)[`planned_${step}`])} {fmtTm((item as any)[`planned_${step}`])}
                                         </span>
@@ -835,7 +835,7 @@ export default function GRNDashboard() {
                                    <div className="flex items-center justify-between mb-0.5">
                                      <p className={`text-[13px] font-semibold   ${done ? "text-emerald-500" : isPending ? "text-[#D97706]" : "text-[#5B6472]"}`}>ST {n}</p>
                                      <div className="flex items-center gap-1">
-                                       {delay && <span className="text-[12px] font-semibold text-rose-500 bg-rose-50 px-1 rounded">-{delay}</span>}
+                                       {delay && <span className="text-[14px] font-semibold text-rose-500 bg-rose-50 px-1 rounded">-{delay}</span>}
                                        {done && <CheckCircleIcon className="w-3 h-3 text-emerald-500" />}
                                        {isPending && <ClockIcon className="w-3 h-3 text-[#D97706] animate-pulse" />}
                                      </div>
@@ -844,11 +844,11 @@ export default function GRNDashboard() {
                                    
                                    <div className={`mt-0.5 space-y-0 pt-0.5 border-t ${done ? "border-emerald-100" : "border-slate-100 dark:border-navy-800"}`}>
                                      <div className="flex justify-between items-center text-[13px] font-semibold tracking-tighter">
-                                       <span className="opacity-40 text-[#5B6472] text-[12px]">Planned</span>
+                                       <span className="opacity-40 text-[#5B6472] text-[14px]">Planned</span>
                                        <span className="text-slate-600 dark:text-white/70">{fmtDt(pl)} {fmtTm(pl)}</span>
                                      </div>
                                      <div className="flex justify-between items-center text-[13px] font-semibold tracking-tighter">
-                                       <span className="opacity-40 text-[#5B6472] text-[12px]">Actual</span>
+                                       <span className="opacity-40 text-[#5B6472] text-[14px]">Actual</span>
                                        <span className={done ? "text-emerald-700" : "opacity-30"}>{act ? `${fmtDt(act)} ${fmtTm(act)}` : "—"}</span>
                                      </div>
                                      {n === 1 && item.remarks_1 && (
@@ -863,7 +863,7 @@ export default function GRNDashboard() {
                                      )}
                                      {n === 4 && item.vendor_visit_date_4 && (
                                        <div className="mt-1 flex items-center justify-between text-[13px] font-semibold tracking-tighter text-blue-500">
-                                         <span className="opacity-40 text-[12px]">Visit Date</span>
+                                         <span className="opacity-40 text-[14px]">Visit Date</span>
                                          <span>{fmtDt(item.vendor_visit_date_4)} {fmtTm(item.vendor_visit_date_4)}</span>
                                        </div>
                                      )}
@@ -993,13 +993,13 @@ export default function GRNDashboard() {
 
                        <div className="flex items-center gap-4">
                           <div className="flex-1 px-4 py-2 bg-slate-50 dark:bg-navy-800 rounded-xl border border-slate-100 dark:border-navy-700 min-w-0">
-                             <p className="text-[12px] font-semibold text-[#5B6472]">Current Step</p>
+                             <p className="text-[14px] font-semibold text-[#5B6472]">Current Step</p>
                              <p className="text-[13px] font-semibold text-slate-700 dark:text-white truncate">{n <= 9 && n > 0 ? GRN_STEP_SHORT[n-1] : "COMPLETED"}</p>
                           </div>
                           {n <= 9 && n > 0 && <ChevronRightIcon className="w-4 h-4 text-[#5B6472] shrink-0" />}
                           {n <= 9 && n > 0 && (
                             <div className="flex-1 px-4 py-2 bg-[#FFFFFF] dark:bg-[#60A5FA]/10 rounded-xl border border-[#2563EB]/30 min-w-0">
-                               <p className="text-[12px] font-semibold text-[#5B6472]">Action</p>
+                               <p className="text-[14px] font-semibold text-[#5B6472]">Action</p>
                                <p className="text-[13px] font-semibold text-[#2563EB] dark:text-[#60A5FA] truncate">Complete Step {n}</p>
                             </div>
                           )}
@@ -1045,7 +1045,7 @@ export default function GRNDashboard() {
 
                           {n === 4 && (
                             <div className="space-y-1">
-                               <p className="text-[12px] font-semibold text-[#5B6472] ml-1">Vendor Visit Date</p>
+                               <p className="text-[14px] font-semibold text-[#5B6472] ml-1">Vendor Visit Date</p>
                                <input 
                                  type="datetime-local" 
                                  value={data.visitDate || ""}
@@ -1199,8 +1199,8 @@ export default function GRNDashboard() {
                       </div>
                       <div className="flex items-center gap-2">
                         <div className="bg-slate-100 dark:bg-navy-900 p-0.5 rounded-full flex items-center border border-slate-200 dark:border-navy-800">
-                          <button onClick={() => { const n = [...stepConfigs]; n[i].tat = n[i].tat.replace("Days", "Hrs"); setStepConfigs(n); }} className={`px-3 py-1 rounded-full text-[12px] font-semibold  transition-all ${cfg.tat.includes("Hrs") ? "bg-[#2563EB] text-white shadow-md" : "text-[#5B6472] dark:text-navy-600"}`}>HRS</button>
-                          <button onClick={() => { const n = [...stepConfigs]; n[i].tat = n[i].tat.replace("Hrs", "Days"); setStepConfigs(n); }} className={`px-3 py-1 rounded-full text-[12px] font-semibold  transition-all ${cfg.tat.includes("Days") ? "bg-[#2563EB] text-white shadow-md" : "text-[#5B6472]"}`}>Days</button>
+                          <button onClick={() => { const n = [...stepConfigs]; n[i].tat = n[i].tat.replace("Days", "Hrs"); setStepConfigs(n); }} className={`px-3 py-1 rounded-full text-[14px] font-semibold  transition-all ${cfg.tat.includes("Hrs") ? "bg-[#2563EB] text-white shadow-md" : "text-[#5B6472] dark:text-navy-600"}`}>HRS</button>
+                          <button onClick={() => { const n = [...stepConfigs]; n[i].tat = n[i].tat.replace("Hrs", "Days"); setStepConfigs(n); }} className={`px-3 py-1 rounded-full text-[14px] font-semibold  transition-all ${cfg.tat.includes("Days") ? "bg-[#2563EB] text-white shadow-md" : "text-[#5B6472]"}`}>Days</button>
                         </div>
                         <input type="text" value={parseFloat(cfg.tat)} onChange={e => { const n = [...stepConfigs]; const unit = cfg.tat.includes("Days") ? "Days" : "Hrs"; n[i].tat = `${e.target.value} ${unit}`; setStepConfigs(n); }} className="w-12 h-8 bg-slate-50 dark:bg-navy-800 border-none rounded-lg text-center font-semibold text-[14px] text-[#2563EB] dark:text-[#60A5FA] outline-none" />
                       </div>

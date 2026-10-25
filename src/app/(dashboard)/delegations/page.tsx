@@ -1032,7 +1032,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
       <div className="flex flex-col lg:flex-row items-center gap-4 px-1">
         <div className="w-full lg:w-1/3 text-center lg:text-left min-w-0">
           <h1 className="text-xl md:text-2xl font-semibold text-gray-900 dark:text-white tracking-tight truncate">Delegations</h1>
-          <p className="text-gray-500 dark:text-slate-300 font-bold text-[12px] md:text-[10px] tracking-wider truncate">Task Assignment System</p>
+          <p className="text-gray-500 dark:text-slate-300 font-bold text-[14px] md:text-[10px] tracking-wider truncate">Task Assignment System</p>
         </div>
         
         <div className="w-full lg:w-1/3 flex justify-center flex-shrink-0 min-w-0">
@@ -1183,7 +1183,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                 >
                   <span className="hidden xs:inline">To Me</span>
                   <span className="xs:hidden">To</span>
-                  <span className="text-[12px] opacity-70">{baseDelegations.filter(d => d.assigned_to === ((session?.user as any)?.username || "")).length}</span>
+                  <span className="text-[14px] opacity-70">{baseDelegations.filter(d => d.assigned_to === ((session?.user as any)?.username || "")).length}</span>
                 </button>
                 <button 
                   onClick={() => { setAssignmentFilter(assignmentFilter === 'ByMe' ? 'All' : 'ByMe'); setCurrentPage(1); }}
@@ -1192,7 +1192,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                 >
                   <span className="hidden xs:inline">By Me</span>
                   <span className="xs:hidden">By</span>
-                  <span className="text-[12px] opacity-70">{baseDelegations.filter(d => d.assigned_by === ((session?.user as any)?.username || "")).length}</span>
+                  <span className="text-[14px] opacity-70">{baseDelegations.filter(d => d.assigned_by === ((session?.user as any)?.username || "")).length}</span>
                 </button>
               </div>
             </div>
@@ -1307,7 +1307,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                   <tr>
                     <td colSpan={9} className="px-4 py-10 text-center">
                       <div className="w-6 h-6 border-2 border-gray-100 border-t-[#2563EB] rounded-full animate-spin mx-auto mb-2" />
-                      <p className="text-[#5B6472] font-bold text-[12px]">Syncing...</p>
+                      <p className="text-[#5B6472] font-bold text-[14px]">Syncing...</p>
                     </td>
                   </tr>
                 ) : paginatedDelegations.length === 0 ? (
@@ -1416,21 +1416,21 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
                         <div className="grid grid-cols-2 gap-3 mt-auto pt-4 border-t border-gray-50 dark:border-white/5">
                           <div className="flex flex-col gap-1 overflow-hidden">
-                            <span className="text-[12px] font-semibold text-[#5B6472]">Assigned To</span>
+                            <span className="text-[14px] font-semibold text-[#5B6472]">Assigned To</span>
                             <span className="text-[13px] font-semibold text-gray-800 dark:text-gray-200 truncate">{del.assigned_to || "—"}</span>
                           </div>
                           <div className="flex flex-col gap-1 overflow-hidden">
-                            <span className="text-[12px] font-semibold text-[#5B6472]">Dept</span>
+                            <span className="text-[14px] font-semibold text-[#5B6472]">Dept</span>
                             <div className="scale-75 origin-left">
                               {getDepartmentBadge(del.department)}
                             </div>
                           </div>
                           <div className="flex flex-col gap-1 overflow-hidden">
-                            <span className="text-[12px] font-semibold text-[#5B6472]">Due Date</span>
+                            <span className="text-[14px] font-semibold text-[#5B6472]">Due Date</span>
                             <span className="text-[13px] font-semibold text-gray-700 dark:text-slate-300 truncate">{formatDateDisplay(del.due_date) || "—"}</span>
                           </div>
                           <div className="flex flex-col gap-1 overflow-hidden">
-                            <span className="text-[12px] font-semibold text-[#5B6472]">Assigned By</span>
+                            <span className="text-[14px] font-semibold text-[#5B6472]">Assigned By</span>
                             <span className="text-[13px] font-bold text-gray-500 dark:text-gray-400 truncate">{del.assigned_by || "—"}</span>
                           </div>
                         </div>
@@ -1536,7 +1536,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                         {selectedTask.assigned_to?.substring(0, 2).toUpperCase() || "TO"}
                       </div>
                       <div>
-                        <p className="text-[12px] font-semibold text-[#5B6472] tracking-tighter leading-none mb-1">Assigned To</p>
+                        <p className="text-[14px] font-semibold text-[#5B6472] tracking-tighter leading-none mb-1">Assigned To</p>
                         <p className="text-[14px] font-semibold text-gray-900 dark:text-white truncate max-w-[120px]">{selectedTask.assigned_to}</p>
                       </div>
                     </div>
@@ -1545,7 +1545,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                         {selectedTask.assigned_by?.substring(0, 2).toUpperCase() || "BY"}
                       </div>
                       <div>
-                        <p className="text-[12px] font-semibold text-[#5B6472] tracking-tighter leading-none mb-1">Assigned By</p>
+                        <p className="text-[14px] font-semibold text-[#5B6472] tracking-tighter leading-none mb-1">Assigned By</p>
                         <p className="text-[14px] font-bold text-gray-600 dark:text-slate-400 truncate max-w-[120px]">{selectedTask.assigned_by}</p>
                       </div>
                     </div>
@@ -1558,7 +1558,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                         <TagIcon className="w-4 h-4" />
                       </div>
                       <div>
-                        <p className="text-[12px] font-semibold text-[#5B6472] leading-none mb-1">Department</p>
+                        <p className="text-[14px] font-semibold text-[#5B6472] leading-none mb-1">Department</p>
                         <p className="text-[14px] font-semibold text-gray-900 dark:text-white">{selectedTask.department}</p>
                       </div>
                     </div>
@@ -1567,7 +1567,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                         <CalendarDaysIcon className="w-4 h-4" />
                       </div>
                       <div>
-                        <p className="text-[12px] font-semibold text-[#5B6472] leading-none mb-1">Due Date</p>
+                        <p className="text-[14px] font-semibold text-[#5B6472] leading-none mb-1">Due Date</p>
                         <p className="text-[14px] font-semibold text-gray-900 dark:text-white">{formatDateDisplay(selectedTask.due_date)}</p>
                       </div>
                     </div>
@@ -1580,7 +1580,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                         <ClockIcon className="w-4 h-4" />
                       </div>
                       <div>
-                        <p className="text-[12px] font-semibold text-[#5B6472] leading-none mb-1">Registered</p>
+                        <p className="text-[14px] font-semibold text-[#5B6472] leading-none mb-1">Registered</p>
                         <p className="text-[13px] font-bold text-gray-600 dark:text-slate-400">{formatDateDisplay(selectedTask.created_at)}</p>
                       </div>
                     </div>
@@ -1590,7 +1590,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                           <ArrowPathIcon className="w-4 h-4" />
                         </div>
                         <div>
-                          <p className="text-[12px] font-semibold text-[#5B6472] leading-none mb-1">Updated</p>
+                          <p className="text-[14px] font-semibold text-[#5B6472] leading-none mb-1">Updated</p>
                           <p className="text-[13px] font-bold text-gray-600 dark:text-slate-400">{formatDateDisplay(selectedTask.updated_at)}</p>
                         </div>
                       </div>
@@ -1693,13 +1693,13 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                              <PaperClipIcon className="w-5 h-5 text-red-500" />
                           )}
                         </div>
-                        <p className="text-[12px] font-semibold tracking-tighter text-red-600 dark:text-red-400 text-center">Open Doc</p>
+                        <p className="text-[14px] font-semibold tracking-tighter text-red-600 dark:text-red-400 text-center">Open Doc</p>
                       </a>
                     ) : (
 
                       <div className="p-4 bg-red-50/10 dark:bg-red-950/5 rounded-2xl border border-dashed border-red-100 dark:border-red-900/20 text-center flex flex-col items-center justify-center h-full">
                         <PaperClipIcon className="w-6 h-6 text-[#5B6472] mb-2" />
-                        <p className="text-[12px] font-semibold text-[#5B6472] tracking-tighter">No Doc</p>
+                        <p className="text-[14px] font-semibold text-[#5B6472] tracking-tighter">No Doc</p>
                       </div>
                     )}
                   </div>
@@ -1751,7 +1751,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                         />
                         <CalendarDaysIcon className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-red-400 pointer-events-none group-hover/date:scale-110 transition-transform" />
                       </div>
-                      <p className="text-[12px] text-[#5B6472] mt-1 font-bold italic tracking-tighter">* Set the new target completion time</p>
+                      <p className="text-[14px] text-[#5B6472] mt-1 font-bold italic tracking-tighter">* Set the new target completion time</p>
                     </div>
                   )}
 
@@ -1830,7 +1830,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                               <span className="text-[13px] font-semibold text-gray-900 dark:text-white tracking-tight">
                                 {item.type === 'remark' ? item.username : `Status -> ${item.new_status}`}
                               </span>
-                              <span className="text-[12px] font-bold text-[#5B6472]">{formatDateDisplay(item.created_at)}</span>
+                              <span className="text-[14px] font-bold text-[#5B6472]">{formatDateDisplay(item.created_at)}</span>
                             </div>
                             
                             {item.type === 'remark' ? (
@@ -1916,9 +1916,9 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                     {editingDelegation ? "Edit Delegation" : "Create Delegation"}
                   </h2>
                   <div className="flex items-center gap-2 mt-1">
-                    <p className="text-[#5B6472] dark:text-slate-400 font-bold text-[12px]">Task Configuration</p>
+                    <p className="text-[#5B6472] dark:text-slate-400 font-bold text-[14px]">Task Configuration</p>
                     {editingDelegation && (
-                      <span className="px-2 py-0.5 bg-[#F7F8FA] dark:bg-zinc-800 text-[12px] font-semibold text-gray-500 rounded border border-[#E5E7EB] dark:border-zinc-700">
+                      <span className="px-2 py-0.5 bg-[#F7F8FA] dark:bg-zinc-800 text-[14px] font-semibold text-gray-500 rounded border border-[#E5E7EB] dark:border-zinc-700">
                         ID: {editingDelegation?.id}
                       </span>
                     )}

@@ -352,7 +352,7 @@ export default function MetrixPage() {
       />
       <div className="text-center">
         <p className="text-[13px] font-semibold text-gray-900 dark:text-white animate-pulse">Syncing Metrix Intelligence</p>
-        <p className="text-[12px] font-bold text-[#5B6472] mt-2">Connecting to Logistics Core...</p>
+        <p className="text-[14px] font-bold text-[#5B6472] mt-2">Connecting to Logistics Core...</p>
       </div>
     </div>
   );
@@ -375,7 +375,7 @@ export default function MetrixPage() {
             </div>
             <div>
               <h1 className="text-xl font-semibold text-gray-900 dark:text-white tracking-tighter leading-none">O2D <span className="text-[#2563EB] dark:text-[#60A5FA] italic">Engine</span></h1>
-              <p className="text-[#5B6472] font-bold text-[12px] mt-1">Analytics Control Center</p>
+              <p className="text-[#5B6472] font-bold text-[14px] mt-1">Analytics Control Center</p>
             </div>
           </div>
 
@@ -742,8 +742,8 @@ export default function MetrixPage() {
                       <div className="flex items-center justify-between mb-6 border-b pb-4 border-gray-50 dark:border-white/5">
                         <h3 className="text-[14px] font-semibold text-gray-900 dark:text-white">Lead Velocity</h3>
                         <div className="flex items-center gap-3">
-                          <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-blue-500"/><span className="text-[12px] font-semibold text-[#5B6472]">Generated</span></div>
-                          <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-emerald-500"/><span className="text-[12px] font-semibold text-[#5B6472]">Won</span></div>
+                          <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-blue-500"/><span className="text-[14px] font-semibold text-[#5B6472]">Generated</span></div>
+                          <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-emerald-500"/><span className="text-[14px] font-semibold text-[#5B6472]">Won</span></div>
                         </div>
                       </div>
                       <div className="h-[250px]">
@@ -1225,10 +1225,10 @@ export default function MetrixPage() {
                         <h4 className="text-[13px] font-semibold opacity-60">Party Analysis</h4>
                         <h2 className="text-xl font-semibold mt-1 leading-tight">{drillDownParty.party}</h2>
                         <div className="mt-4 flex flex-wrap items-center justify-between gap-4 border-t border-[#2563EB]/10 pt-4">
-                          <div><p className="text-[12px] font-bold opacity-60">Business</p><p className="text-lg font-semibold text-[#2563EB]">{(drillDownParty.amount / 100000).toFixed(2)}L</p></div>
-                          <div><p className="text-[12px] font-bold opacity-60">Orders</p><p className="text-lg font-semibold text-[#2563EB]">{drillDownParty.count}</p></div>
-                          <div><p className="text-[12px] font-bold opacity-60">OTD Success</p><p className="text-lg font-semibold text-emerald-600">{drillDownParty.otdRate}%</p></div>
-                          <div><p className="text-[12px] font-bold opacity-60">Delayed</p><p className="text-lg font-semibold text-rose-600">{drillDownParty.delayedCount}</p></div>
+                          <div><p className="text-[14px] font-bold opacity-60">Business</p><p className="text-lg font-semibold text-[#2563EB]">{(drillDownParty.amount / 100000).toFixed(2)}L</p></div>
+                          <div><p className="text-[14px] font-bold opacity-60">Orders</p><p className="text-lg font-semibold text-[#2563EB]">{drillDownParty.count}</p></div>
+                          <div><p className="text-[14px] font-bold opacity-60">OTD Success</p><p className="text-lg font-semibold text-emerald-600">{drillDownParty.otdRate}%</p></div>
+                          <div><p className="text-[14px] font-bold opacity-60">Delayed</p><p className="text-lg font-semibold text-rose-600">{drillDownParty.delayedCount}</p></div>
                         </div>
                       </div>
 
@@ -1259,8 +1259,8 @@ export default function MetrixPage() {
                             <div key={i} className="flex items-center justify-between p-2 bg-gray-50 dark:bg-navy-800 rounded-lg border border-gray-100 dark:border-white/5">
                               <p className="text-[13px] font-semibold text-gray-900 dark:text-white truncate">{uc.category}</p>
                               <div className="text-right">
-                                <p className="text-[12px] font-bold text-[#5B6472]">Avg Sale</p>
-                                <p className="text-[12px] font-semibold text-rose-500">{(uc.marketAvg / 1000).toFixed(1)}k</p>
+                                <p className="text-[14px] font-bold text-[#5B6472]">Avg Sale</p>
+                                <p className="text-[14px] font-semibold text-rose-500">{(uc.marketAvg / 1000).toFixed(1)}k</p>
                               </div>
                             </div>
                           ))}
@@ -1274,8 +1274,8 @@ export default function MetrixPage() {
                         <div className="flex items-center justify-between mb-4">
                           <h4 className="text-[13px] font-semibold text-[#5B6472]">Order & Revenue Velocity (Week Wise)</h4>
                           <div className="flex gap-3">
-                            <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#2563EB]" /><span className="text-[12px] font-semibold">Revenue</span></div>
-                            <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500" /><span className="text-[12px] font-semibold">Orders</span></div>
+                            <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#2563EB]" /><span className="text-[14px] font-semibold">Revenue</span></div>
+                            <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500" /><span className="text-[14px] font-semibold">Orders</span></div>
                           </div>
                         </div>
                         <ResponsiveContainer width="100%" height="100%">
@@ -1410,10 +1410,10 @@ export default function MetrixPage() {
                         <h4 className="text-[13px] font-semibold opacity-60">Category Analysis</h4>
                         <h2 className="text-xl font-semibold mt-1 leading-tight">{drillDownCategory.category}</h2>
                         <div className="mt-4 flex flex-wrap items-center justify-between gap-4 border-t border-[#2563EB]/10 pt-4">
-                          <div><p className="text-[12px] font-bold opacity-60">Business</p><p className="text-lg font-semibold text-[#2563EB]">{(drillDownCategory.amount / 100000).toFixed(2)}L</p></div>
-                          <div><p className="text-[12px] font-bold opacity-60">Quantity</p><p className="text-lg font-semibold text-[#2563EB]">{drillDownCategory.count}</p></div>
-                          <div><p className="text-[12px] font-bold opacity-60">OTD Success</p><p className="text-lg font-semibold text-emerald-600">{drillDownCategory.otdRate}%</p></div>
-                          <div><p className="text-[12px] font-bold opacity-60">Delayed</p><p className="text-lg font-semibold text-rose-600">{drillDownCategory.delayedCount}</p></div>
+                          <div><p className="text-[14px] font-bold opacity-60">Business</p><p className="text-lg font-semibold text-[#2563EB]">{(drillDownCategory.amount / 100000).toFixed(2)}L</p></div>
+                          <div><p className="text-[14px] font-bold opacity-60">Quantity</p><p className="text-lg font-semibold text-[#2563EB]">{drillDownCategory.count}</p></div>
+                          <div><p className="text-[14px] font-bold opacity-60">OTD Success</p><p className="text-lg font-semibold text-emerald-600">{drillDownCategory.otdRate}%</p></div>
+                          <div><p className="text-[14px] font-bold opacity-60">Delayed</p><p className="text-lg font-semibold text-rose-600">{drillDownCategory.delayedCount}</p></div>
                         </div>
                       </div>
 
@@ -1422,26 +1422,26 @@ export default function MetrixPage() {
                         <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-6">
                           {/* Top 30 */}
                           <div className="space-y-1">
-                            <p className="text-[12px] font-semibold text-emerald-500 mb-2 px-1">Top Selling Items</p>
+                            <p className="text-[14px] font-semibold text-emerald-500 mb-2 px-1">Top Selling Items</p>
                             {drillDownCategory.top30Items.map((item: any, i: number) => (
                               <div key={i} className="flex items-center justify-between p-2 bg-gray-50 dark:bg-navy-900 rounded-lg">
                                 <p className="text-[13px] font-semibold text-gray-900 dark:text-white truncate max-w-[200px]">{item.name}</p>
                                 <div className="text-right">
                                   <p className="text-[13px] font-semibold text-emerald-600">{item.count} qty</p>
-                                  <p className="text-[12px] font-bold text-[#5B6472]">{(item.amount / 1000).toFixed(1)}k</p>
+                                  <p className="text-[14px] font-bold text-[#5B6472]">{(item.amount / 1000).toFixed(1)}k</p>
                                 </div>
                               </div>
                             ))}
                           </div>
                           {/* Bottom 30 */}
                           <div className="space-y-1">
-                            <p className="text-[12px] font-semibold text-rose-500 mb-2 px-1">Bottom Selling Items</p>
+                            <p className="text-[14px] font-semibold text-rose-500 mb-2 px-1">Bottom Selling Items</p>
                             {drillDownCategory.bottom30Items.map((item: any, i: number) => (
                               <div key={i} className="flex items-center justify-between p-2 bg-gray-50 dark:bg-navy-900 rounded-lg">
                                 <p className="text-[13px] font-semibold text-gray-900 dark:text-white truncate max-w-[200px]">{item.name}</p>
                                 <div className="text-right">
                                   <p className="text-[13px] font-semibold text-rose-600">{item.count} qty</p>
-                                  <p className="text-[12px] font-bold text-[#5B6472]">{(item.amount / 1000).toFixed(1)}k</p>
+                                  <p className="text-[14px] font-bold text-[#5B6472]">{(item.amount / 1000).toFixed(1)}k</p>
                                 </div>
                               </div>
                             ))}
@@ -1456,8 +1456,8 @@ export default function MetrixPage() {
                         <div className="flex items-center justify-between mb-8">
                           <h4 className="text-[13px] font-semibold text-[#5B6472]">Monthly Segment Velocity (Qty vs Revenue)</h4>
                           <div className="flex gap-4">
-                            <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-[#2563EB]" /><span className="text-[12px] font-semibold">Revenue</span></div>
-                            <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-emerald-500" /><span className="text-[12px] font-semibold">Quantity</span></div>
+                            <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-[#2563EB]" /><span className="text-[14px] font-semibold">Revenue</span></div>
+                            <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-emerald-500" /><span className="text-[14px] font-semibold">Quantity</span></div>
                           </div>
                         </div>
                         <ResponsiveContainer width="100%" height="100%">
@@ -1508,7 +1508,7 @@ export default function MetrixPage() {
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="bg-white dark:bg-navy-800 p-6 rounded-[2.5rem] border border-gray-100 dark:border-white/5 shadow-2xl ring-1 ring-black/5 mt-2">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 border-b border-gray-50 dark:border-white/5 pb-4">
                 <div className="flex items-center gap-4">
-                  <div><h3 className="text-xl font-semibold text-gray-900 dark:text-white tracking-tighter">Execution Roadmap</h3><p className="text-[12px] font-semibold text-[#5B6472] mt-0.5">Real-time Logistics Lifecycle</p></div>
+                  <div><h3 className="text-xl font-semibold text-gray-900 dark:text-white tracking-tighter">Execution Roadmap</h3><p className="text-[14px] font-semibold text-[#5B6472] mt-0.5">Real-time Logistics Lifecycle</p></div>
                   <div className="h-10 w-px bg-gray-100 dark:bg-white/10 hidden md:block" />
                   <div className="flex flex-col">
                     <p className="text-[13px] font-semibold text-[#5B6472] leading-none">{targetDate === new Date().toISOString().split('T')[0] ? "Today's Orders" : "Filtered Orders"}</p>
@@ -1632,7 +1632,7 @@ export default function MetrixPage() {
                                     {/* Label & Time Below */}
                                     <div className="absolute -bottom-12 text-center w-28">
                                       <p className={`text-[13px] font-semibold  leading-tight tracking-tighter ${isCompleted || isCurrent ? 'text-gray-900 dark:text-white' : 'text-[#5B6472]'}`}>{step.name}</p>
-                                      <p className={`text-[12px] font-bold mt-1  ${isCompleted ? 'text-emerald-500' : 'text-[#5B6472]'}`}>{step.actual ? new Date(step.actual).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '—'}</p>
+                                      <p className={`text-[14px] font-bold mt-1  ${isCompleted ? 'text-emerald-500' : 'text-[#5B6472]'}`}>{step.actual ? new Date(step.actual).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '—'}</p>
                                     </div>
                                   </div>
                                 );

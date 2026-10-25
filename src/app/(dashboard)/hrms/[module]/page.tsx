@@ -852,7 +852,7 @@ export default function HRMSModulePage({ params }: { params: Promise<{ module: s
                               <div className="flex items-center bg-white dark:bg-navy-800 border border-[#2563EB] rounded-full shadow-sm overflow-hidden divide-x divide-[#2563EB]/30 mr-1">
                                 <div className="flex flex-col items-center justify-center px-3 py-1.5 min-w-[120px]">
                                   <p className="text-[13px] font-semibold text-[#2563EB] dark:text-[#60A5FA] tracking-tighter leading-none whitespace-nowrap">{fmtDt((item as any)[`planned_${step}`])} {fmtTm((item as any)[`planned_${step}`])}</p>
-                                  <p className={`text-[12px] font-semibold   mt-0.5 ${getDelayInfo((item as any)[`planned_${step}`], null)?.color}`}>{getDelayInfo((item as any)[`planned_${step}`], null)?.text}</p>
+                                  <p className={`text-[14px] font-semibold   mt-0.5 ${getDelayInfo((item as any)[`planned_${step}`], null)?.color}`}>{getDelayInfo((item as any)[`planned_${step}`], null)?.text}</p>
                                 </div>
                                 <div className="flex items-center gap-1.5 px-4 py-1.5 bg-[#2563EB]/5 dark:bg-[#60A5FA]/10">
                                   <ClockIcon className="w-3.5 h-3.5 text-[#2563EB] stroke-[3]" />
@@ -992,7 +992,7 @@ export default function HRMSModulePage({ params }: { params: Promise<{ module: s
                                             const arr = JSON.parse((item as any).social_medias_1);
                                             if (Array.isArray(arr) && arr.length > 0) {
                                               return arr.map((sm, idx) => (
-                                                <span key={idx} className="px-1.5 py-0.5 bg-[#2563EB] text-white text-[12px] font-semibold rounded shadow-sm">{sm}</span>
+                                                <span key={idx} className="px-1.5 py-0.5 bg-[#2563EB] text-white text-[14px] font-semibold rounded shadow-sm">{sm}</span>
                                               ));
                                             }
                                           } catch (e) { }
@@ -1013,8 +1013,8 @@ export default function HRMSModulePage({ params }: { params: Promise<{ module: s
                                         )}
                                         {n === 2 && (
                                           <>
-                                            {(item as any).knowledge_transfer_2 && <div className="space-y-0.5 mt-1"><span className="opacity-50 text-[13px] font-semibold block">Knowledge Transfer:</span><div className="flex flex-wrap gap-1">{(item as any).knowledge_transfer_2.split(',').filter((x: string) => x.trim()).map((k: string, idx: number) => <span key={idx} className="px-1.5 py-0.5 bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-300 text-[12px] font-semibold rounded shadow-sm">{k.trim()}</span>)}</div></div>}
-                                            {(item as any).asset_recovery_2 && <div className="space-y-0.5 mt-1"><span className="opacity-50 text-[13px] font-semibold block">Asset Recovery:</span><div className="flex flex-wrap gap-1">{(item as any).asset_recovery_2.split(',').filter((x: string) => x.trim()).map((k: string, idx: number) => <span key={idx} className="px-1.5 py-0.5 bg-purple-100 dark:bg-purple-900/40 text-purple-800 dark:text-purple-300 text-[12px] font-semibold rounded shadow-sm">{k.trim()}</span>)}</div></div>}
+                                            {(item as any).knowledge_transfer_2 && <div className="space-y-0.5 mt-1"><span className="opacity-50 text-[13px] font-semibold block">Knowledge Transfer:</span><div className="flex flex-wrap gap-1">{(item as any).knowledge_transfer_2.split(',').filter((x: string) => x.trim()).map((k: string, idx: number) => <span key={idx} className="px-1.5 py-0.5 bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-300 text-[14px] font-semibold rounded shadow-sm">{k.trim()}</span>)}</div></div>}
+                                            {(item as any).asset_recovery_2 && <div className="space-y-0.5 mt-1"><span className="opacity-50 text-[13px] font-semibold block">Asset Recovery:</span><div className="flex flex-wrap gap-1">{(item as any).asset_recovery_2.split(',').filter((x: string) => x.trim()).map((k: string, idx: number) => <span key={idx} className="px-1.5 py-0.5 bg-purple-100 dark:bg-purple-900/40 text-purple-800 dark:text-purple-300 text-[14px] font-semibold rounded shadow-sm">{k.trim()}</span>)}</div></div>}
                                           </>
                                         )}
                                         {n === 3 && (
@@ -1028,7 +1028,7 @@ export default function HRMSModulePage({ params }: { params: Promise<{ module: s
                                             {['relieving_letter_4', 'experience_letter_4', 'f_and_f_statement_4', 'salary_slips_if_requested_4'].map((doc, idx) => {
                                               if ((item as any)[doc] === "Done") {
                                                 const label = ['Relieving Ltr', 'Experience Ltr', 'F&F Stmt', 'Salary Slips'][idx];
-                                                return <span key={idx} className="px-1.5 py-0.5 bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-300 text-[12px] font-semibold rounded shadow-sm flex items-center gap-1"><CheckCircleIcon className="w-2.5 h-2.5" /> {label}</span>;
+                                                return <span key={idx} className="px-1.5 py-0.5 bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-300 text-[14px] font-semibold rounded shadow-sm flex items-center gap-1"><CheckCircleIcon className="w-2.5 h-2.5" /> {label}</span>;
                                               }
                                               return null;
                                             })}
@@ -1085,7 +1085,7 @@ export default function HRMSModulePage({ params }: { params: Promise<{ module: s
                           <td className="p-3 sticky left-24 z-10 bg-white dark:bg-navy-800">
                             <div className="flex flex-col">
                               <span className="px-2 py-0.5 bg-blue-50 dark:bg-blue-900/20 text-[#2563EB] dark:text-blue-400 rounded border border-blue-100 dark:border-blue-900/50 whitespace-nowrap">{item.id.slice(0, 8).toUpperCase()}</span>
-                              {item.cancelled && <span className="text-[12px] text-red-500 font-semibold mt-0.5" title={`${fmtDt(item.cancelled)} ${fmtTm(item.cancelled)}`}>Cancelled</span>}
+                              {item.cancelled && <span className="text-[14px] text-red-500 font-semibold mt-0.5" title={`${fmtDt(item.cancelled)} ${fmtTm(item.cancelled)}`}>Cancelled</span>}
                             </div>
                           </td>
                           {formFields.map(f => (
@@ -1304,9 +1304,9 @@ export default function HRMSModulePage({ params }: { params: Promise<{ module: s
                   <UserIcon className="w-5 h-5 text-[#2563EB]" /> {editingItem ? "Edit" : "New"} {moduleName}
                 </h2>
                 <div className="flex items-center gap-2 mt-0.5">
-                  <p className="text-[#2563EB] dark:text-slate-400 font-bold text-[12px]">HRMS Configuration</p>
+                  <p className="text-[#2563EB] dark:text-slate-400 font-bold text-[14px]">HRMS Configuration</p>
                   {editingItem && (
-                    <span className="px-2 py-0.5 bg-white/10 text-[12px] font-semibold text-[#2563EB] rounded border border-white/20">
+                    <span className="px-2 py-0.5 bg-white/10 text-[14px] font-semibold text-[#2563EB] rounded border border-white/20">
                       ID: {editingItem.id}
                     </span>
                   )}
@@ -1434,11 +1434,11 @@ export default function HRMSModulePage({ params }: { params: Promise<{ module: s
                         <div className="bg-slate-100 dark:bg-navy-900 p-0.5 rounded-full flex items-center border border-slate-200 dark:border-navy-800">
                           <button
                             onClick={() => { const n = [...configFormData]; n[i].tat = n[i].tat.replace("Days", "Hrs"); setConfigFormData(n); }}
-                            className={`px-3 py-1 rounded-full text-[12px] font-semibold  transition-all ${cfg.tat.includes("Hrs") ? "bg-[#2563EB] text-white shadow-md" : "text-[#5B6472] dark:text-navy-600"}`}
+                            className={`px-3 py-1 rounded-full text-[14px] font-semibold  transition-all ${cfg.tat.includes("Hrs") ? "bg-[#2563EB] text-white shadow-md" : "text-[#5B6472] dark:text-navy-600"}`}
                           >HRS</button>
                           <button
                             onClick={() => { const n = [...configFormData]; n[i].tat = n[i].tat.replace("Hrs", "Days"); setConfigFormData(n); }}
-                            className={`px-3 py-1 rounded-full text-[12px] font-semibold  transition-all ${cfg.tat.includes("Days") ? "bg-[#2563EB] text-white shadow-md" : "text-[#5B6472]"}`}
+                            className={`px-3 py-1 rounded-full text-[14px] font-semibold  transition-all ${cfg.tat.includes("Days") ? "bg-[#2563EB] text-white shadow-md" : "text-[#5B6472]"}`}
                           >Days</button>
                         </div>
                         <input
@@ -1566,7 +1566,7 @@ export default function HRMSModulePage({ params }: { params: Promise<{ module: s
                 <h2 className="text-lg font-semibold tracking-tight flex items-center gap-2">
                   <DocumentTextIcon className="w-5 h-5 text-[#2563EB]" /> Import To Onboard
                 </h2>
-                <p className="text-[#2563EB] dark:text-slate-400 font-bold text-[12px] mt-0.5">Fetch Candidate/Sales Data</p>
+                <p className="text-[#2563EB] dark:text-slate-400 font-bold text-[14px] mt-0.5">Fetch Candidate/Sales Data</p>
               </div>
               <button onClick={() => setIsOnboardImportModalOpen(false)} className="p-1.5 hover:bg-white/10 rounded-lg transition-colors">
                 <XMarkIcon className="w-6 h-6" />

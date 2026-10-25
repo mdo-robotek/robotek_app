@@ -850,7 +850,7 @@ export default function I2RPackingPage() {
                               <div className="flex items-center bg-white dark:bg-navy-800 border border-[#2563EB] rounded-full shadow-sm overflow-hidden divide-x divide-[#2563EB]/30 mr-1">
                                 <div className="flex flex-col items-center justify-center px-3 py-1.5 min-w-[120px]">
                                   <p className="text-[13px] font-semibold text-[#2563EB] dark:text-[#60A5FA] tracking-tighter leading-none whitespace-nowrap">{fmtDt((item as any)[`planned_${step}`])} {fmtTm((item as any)[`planned_${step}`])}</p>
-                                  <p className={`text-[12px] font-semibold   mt-0.5 ${getDelayInfo((item as any)[`planned_${step}`], null, now)?.color}`}>{getDelayInfo((item as any)[`planned_${step}`], null, now)?.text}</p>
+                                  <p className={`text-[14px] font-semibold   mt-0.5 ${getDelayInfo((item as any)[`planned_${step}`], null, now)?.color}`}>{getDelayInfo((item as any)[`planned_${step}`], null, now)?.text}</p>
                                 </div>
                                 <div className="flex items-center gap-1.5 px-4 py-1.5 bg-[#2563EB]/5 dark:bg-[#60A5FA]/10">
                                   <ClockIcon className="w-3.5 h-3.5 text-[#2563EB] stroke-[3]" />
@@ -1026,7 +1026,7 @@ export default function I2RPackingPage() {
                           <td className="p-4 sticky left-[120px] z-10 bg-white dark:bg-navy-900 group-hover:bg-[#FFFFFF] dark:group-hover:bg-navy-800 transition-colors">
                             <div className="flex flex-col">
                               <span className="px-3 py-1 bg-blue-50 dark:bg-blue-900/20 text-[#2563EB] dark:text-blue-400 rounded-full border border-blue-100 dark:border-blue-900/50 text-[13px] font-semibold italic tracking-tighter">{item.ppf_num}</span>
-                              {isCancelled && <span className="text-[12px] font-semibold text-red-500 mt-1 ml-1">Cancelled</span>}
+                              {isCancelled && <span className="text-[14px] font-semibold text-red-500 mt-1 ml-1">Cancelled</span>}
                             </div>
                           </td>
                           <td className="p-4">
@@ -1410,11 +1410,11 @@ export default function I2RPackingPage() {
                         <div className="bg-slate-100 dark:bg-navy-900 p-0.5 rounded-full flex items-center border border-slate-200 dark:border-navy-800">
                           <button
                             onClick={() => { const n = [...stepConfigs]; n[i].tat = n[i].tat.replace("Days", "Hrs"); setStepConfigs(n); }}
-                            className={`px-3 py-1 rounded-full text-[12px] font-semibold  transition-all ${cfg.tat.includes("Hrs") ? "bg-[#2563EB] text-white shadow-md" : "text-[#5B6472] dark:text-navy-600"}`}
+                            className={`px-3 py-1 rounded-full text-[14px] font-semibold  transition-all ${cfg.tat.includes("Hrs") ? "bg-[#2563EB] text-white shadow-md" : "text-[#5B6472] dark:text-navy-600"}`}
                           >HRS</button>
                           <button
                             onClick={() => { const n = [...stepConfigs]; n[i].tat = n[i].tat.replace("Hrs", "Days"); setStepConfigs(n); }}
-                            className={`px-3 py-1 rounded-full text-[12px] font-semibold  transition-all ${cfg.tat.includes("Days") ? "bg-[#2563EB] text-white shadow-md" : "text-[#5B6472]"}`}
+                            className={`px-3 py-1 rounded-full text-[14px] font-semibold  transition-all ${cfg.tat.includes("Days") ? "bg-[#2563EB] text-white shadow-md" : "text-[#5B6472]"}`}
                           >Days</button>
                         </div>
                         <input

@@ -490,8 +490,8 @@ export default function PartyFormModal({
           <div>
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white tracking-tight">{editingParty ? "Edit Party" : "Add New Party"}</h2>
             <div className="flex items-center gap-2 mt-1">
-              <p className="text-[#5B6472] dark:text-slate-400 font-bold text-[12px]">Party Configuration</p>
-              {editingParty && <span className="px-2 py-0.5 bg-[#F7F8FA] dark:bg-zinc-800 text-[12px] font-semibold text-gray-500 rounded border border-[#E5E7EB] dark:border-zinc-700">ID: {editingParty.id}</span>}
+              <p className="text-[#5B6472] dark:text-slate-400 font-bold text-[14px]">Party Configuration</p>
+              {editingParty && <span className="px-2 py-0.5 bg-[#F7F8FA] dark:bg-zinc-800 text-[14px] font-semibold text-gray-500 rounded border border-[#E5E7EB] dark:border-zinc-700">ID: {editingParty.id}</span>}
             </div>
           </div>
           <button onClick={onClose} className="p-2 text-[#5B6472] hover:text-gray-600 dark:hover:text-zinc-200 transition-colors"><XMarkIcon className="w-8 h-8" /></button>

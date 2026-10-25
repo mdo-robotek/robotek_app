@@ -915,7 +915,7 @@ export default function ChecklistsPage() {
       <div className="flex flex-col lg:flex-row items-center gap-4 px-1">
         <div className="w-full lg:w-1/3 text-center lg:text-left min-w-0">
           <h1 className="text-xl md:text-2xl font-semibold text-gray-900 dark:text-white tracking-tight">Checklists</h1>
-          <p className="text-gray-500 dark:text-slate-300 font-bold text-[12px] md:text-[10px] tracking-wider">Master tasks + date-wise occurrences</p>
+          <p className="text-gray-500 dark:text-slate-300 font-bold text-[14px] md:text-[10px] tracking-wider">Master tasks + date-wise occurrences</p>
         </div>
         
         <div className="w-full lg:w-1/3 flex justify-center flex-shrink-0 min-w-0">
@@ -1041,7 +1041,7 @@ export default function ChecklistsPage() {
                 className={`px-2 py-1 rounded-full text-[13px] font-semibold   transition-all h-[26px] flex items-center gap-1 ${assignmentFilter === "ToMe" ? "bg-[#2563EB] text-white shadow-sm" : "text-gray-500 hover:text-gray-700 dark:text-gray-400"}`}
               >
                 To
-                <span className={`px-1 rounded-full text-[12px] ${assignmentFilter === "ToMe" ? "bg-white/20" : "bg-gray-200 dark:bg-navy-800"}`}>
+                <span className={`px-1 rounded-full text-[14px] ${assignmentFilter === "ToMe" ? "bg-white/20" : "bg-gray-200 dark:bg-navy-800"}`}>
                   {toMeCount}
                 </span>
               </button>
@@ -1053,7 +1053,7 @@ export default function ChecklistsPage() {
                 className={`px-2 py-1 rounded-full text-[13px] font-semibold   transition-all h-[26px] flex items-center gap-1 ${assignmentFilter === "ByMe" ? "bg-[#2563EB] text-white shadow-sm" : "text-gray-500 hover:text-gray-700 dark:text-gray-400"}`}
               >
                 By
-                <span className={`px-1 rounded-full text-[12px] ${assignmentFilter === "ByMe" ? "bg-white/20" : "bg-gray-200 dark:bg-navy-800"}`}>
+                <span className={`px-1 rounded-full text-[14px] ${assignmentFilter === "ByMe" ? "bg-white/20" : "bg-gray-200 dark:bg-navy-800"}`}>
                   {byMeCount}
                 </span>
               </button>
@@ -1090,7 +1090,7 @@ export default function ChecklistsPage() {
                   {tile.icon}
                   {tile.label}
                   <span
-                    className={`px-1 rounded-full text-[12px] ${
+                    className={`px-1 rounded-full text-[14px] ${
                       isActive ? "bg-white/20 dark:bg-black/20" : "bg-black/5 dark:bg-white/10"
                     }`}
                   >
@@ -1205,7 +1205,7 @@ export default function ChecklistsPage() {
                 <tr>
                   <td colSpan={activeTab === "tasks" ? 10 : 9} className="px-4 py-10 text-center">
                     <div className="w-6 h-6 border-2 border-gray-100 border-t-[#2563EB] rounded-full animate-spin mx-auto mb-2" />
-                    <p className="text-[#5B6472] font-bold text-[12px]">Syncing...</p>
+                    <p className="text-[#5B6472] font-bold text-[14px]">Syncing...</p>
                   </td>
                 </tr>
               ) : paginatedChecklists.length === 0 ? (
@@ -1410,17 +1410,17 @@ export default function ChecklistsPage() {
                     <div className="p-3 md:p-4 flex-1 flex flex-col gap-4">
                       <div className="grid grid-cols-2 gap-3 mt-auto">
                         <div className="flex flex-col gap-1.5 overflow-hidden">
-                          <span className="text-[12px] font-semibold text-[#5B6472]">Assigned To</span>
+                          <span className="text-[14px] font-semibold text-[#5B6472]">Assigned To</span>
                           {renderUserName(item.assigned_to)}
                         </div>
                         <div className="flex flex-col gap-1 overflow-hidden">
-                          <span className="text-[12px] font-semibold text-[#5B6472]">Dept</span>
+                          <span className="text-[14px] font-semibold text-[#5B6472]">Dept</span>
                           <div className="scale-75 origin-left">
                             {getDeptBadge(item.department)}
                           </div>
                         </div>
                         <div className="flex flex-col gap-1 overflow-hidden">
-                          <span className="text-[12px] font-semibold text-[#5B6472]">Due Date</span>
+                          <span className="text-[14px] font-semibold text-[#5B6472]">Due Date</span>
                           <span className="text-[13px] font-semibold text-gray-700 dark:text-slate-300 truncate">
                             {formatDateDisplay(
                               activeTab === "tasks"
@@ -1431,14 +1431,14 @@ export default function ChecklistsPage() {
                         </div>
                         {activeTab === "tasks" ? (
                           <div className="flex flex-col gap-1 overflow-hidden">
-                            <span className="text-[12px] font-semibold text-[#5B6472]">Completed</span>
+                            <span className="text-[14px] font-semibold text-[#5B6472]">Completed</span>
                             <span className="text-[13px] font-semibold text-gray-700 dark:text-slate-300 truncate">
                               {formatDateDisplay(occ.completed_date || "") || "—"}
                             </span>
                           </div>
                         ) : (
                           <div className="flex flex-col gap-1.5 overflow-hidden">
-                            <span className="text-[12px] font-semibold text-[#5B6472]">Assigned By</span>
+                            <span className="text-[14px] font-semibold text-[#5B6472]">Assigned By</span>
                             {renderUserName(item.assigned_by)}
                           </div>
                         )}
@@ -1536,9 +1536,9 @@ export default function ChecklistsPage() {
                   {editingItem ? "Edit Checklist" : "New Checklist"}
                 </h2>
                 <div className="flex items-center gap-2 mt-1">
-                  <p className="text-[#5B6472] dark:text-slate-400 font-bold text-[12px]">Task Configuration</p>
+                  <p className="text-[#5B6472] dark:text-slate-400 font-bold text-[14px]">Task Configuration</p>
                   {editingItem && (
-                    <span className="px-2 py-0.5 bg-[#F7F8FA] dark:bg-zinc-800 text-[12px] font-semibold text-gray-500 rounded border border-[#E5E7EB] dark:border-zinc-700">
+                    <span className="px-2 py-0.5 bg-[#F7F8FA] dark:bg-zinc-800 text-[14px] font-semibold text-gray-500 rounded border border-[#E5E7EB] dark:border-zinc-700">
                       ID: {editingItem.id}
                     </span>
                   )}
@@ -1953,7 +1953,7 @@ export default function ChecklistsPage() {
                         {selectedTask.assigned_to?.substring(0, 2).toUpperCase() || "TO"}
                       </div>
                       <div>
-                        <p className="text-[12px] font-semibold text-[#5B6472] tracking-tighter leading-none mb-1">Assigned To</p>
+                        <p className="text-[14px] font-semibold text-[#5B6472] tracking-tighter leading-none mb-1">Assigned To</p>
                         <p className="text-[14px] font-semibold text-gray-900 dark:text-white truncate max-w-[120px]">{selectedTask.assigned_to}</p>
                       </div>
                     </div>
@@ -1962,7 +1962,7 @@ export default function ChecklistsPage() {
                         {selectedTask.assigned_by?.substring(0, 2).toUpperCase() || "BY"}
                       </div>
                       <div>
-                        <p className="text-[12px] font-semibold text-[#5B6472] tracking-tighter leading-none mb-1">Assigned By</p>
+                        <p className="text-[14px] font-semibold text-[#5B6472] tracking-tighter leading-none mb-1">Assigned By</p>
                         <p className="text-[14px] font-bold text-gray-600 dark:text-slate-400 truncate max-w-[120px]">{selectedTask.assigned_by}</p>
                       </div>
                     </div>
@@ -1975,7 +1975,7 @@ export default function ChecklistsPage() {
                         <TagIcon className="w-4 h-4" />
                       </div>
                       <div>
-                        <p className="text-[12px] font-semibold text-[#5B6472] leading-none mb-1">Department</p>
+                        <p className="text-[14px] font-semibold text-[#5B6472] leading-none mb-1">Department</p>
                         <p className="text-[14px] font-semibold text-gray-900 dark:text-white">{selectedTask.department}</p>
                       </div>
                     </div>
@@ -1984,7 +1984,7 @@ export default function ChecklistsPage() {
                         <CalendarDaysIcon className="w-4 h-4" />
                       </div>
                       <div>
-                        <p className="text-[12px] font-semibold text-[#5B6472] leading-none mb-1">Due Date</p>
+                        <p className="text-[14px] font-semibold text-[#5B6472] leading-none mb-1">Due Date</p>
                         <p className="text-[14px] font-semibold text-gray-900 dark:text-white">{formatDateDisplay(selectedTask.due_date)}</p>
                       </div>
                     </div>
@@ -1997,7 +1997,7 @@ export default function ChecklistsPage() {
                         <ClockIcon className="w-4 h-4" />
                       </div>
                       <div>
-                        <p className="text-[12px] font-semibold text-[#5B6472] leading-none mb-1">Registered</p>
+                        <p className="text-[14px] font-semibold text-[#5B6472] leading-none mb-1">Registered</p>
                         <p className="text-[13px] font-bold text-gray-600 dark:text-slate-400">{formatDateDisplay(selectedTask.created_at)}</p>
                       </div>
                     </div>
@@ -2007,7 +2007,7 @@ export default function ChecklistsPage() {
                           <ArrowPathIcon className="w-4 h-4" />
                         </div>
                         <div>
-                          <p className="text-[12px] font-semibold text-[#5B6472] leading-none mb-1">Updated</p>
+                          <p className="text-[14px] font-semibold text-[#5B6472] leading-none mb-1">Updated</p>
                           <p className="text-[13px] font-bold text-gray-600 dark:text-slate-400">{formatDateDisplay(selectedTask.updated_at)}</p>
                         </div>
                       </div>
@@ -2059,7 +2059,7 @@ export default function ChecklistsPage() {
                               <span className="text-[13px] font-semibold text-gray-900 dark:text-white tracking-tight">
                                 {item.new_status || "Completed"}
                               </span>
-                              <span className="text-[12px] font-bold text-[#5B6472]">
+                              <span className="text-[14px] font-bold text-[#5B6472]">
                                 {formatDateDisplay(item.timestamp || item.created_at)}
                               </span>
                             </div>

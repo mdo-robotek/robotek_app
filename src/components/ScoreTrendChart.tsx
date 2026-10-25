@@ -116,7 +116,7 @@ export default function ScoreTrendChart({ data, granularity, onGranularityChange
               <text
                 x={padL - 6} y={toY(v) + 3}
                 textAnchor="end"
-                className="text-[12px] font-bold fill-gray-400"
+                className="text-[14px] font-bold fill-gray-400"
               >
                 {v}%
               </text>
@@ -206,7 +206,7 @@ export default function ScoreTrendChart({ data, granularity, onGranularityChange
                   <text
                     x={Math.max(48, Math.min(toX(i), chartW - 48))} y={padT - 13}
                     textAnchor="middle"
-                    className="text-[12px] font-bold fill-white"
+                    className="text-[14px] font-bold fill-white"
                   >
                     {d.total === 0 ? "No Tasks in Period" : `Score: ${getDisplayVal(d.score)}% | OT: ${d.completed === 0 ? "—" : getDisplayVal(d.onTime) + "%"}`}
                   </text>
@@ -224,7 +224,7 @@ export default function ScoreTrendChart({ data, granularity, onGranularityChange
                 x={toX(i)}
                 y={chartH - padB + 14}
                 textAnchor="middle"
-                className="text-[12px] font-bold fill-gray-400"
+                className="text-[14px] font-bold fill-gray-400"
                 transform={data.length > 10 ? `rotate(-35, ${toX(i)}, ${chartH - padB + 14})` : ''}
               >
                 {d.label}
@@ -237,7 +237,7 @@ export default function ScoreTrendChart({ data, granularity, onGranularityChange
             x={padL + plotW / 2}
             y={chartH - 2}
             textAnchor="middle"
-            className="text-[12px] font-semibold fill-gray-300"
+            className="text-[14px] font-semibold fill-gray-300"
           >
             {granularity === 'quarterly' ? 'Quarter' : granularity === 'yearly' ? 'Year' : granularity.charAt(0).toUpperCase() + granularity.slice(1)}
           </text>
@@ -259,18 +259,18 @@ function ChartHeader({ granularity, onGranularityChange }: { granularity: Granul
         {/* Legend */}
         <div className="flex items-center gap-1">
           <span className="w-3 h-0.5 rounded-full bg-[#2563EB] dark:bg-[#60A5FA]" />
-          <span className="text-[12px] font-semibold text-[#5B6472]">Score</span>
+          <span className="text-[14px] font-semibold text-[#5B6472]">Score</span>
         </div>
         <div className="flex items-center gap-1">
           <span className="w-3 h-0.5 rounded-full bg-emerald-500" />
-          <span className="text-[12px] font-semibold text-[#5B6472]">On-Time</span>
+          <span className="text-[14px] font-semibold text-[#5B6472]">On-Time</span>
         </div>
         {/* Granularity dropdown */}
         <select
           value={granularity}
           onChange={(e) => onGranularityChange(e.target.value as Granularity)}
           style={{ backgroundColor: 'var(--panel-card)', borderColor: 'var(--panel-border)' }}
-          className="rounded-lg text-[12px] font-semibold tracking-tight px-2 py-1 text-gray-600 dark:text-gray-300 border outline-none cursor-pointer hover:border-[#2563EB]/30 transition-colors"
+          className="rounded-lg text-[14px] font-semibold tracking-tight px-2 py-1 text-gray-600 dark:text-gray-300 border outline-none cursor-pointer hover:border-[#2563EB]/30 transition-colors"
         >
           {GRANULARITY_OPTIONS.map(opt => (
             <option key={opt.id} value={opt.id}>{opt.label}</option>

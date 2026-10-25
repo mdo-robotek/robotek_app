@@ -283,8 +283,8 @@ export default function UrgentLogView() {
                       Flag urgent matter
                     </h2>
                     <div className="flex items-center gap-2 mt-1">
-                      <p className="text-[#5B6472] dark:text-slate-400 font-bold text-[12px]">Triage & Escalate Workspace</p>
-                      <span className="px-2 py-0.5 bg-rose-50 dark:bg-navy-800 text-[12px] font-semibold text-rose-700 dark:text-rose-400 rounded border border-rose-100 dark:border-navy-700">
+                      <p className="text-[#5B6472] dark:text-slate-400 font-bold text-[14px]">Triage & Escalate Workspace</p>
+                      <span className="px-2 py-0.5 bg-rose-50 dark:bg-navy-800 text-[14px] font-semibold text-rose-700 dark:text-rose-400 rounded border border-rose-100 dark:border-navy-700">
                         Immediate Action
                       </span>
                     </div>

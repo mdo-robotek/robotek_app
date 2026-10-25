@@ -155,7 +155,7 @@ export default function AdminReport() {
                                             ${isToday ? 'border-b-2 border-b-[#2563EB] dark:border-b-[#60A5FA] bg-[#2563EB]/5 dark:bg-[#60A5FA]/10 text-white dark:text-[#60A5FA]' : ''}
                                         `}>
                                             <div className="flex flex-col gap-0.5">
-                                                <span className="text-[12px] opacity-70">
+                                                <span className="text-[14px] opacity-70">
                                                     {new Date(year, month, d).toLocaleString('default', { weekday: 'short' })}
                                                 </span>
                                                 <span className="text-sm">{d}</span>
@@ -190,12 +190,12 @@ export default function AdminReport() {
                                             cellContent = (
                                                 <div className="flex flex-col items-center gap-1">
                                                     <div className="flex flex-col items-center">
-                                                        <span className="text-[12px] font-semibold text-[#5B6472] leading-none">IN</span>
+                                                        <span className="text-[14px] font-semibold text-[#5B6472] leading-none">IN</span>
                                                         <span className="text-green-600 dark:text-green-400 font-semibold text-[13px] leading-none">{formatTime(record.inTime)}</span>
                                                     </div>
                                                     {record.outTime && (
                                                         <div className="flex flex-col items-center">
-                                                            <span className="text-[12px] font-semibold text-[#5B6472] leading-none">OUT</span>
+                                                            <span className="text-[14px] font-semibold text-[#5B6472] leading-none">OUT</span>
                                                             <span className="text-red-600 dark:text-red-400 font-semibold text-[13px] leading-none">{formatTime(record.outTime)}</span>
                                                         </div>
                                                     )}

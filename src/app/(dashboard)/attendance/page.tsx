@@ -915,7 +915,7 @@ export default function AttendancePage() {
 
                                      {/* Big Distance Display */}
                                      <div className="text-center py-2 flex flex-col items-center justify-center mt-4">
-                                         <div className="text-[12px] font-semibold text-[#5B6472] mb-1">Nearest Gap</div>
+                                         <div className="text-[14px] font-semibold text-[#5B6472] mb-1">Nearest Gap</div>
                                          <div className={`text-4xl font-semibold tracking-tighter ${isInRange ? 'text-green-500' : 'text-red-500'} drop-shadow-sm`}>
                                              {distance !== null ? `${Math.round(distance)}m` : '...'}
                                          </div>

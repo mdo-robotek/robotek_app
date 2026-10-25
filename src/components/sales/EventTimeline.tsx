@@ -70,7 +70,7 @@ export default function EventTimeline({ followUps, selectedDate }: EventTimeline
                   }`}>
                     {event.status || 'Status Not Provided'}
                   </span>
-                  {isLatest && <span className="text-[12px] font-semibold text-white bg-[#2563EB]/10 px-1.5 rounded">Latest</span>}
+                  {isLatest && <span className="text-[14px] font-semibold text-white bg-[#2563EB]/10 px-1.5 rounded">Latest</span>}
                 </div>
                 <div className="text-right">
                   <p className="text-[13px] font-semibold text-[#5B6472]">

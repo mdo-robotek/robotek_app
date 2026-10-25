@@ -212,7 +212,7 @@ export default function SalesPage() {
       <div className="flex flex-col lg:flex-row items-center gap-4 px-1 shrink-0">
         <div className="w-full lg:w-1/2 text-center lg:text-left min-w-0">
           <h1 className="text-xl md:text-2xl font-semibold text-gray-900 dark:text-white tracking-tight">Sales Pipeline</h1>
-          <p className="text-gray-500 dark:text-slate-300 font-bold text-[12px] md:text-[10px] tracking-wider">Manage Leads &amp; Deals</p>
+          <p className="text-gray-500 dark:text-slate-300 font-bold text-[14px] md:text-[10px] tracking-wider">Manage Leads &amp; Deals</p>
         </div>
         <div className="w-full lg:w-1/2 flex justify-end flex-shrink-0 min-w-0">
           <div className="flex items-center gap-1 rounded-full border-2 border-b-4 border-[#2563EB] dark:border-[#60A5FA] bg-white dark:bg-navy-800 shadow-sm transition-all active:translate-y-[2px] active:border-b-2 p-1 overflow-x-auto no-scrollbar max-w-full">
@@ -506,7 +506,7 @@ export default function SalesPage() {
                               </span>
                               <div className="flex items-center gap-1.5 mt-0.5 min-w-0">
                                 <div className="h-4 w-4 rounded-full bg-indigo-500 flex items-center justify-center shrink-0">
-                                  <span className="text-[12px] font-semibold text-white">
+                                  <span className="text-[14px] font-semibold text-white">
                                     {(lead.sales_person_assigned || "U").substring(0, 2).toUpperCase()}
                                   </span>
                                 </div>

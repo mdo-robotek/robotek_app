@@ -470,8 +470,8 @@ export default function WeeklyUpdateView() {
                     )}
                   </h2>
                   <div className="flex items-center gap-2 mt-1">
-                    <p className="text-[#5B6472] dark:text-slate-400 font-bold text-[12px]">EA-MD Hub</p>
-                    <span className="px-2 py-0.5 bg-[#F7F8FA] dark:bg-navy-800 text-[12px] font-semibold text-[#2563EB] dark:text-[#60A5FA] rounded border border-[#E5E7EB] dark:border-navy-700">
+                    <p className="text-[#5B6472] dark:text-slate-400 font-bold text-[14px]">EA-MD Hub</p>
+                    <span className="px-2 py-0.5 bg-[#F7F8FA] dark:bg-navy-800 text-[14px] font-semibold text-[#2563EB] dark:text-[#60A5FA] rounded border border-[#E5E7EB] dark:border-navy-700">
                       Weekly Update
                     </span>
                   </div>

@@ -967,12 +967,12 @@ export default function PaymentVendorApprovalPage() {
                       <div className="flex flex-col items-center gap-1 p-2 rounded-xl bg-red-50 dark:bg-red-950/30 border border-red-100 dark:border-red-900/40">
                         <XCircleIcon className="w-4 h-4 text-red-500" />
                         <span className="text-[13px] font-semibold text-red-600 dark:text-red-400">Rejected</span>
-                        <span className="text-[12px] text-center text-red-500/80">Payment blocked</span>
+                        <span className="text-[14px] text-center text-red-500/80">Payment blocked</span>
                       </div>
                       <div className="flex flex-col items-center gap-1 p-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/40">
                         <CheckCircleIcon className="w-4 h-4 text-emerald-500" />
                         <span className="text-[13px] font-semibold text-emerald-600 dark:text-emerald-400">Approved</span>
-                        <span className="text-[12px] text-center text-emerald-600/80 flex items-center gap-0.5">
+                        <span className="text-[14px] text-center text-emerald-600/80 flex items-center gap-0.5">
                           <BellIcon className="w-2.5 h-2.5" /> WhatsApp Himanshi
                         </span>
                       </div>
@@ -1026,7 +1026,7 @@ export default function PaymentVendorApprovalPage() {
                   ].map((tab) => (
                     <div key={tab.label} className={`rounded-xl p-3 bg-gradient-to-br ${tab.color} text-white shadow-md`}>
                       <p className="text-[13px] font-semibold tracking-wide leading-tight">{tab.label}</p>
-                      <p className="text-[12px] font-bold opacity-80 mt-1">{tab.desc}</p>
+                      <p className="text-[14px] font-bold opacity-80 mt-1">{tab.desc}</p>
                     </div>
                   ))}
                 </div>

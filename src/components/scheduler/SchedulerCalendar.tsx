@@ -266,7 +266,7 @@ export default function SchedulerCalendar({
                       className={`absolute rounded-xl p-2 border-l-4 shadow-sm z-20 cursor-pointer overflow-hidden ${categoryColors[e.type]} bg-opacity-90 dark:bg-opacity-80 border-black/10`}
                     >
                       <div className="text-[13px] font-semibold text-white leading-tight mb-1 truncate">{e.title}</div>
-                      <div className="flex items-center gap-1 text-[12px] font-bold text-white opacity-90">
+                      <div className="flex items-center gap-1 text-[14px] font-bold text-white opacity-90">
                         <ClockIcon className="w-3 h-3" />
                         {format(e.start, "h:mm aa")}
                       </div>

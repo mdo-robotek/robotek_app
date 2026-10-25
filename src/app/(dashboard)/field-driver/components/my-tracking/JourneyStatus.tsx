@@ -147,7 +147,7 @@ export default function JourneyStatus({
                   <p className="font-mono font-semibold text-sm text-[#1D4ED8] dark:text-white leading-none">
                     {elapsedTime.slice(0, 5)}
                   </p>
-                  <p className="text-[12px] font-bold text-[#5B6472] mt-0.5">HH:MM</p>
+                  <p className="text-[14px] font-bold text-[#5B6472] mt-0.5">HH:MM</p>
                 </div>
               </div>
               <div className="flex items-center justify-center gap-1.5 py-1 px-2 bg-[#FEF9C3] border border-[#FDE047] rounded-full">

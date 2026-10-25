@@ -201,7 +201,7 @@ export default function MdDashboardView() {
               <div className="bg-blue-50 dark:bg-[#1D4ED8]/40 border-l-2 border-[#1D4ED8] p-4 rounded-r-xl mt-2 max-w-sm">
                  {nextMeeting ? (
                    <>
-                     <p className="text-[12px] font-semibold text-[#1D4ED8] dark:text-blue-400 mb-1">Scheduled</p>
+                     <p className="text-[14px] font-semibold text-[#1D4ED8] dark:text-blue-400 mb-1">Scheduled</p>
                      <p className="text-sm font-semibold text-[#1D4ED8] dark:text-white">
                        {formatDisplayDate(nextMeeting.date).toUpperCase()}
                      </p>

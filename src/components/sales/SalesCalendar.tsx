@@ -77,7 +77,7 @@ export default function SalesCalendar({ followUps, selectedDate, onSelectDate }:
           {i}
         </button>
         {isHighlighted && (
-          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[12px] font-semibold w-3.5 h-3.5 flex items-center justify-center rounded-full shadow-sm">
+          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[14px] font-semibold w-3.5 h-3.5 flex items-center justify-center rounded-full shadow-sm">
             {count > 9 ? '9+' : count}
           </span>
         )}
@@ -105,7 +105,7 @@ export default function SalesCalendar({ followUps, selectedDate, onSelectDate }:
       
       <div className="grid grid-cols-7 gap-1 mb-2">
         {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(day => (
-          <div key={day} className="h-6 flex items-center justify-center text-[12px] font-semibold text-[#5B6472]">
+          <div key={day} className="h-6 flex items-center justify-center text-[14px] font-semibold text-[#5B6472]">
             {day}
           </div>
         ))}

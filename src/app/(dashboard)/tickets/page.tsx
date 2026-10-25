@@ -524,7 +524,7 @@ export default function TicketsPage() {
         <div className="flex flex-col lg:flex-row items-center gap-4 px-1">
           <div className="w-full lg:w-1/3 text-center lg:text-left min-w-0">
             <h1 className="text-xl md:text-2xl font-semibold text-gray-900 dark:text-white tracking-tight truncate">Help Tickets</h1>
-            <p className="text-gray-500 dark:text-slate-300 font-bold text-[12px] md:text-[10px] tracking-wider">Support Ticketing System</p>
+            <p className="text-gray-500 dark:text-slate-300 font-bold text-[14px] md:text-[10px] tracking-wider">Support Ticketing System</p>
           </div>
 
           <div className="w-full lg:w-1/3 flex justify-center flex-shrink-0 min-w-0">
@@ -607,7 +607,7 @@ export default function TicketsPage() {
                     >
                       <span className="hidden sm:inline">{btn.full}</span>
                       <span className="sm:hidden">{btn.label}</span>
-                      <span className={`px-1 rounded-md text-[12px] ${isActive ? 'bg-white/20' : 'bg-black/5 dark:bg-white/10'}`}>
+                      <span className={`px-1 rounded-md text-[14px] ${isActive ? 'bg-white/20' : 'bg-black/5 dark:bg-white/10'}`}>
                         {btn.count}
                       </span>
                     </button>
@@ -710,7 +710,7 @@ export default function TicketsPage() {
                     <div className="flex items-center gap-2 min-w-0">
                       {renderUserAvatar(ticket.raised_by || "System")}
                       <div className="min-w-0">
-                        <p className="text-[12px] font-semibold text-blue-400 dark:text-blue-500 leading-none mb-0.5">Raised By</p>
+                        <p className="text-[14px] font-semibold text-blue-400 dark:text-blue-500 leading-none mb-0.5">Raised By</p>
                         <p className="text-[14px] font-bold text-gray-900 dark:text-gray-100 truncate">{ticket.raised_by || "System"}</p>
                       </div>
                     </div>
@@ -718,7 +718,7 @@ export default function TicketsPage() {
                     <div className="flex items-center gap-2 min-w-0">
                       {renderUserAvatar(ticket.solver_person || "Unassigned")}
                       <div className="min-w-0">
-                        <p className="text-[12px] font-semibold text-emerald-400 dark:text-emerald-500 leading-none mb-0.5">Assignee</p>
+                        <p className="text-[14px] font-semibold text-emerald-400 dark:text-emerald-500 leading-none mb-0.5">Assignee</p>
                         <p className="text-[14px] font-bold text-gray-900 dark:text-gray-100 truncate">{ticket.solver_person || "Unassigned"}</p>
                       </div>
                     </div>
@@ -728,7 +728,7 @@ export default function TicketsPage() {
                         <CalendarIcon className="w-4 h-4" />
                       </div>
                       <div className="min-w-0">
-                        <p className="text-[12px] font-semibold text-amber-400 dark:text-amber-500 leading-none mb-0.5">Due Date</p>
+                        <p className="text-[14px] font-semibold text-amber-400 dark:text-amber-500 leading-none mb-0.5">Due Date</p>
                         <p className="text-[14px] font-bold text-gray-800 dark:text-slate-200 truncate">
                           {ticket.planned_resolution ? new Date(ticket.planned_resolution).toLocaleDateString() : "—"}
                         </p>
@@ -740,7 +740,7 @@ export default function TicketsPage() {
                         <TagIcon className="w-4 h-4" />
                       </div>
                       <div className="min-w-0">
-                        <p className="text-[12px] font-semibold text-purple-400 dark:text-purple-500 leading-none mb-0.5">Category</p>
+                        <p className="text-[14px] font-semibold text-purple-400 dark:text-purple-500 leading-none mb-0.5">Category</p>
                         <p className="text-[14px] font-semibold text-[#2563EB] dark:text-[#60A5FA] truncate">{ticket.category}</p>
                       </div>
                     </div>
@@ -783,9 +783,9 @@ export default function TicketsPage() {
                   <TicketIcon className="w-5 h-5 text-[#2563EB]" /> {editingTicket ? "Edit Ticket" : "New Ticket"}
                 </h2>
                 <div className="flex items-center gap-2 mt-0.5">
-                  <p className="text-[#2563EB] dark:text-slate-400 font-bold text-[12px]">Support Configuration</p>
+                  <p className="text-[#2563EB] dark:text-slate-400 font-bold text-[14px]">Support Configuration</p>
                   {editingTicket && (
-                    <span className="px-2 py-0.5 bg-white/10 text-[12px] font-semibold text-[#2563EB] rounded border border-white/20">
+                    <span className="px-2 py-0.5 bg-white/10 text-[14px] font-semibold text-[#2563EB] rounded border border-white/20">
                       ID: {editingTicket.id}
                     </span>
                   )}
@@ -857,7 +857,7 @@ export default function TicketsPage() {
                 <div className="flex items-center justify-between px-1">
                   <p className="text-[13px] font-semibold text-[#2563EB]">Attachments</p>
                   {editingTicket && (editingTicket.attachment_url || editingTicket.voice_note) && (
-                    <span className="text-[12px] font-bold text-green-500 bg-green-500/10 px-2 py-0.5 rounded">Existing Files Preserved</span>
+                    <span className="text-[14px] font-bold text-green-500 bg-green-500/10 px-2 py-0.5 rounded">Existing Files Preserved</span>
                   )}
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -957,7 +957,7 @@ export default function TicketsPage() {
                   <label className="text-[13px] font-semibold text-[#5B6472] block mb-1.5 px-1">Priority</label>
                   <div className="flex bg-gray-100 dark:bg-navy-900/50 p-1 rounded-xl gap-1">
                     {(['Low', 'Medium', 'High', 'Critical'] as const).map((pri) => (
-                      <button key={pri} type="button" onClick={() => editingTicket ? setEditingTicket({ ...editingTicket, priority: pri }) : setNewTicket({ ...newTicket, priority: pri })} className={`flex-1 py-2 text-[12px] sm:text-[9px] font-semibold   rounded-lg transition-all ${(editingTicket ? editingTicket.priority : newTicket.priority) === pri
+                      <button key={pri} type="button" onClick={() => editingTicket ? setEditingTicket({ ...editingTicket, priority: pri }) : setNewTicket({ ...newTicket, priority: pri })} className={`flex-1 py-2 text-[14px] sm:text-[9px] font-semibold   rounded-lg transition-all ${(editingTicket ? editingTicket.priority : newTicket.priority) === pri
                           ? pri === 'Low' ? 'bg-green-500 text-white shadow-md'
                             : pri === 'Medium' ? 'bg-yellow-500 text-white shadow-md'
                               : pri === 'High' ? 'bg-[#D97706] text-white shadow-md'
@@ -1085,21 +1085,21 @@ export default function TicketsPage() {
               {/* Ticket Details Metadata */}
               <div className="grid grid-cols-2 gap-3 px-1">
                 <div className="space-y-1">
-                  <span className="text-[12px] font-semibold text-[#5B6472] block px-0.5">Raised By</span>
+                  <span className="text-[14px] font-semibold text-[#5B6472] block px-0.5">Raised By</span>
                   <div className="flex items-center gap-1.5 bg-blue-50/50 dark:bg-blue-900/10 px-2 py-1 rounded-lg border border-blue-100/50 dark:border-blue-800/20">
                     <UserIcon className="w-3 h-3 text-blue-500" />
                     <span className="text-[13px] font-semibold text-blue-700 dark:text-blue-400 truncate">{selectedTicket.raised_by}</span>
                   </div>
                 </div>
                 <div className="space-y-1">
-                  <span className="text-[12px] font-semibold text-[#5B6472] block px-0.5">Assigned To</span>
+                  <span className="text-[14px] font-semibold text-[#5B6472] block px-0.5">Assigned To</span>
                   <div className="flex items-center gap-1.5 bg-purple-50/50 dark:bg-purple-900/10 px-2 py-1 rounded-lg border border-purple-100/50 dark:border-purple-800/20">
                     <UserGroupIcon className="w-3 h-3 text-purple-500" />
                     <span className="text-[13px] font-semibold text-purple-700 dark:text-purple-400 truncate">{selectedTicket.solver_person || 'Unassigned'}</span>
                   </div>
                 </div>
                 <div className="space-y-1">
-                  <span className="text-[12px] font-semibold text-[#5B6472] block px-0.5">Due Date</span>
+                  <span className="text-[14px] font-semibold text-[#5B6472] block px-0.5">Due Date</span>
                   <div className="flex items-center gap-1.5 bg-amber-50/50 dark:bg-amber-900/10 px-2 py-1 rounded-lg border border-amber-100/50 dark:border-amber-800/20">
                     <CalendarIcon className="w-3 h-3 text-amber-500" />
                     <span className="text-[13px] font-semibold text-amber-700 dark:text-amber-400 truncate">
@@ -1108,7 +1108,7 @@ export default function TicketsPage() {
                   </div>
                 </div>
                 <div className="space-y-1">
-                  <span className="text-[12px] font-semibold text-[#5B6472] block px-0.5">Category</span>
+                  <span className="text-[14px] font-semibold text-[#5B6472] block px-0.5">Category</span>
                   <div className="flex items-center gap-1.5 bg-emerald-50/50 dark:bg-emerald-900/10 px-2 py-1 rounded-lg border border-emerald-100/50 dark:border-emerald-800/20">
                     <TagIcon className="w-3 h-3 text-emerald-500" />
                     <span className="text-[13px] font-semibold text-emerald-700 dark:text-emerald-400 truncate">{selectedTicket.category}</span>
@@ -1159,7 +1159,7 @@ export default function TicketsPage() {
                         <div className="flex-1 p-2.5 rounded-xl bg-gray-50 dark:bg-navy-800 border border-gray-100 dark:border-navy-700 shadow-sm z-10">
                           <div className="flex justify-between items-start mb-1">
                             <span className="text-[13px] font-semibold text-[#2563EB] dark:text-[#60A5FA]">{log.actor_username}</span>
-                            <span className="text-[12px] font-bold text-[#5B6472]">{new Date(log.created_at).toLocaleString([], { hour: '2-digit', minute: '2-digit', day: '2-digit', month: 'short' })}</span>
+                            <span className="text-[14px] font-bold text-[#5B6472]">{new Date(log.created_at).toLocaleString([], { hour: '2-digit', minute: '2-digit', day: '2-digit', month: 'short' })}</span>
                           </div>
                           {log.action_type === 'STATUS_CHANGE' && (
                             <p className="text-[14px] font-bold text-gray-600 dark:text-gray-300 mb-1.5 flex items-center gap-2">

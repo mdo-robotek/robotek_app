@@ -2380,12 +2380,12 @@ export default function O2DPage() {
                                     {item.order_no}
                                   </span>
                                   {item.hold && (
-                                    <span className="text-[12px] text-[#D97706] font-semibold tracking-tighter">
+                                    <span className="text-[14px] text-[#D97706] font-semibold tracking-tighter">
                                       On Hold
                                     </span>
                                   )}
                                   {item.cancelled && (
-                                    <span className="text-[12px] text-red-500 font-semibold tracking-tighter">
+                                    <span className="text-[14px] text-red-500 font-semibold tracking-tighter">
                                       Cancelled
                                     </span>
                                   )}
@@ -2665,12 +2665,12 @@ export default function O2DPage() {
                                     {no}
                                   </span>
                                   {first?.cancelled ? (
-                                    <span className="px-1.5 py-0.5 rounded-sm bg-red-100 text-red-600 dark:bg-red-900/40 dark:text-red-400 text-[12px] leading-none font-bold">
+                                    <span className="px-1.5 py-0.5 rounded-sm bg-red-100 text-red-600 dark:bg-red-900/40 dark:text-red-400 text-[14px] leading-none font-bold">
                                       Cancelled
                                     </span>
                                   ) : null}
                                   {first?.hold && !first?.cancelled ? (
-                                    <span className="px-1.5 py-0.5 rounded-sm bg-[#F7F8FA] text-[#D97706] dark:bg-[#FEF3C7] dark:text-[#D97706] text-[12px] leading-none font-bold">
+                                    <span className="px-1.5 py-0.5 rounded-sm bg-[#F7F8FA] text-[#D97706] dark:bg-[#FEF3C7] dark:text-[#D97706] text-[14px] leading-none font-bold">
                                       Hold
                                     </span>
                                   ) : null}
@@ -2720,7 +2720,7 @@ export default function O2DPage() {
                                         </span>
                                       </span>
                                       {plannedTimeStr && (
-                                        <span className="text-[12px] opacity-75 font-semibold pl-2 mt-0.5 flex items-center gap-1 tracking-wider normal-case">
+                                        <span className="text-[14px] opacity-75 font-semibold pl-2 mt-0.5 flex items-center gap-1 tracking-wider normal-case">
                                           <ClockIcon className="w-2 h-2" />
                                           {plannedTimeStr}
                                         </span>
@@ -3468,7 +3468,7 @@ export default function O2DPage() {
                         ) : stepAttachment ? (
                           <div className="flex flex-col items-center gap-1">
                             <ArchiveBoxIcon className="w-8 h-8 text-[#2563EB]/40" />
-                            <span className="text-[12px] font-semibold text-[#5B6472] max-w-[150px] truncate">
+                            <span className="text-[14px] font-semibold text-[#5B6472] max-w-[150px] truncate">
                               {stepAttachment?.name}
                             </span>
                           </div>
@@ -3529,7 +3529,7 @@ export default function O2DPage() {
                         ) : stepAttachment ? (
                           <div className="flex flex-col items-center gap-1">
                             <ArchiveBoxIcon className="w-8 h-8 text-[#2563EB]/40" />
-                            <span className="text-[12px] font-semibold text-[#5B6472] max-w-[150px] truncate">
+                            <span className="text-[14px] font-semibold text-[#5B6472] max-w-[150px] truncate">
                               {stepAttachment?.name}
                             </span>
                           </div>
@@ -3757,7 +3757,7 @@ export default function O2DPage() {
                     <p className="text-[14px] font-semibold tracking-tighter">
                       Only Step {removeStep}
                     </p>
-                    <p className="text-[12px] font-bold opacity-60">
+                    <p className="text-[14px] font-bold opacity-60">
                       Surgical Clear
                     </p>
                   </button>
@@ -3768,7 +3768,7 @@ export default function O2DPage() {
                     <p className="text-[14px] font-semibold tracking-tighter">
                       Step {removeStep} Onwards
                     </p>
-                    <p className="text-[12px] font-bold opacity-60">
+                    <p className="text-[14px] font-bold opacity-60">
                       Sequence Reset
                     </p>
                   </button>
@@ -4922,7 +4922,7 @@ function O2DDetailPanel({
                           title={step}
                         >
                           <div className="flex flex-col items-center justify-center gap-0.5 min-w-[120px]">
-                            <span className="text-[12px] opacity-50 font-semibold">
+                            <span className="text-[14px] opacity-50 font-semibold">
                               Step {idx + 1}
                             </span>
                             <span className="text-[13px] whitespace-normal leading-tight">

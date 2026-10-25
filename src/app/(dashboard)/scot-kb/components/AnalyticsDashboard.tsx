@@ -469,7 +469,7 @@ export default function AnalyticsDashboard({ feeders, scotRows = [], defaultEmpl
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none pb-8">
                 <div className="text-center">
                   <p className="text-2xl font-semibold text-slate-900 dark:text-white leading-none">{kpi.totalCalls}</p>
-                  <p className="text-[12px] font-bold text-slate-500 mt-1">Total</p>
+                  <p className="text-[14px] font-bold text-slate-500 mt-1">Total</p>
                 </div>
               </div>
             </div>

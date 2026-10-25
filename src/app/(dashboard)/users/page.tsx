@@ -503,7 +503,7 @@ export default function UsersPage() {
         <div className="flex flex-col lg:flex-row items-center gap-4 px-1">
         <div className="w-full lg:w-1/3 text-center lg:text-left min-w-0">
           <h1 className="text-xl md:text-2xl font-semibold text-gray-900 dark:text-white tracking-tight">Users</h1>
-          <p className="text-gray-500 dark:text-slate-300 font-bold text-[12px] md:text-[10px] tracking-wider">System Access Control</p>
+          <p className="text-gray-500 dark:text-slate-300 font-bold text-[14px] md:text-[10px] tracking-wider">System Access Control</p>
         </div>
         
         <div className="w-full lg:w-1/3 flex justify-center flex-shrink-0 min-w-0">
@@ -678,7 +678,7 @@ export default function UsersPage() {
               <tr>
                 <td colSpan={9} className="px-4 py-10 text-center">
                   <div className="w-6 h-6 border-2 border-gray-100 border-t-[#2563EB] rounded-full animate-spin mx-auto mb-2" />
-                  <p className="text-[#5B6472] font-bold text-[12px]">Syncing...</p>
+                  <p className="text-[#5B6472] font-bold text-[14px]">Syncing...</p>
                 </td>
               </tr>
             ) : paginatedUsers.length === 0 ? (
@@ -722,12 +722,12 @@ export default function UsersPage() {
                     <p className="text-[14px] md:text-xs font-bold text-gray-600 dark:text-slate-300">{user.phone || "—"}</p>
                   </td>
                   <td className="px-3 md:px-4 py-3 hidden lg:table-cell">
-                    <span className="px-1.5 md:px-2 py-0.5 bg-[#2563EB]/5 dark:bg-[#60A5FA]/10 text-white dark:text-[#60A5FA] text-[12px] md:text-[9px] font-semibold rounded border border-[#E5E7EB] dark:border-[#60A5FA]/20">
+                    <span className="px-1.5 md:px-2 py-0.5 bg-[#2563EB]/5 dark:bg-[#60A5FA]/10 text-white dark:text-[#60A5FA] text-[14px] md:text-[9px] font-semibold rounded border border-[#E5E7EB] dark:border-[#60A5FA]/20">
                       {user.office || "—"}
                     </span>
                   </td>
                   <td className="px-3 md:px-4 py-3 hidden lg:table-cell">
-                    <span className="inline-flex items-center px-1.5 md:px-2 py-0.5 bg-[#F7F8FA] dark:bg-[#60A5FA]/10 text-[#DC2626] dark:text-[#60A5FA] text-[12px] md:text-[10px] font-semibold rounded-md border border-[#E5E7EB] dark:border-[#60A5FA]/20">
+                    <span className="inline-flex items-center px-1.5 md:px-2 py-0.5 bg-[#F7F8FA] dark:bg-[#60A5FA]/10 text-[#DC2626] dark:text-[#60A5FA] text-[14px] md:text-[10px] font-semibold rounded-md border border-[#E5E7EB] dark:border-[#60A5FA]/20">
                       {user.role_name || "MEMBER"}
                     </span>
                   </td>
@@ -767,7 +767,7 @@ export default function UsersPage() {
                     </div>
                   </td>
                   <td className="px-3 md:px-4 py-3">
-                    <span className={`px-2 py-0.5 rounded-full text-[12px] font-semibold   border ${
+                    <span className={`px-2 py-0.5 rounded-full text-[14px] font-semibold   border ${
                       user.isActive 
                         ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' 
                         : 'bg-rose-500/10 text-rose-500 border-rose-500/20'
@@ -897,9 +897,9 @@ export default function UsersPage() {
                   {editingUser ? "Edit User" : "Add New User"}
                 </h2>
                 <div className="flex items-center gap-2 mt-1">
-                  <p className="text-[#5B6472] dark:text-slate-400 font-bold text-[12px]">Profile Configuration</p>
+                  <p className="text-[#5B6472] dark:text-slate-400 font-bold text-[14px]">Profile Configuration</p>
                   {editingUser && (
-                    <span className="px-2 py-0.5 bg-[#F7F8FA] dark:bg-zinc-800 text-[12px] font-semibold text-gray-500 rounded border border-[#E5E7EB] dark:border-zinc-700">
+                    <span className="px-2 py-0.5 bg-[#F7F8FA] dark:bg-zinc-800 text-[14px] font-semibold text-gray-500 rounded border border-[#E5E7EB] dark:border-zinc-700">
                       User Profile
                     </span>
                   )}
@@ -1184,7 +1184,7 @@ export default function UsersPage() {
                     <button
                       type="button"
                       onClick={addLocation}
-                      className="px-3 py-1 bg-[#2563EB] dark:bg-[#60A5FA] text-white dark:text-black rounded-lg font-semibold text-[12px] shadow-sm active:scale-95 transition-all"
+                      className="px-3 py-1 bg-[#2563EB] dark:bg-[#60A5FA] text-white dark:text-black rounded-lg font-semibold text-[14px] shadow-sm active:scale-95 transition-all"
                     >
                       + Add Site
                     </button>
@@ -1195,7 +1195,7 @@ export default function UsersPage() {
                       <div key={index} className="p-3 bg-gray-50 dark:bg-navy-950/50 rounded-xl border border-gray-100 dark:border-navy-800/50">
                         <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
                           <div className="md:col-span-4">
-                            <label className="text-[12px] font-semibold text-[#5B6472] block mb-1.5">Site Name</label>
+                            <label className="text-[14px] font-semibold text-[#5B6472] block mb-1.5">Site Name</label>
                             <input
                               type="text"
                               value={loc.name}
@@ -1206,7 +1206,7 @@ export default function UsersPage() {
                           </div>
                           <div className="md:col-span-8 flex gap-2">
                             <div className="flex-1">
-                              <label className="text-[12px] font-semibold text-[#5B6472] block mb-1.5">Coordinates</label>
+                              <label className="text-[14px] font-semibold text-[#5B6472] block mb-1.5">Coordinates</label>
                               <div className="relative">
                                 <input
                                   type="text"

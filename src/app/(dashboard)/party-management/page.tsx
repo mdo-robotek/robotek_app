@@ -276,7 +276,7 @@ export default function PartyManagementPage() {
         <div className="flex flex-col lg:flex-row items-center gap-4 px-1">
           <div className="w-full lg:w-1/3 text-center lg:text-left min-w-0">
             <h1 className="text-xl md:text-2xl font-semibold text-gray-900 dark:text-white tracking-tight">Party Management</h1>
-            <p className="text-gray-500 dark:text-slate-300 font-bold text-[12px] md:text-[10px] tracking-wider">Customer &amp; Client Directory</p>
+            <p className="text-gray-500 dark:text-slate-300 font-bold text-[14px] md:text-[10px] tracking-wider">Customer &amp; Client Directory</p>
           </div>
           <div className="w-full lg:w-1/3 flex justify-center flex-shrink-0 min-w-0">
             <div className="flex items-center gap-1 rounded-full border-2 border-b-4 border-[#2563EB] dark:border-[#60A5FA] bg-white dark:bg-navy-800 shadow-sm transition-all active:translate-y-[2px] active:border-b-2 p-1 overflow-x-auto no-scrollbar max-w-full">
@@ -350,7 +350,7 @@ export default function PartyManagementPage() {
             </thead>
             <tbody className="divide-y divide-[#E5E7EB]">
               {isLoading ? (
-                <tr><td colSpan={5} className="px-4 py-10 text-center"><div className="w-6 h-6 border-2 border-gray-100 border-t-[#2563EB] rounded-full animate-spin mx-auto mb-2" /><p className="text-[#5B6472] font-bold text-[12px]">Syncing...</p></td></tr>
+                <tr><td colSpan={5} className="px-4 py-10 text-center"><div className="w-6 h-6 border-2 border-gray-100 border-t-[#2563EB] rounded-full animate-spin mx-auto mb-2" /><p className="text-[#5B6472] font-bold text-[14px]">Syncing...</p></td></tr>
               ) : paginatedParties.length === 0 ? (
                 <tr><td colSpan={5} className="px-4 py-10 text-center"><p className="text-[14px] text-[#5B6472] font-bold">No entries found</p></td></tr>
               ) : (
@@ -379,7 +379,7 @@ export default function PartyManagementPage() {
                       })()}
                     </td>
                     <td className="px-3 md:px-4 py-3 hidden sm:table-cell">
-                      <span className="inline-flex items-center px-1.5 md:px-2 py-0.5 bg-[#F7F8FA] dark:bg-[#60A5FA]/10 text-[#DC2626] dark:text-[#60A5FA] text-[12px] md:text-[10px] font-semibold rounded-md border border-[#E5E7EB] dark:border-[#60A5FA]/20">{party.customerType || "—"}</span>
+                      <span className="inline-flex items-center px-1.5 md:px-2 py-0.5 bg-[#F7F8FA] dark:bg-[#60A5FA]/10 text-[#DC2626] dark:text-[#60A5FA] text-[14px] md:text-[10px] font-semibold rounded-md border border-[#E5E7EB] dark:border-[#60A5FA]/20">{party.customerType || "—"}</span>
                     </td>
                     <td className="px-3 md:px-4 py-3 hidden md:table-cell"><p className="text-[14px] md:text-xs font-bold text-gray-600 dark:text-slate-300">{party.partyType || "—"}</p></td>
                     <td className="px-3 md:px-4 py-3 hidden lg:table-cell"><p className="text-[14px] md:text-xs font-bold text-gray-600 dark:text-slate-300">{party.salePersonName || "—"}</p></td>
@@ -437,7 +437,7 @@ export default function PartyManagementPage() {
             <div className="p-4 border-b border-[#E5E7EB] dark:border-zinc-800 flex items-center justify-between">
               <div>
                 <h2 className="text-lg font-semibold text-gray-900 dark:text-white tracking-tight">{viewModalTitle}</h2>
-                <p className="text-[#5B6472] dark:text-slate-400 font-bold text-[12px] mt-1">Selected Items</p>
+                <p className="text-[#5B6472] dark:text-slate-400 font-bold text-[14px] mt-1">Selected Items</p>
               </div>
               <button onClick={() => setIsViewModalOpen(false)} className="p-2 text-[#5B6472] hover:text-gray-600 dark:hover:text-zinc-200 transition-colors"><XMarkIcon className="w-6 h-6" /></button>
             </div>

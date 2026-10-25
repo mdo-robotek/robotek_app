@@ -248,7 +248,7 @@ export default function ActionLogView() {
                 }`}
               >
                 {f}
-                <span className={`px-1.5 py-0.5 rounded-full text-[12px] ${
+                <span className={`px-1.5 py-0.5 rounded-full text-[14px] ${
                   activeFilter === f ? 'bg-white/20 text-white' : 'bg-gray-200 text-gray-600 dark:bg-gray-800 dark:text-gray-400'
                 }`}>
                   {count}
@@ -310,12 +310,12 @@ export default function ActionLogView() {
                         {item.owner || "—"}
                       </td>
                       <td className="px-4 py-4 text-center">
-                        <span className={`inline-block px-2.5 py-1 rounded-full text-[12px] font-semibold   border ${getPriorityStyle(item.priority)}`}>
+                        <span className={`inline-block px-2.5 py-1 rounded-full text-[14px] font-semibold   border ${getPriorityStyle(item.priority)}`}>
                           {item.priority}
                         </span>
                       </td>
                       <td className="px-4 py-4 text-center">
-                        <span className={`inline-block px-2.5 py-1 rounded-full text-[12px] font-semibold   border ${getStatusStyle(item.status)}`}>
+                        <span className={`inline-block px-2.5 py-1 rounded-full text-[14px] font-semibold   border ${getStatusStyle(item.status)}`}>
                           {item.status}
                         </span>
                       </td>
@@ -352,8 +352,8 @@ export default function ActionLogView() {
                     {editingItem ? "Update Task" : "Create New Task"}
                   </h2>
                   <div className="flex items-center gap-2 mt-1">
-                    <p className="text-[#5B6472] dark:text-slate-400 font-bold text-[12px]">EA-MD Hub Action Tracker</p>
-                    <span className="px-2 py-0.5 bg-[#F7F8FA] dark:bg-navy-800 text-[12px] font-semibold text-[#2563EB] dark:text-[#60A5FA] rounded border border-[#E5E7EB] dark:border-navy-700">
+                    <p className="text-[#5B6472] dark:text-slate-400 font-bold text-[14px]">EA-MD Hub Action Tracker</p>
+                    <span className="px-2 py-0.5 bg-[#F7F8FA] dark:bg-navy-800 text-[14px] font-semibold text-[#2563EB] dark:text-[#60A5FA] rounded border border-[#E5E7EB] dark:border-navy-700">
                       Task Details
                     </span>
                   </div>

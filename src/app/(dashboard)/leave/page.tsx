@@ -640,8 +640,8 @@ export default function LeavePage() {
                                                                                         {name}
                                                                                     </span>
                                                                                     {accepted
-                                                                                        ? <span className="text-[12px] font-semibold text-emerald-600 mt-0.5">✓ {acceptedBy} · {acceptedTime}</span>
-                                                                                        : <span className="text-[12px] font-semibold text-[#5B6472] mt-0.5">Awaiting acceptance</span>
+                                                                                        ? <span className="text-[14px] font-semibold text-emerald-600 mt-0.5">✓ {acceptedBy} · {acceptedTime}</span>
+                                                                                        : <span className="text-[14px] font-semibold text-[#5B6472] mt-0.5">Awaiting acceptance</span>
                                                                                     }
                                                                                 </div>
                                                                             );
@@ -691,7 +691,7 @@ export default function LeavePage() {
                                                                             <div className="flex items-start gap-2">
                                                                                 <div className="flex flex-col shrink-0 gap-0.5">
                                                                                     <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-purple-100 text-purple-700 border border-purple-200 text-[13px] font-semibold rounded-full">① {r1.full_name || r1.username}</span>
-                                                                                    {(lv as any).acceptedBy1 ? <span className="inline-flex items-center gap-0.5 text-[12px] font-semibold text-emerald-600"><CheckCircleIcon className="w-2.5 h-2.5" />Accepted</span> : <span className="inline-flex items-center gap-0.5 text-[12px] font-semibold text-amber-500"><ClockIcon className="w-2.5 h-2.5" />Pending</span>}
+                                                                                    {(lv as any).acceptedBy1 ? <span className="inline-flex items-center gap-0.5 text-[14px] font-semibold text-emerald-600"><CheckCircleIcon className="w-2.5 h-2.5" />Accepted</span> : <span className="inline-flex items-center gap-0.5 text-[14px] font-semibold text-amber-500"><ClockIcon className="w-2.5 h-2.5" />Pending</span>}
                                                                                 </div>
                                                                                 <span className="text-[14px] text-gray-600 dark:text-gray-300 font-medium">{lv.tasks1}</span>
                                                                             </div>
@@ -700,7 +700,7 @@ export default function LeavePage() {
                                                                             <div className="flex items-start gap-2">
                                                                                 <div className="flex flex-col shrink-0 gap-0.5">
                                                                                     <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-100 text-blue-700 border border-blue-200 text-[13px] font-semibold rounded-full">② {r2.full_name || r2.username}</span>
-                                                                                    {(lv as any).acceptedBy2 ? <span className="inline-flex items-center gap-0.5 text-[12px] font-semibold text-emerald-600"><CheckCircleIcon className="w-2.5 h-2.5" />Accepted</span> : <span className="inline-flex items-center gap-0.5 text-[12px] font-semibold text-amber-500"><ClockIcon className="w-2.5 h-2.5" />Pending</span>}
+                                                                                    {(lv as any).acceptedBy2 ? <span className="inline-flex items-center gap-0.5 text-[14px] font-semibold text-emerald-600"><CheckCircleIcon className="w-2.5 h-2.5" />Accepted</span> : <span className="inline-flex items-center gap-0.5 text-[14px] font-semibold text-amber-500"><ClockIcon className="w-2.5 h-2.5" />Pending</span>}
                                                                                 </div>
                                                                                 <span className="text-[14px] text-gray-600 dark:text-gray-300 font-medium">{lv.tasks2}</span>
                                                                             </div>
@@ -709,7 +709,7 @@ export default function LeavePage() {
                                                                             <div className="flex items-start gap-2">
                                                                                 <div className="flex flex-col shrink-0 gap-0.5">
                                                                                     <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-[#F7F8FA] text-[#D97706] border border-[#E5E7EB] text-[13px] font-semibold rounded-full">③ {r3.full_name || r3.username}</span>
-                                                                                    {(lv as any).acceptedBy3 ? <span className="inline-flex items-center gap-0.5 text-[12px] font-semibold text-emerald-600"><CheckCircleIcon className="w-2.5 h-2.5" />Accepted</span> : <span className="inline-flex items-center gap-0.5 text-[12px] font-semibold text-amber-500"><ClockIcon className="w-2.5 h-2.5" />Pending</span>}
+                                                                                    {(lv as any).acceptedBy3 ? <span className="inline-flex items-center gap-0.5 text-[14px] font-semibold text-emerald-600"><CheckCircleIcon className="w-2.5 h-2.5" />Accepted</span> : <span className="inline-flex items-center gap-0.5 text-[14px] font-semibold text-amber-500"><ClockIcon className="w-2.5 h-2.5" />Pending</span>}
                                                                                 </div>
                                                                                 <span className="text-[14px] text-gray-600 dark:text-gray-300 font-medium">{lv.tasks3}</span>
                                                                             </div>

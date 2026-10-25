@@ -102,7 +102,7 @@ export async function addUser(user: User): Promise<boolean> {
           user.id,
           user.username,
           user.email,
-          user.password,
+          password,
           user.phone,
           user.role_name,
           user.late_long,
@@ -132,7 +132,7 @@ export async function updateUser(id: string, user: User): Promise<boolean> {
     const sheets = await getSheetsClient();
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId: GOOGLE_SHEET_ID,
-      range: `${SHEET_NAME}!A:A`,
+      range: `${SHEET_NAME}!A:D`,
     });
 
     const rows = response.data.values;
@@ -140,6 +140,13 @@ export async function updateUser(id: string, user: User): Promise<boolean> {
 
     const rowIndex = rows.findIndex(row => row[0] === id);
     if (rowIndex === -1) return false;
+
+    // The browser never receives passwords any more, so an edit (or a
+    // permission toggle, which re-sends the whole user) arrives with an empty
+    // password. Empty means "keep the current one" — never blank it out.
+    const password = String(user.password ?? "").trim()
+      ? user.password
+      : (rows[rowIndex][3] ?? "");
 
     await sheets.spreadsheets.values.update({
       spreadsheetId: GOOGLE_SHEET_ID,

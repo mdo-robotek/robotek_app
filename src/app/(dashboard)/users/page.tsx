@@ -1021,13 +1021,15 @@ export default function UsersPage() {
                 </div>
 
                 <div>
-                  <label className="text-[13px] font-semibold text-[#5B6472] block mb-2">Password</label>
+                  <label className="text-[13px] font-semibold text-[#5B6472] block mb-2">
+                    {editingUser ? "New password" : "Password"}
+                  </label>
                   <input
                     type="text"
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                     className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-3 py-1.5 rounded-lg border border-[#E5E7EB] dark:border-zinc-800 focus:border-[#2563EB] focus:bg-white dark:focus:bg-zinc-900 outline-none font-bold text-[14px] text-gray-800 dark:text-zinc-100 transition-all shadow-sm"
-                    placeholder="••••••••"
+                    placeholder={editingUser ? "Leave blank to keep the current password" : "Set a password"}
                   />
                 </div>
 

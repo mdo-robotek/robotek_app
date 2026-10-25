@@ -20,7 +20,10 @@ function nextEmpCodeFrom(users: { id?: string }[]): string {
 export async function GET() {
   try {
     const allUsers = await getUsers();
-    return NextResponse.json(allUsers);
+    // Passwords never leave the server. Editing a user with the password box
+    // left blank keeps the current password (see updateUser).
+    const safe = allUsers.map(({ password: _password, ...rest }) => ({ ...rest, password: "" }));
+    return NextResponse.json(safe);
   } catch (error: any) {
     console.error("GET Users Error:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });

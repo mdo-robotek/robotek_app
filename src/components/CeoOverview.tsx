@@ -54,7 +54,7 @@ function Tile({ m }: { m: ModuleSummary }) {
  * module's own page, which carries its detailed figures.
  */
 export default function CeoOverview() {
-  const { data } = useSWR("/api/summary", fetcher, {
+  const { data, error } = useSWR("/api/summary", fetcher, {
     refreshInterval: 120000,
     revalidateOnFocus: false,
     keepPreviousData: true,
@@ -84,6 +84,15 @@ export default function CeoOverview() {
   const monthPct = ov?.monthTarget ? Math.round((ov.monthSale / ov.monthTarget) * 100) : 0;
   const pctTone = (p: number) => (p >= 100 ? "text-[#15803D]" : p >= 60 ? "text-[#D97706]" : "text-[#DC2626]");
   const barTone = (p: number) => (p >= 100 ? "bg-[#15803D]" : p >= 60 ? "bg-[#D97706]" : "bg-[#DC2626]");
+
+  if (!data && error) {
+    return (
+      <div className="rounded-2xl bg-white dark:bg-navy-900 border border-[#E5E7EB] dark:border-navy-800 p-6">
+        <p className="text-[15px] font-semibold text-[#1A1D21] dark:text-white">Couldn&apos;t load the overview right now.</p>
+        <p className="mt-1 text-[14px] text-[#5B6472] dark:text-gray-400">It will try again on its own in a couple of minutes. You can also refresh the page.</p>
+      </div>
+    );
+  }
 
   if (!data) {
     return (

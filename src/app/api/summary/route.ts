@@ -15,6 +15,7 @@ export const revalidate = 0;
 const COO_PARAMS = () => new URLSearchParams("granularity=month"); // same key the Home page uses
 const COO_MODULES: ModuleKey[] = ["o2d", "ims", "tasks", "people"];
 const ORDER: ModuleKey[] = ["o2d", "i2r", "grn", "ims", "tasks", "people"];
+const ADMIN_MODULES: ModuleKey[] = ["i2r", "tasks", "people"];
 
 async function build(key: ModuleKey, coo: any | null): Promise<ModuleSummary> {
   switch (key) {
@@ -43,6 +44,9 @@ export async function GET(request: Request) {
   try {
     if (one) {
       if (!ORDER.includes(one)) return NextResponse.json({ error: "Unknown module" }, { status: 400 });
+      // Company-wide people/task figures, and I2R (whose page shows non-admins
+      // only their own steps), are for admins — same rule as the page strips.
+      if (ADMIN_MODULES.includes(one) && !isAdmin) return NextResponse.json({ error: "Only for admins" }, { status: 403 });
       const coo = COO_MODULES.includes(one) ? await getCooReport(COO_PARAMS()) : null;
       const summary = await build(one, coo);
       const sections = MODULE_DETAIL_SECTIONS[one];

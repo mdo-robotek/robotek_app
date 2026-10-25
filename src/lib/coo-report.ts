@@ -790,7 +790,12 @@ export async function getCooReport(searchParams: URLSearchParams): Promise<any> 
   if (running) return running;
   const p = buildCooReport(searchParams)
     .then((data) => {
-      cooCache.set(key, { at: Date.now(), data });
+      // Keep the cache small: drop stale entries, and never hold more than a
+      // handful of filter combinations (each report is large).
+      const now = Date.now();
+      for (const [k, v] of cooCache) if (now - v.at >= COO_CACHE_MS) cooCache.delete(k);
+      while (cooCache.size >= 8) cooCache.delete(cooCache.keys().next().value as string);
+      cooCache.set(key, { at: now, data });
       return data;
     })
     .finally(() => cooInflight.delete(key));

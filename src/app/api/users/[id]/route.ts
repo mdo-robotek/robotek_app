@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { isAdminSession, ADMIN_ONLY_MESSAGE } from "@/lib/require-admin";
 import { updateUser, deleteUser } from "@/lib/google-sheets";
 import { uploadFileToDrive } from "@/lib/google-drive";
 
@@ -9,6 +10,11 @@ export async function PUT(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  // Writes are admin-only (Oct 26): before this any logged-in user could
+  // add users, change roles (even their own to ADMIN) or reset passwords.
+  if (!(await isAdminSession())) {
+    return NextResponse.json({ error: ADMIN_ONLY_MESSAGE }, { status: 403 });
+  }
   try {
     const { id } = await params;
     const contentType = req.headers.get("content-type") || "";
@@ -49,6 +55,11 @@ export async function DELETE(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  // Writes are admin-only (Oct 26): before this any logged-in user could
+  // add users, change roles (even their own to ADMIN) or reset passwords.
+  if (!(await isAdminSession())) {
+    return NextResponse.json({ error: ADMIN_ONLY_MESSAGE }, { status: 403 });
+  }
   try {
     const { id } = await params;
     const success = await deleteUser(id);

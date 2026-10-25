@@ -16,7 +16,7 @@ export interface Figure {
   value: number | string;
   tone: Tone;
   /** Optional step filter the module page can apply when this is tapped. */
-  step?: number | "tbd" | "completed";
+  step?: number | "tbd";
 }
 
 export interface ModuleSummary {
@@ -111,6 +111,9 @@ export function i2rSummary(items: I2R[], nowDate = new Date()): ModuleSummary {
   for (const it of items) {
     const s = i2rActiveStep(it);
     if (s < 0) continue;
+    // Same rule as the page's "Decide Name" filter: any live indent whose
+    // name is still TBD, even if its other steps are finished.
+    if (isTbdName(it.item_name)) tbd++;
     if (s === 0) {
       if (inThisMonth((it as any).actual_11, nowDate)) doneMonth++;
       continue;
@@ -118,7 +121,6 @@ export function i2rSummary(items: I2R[], nowDate = new Date()): ModuleSummary {
     open++;
     perStep[s]++;
     if (isPast((it as any)[`planned_${s}`], now)) late++;
-    if (isTbdName(it.item_name)) tbd++;
   }
   let topStep = 0;
   for (let i = 1; i <= 11; i++) if (perStep[i] > (perStep[topStep] || 0)) topStep = i;
@@ -132,7 +134,7 @@ export function i2rSummary(items: I2R[], nowDate = new Date()): ModuleSummary {
       { key: "open", label: "Open", value: open, tone: "neutral" },
       { key: "late", label: "Late", value: late, tone: toneCount(late, true) },
       { key: "tbd", label: "Names to decide", value: tbd, tone: toneCount(tbd), step: "tbd" },
-      { key: "done", label: "Done this month", value: doneMonth, tone: "neutral", step: "completed" },
+      { key: "done", label: "Done this month", value: doneMonth, tone: "neutral" },
     ],
     stuckAt: topStep ? { step: topStep, name: I2R_STEP_SHORT[topStep - 1], count: perStep[topStep] } : null,
   };
@@ -188,7 +190,7 @@ export function grnSummary(items: GRN[], nowDate = new Date()): ModuleSummary {
       { key: "open", label: "Open", value: open, tone: "neutral" },
       { key: "late", label: "Late", value: late, tone: toneCount(late, true) },
       { key: "payment", label: "Payments to settle", value: payment, tone: toneCount(payment), step: 9 },
-      { key: "done", label: "Done this month", value: doneMonth, tone: "neutral", step: "completed" },
+      { key: "done", label: "Done this month", value: doneMonth, tone: "neutral" },
     ],
     stuckAt: topStep ? { step: topStep, name: GRN_STEP_SHORT[topStep - 1], count: perStep[topStep] } : null,
   };

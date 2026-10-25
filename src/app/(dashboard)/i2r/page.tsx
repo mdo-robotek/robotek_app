@@ -826,8 +826,10 @@ export default function I2RPage() {
           <button onClick={() => setLayoutMode("smart")} className={`px-4 py-1 rounded-full text-[13px] font-semibold   transition-all ${layoutMode === "smart" ? "bg-white dark:bg-navy-800 text-[#2563EB] dark:text-[#60A5FA] shadow-md" : "text-[#5B6472] dark:text-navy-600"}`}>Smart View</button>
         </div>
       </div>
-      {/* Key figures — same numbers as the Purchase tile on the CEO home */}
-      <ModuleStrip module="i2r" onFigure={(f) => { if (f.step !== undefined) setSelectedStepFilter(f.step); }} />
+      {/* Key figures — same numbers as the Purchase tile on the CEO home.
+          Admins only: other users see just the steps they own, so
+          company-wide counts would not match their list. */}
+      <ModuleStrip module="i2r" adminOnly onFigure={(f) => { if (f.step !== undefined) setSelectedStepFilter(f.step); }} />
 
       <div className="flex gap-4 flex-1 overflow-hidden mt-1 px-1">
         {/* ─── Sidebar ─── */}

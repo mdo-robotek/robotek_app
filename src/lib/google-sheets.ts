@@ -62,7 +62,11 @@ export async function getUsers(): Promise<User[]> {
         id,
         username: row[1] || "",
         email: row[2] || "",
-        password: row[3] || "",
+        // Never carried in the shared user list: many API routes send this
+        // list (or parts of it) to the browser. Login reads the password
+        // through getUserByUsernameOrEmail; updateUser keeps the stored one
+        // when an empty value comes back (Oct 26).
+        password: "",
         phone: row[4] || "",
         role_name: row[5] || "",
         late_long: row[6] || "",
@@ -102,7 +106,7 @@ export async function addUser(user: User): Promise<boolean> {
           user.id,
           user.username,
           user.email,
-          password,
+          user.password,
           user.phone,
           user.role_name,
           user.late_long,
@@ -157,7 +161,7 @@ export async function updateUser(id: string, user: User): Promise<boolean> {
           user.id,
           user.username,
           user.email,
-          user.password,
+          password,
           user.phone,
           user.role_name,
           user.late_long,

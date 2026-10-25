@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { isAdminSession, ADMIN_ONLY_MESSAGE } from "@/lib/require-admin";
 import { getUsers, addUser } from "@/lib/google-sheets";
 import { uploadFileToDrive } from "@/lib/google-drive";
 
@@ -31,6 +32,11 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
+  // Writes are admin-only (Oct 26): before this any logged-in user could
+  // add users, change roles (even their own to ADMIN) or reset passwords.
+  if (!(await isAdminSession())) {
+    return NextResponse.json({ error: ADMIN_ONLY_MESSAGE }, { status: 403 });
+  }
   try {
     const contentType = req.headers.get("content-type") || "";
     let userData: any;

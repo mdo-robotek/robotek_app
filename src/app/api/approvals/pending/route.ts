@@ -43,6 +43,12 @@ export async function GET() {
       (u) => String(u.username).trim().toLowerCase() === username.trim().toLowerCase()
     );
 
+    // Someone who has left the company (inactive in the Users sheet) owns
+    // nothing, even if their designation still says HR / PC.
+    if (me && me.isActive === false) {
+      return NextResponse.json({ groups: [], total: 0 });
+    }
+
     const mine = approvalsForUser({
       username,
       designation: me?.designation || "",

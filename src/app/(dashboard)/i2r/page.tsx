@@ -44,6 +44,7 @@ import {
 import ActionStatusModal from "@/components/ActionStatusModal";
 import ConfirmModal from "@/components/ConfirmModal";
 import IMSFormModal from "@/components/IMSFormModal";
+import ModuleStrip from "@/components/ModuleStrip";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -798,8 +799,8 @@ export default function I2RPage() {
       {/* ─── Header ─── */}
       <div className="flex items-center justify-between px-2 py-0.5 shrink-0">
         <div>
-          <h1 className="text-xl font-semibold text-[#2563EB] dark:text-white tracking-tight">I2R Management</h1>
-          <p className="text-[13px] font-bold text-[#5B6472] dark:text-slate-400">INDENT TO REQUEST — ITEM REQUISITIONS</p>
+          <h1 className="text-xl font-semibold text-[#1A1D21] dark:text-white">I2R</h1>
+          <p className="text-[14px] text-[#5B6472] dark:text-slate-400">Purchase requests (indents)</p>
         </div>
 
         {/* Central Pill Actions */}
@@ -815,7 +816,7 @@ export default function I2RPage() {
           </button>
           <div className="w-[1px] h-5 bg-slate-200 dark:bg-navy-700 mx-1" />
           <button onClick={() => setViewMode(viewMode==='cancelled'?'active':'cancelled')} className={`flex items-center gap-2 px-4 py-1 font-semibold   text-[13px] transition-all rounded-full ${viewMode==='cancelled'?'bg-red-500 text-white shadow-md':'text-[#2563EB] dark:text-[#60A5FA] hover:bg-slate-50 dark:hover:bg-navy-800'}`}>
-            <NoSymbolIcon className="w-3.5 h-3.5" /> <span>CANCELLED ({items.filter(i => !!(i.cancelled || "").trim()).length})</span>
+            <NoSymbolIcon className="w-3.5 h-3.5" /> <span>Cancelled ({items.filter(i => !!(i.cancelled || "").trim()).length})</span>
           </button>
         </div>
 
@@ -825,6 +826,8 @@ export default function I2RPage() {
           <button onClick={() => setLayoutMode("smart")} className={`px-4 py-1 rounded-full text-[13px] font-semibold   transition-all ${layoutMode === "smart" ? "bg-white dark:bg-navy-800 text-[#2563EB] dark:text-[#60A5FA] shadow-md" : "text-[#5B6472] dark:text-navy-600"}`}>Smart View</button>
         </div>
       </div>
+      {/* Key figures — same numbers as the Purchase tile on the CEO home */}
+      <ModuleStrip module="i2r" onFigure={(f) => { if (f.step !== undefined) setSelectedStepFilter(f.step); }} />
 
       <div className="flex gap-4 flex-1 overflow-hidden mt-1 px-1">
         {/* ─── Sidebar ─── */}
@@ -1210,7 +1213,7 @@ export default function I2RPage() {
                         <td className="p-3 sticky left-24 z-10 bg-white dark:bg-navy-800 group-hover:bg-slate-50 dark:group-hover:bg-navy-900/30 transition-all">
                           <div className="flex flex-col gap-1">
                             <span className="px-3 py-1 bg-blue-50 dark:bg-blue-900/20 text-[#2563EB] dark:text-blue-400 rounded-full font-semibold text-[13px] border border-blue-100 dark:border-blue-900/50 whitespace-nowrap">INDT- {it.id}</span>
-                            {it.cancelled && <span className="px-2 py-0.5 bg-red-50 dark:bg-red-900/10 text-red-600 dark:text-red-400 rounded text-[12px] font-semibold border border-red-100 dark:border-red-900/30 text-center">CANCELLED {fmtDt(it.cancelled)} {fmtTm(it.cancelled)}</span>}
+                            {it.cancelled && <span className="px-2 py-0.5 bg-red-50 dark:bg-red-900/10 text-red-600 dark:text-red-400 rounded text-[12px] font-semibold border border-red-100 dark:border-red-900/30 text-center">Cancelled {fmtDt(it.cancelled)} {fmtTm(it.cancelled)}</span>}
                           </div>
                         </td>
                         <td className="p-3 font-semibold text-slate-800 dark:text-white max-w-[200px] truncate">

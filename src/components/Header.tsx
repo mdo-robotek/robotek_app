@@ -87,8 +87,10 @@ export default function Header({ onMenuClick }: HeaderProps) {
               return raw.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase());
             })()}
           </span>
-          <span className="text-[13px] text-[#5B6472] dark:text-slate-400 leading-tight hidden sm:block">
-            {new Date().toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long" })}
+          {/* India time on both server and browser; suppressHydrationWarning
+              because the server's and browser's date text can differ slightly. */}
+          <span suppressHydrationWarning className="text-[13px] text-[#5B6472] dark:text-slate-400 leading-tight hidden sm:block">
+            {new Date().toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long", timeZone: "Asia/Kolkata" })}
           </span>
         </div>
       </div>

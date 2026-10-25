@@ -24,9 +24,8 @@ import {
   UserAssetsPanel,
   CompactPartyCelebrationCard
 } from "./DashboardComponents";
-import CooReport from "@/components/CooReport";
 import PendingApprovalsCard from "@/components/PendingApprovalsCard";
-import CooCommandBar from "@/components/CooCommandBar";
+import CeoOverview from "@/components/CeoOverview";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -44,13 +43,6 @@ export default function Dashboard() {
   const userRole = (session?.user as any)?.role || 'User';
   const isAdmin = (session?.user as any)?.role === 'ADMIN' || (session?.user as any)?.role === 'EA';
 
-  // Single dashboard: admins/EA get the COO Command Center on top of the personal view.
-  // Fetched only for admins (null key = no request); current month by default.
-  const { data: cooData, isLoading: cooLoading } = useSWR(
-    isAdmin ? '/api/metrix/coo?granularity=month' : null,
-    fetcher,
-    { refreshInterval: 300000, revalidateOnFocus: false, keepPreviousData: true }
-  );
 
   // Busy sale register freshness — reminder for the accounts team to copy
   // Busy -> Transaction -> Sales -> List into the sale sheet.
@@ -125,16 +117,16 @@ export default function Dashboard() {
           <CompactWelcome firstName={firstName} role={userRole} />
         </div>
         <div className="xl:col-span-2">
-            {!isLoading && data && <CompactScore score={data.score.score} total={data.score.total} label="FAILURE SCORE (GAP)" isNegative={true} />}
+            {!isLoading && data?.score && <CompactScore score={data.score.score} total={data.score.total} label="Failure score (gap)" isNegative={true} />}
         </div>
         <div className="xl:col-span-2">
-            {!isLoading && data && <CompactScore score={data.score.onTimeRate} total={data.score.completed} label="ACCURACY GAP" isNegative={true} />}
+            {!isLoading && data?.score && <CompactScore score={data.score.onTimeRate} total={data.score.completed} label="Accuracy gap" isNegative={true} />}
         </div>
         <div className="xl:col-span-3">
-            {!isLoading && data && <CompactOccasionCard birthdays={data.birthdays} anniversaries={data.anniversaries} />}
+            {!isLoading && data && <CompactOccasionCard birthdays={data.birthdays || []} anniversaries={data.anniversaries || []} />}
         </div>
         <div className="xl:col-span-3">
-            {!isLoading && data && <CompactPartyCelebrationCard partyBirthdays={data.partyBirthdays} partyAnniversaries={data.partyAnniversaries} />}
+            {!isLoading && data && <CompactPartyCelebrationCard partyBirthdays={data.partyBirthdays || []} partyAnniversaries={data.partyAnniversaries || []} />}
         </div>
       </div>
 
@@ -265,7 +257,8 @@ export default function Dashboard() {
 
   return (
     <div>
-      {busyBanner}
+      {/* On the CEO view the Busy reminder sits inside "Needs attention" */}
+      {view !== "coo" && busyBanner}
       <div className="max-w-[1600px] mx-auto px-4 pb-4 flex gap-2 overflow-x-auto">
         {tabs.map((t) => (
           <button
@@ -283,8 +276,7 @@ export default function Dashboard() {
       </div>
       {view === "coo" ? (
         <div className="max-w-[1600px] mx-auto px-4 pb-10">
-          <CooCommandBar data={cooData} />
-          <CooReport data={cooData} loading={cooLoading} />
+          <CeoOverview />
         </div>
       ) : (
         <>

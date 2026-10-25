@@ -316,10 +316,10 @@ export default function MetrixPage() {
     if (!data) return [];
     let history: any[] = [];
     if (forecastType === "category") {
-      const cat = data.categories.all.find((c: any) => c.category === forecastTarget);
+      const cat = data.categories?.all?.find((c: any) => c.category === forecastTarget);
       history = cat?.history || [];
     } else if (forecastType === "party") {
-      const p = data.parties.all.find((p: any) => p.party === forecastTarget);
+      const p = data.parties?.all?.find((p: any) => p.party === forecastTarget);
       history = p?.history || [];
     }
     if (history.length < 2) return [];
@@ -374,8 +374,8 @@ export default function MetrixPage() {
               )}
             </div>
             <div>
-              <h1 className="text-xl font-semibold text-gray-900 dark:text-white tracking-tighter leading-none">O2D <span className="text-[#2563EB] dark:text-[#60A5FA] italic">Engine</span></h1>
-              <p className="text-[#5B6472] font-bold text-[14px] mt-1">Analytics Control Center</p>
+              <h1 className="text-xl font-semibold text-[#1A1D21] dark:text-white leading-none">Metrix</h1>
+              <p className="text-[#5B6472] text-[14px] mt-1">Sales, orders and team — over time</p>
             </div>
           </div>
 
@@ -388,7 +388,7 @@ export default function MetrixPage() {
                 { key: "categories", label: "Categories" },
                 { key: "sales-funnel", label: "Sales Funnel" },
                 { key: "department", label: "Department Performance" },
-                { key: "forecast", label: "⚡ COO Report" },
+                { key: "forecast", label: "Trends" },
               ]).map(({ key, label }) => (
                 <button
                   key={key}
@@ -1500,7 +1500,15 @@ export default function MetrixPage() {
 
           {activeTab === "forecast" && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-2">
-              <CooReport data={cooData} loading={cooLoading} />
+              {/* The CEO view itself lives on Home now (short tiles), and each
+                  module page carries its own figures. Metrix keeps the
+                  over-time picture: revenue, order velocity, team trend,
+                  scorecard, party pipeline, and the action list. */}
+              <CooReport
+                data={cooData}
+                loading={cooLoading}
+                sections={["revenue", "orderVelocity", "teamTrend", "scorecard", "partyPipeline", "actionRequired"]}
+              />
             </motion.div>
           )}
 

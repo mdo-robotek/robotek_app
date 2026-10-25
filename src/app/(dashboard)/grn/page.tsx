@@ -42,6 +42,7 @@ import {
 } from "@heroicons/react/24/outline";
 import ActionStatusModal from "@/components/ActionStatusModal";
 import ConfirmModal from "@/components/ConfirmModal";
+import ModuleStrip from "@/components/ModuleStrip";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -582,8 +583,8 @@ export default function GRNDashboard() {
       <div className="px-2 py-0.5 bg-[#FFFFFF] dark:bg-navy-900 border-b border-slate-100 dark:border-navy-800 shrink-0 relative">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-semibold text-[#2563EB] dark:text-white tracking-tight leading-none">GRN Management</h1>
-            <p className="text-[13px] font-bold text-[#5B6472] dark:text-slate-400 mt-1.5">Goods Receipt Note — Process Tracking</p>
+            <h1 className="text-xl font-semibold text-[#1A1D21] dark:text-white leading-none">GRN</h1>
+            <p className="text-[14px] text-[#5B6472] dark:text-slate-400 mt-1.5">Goods received</p>
           </div>
           
           {/* Central Pill Actions */}
@@ -596,7 +597,7 @@ export default function GRNDashboard() {
             </button>
             <div className="w-[1px] h-5 bg-slate-200 dark:bg-navy-700 mx-1" />
             <button onClick={() => setViewMode(viewMode === "active" ? "cancelled" : "active")} className={`flex items-center gap-2 px-4 py-1.5 font-semibold   text-[13px] transition-all rounded-full ${viewMode === "cancelled" ? "bg-red-500 text-white shadow-md" : "text-[#2563EB] dark:text-[#60A5FA] hover:bg-slate-50 dark:hover:bg-navy-800"}`}>
-              <NoSymbolIcon className="w-3.5 h-3.5" /> <span>CANCELLED ({items.filter(i => i.cancelled).length})</span>
+              <NoSymbolIcon className="w-3.5 h-3.5" /> <span>Cancelled ({items.filter(i => i.cancelled).length})</span>
             </button>
           </div>
 
@@ -606,6 +607,8 @@ export default function GRNDashboard() {
           </div>
         </div>
       </div>
+      {/* Key figures — same numbers as the Goods In tile on the CEO home */}
+      <div className="pt-2"><ModuleStrip module="grn" onFigure={(f) => { if (f.step !== undefined && f.step !== "tbd") setSelectedStepFilter(f.step); }} /></div>
 
       {/* ─── Main Content ─── */}
       <div className="flex flex-1 overflow-hidden">
@@ -675,9 +678,9 @@ export default function GRNDashboard() {
             
             <div className="flex items-center gap-1.5">
               {[
-                { label: "YESTERDAY", val: new Date(Date.now() - 86400000).toISOString().split('T')[0], count: items.filter(i => new Date(i.updated_at).toDateString() === new Date(Date.now() - 86400000).toDateString()).length, theme: "blue" },
-                { label: "TODAY", val: new Date().toISOString().split('T')[0], count: items.filter(i => new Date(i.updated_at).toDateString() === new Date().toDateString()).length, theme: "orange" },
-                { label: "TOMORROW", val: new Date(Date.now() + 86400000).toISOString().split('T')[0], count: 0, theme: "blue" }
+                { label: "Yesterday", val: new Date(Date.now() - 86400000).toISOString().split('T')[0], count: items.filter(i => new Date(i.updated_at).toDateString() === new Date(Date.now() - 86400000).toDateString()).length, theme: "blue" },
+                { label: "Today", val: new Date().toISOString().split('T')[0], count: items.filter(i => new Date(i.updated_at).toDateString() === new Date().toDateString()).length, theme: "orange" },
+                { label: "Tomorrow", val: new Date(Date.now() + 86400000).toISOString().split('T')[0], count: 0, theme: "blue" }
               ].map(f => (
                 <button 
                   key={f.label} 

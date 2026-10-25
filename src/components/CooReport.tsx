@@ -37,9 +37,14 @@ import DrillDownModal, { DrillDownColumn } from "./DrillDownModal";
 interface CooReportProps {
   data: any;
   loading: boolean;
+  /** Render only these sections, stacked full width (module pages and the
+   *  Metrix Trends tab). Leave out to render the whole report. */
+  sections?: string[];
 }
 
-export default function CooReport({ data: coo, loading }: CooReportProps) {
+export default function CooReport({ data: coo, loading, sections }: CooReportProps) {
+  const show = (k: string) => !sections || sections.includes(k);
+  const rowClass = sections ? "flex flex-col gap-6" : "grid grid-cols-1 lg:grid-cols-12 gap-6";
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [selectedGapTile, setSelectedGapTile] = useState<any | null>(null);
@@ -103,6 +108,7 @@ export default function CooReport({ data: coo, loading }: CooReportProps) {
     <div className="space-y-6">
       {/* Header — calm line, not a heavy blue banner. Sahil, 25 Oct:
           "no heavy dark headers, ek screen pe ek hi accent". */}
+      {show("header") && (
       <div className="flex items-end justify-between gap-4 flex-wrap">
         <div>
           <h2 className="text-[22px] font-semibold text-[#1A1D21] dark:text-white">
@@ -128,8 +134,10 @@ export default function CooReport({ data: coo, loading }: CooReportProps) {
           )}
         </div>
       </div>
+      )}
 
       {/* KPI STRIP */}
+      {show("kpis") && (
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         {[
           { label: "Today's Revenue", value: fmtAmount(ord.todayRevenue || 0), sub: `MTD: ${fmtAmount(rev.mtdActual || 0)}`, icon: CurrencyDollarIcon },
@@ -158,14 +166,15 @@ export default function CooReport({ data: coo, loading }: CooReportProps) {
           </motion.div>
         ))}
       </div>
+      )}
 
       {/* DISPATCH GAP ANALYSIS — compact strip (Sahil, 2026-10-23: the big
           gradient cards ate too much screen; same info, one slim row).
           Color = speed: green ≤9h (within OTD target), amber ≤24h, red >24h. */}
-      {ord.gapAnalysis && ord.gapAnalysis.length > 0 && (
-        <div className="bg-white dark:bg-navy-800 rounded-2xl px-4 py-3 shadow-xl border border-gray-100 dark:border-white/5 ring-1 ring-black/5">
+      {show("dispatchSpeed") && ord.gapAnalysis && ord.gapAnalysis.length > 0 && (
+        <div className="bg-white dark:bg-navy-800 rounded-2xl px-4 py-3 border border-[#E5E7EB] dark:border-white/5">
           <div className="flex items-center justify-between mb-2">
-            <p className="text-[13px] font-semibold text-gray-500 dark:text-zinc-400">⚡ Dispatch Speed — avg time order → dispatch (click a day for orders)</p>
+            <p className="text-[13px] font-semibold text-gray-500 dark:text-zinc-400">Dispatch Speed — avg time order → dispatch (click a day for orders)</p>
             <div className="hidden md:flex items-center gap-3 text-[13px] font-semibold text-[#5B6472]">
               <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-emerald-500" />≤9h fast</span>
               <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-amber-500" />≤24h ok</span>
@@ -221,8 +230,8 @@ export default function CooReport({ data: coo, loading }: CooReportProps) {
 
       {/* STEP PERFORMANCE — har O2D step ka apna on-time% / pending / avg
           delay, taaki bilty jaise slow steps alag se pakde jayein. */}
-      {(ord.stepPerformance || []).length > 0 && (
-        <div className="bg-white dark:bg-navy-800 rounded-2xl px-4 py-3 shadow-xl border border-gray-100 dark:border-white/5 ring-1 ring-black/5">
+      {show("stepPerformance") && (ord.stepPerformance || []).length > 0 && (
+        <div className="bg-white dark:bg-navy-800 rounded-2xl px-4 py-3 border border-[#E5E7EB] dark:border-white/5">
           <p className="text-[13px] font-semibold text-gray-500 dark:text-zinc-400 mb-2">Step Performance — on-time % for each step (planned vs actual)</p>
           <div className="overflow-x-auto custom-scrollbar">
             <table className="w-full text-[14px]">
@@ -254,16 +263,18 @@ export default function CooReport({ data: coo, loading }: CooReportProps) {
       )}
 
       {/* SECOND ROW: ALERTS + VELOCITY + PERF TREND */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      {(show("actionRequired") || show("orderVelocity") || show("teamTrend")) && (
+      <div className={rowClass}>
         {/* Action Required */}
-        <div className="lg:col-span-3 bg-white dark:bg-navy-800 rounded-[2rem] p-6 shadow-xl border border-gray-100 dark:border-white/5 ring-1 ring-black/5 flex flex-col">
+        {show("actionRequired") && (
+        <div className="lg:col-span-3 bg-white dark:bg-navy-800 rounded-2xl p-6 border border-[#E5E7EB] dark:border-white/5 flex flex-col">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-[14px] font-semibold text-red-500 flex items-center gap-2">
               <span className="w-2 h-2 bg-red-500 rounded-full animate-ping" />
               Action Required
             </h3>
             <span className="bg-red-50 dark:bg-red-500/10 text-red-500 text-[13px] font-semibold px-3 py-1 rounded-full border border-red-100 dark:border-red-500/20">
-              {(del.overdue || 0) + (ord.delayAging?.gt7?.count || 0) + (alerts.inactiveParties?.length || 0)} OPEN
+              {(del.overdue || 0) + (ord.delayAging?.gt7?.count || 0) + (alerts.inactiveParties?.length || 0)} open
             </span>
           </div>
           <div className="space-y-3 overflow-y-auto max-h-[400px] pr-2 custom-scrollbar">
@@ -313,11 +324,13 @@ export default function CooReport({ data: coo, loading }: CooReportProps) {
             )}
           </div>
         </div>
+        )}
 
         {/* Order Velocity & OTD% */}
-        <div className="lg:col-span-5 bg-white dark:bg-navy-800 rounded-[2rem] p-6 shadow-xl border border-gray-100 dark:border-white/5 ring-1 ring-black/5">
+        {show("orderVelocity") && (
+        <div className="lg:col-span-5 bg-white dark:bg-navy-800 rounded-2xl p-6 border border-[#E5E7EB] dark:border-white/5">
           <div className="flex items-center justify-between mb-2">
-            <h3 className="text-[14px] font-semibold text-gray-900 dark:text-white">📦 Order Velocity & OTD %</h3>
+            <h3 className="text-[14px] font-semibold text-gray-900 dark:text-white">Order Velocity & OTD %</h3>
             <div className="flex items-center gap-4">
                <div className="flex items-center gap-1.5 text-[13px] font-semibold text-[#5B6472]"><div className="w-2 h-2 bg-[#6366f1] rounded" /> Orders</div>
                <div className="flex items-center gap-1.5 text-[13px] font-semibold text-[#5B6472]"><div className="w-2 h-2 bg-red-500 rounded" /> OTD %</div>
@@ -346,11 +359,13 @@ export default function CooReport({ data: coo, loading }: CooReportProps) {
             </ResponsiveContainer>
           </div>
         </div>
+        )}
 
         {/* Team Performance Trend */}
-        <div className="lg:col-span-4 bg-white dark:bg-navy-800 rounded-[2rem] p-6 shadow-xl border border-gray-100 dark:border-white/5 ring-1 ring-black/5">
+        {show("teamTrend") && (
+        <div className="lg:col-span-4 bg-white dark:bg-navy-800 rounded-2xl p-6 border border-[#E5E7EB] dark:border-white/5">
           <div className="flex items-center justify-between mb-2">
-            <h3 className="text-[14px] font-semibold text-gray-900 dark:text-white">📈 Team Performance Trend</h3>
+            <h3 className="text-[14px] font-semibold text-gray-900 dark:text-white">Team Performance Trend</h3>
             <span className="bg-red-50 text-red-500 text-[13px] font-semibold px-2 py-0.5 rounded-full">-34% AVG</span>
           </div>
           <p className="text-[13px] text-[#5B6472] font-bold mb-6">Weekly combined score & on-time accuracy across all modules</p>
@@ -367,14 +382,18 @@ export default function CooReport({ data: coo, loading }: CooReportProps) {
             </ResponsiveContainer>
           </div>
         </div>
+        )}
       </div>
+      )}
 
       {/* THIRD ROW: REVENUE vs TARGET + DELAY AGING + TEAM TODAY */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      {(show("revenue") || show("delayAging") || show("teamToday")) && (
+      <div className={rowClass}>
         {/* Revenue vs Target */}
-        <div className="lg:col-span-5 bg-white dark:bg-navy-800 rounded-[2rem] p-6 shadow-xl border border-gray-100 dark:border-white/5 ring-1 ring-black/5 flex flex-col">
+        {show("revenue") && (
+        <div className="lg:col-span-5 bg-white dark:bg-navy-800 rounded-2xl p-6 border border-[#E5E7EB] dark:border-white/5 flex flex-col">
           <div className="flex items-center justify-between mb-2">
-            <h3 className="text-[14px] font-semibold text-gray-900 dark:text-white">💰 Revenue vs Target</h3>
+            <h3 className="text-[14px] font-semibold text-gray-900 dark:text-white">Revenue vs Target</h3>
             <p className="text-[13px] text-[#5B6472] font-bold">{new Date().toLocaleString('default', { month: 'long', year: 'numeric' })}</p>
           </div>
           <p className="text-[13px] text-[#5B6472] font-bold mb-6">Daily actual revenue vs cumulative target pace</p>
@@ -407,12 +426,14 @@ export default function CooReport({ data: coo, loading }: CooReportProps) {
             ))}
           </div>
         </div>
+        )}
 
         {/* Delay Aging Analysis */}
-        <div className="lg:col-span-4 bg-white dark:bg-navy-800 rounded-[2rem] p-6 shadow-xl border border-gray-100 dark:border-white/5 ring-1 ring-black/5">
+        {show("delayAging") && (
+        <div className="lg:col-span-4 bg-white dark:bg-navy-800 rounded-2xl p-6 border border-[#E5E7EB] dark:border-white/5">
           <div className="flex items-center justify-between mb-2">
-            <h3 className="text-[14px] font-semibold text-gray-900 dark:text-white">⏱ Delay Aging Analysis</h3>
-            <p className="text-[13px] text-[#5B6472] font-bold">{ord.delayAging?.total || 0} TOTAL</p>
+            <h3 className="text-[14px] font-semibold text-gray-900 dark:text-white">Delay Aging Analysis</h3>
+            <p className="text-[13px] text-[#5B6472] font-bold">{ord.delayAging?.total || 0} total</p>
           </div>
           <p className="text-[13px] text-[#5B6472] font-bold mb-6">Prioritize oldest delayed orders first for revenue clearance</p>
           <div className="h-[180px] w-full">
@@ -438,23 +459,25 @@ export default function CooReport({ data: coo, loading }: CooReportProps) {
           </div>
           <div className="grid grid-cols-4 gap-2 mt-6">
             {[
-              { label: ">7 DAYS", count: ord.delayAging?.gt7?.count || 0, color: "text-red-500", sub: "Escalate NOW" },
-              { label: "4-7 DAYS", count: ord.delayAging?.d4to7?.count || 0, color: "text-amber-500", sub: "Priority Fix" },
-              { label: "1-3 DAYS", count: ord.delayAging?.d1to3?.count || 0, color: "text-yellow-500", sub: "Monitor" },
-              { label: "SAME DAY", count: ord.delayAging?.sameDay?.count || 0, color: "text-indigo-500", sub: "In Process" },
+              { label: "Over 7 days", count: ord.delayAging?.gt7?.count || 0, color: "text-red-500", sub: "Escalate now" },
+              { label: "4-7 days", count: ord.delayAging?.d4to7?.count || 0, color: "text-amber-500", sub: "Priority Fix" },
+              { label: "1-3 days", count: ord.delayAging?.d1to3?.count || 0, color: "text-amber-500", sub: "Monitor" },
+              { label: "Same day", count: ord.delayAging?.sameDay?.count || 0, color: "text-[#1A1D21] dark:text-white", sub: "In process" },
             ].map((b, i) => (
               <div key={i} className="text-center p-2 bg-gray-50 dark:bg-white/5 rounded-2xl">
                 <p className={`text-xl font-semibold ${b.color} tracking-tighter`}>{b.count}</p>
-                <p className="text-[12px] font-semibold text-[#5B6472] mt-1">{b.label}</p>
-                <p className="text-[12px] font-bold text-[#5B6472]/60">{b.sub}</p>
+                <p className="text-[13px] font-semibold text-[#5B6472] mt-1">{b.label}</p>
+                <p className="text-[13px] font-semibold text-[#5B6472]">{b.sub}</p>
               </div>
             ))}
           </div>
         </div>
+        )}
 
         {/* Team Today */}
-        <div className="lg:col-span-3 bg-white dark:bg-navy-800 rounded-[2rem] p-6 shadow-xl border border-gray-100 dark:border-white/5 ring-1 ring-black/5 flex flex-col">
-          <h3 className="text-[14px] font-semibold text-gray-900 dark:text-white mb-6">👥 Team Today</h3>
+        {show("teamToday") && (
+        <div className="lg:col-span-3 bg-white dark:bg-navy-800 rounded-2xl p-6 border border-[#E5E7EB] dark:border-white/5 flex flex-col">
+          <h3 className="text-[14px] font-semibold text-gray-900 dark:text-white mb-6">Team Today</h3>
           <div className="flex justify-center mb-6">
             <div className="relative w-40 h-40">
               <ResponsiveContainer width="100%" height="100%">
@@ -505,15 +528,19 @@ export default function CooReport({ data: coo, loading }: CooReportProps) {
              ))}
           </div>
         </div>
+        )}
       </div>
+      )}
 
       {/* FOURTH ROW: DELEGATIONS + INVENTORY */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      {(show("delegations") || show("inventory")) && (
+      <div className={rowClass}>
         {/* Delegations Overview */}
-        <div className="lg:col-span-6 bg-white dark:bg-navy-800 rounded-[2rem] p-8 shadow-xl border border-gray-100 dark:border-white/5 ring-1 ring-black/5">
+        {show("delegations") && (
+        <div className="lg:col-span-6 bg-white dark:bg-navy-800 rounded-2xl p-8 border border-[#E5E7EB] dark:border-white/5">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">📋 Delegations Overview</h3>
-            <p className="text-[13px] text-[#5B6472] font-semibold">{del.total || 0} TOTAL TASKS</p>
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Delegations Overview</h3>
+            <p className="text-[13px] text-[#5B6472] font-semibold">{del.total || 0} total tasks</p>
           </div>
           <p className="text-[13px] text-[#5B6472] font-bold mb-6">Task Pipeline Status</p>
           {/* Pipeline Bar */}
@@ -572,13 +599,15 @@ export default function CooReport({ data: coo, loading }: CooReportProps) {
              ))}
           </div>
         </div>
+        )}
 
         {/* Inventory & Reorder Alerts */}
-        <div className="lg:col-span-6 bg-white dark:bg-navy-800 rounded-[2rem] p-8 shadow-xl border border-gray-100 dark:border-white/5 ring-1 ring-black/5">
+        {show("inventory") && (
+        <div className="lg:col-span-6 bg-white dark:bg-navy-800 rounded-2xl p-8 border border-[#E5E7EB] dark:border-white/5">
           <div className="flex items-center justify-between mb-8">
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">📦 Inventory & Reorder Alerts</h3>
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Inventory & Reorder Alerts</h3>
             <span className="bg-red-50 dark:bg-red-500/10 text-red-500 text-[13px] font-semibold px-4 py-1.5 rounded-full border border-red-100 dark:border-red-500/20">
-              {inv.outOfStockCount || 0} REORDER NEEDED
+              {inv.outOfStockCount || 0} need reorder
             </span>
           </div>
 
@@ -586,8 +615,7 @@ export default function CooReport({ data: coo, loading }: CooReportProps) {
              <div className="bg-gray-50 dark:bg-white/5 rounded-2xl p-6 text-center border border-transparent hover:border-indigo-500/20 transition-all">
                 <p className="text-3xl font-semibold tracking-tighter">{inv.totalSKUs || 0}</p>
                 <p className="text-[13px] font-semibold text-[#5B6472] mt-2">Total SKUs</p>
-                <p className="text-[13px] font-bold text-emerald-500 mt-1">↑ 12 new this month</p>
-             </div>
+                             </div>
              <div 
                className="bg-red-50 dark:bg-red-500/5 rounded-2xl p-6 text-center border border-red-100 dark:border-red-500/20 cursor-pointer hover:bg-red-100 dark:hover:bg-red-500/10 transition-colors"
                onClick={() => setDrillDownModal({ isOpen: true, title: "Out of Stock Items", data: inv.outOfStockList || [], columns: [{ key: 'sku', label: 'SKU' }, { key: 'category', label: 'Category' }, { key: 'stockLeft', label: 'Stock Left' }] })}
@@ -649,10 +677,10 @@ export default function CooReport({ data: coo, loading }: CooReportProps) {
               them beats everything else on this list. */}
           <div className="space-y-3 mb-10">
             <div className="flex items-center justify-between">
-              <p className="text-[13px] font-semibold text-[#5B6472]">🔥 Can't Afford To Be Low — Top Movers</p>
+              <p className="text-[13px] font-semibold text-[#5B6472]">Can't Afford To Be Low — Top Movers</p>
               {(inv.criticalAtRiskCount || 0) > 0 && (
                 <span className="bg-[#F7F8FA] dark:bg-[#D97706]/10 text-[#D97706] text-[13px] font-semibold px-3 py-1 rounded-full border border-[#E5E7EB] dark:border-[#E5E7EB]">
-                  {inv.criticalAtRiskCount} AT RISK
+                  {inv.criticalAtRiskCount} at risk
                 </span>
               )}
             </div>
@@ -705,12 +733,16 @@ export default function CooReport({ data: coo, loading }: CooReportProps) {
              </div>
           </div>
         </div>
+        )}
       </div>
+      )}
 
       {/* FIFTH ROW: SCORECARD + PARTY PIPELINE */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      {(show("scorecard") || show("partyPipeline")) && (
+      <div className={rowClass}>
         {/* Team Performance Scorecard */}
-        <div className="lg:col-span-8 bg-white dark:bg-navy-800 rounded-[2rem] p-8 shadow-xl border border-gray-100 dark:border-white/5 ring-1 ring-black/5">
+        {show("scorecard") && (
+        <div className="lg:col-span-8 bg-white dark:bg-navy-800 rounded-2xl p-8 border border-[#E5E7EB] dark:border-white/5">
            <div className="flex items-center justify-between mb-8">
              <h3 className="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-3">
                <span className="p-1.5 bg-amber-500/10 text-amber-500 rounded-lg"><UsersIcon className="w-4 h-4" /></span>
@@ -729,7 +761,7 @@ export default function CooReport({ data: coo, loading }: CooReportProps) {
            <div className="overflow-x-auto">
              <table className="w-full">
                <thead>
-                 <tr className="text-[13px] font-semibold text-[#5B6472] border-b border-gray-100 dark:border-white/5">
+                 <tr className="text-[13px] font-semibold text-[#5B6472] border-b border-[#E5E7EB] dark:border-white/5">
                    <th className="text-left pb-4 font-semibold">Member</th>
                    <th className="text-left pb-4 font-semibold">Dept</th>
                    <th className="text-center pb-4 font-semibold">Assigned</th>
@@ -782,9 +814,11 @@ export default function CooReport({ data: coo, loading }: CooReportProps) {
              </table>
            </div>
         </div>
+        )}
 
         {/* Party & Sales Pipeline */}
-        <div className="lg:col-span-4 bg-white dark:bg-navy-800 rounded-[2rem] p-8 shadow-xl border border-gray-100 dark:border-white/5 ring-1 ring-black/5 flex flex-col">
+        {show("partyPipeline") && (
+        <div className="lg:col-span-4 bg-white dark:bg-navy-800 rounded-2xl p-8 border border-[#E5E7EB] dark:border-white/5 flex flex-col">
            <div className="flex items-center justify-between mb-8">
              <h3 className="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-3">
                <span className="p-1.5 bg-blue-500/10 text-blue-500 rounded-lg"><ArrowTrendingUpIcon className="w-4 h-4" /></span>
@@ -852,16 +886,20 @@ export default function CooReport({ data: coo, loading }: CooReportProps) {
            </div>
 
         </div>
+        )}
       </div>
+      )}
 
       {/* Footer Decal */}
-      <div className="pt-8 border-t border-gray-100 dark:border-white/5 flex flex-col md:flex-row items-center justify-between gap-4">
+      {show("footer") && (
+      <div className="pt-8 border-t border-[#E5E7EB] dark:border-white/5 flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
              <ArchiveBoxIcon className="w-5 h-5 text-[#5B6472]" />
              <p className="text-[13px] font-semibold text-[#5B6472]">Robotek COO Dashboard v2.0 · O2D · Score · Attendance · IMS · Delegations · CRM</p>
           </div>
           <p className="text-[13px] font-semibold text-[#5B6472]">Designed for Sahil Sir · Refresh: 300s</p>
       </div>
+      )}
 
       {/* GAP DETAILS MODAL */}
       {selectedGapTile && (
@@ -870,10 +908,10 @@ export default function CooReport({ data: coo, loading }: CooReportProps) {
           <motion.div 
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-white dark:bg-navy-900 w-full max-w-3xl max-h-[85vh] rounded-[2rem] shadow-2xl relative z-10 flex flex-col overflow-hidden border border-gray-100 dark:border-white/10"
+            className="bg-white dark:bg-navy-900 w-full max-w-3xl max-h-[85vh] rounded-2xl relative z-10 flex flex-col overflow-hidden border border-gray-100 dark:border-white/10"
           >
              {/* Header */}
-             <div className="p-6 bg-gray-50 dark:bg-white/5 border-b border-gray-100 dark:border-white/5 flex items-center justify-between">
+             <div className="p-6 bg-gray-50 dark:bg-white/5 border-b border-[#E5E7EB] dark:border-white/5 flex items-center justify-between">
                 <div>
                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white tracking-tight">
                      Dispatch Gap Details
@@ -894,7 +932,7 @@ export default function CooReport({ data: coo, loading }: CooReportProps) {
              <div className="flex-1 overflow-y-auto p-6 custom-scrollbar bg-white dark:bg-navy-900">
                 <table className="w-full text-left border-collapse">
                   <thead>
-                    <tr className="text-[13px] font-semibold text-[#5B6472] border-b border-gray-100 dark:border-white/5">
+                    <tr className="text-[13px] font-semibold text-[#5B6472] border-b border-[#E5E7EB] dark:border-white/5">
                        <th className="pb-3 pl-2 w-32">Order No</th>
                        <th className="pb-3 w-1/3">Party Name</th>
                        <th className="pb-3 w-1/3">Timeline</th>

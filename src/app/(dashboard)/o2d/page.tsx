@@ -108,6 +108,7 @@ import ConfirmModal from "@/components/ConfirmModal";
 import PartyFormModal from "@/components/PartyFormModal";
 import ItemFormModal from "@/components/ItemFormModal";
 import PremiumDatePicker from "@/components/PremiumDatePicker";
+import ModuleStrip from "@/components/ModuleStrip";
 
 // --- Searchable Dropdown ---
 interface SearchableDropdownProps {
@@ -2201,11 +2202,11 @@ export default function O2DPage() {
       {/* Header Row */}
       <div className="flex flex-col lg:flex-row items-center justify-between gap-4 px-2 shrink-0">
         <div className="text-center lg:text-left min-w-0">
-          <h1 className="text-xl md:text-2xl font-semibold text-gray-900 dark:text-white tracking-tight italic">
-            O2D SYSTEM
+          <h1 className="text-xl md:text-2xl font-semibold text-[#1A1D21] dark:text-white">
+            O2D
           </h1>
-          <p className="text-[#2563EB] dark:text-[#60A5FA] font-semibold text-[13px] md:text-[10px] opacity-80 -mt-1">
-            Syncing Intelligence
+          <p className="text-[#5B6472] dark:text-gray-400 text-[14px]">
+            Order to dispatch
           </p>
         </div>
         <div className="flex justify-end flex-shrink-0 min-w-0 lg:ml-auto">
@@ -2269,6 +2270,8 @@ export default function O2DPage() {
           </div>
         </div>
       </div>
+      {/* Key figures — same numbers as the Orders tile on the CEO home */}
+      <ModuleStrip module="o2d" />
 
       {/* Main Master-Detail View Wrapper */}
       <div className="flex-1 flex flex-col relative">
@@ -2614,7 +2617,7 @@ export default function O2DPage() {
                       <MagnifyingGlassIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5B6472] group-focus-within:text-[#2563EB] transition-colors" />
                       <input
                         type="text"
-                        placeholder="Search resources..."
+                        placeholder="Search orders..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         className="w-full pl-10 pr-4 h-[34px] bg-white dark:bg-black border border-gray-100 dark:border-navy-700 focus:border-[#2563EB] outline-none font-bold text-[14px] rounded-xl transition-all shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] focus:shadow-md"
@@ -5650,7 +5653,7 @@ function O2DDetailPanel({
             <Squares2X2Icon className="w-8 h-8 text-[#2563EB]" />
           </div>
           <p className="text-[14px] font-semibold text-[#2563EB] italic">
-            Select record to engage
+            Pick an order to see its details
           </p>
         </div>
       )}

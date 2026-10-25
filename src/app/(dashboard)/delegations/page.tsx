@@ -46,6 +46,7 @@ import ActionStatusModal from "@/components/ActionStatusModal";
 import ConfirmModal from "@/components/ConfirmModal";
 import { User } from "@/types/user";
 import Portal from "@/components/Portal";
+import ModuleStrip from "@/components/ModuleStrip";
 
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
@@ -1032,7 +1033,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
       <div className="flex flex-col lg:flex-row items-center gap-4 px-1">
         <div className="w-full lg:w-1/3 text-center lg:text-left min-w-0">
           <h1 className="text-xl md:text-2xl font-semibold text-gray-900 dark:text-white tracking-tight truncate">Delegations</h1>
-          <p className="text-gray-500 dark:text-slate-300 font-bold text-[14px] md:text-[10px] tracking-wider truncate">Task Assignment System</p>
+          <p className="text-[#5B6472] dark:text-slate-300 text-[14px] truncate">Tasks you give and get</p>
         </div>
         
         <div className="w-full lg:w-1/3 flex justify-center flex-shrink-0 min-w-0">
@@ -1096,6 +1097,8 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
         </div>
         <div className="hidden lg:block lg:w-1/3"></div>
       </div>
+      {/* Company-wide figures for admins — same as the Tasks tile on the CEO home */}
+      <div className="pt-3 -mx-1"><ModuleStrip module="tasks" adminOnly /></div>
 
       <div 
         style={{ borderColor: 'var(--panel-border)' }}

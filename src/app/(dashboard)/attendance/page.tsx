@@ -34,6 +34,7 @@ import {
     XMarkIcon,
     DocumentTextIcon
 } from '@heroicons/react/24/outline';
+import ModuleStrip from "@/components/ModuleStrip";
 
 // Icons (Using local SVG / Lucide pattern from project)
 const StatusIcon = ({ status }: { status: string }) => {
@@ -714,9 +715,9 @@ export default function AttendancePage() {
             )}
             {/* Page Header with Integrated Pill Tabs */}
             <div className="flex flex-col lg:flex-row items-center gap-4 px-1">
-                <div className="text-center lg:text-left shrink-0 min-w-0 font-serif">
+                <div className="text-center lg:text-left shrink-0 min-w-0">
                     <h1 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight truncate">Attendance & Leave</h1>
-                    <p className="text-sm font-medium text-gray-500 dark:text-slate-400 tracking-wider">Operational Personnel Tracking</p>
+                    <p className="text-[14px] text-[#5B6472] dark:text-slate-400">Attendance and leave for the team</p>
                 </div>
 
                 <div className="flex-1 w-full flex justify-center lg:justify-end">
@@ -747,6 +748,8 @@ export default function AttendancePage() {
                     </div>
                 </div>
             </div>
+            {/* Company-wide figures for admins — same as the Team tile on the CEO home */}
+            <div className="-mx-2"><ModuleStrip module="people" adminOnly /></div>
 
             {activeTab === 'ATTENDANCE' && (
                 <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">

@@ -722,7 +722,7 @@ export default function UsersPage() {
                     <p className="text-[14px] md:text-xs font-bold text-gray-600 dark:text-slate-300">{user.phone || "—"}</p>
                   </td>
                   <td className="px-3 md:px-4 py-3 hidden lg:table-cell">
-                    <span className="px-1.5 md:px-2 py-0.5 bg-[#2563EB]/5 dark:bg-[#60A5FA]/10 text-white dark:text-[#60A5FA] text-[14px] md:text-[9px] font-semibold rounded border border-[#E5E7EB] dark:border-[#60A5FA]/20">
+                    <span className="px-1.5 md:px-2 py-0.5 bg-[#2563EB]/5 dark:bg-[#60A5FA]/10 text-[#2563EB] dark:text-[#60A5FA] text-[14px] md:text-[9px] font-semibold rounded border border-[#E5E7EB] dark:border-[#60A5FA]/20">
                       {user.office || "—"}
                     </span>
                   </td>
@@ -779,7 +779,7 @@ export default function UsersPage() {
                     <div className="flex items-center justify-end gap-1">
                       <button
                         onClick={() => handleEdit(user)}
-                        className="p-1.5 bg-[#2563EB]/10 text-white dark:bg-[#60A5FA]/10 dark:text-[#60A5FA] hover:bg-[#2563EB] hover:text-white dark:hover:bg-[#60A5FA] dark:hover:text-black rounded-lg transition-all"
+                        className="p-1.5 bg-[#2563EB]/10 text-[#2563EB] dark:bg-[#60A5FA]/10 dark:text-[#60A5FA] hover:bg-[#2563EB] hover:text-white dark:hover:bg-[#60A5FA] dark:hover:text-black rounded-lg transition-all"
                         title="Edit User"
                       >
                         <PencilSquareIcon className="w-3.5 h-3.5" />
@@ -1228,7 +1228,7 @@ export default function UsersPage() {
                               <button
                                 type="button"
                                 onClick={() => handleFetchLocation(index)}
-                                className="p-2 bg-[#2563EB]/10 text-white dark:bg-[#60A5FA]/10 dark:text-[#60A5FA] hover:bg-[#2563EB] hover:text-white dark:hover:bg-[#60A5FA] dark:hover:text-black rounded-lg transition-all"
+                                className="p-2 bg-[#2563EB]/10 text-[#2563EB] dark:bg-[#60A5FA]/10 dark:text-[#60A5FA] hover:bg-[#2563EB] hover:text-white dark:hover:bg-[#60A5FA] dark:hover:text-black rounded-lg transition-all"
                                 title="Auto Fetch"
                               >
                                 <MapPinIcon className="w-4 h-4" />

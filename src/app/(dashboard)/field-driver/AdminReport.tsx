@@ -152,7 +152,7 @@ export default function AdminReport() {
                                     return (
                                         <th key={d} className={`p-2 text-center text-[13px] font-semibold   border-b border-r border-gray-200 dark:border-white/10 min-w-[60px]
                                             ${isSunday ? 'bg-red-500/10 text-red-500' : 'text-[#5B6472]'}
-                                            ${isToday ? 'border-b-2 border-b-[#2563EB] dark:border-b-[#60A5FA] bg-[#2563EB]/5 dark:bg-[#60A5FA]/10 text-white dark:text-[#60A5FA]' : ''}
+                                            ${isToday ? 'border-b-2 border-b-[#2563EB] dark:border-b-[#60A5FA] bg-[#2563EB]/5 dark:bg-[#60A5FA]/10 text-[#2563EB] dark:text-[#60A5FA]' : ''}
                                         `}>
                                             <div className="flex flex-col gap-0.5">
                                                 <span className="text-[14px] opacity-70">

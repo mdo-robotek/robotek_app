@@ -130,7 +130,7 @@ export default function PremiumDateRangePicker({
                 onClick={() => handleDateClick(date)}
                 className={`
                   h-8 text-[14px] font-bold transition-all relative z-10
-                  ${selected ? "bg-[#2563EB] text-white" : inRange ? "bg-[#2563EB]/10 text-white" : "hover:bg-gray-100/50"}
+                  ${selected ? "bg-[#2563EB] text-white" : inRange ? "bg-[#2563EB]/10 text-[#2563EB]" : "hover:bg-gray-100/50"}
                   ${isStart ? "rounded-l-lg" : ""}
                   ${isEnd ? "rounded-r-lg" : ""}
                   ${!isStart && !isEnd && selected ? "rounded-lg" : ""}

@@ -1009,14 +1009,14 @@ export default function I2RPage() {
                               </div>
                             ) : (
                               step === 0 && (
-                                <button className="flex items-center gap-2 px-4 py-1.5 bg-white dark:bg-navy-800 border border-[#2563EB] text-white dark:text-[#60A5FA] rounded-full text-[14px] font-semibold shadow-sm hover:bg-[#2563EB]/5 transition-all">
+                                <button className="flex items-center gap-2 px-4 py-1.5 bg-white dark:bg-navy-800 border border-[#2563EB] text-[#2563EB] dark:text-[#60A5FA] rounded-full text-[14px] font-semibold shadow-sm hover:bg-[#2563EB]/5 transition-all">
                                   <ClockIcon className="w-3.5 h-3.5 text-[#2563EB] stroke-[3]" />
                                   DONE
                                 </button>
                               )
                             )}
                             <div className="flex items-center gap-1 px-2 py-1 bg-white dark:bg-navy-800 rounded-full border border-slate-100 dark:border-navy-700 shadow-lg ring-1 ring-slate-100/50 dark:ring-navy-700/50">
-                              <button onClick={e => { e.stopPropagation(); setExpandedTiles(p => ({ ...p, [item.id]: !exp })); }} className={`p-1.5 rounded-full transition-all active:scale-90 ${exp ? "bg-[#2563EB] text-white" : "text-white dark:text-[#60A5FA] hover:bg-yellow-50 dark:hover:bg-yellow-900/20"}`} title={exp ? "Hide Pipeline" : "Show Pipeline"}><ChevronDownIcon className={`w-3.5 h-3.5 stroke-[3] transition-transform ${exp ? "rotate-180" : ""}`} /></button>
+                              <button onClick={e => { e.stopPropagation(); setExpandedTiles(p => ({ ...p, [item.id]: !exp })); }} className={`p-1.5 rounded-full transition-all active:scale-90 ${exp ? "bg-[#2563EB] text-white" : "text-[#2563EB] dark:text-[#60A5FA] hover:bg-yellow-50 dark:hover:bg-yellow-900/20"}`} title={exp ? "Hide Pipeline" : "Show Pipeline"}><ChevronDownIcon className={`w-3.5 h-3.5 stroke-[3] transition-transform ${exp ? "rotate-180" : ""}`} /></button>
                               {(isAdmin || step > 0) && (
                                 <>
                                   <button onClick={e => { e.stopPropagation(); openPOModal(item); }} className="p-1.5 text-[#2563EB] dark:text-[#60A5FA] hover:bg-yellow-50 dark:hover:bg-yellow-900/20 rounded-full transition-all active:scale-90" title="Make PO"><PlusIcon className="w-3.5 h-3.5 stroke-[3]" /></button>

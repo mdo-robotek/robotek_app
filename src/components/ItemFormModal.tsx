@@ -171,7 +171,7 @@ export default function ItemFormModal({
                 readOnly
                 value={finalPrice}
                 placeholder="0.00"
-                className="w-full bg-[#2563EB]/5 dark:bg-[#60A5FA]/5 px-4 py-2.5 rounded-xl border border-[#E5E7EB] dark:border-navy-700 outline-none font-semibold text-[14px] text-white dark:text-[#60A5FA] transition-all shadow-sm"
+                className="w-full bg-[#2563EB]/5 dark:bg-[#60A5FA]/5 px-4 py-2.5 rounded-xl border border-[#E5E7EB] dark:border-navy-700 outline-none font-semibold text-[14px] text-[#2563EB] dark:text-[#60A5FA] transition-all shadow-sm"
               />
             </div>
           </div>

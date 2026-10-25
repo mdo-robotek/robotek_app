@@ -1008,7 +1008,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
     return (
       <div className="flex items-center gap-2">
-        <div className="w-7 h-7 rounded-full bg-[#2563EB]/10 dark:bg-[#60A5FA]/10 border border-[#2563EB]/20 dark:border-[#60A5FA]/20 flex items-center justify-center text-[13px] font-semibold text-white dark:text-[#60A5FA] overflow-hidden shrink-0">
+        <div className="w-7 h-7 rounded-full bg-[#2563EB]/10 dark:bg-[#60A5FA]/10 border border-[#2563EB]/20 dark:border-[#60A5FA]/20 flex items-center justify-center text-[13px] font-semibold text-[#2563EB] dark:text-[#60A5FA] overflow-hidden shrink-0">
           {imageUrl ? (
             <img src={imageUrl} alt={username} className="w-full h-full object-cover" />
           ) : (
@@ -1347,7 +1347,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                           <button onClick={() => setSelectedTask(del)} className="p-1.5 bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400 hover:bg-emerald-600 hover:text-white dark:hover:bg-emerald-500 dark:hover:text-black rounded-lg transition-all" title="Follow Up"><ArrowTopRightOnSquareIcon className="w-3.5 h-3.5" /></button>
                           {(['ADMIN', 'EA'].includes(userRole?.toUpperCase()) || del.assigned_by === currentUser) && (
                             <>
-                              <button onClick={() => handleEdit(del)} className="p-1.5 bg-[#2563EB]/10 text-white dark:bg-[#60A5FA]/10 dark:text-[#60A5FA] hover:bg-[#2563EB] hover:text-white dark:hover:bg-[#60A5FA] dark:hover:text-black rounded-lg transition-all" title="Edit"><PencilSquareIcon className="w-3.5 h-3.5" /></button>
+                              <button onClick={() => handleEdit(del)} className="p-1.5 bg-[#2563EB]/10 text-[#2563EB] dark:bg-[#60A5FA]/10 dark:text-[#60A5FA] hover:bg-[#2563EB] hover:text-white dark:hover:bg-[#60A5FA] dark:hover:text-black rounded-lg transition-all" title="Edit"><PencilSquareIcon className="w-3.5 h-3.5" /></button>
                               <button onClick={() => handleDeleteClick(del.id)} className="p-1.5 bg-[#DC2626]/10 text-[#DC2626] hover:bg-[#DC2626] hover:text-white rounded-lg transition-all" title="Delete"><TrashIcon className="w-3.5 h-3.5" /></button>
                             </>
                           )}
@@ -1398,7 +1398,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                       <div className="p-3 md:p-4 border-b border-gray-50 dark:border-white/5 flex items-start justify-between gap-3 bg-gray-50/30 dark:bg-white/5">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1">
-                            <span className="font-mono text-[13px] font-semibold text-white dark:text-white bg-[#2563EB]/5 dark:bg-[#60A5FA]/10 px-1.5 py-0.5 rounded">#{del.id}</span>
+                            <span className="font-mono text-[13px] font-semibold text-[#2563EB] dark:text-white bg-[#2563EB]/5 dark:bg-[#60A5FA]/10 px-1.5 py-0.5 rounded">#{del.id}</span>
                             {getPriorityBadge(del.priority)}
                           </div>
                           <h3 className="font-semibold text-sm text-gray-900 dark:text-white leading-tight line-clamp-2 tracking-wide group-hover:text-[#2563EB] dark:group-hover:text-[#60A5FA] transition-colors">{del.title}</h3>
@@ -1450,7 +1450,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                               <>
                                 <button
                                   onClick={() => handleEdit(del)}
-                                  className="p-1.5 bg-[#2563EB]/10 text-white dark:bg-[#60A5FA]/10 dark:text-[#60A5FA] hover:bg-[#2563EB] hover:text-white dark:hover:bg-[#60A5FA] dark:hover:text-black rounded-xl transition-all"
+                                  className="p-1.5 bg-[#2563EB]/10 text-[#2563EB] dark:bg-[#60A5FA]/10 dark:text-[#60A5FA] hover:bg-[#2563EB] hover:text-white dark:hover:bg-[#60A5FA] dark:hover:text-black rounded-xl transition-all"
                                   title="Edit"
                                 >
                                   <PencilSquareIcon className="w-4 h-4" />
@@ -2382,7 +2382,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                               return (
                                 <div key={s} 
                                   className={`px-3 py-2 rounded-lg text-[14px] font-bold cursor-pointer flex items-center justify-between group transition-colors ${
-                                    isSelected ? 'bg-[#2563EB]/5 dark:bg-[#60A5FA]/10 text-white dark:text-[#60A5FA]' : 'hover:bg-[#2563EB]/5 dark:hover:bg-[#60A5FA]/10 text-gray-700 dark:text-zinc-300'
+                                    isSelected ? 'bg-[#2563EB]/5 dark:bg-[#60A5FA]/10 text-[#2563EB] dark:text-[#60A5FA]' : 'hover:bg-[#2563EB]/5 dark:hover:bg-[#60A5FA]/10 text-gray-700 dark:text-zinc-300'
                                   }`}
                                   onClick={() => setModalStatusFilter(prev => isSelected ? prev.filter(x => x !== s) : [...prev, s])}
                                 >
@@ -2424,7 +2424,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                             return (
                               <div key={p} 
                                 className={`px-3 py-2 rounded-lg text-[14px] font-bold cursor-pointer flex items-center justify-between group transition-colors ${
-                                  isSelected ? 'bg-[#2563EB]/5 dark:bg-[#60A5FA]/10 text-white dark:text-[#60A5FA]' : 'hover:bg-[#2563EB]/5 dark:hover:bg-[#60A5FA]/10 text-gray-700 dark:text-zinc-300'
+                                  isSelected ? 'bg-[#2563EB]/5 dark:bg-[#60A5FA]/10 text-[#2563EB] dark:text-[#60A5FA]' : 'hover:bg-[#2563EB]/5 dark:hover:bg-[#60A5FA]/10 text-gray-700 dark:text-zinc-300'
                                 }`}
                                 onClick={() => setModalPriorityFilter(prev => isSelected ? prev.filter(x => x !== p) : [...prev, p])}
                               >
@@ -2475,7 +2475,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                               return (
                                 <div key={u.id} 
                                   className={`px-3 py-2 rounded-lg text-[14px] font-bold cursor-pointer flex items-center justify-between group transition-colors ${
-                                    isSelected ? 'bg-[#2563EB]/5 dark:bg-[#60A5FA]/10 text-white dark:text-[#60A5FA]' : 'hover:bg-[#2563EB]/5 dark:hover:bg-[#60A5FA]/10 text-gray-700 dark:text-zinc-300'
+                                    isSelected ? 'bg-[#2563EB]/5 dark:bg-[#60A5FA]/10 text-[#2563EB] dark:text-[#60A5FA]' : 'hover:bg-[#2563EB]/5 dark:hover:bg-[#60A5FA]/10 text-gray-700 dark:text-zinc-300'
                                   }`}
                                   onClick={() => setModalAssignedToFilter(prev => isSelected ? prev.filter(x => x !== u.username) : [...prev, u.username])}
                                 >
@@ -2526,7 +2526,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                               return (
                                 <div key={u.id} 
                                   className={`px-3 py-2 rounded-lg text-[14px] font-bold cursor-pointer flex items-center justify-between group transition-colors ${
-                                    isSelected ? 'bg-[#2563EB]/5 dark:bg-[#60A5FA]/10 text-white dark:text-[#60A5FA]' : 'hover:bg-[#2563EB]/5 dark:hover:bg-[#60A5FA]/10 text-gray-700 dark:text-zinc-300'
+                                    isSelected ? 'bg-[#2563EB]/5 dark:bg-[#60A5FA]/10 text-[#2563EB] dark:text-[#60A5FA]' : 'hover:bg-[#2563EB]/5 dark:hover:bg-[#60A5FA]/10 text-gray-700 dark:text-zinc-300'
                                   }`}
                                   onClick={() => setModalAssignedByFilter(prev => isSelected ? prev.filter(x => x !== u.username) : [...prev, u.username])}
                                 >
@@ -2577,7 +2577,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                               return (
                                 <div key={d} 
                                   className={`px-3 py-2 rounded-lg text-[14px] font-bold cursor-pointer flex items-center justify-between group transition-colors ${
-                                    isSelected ? 'bg-[#2563EB]/5 dark:bg-[#60A5FA]/10 text-white dark:text-[#60A5FA]' : 'hover:bg-[#2563EB]/5 dark:hover:bg-[#60A5FA]/10 text-gray-700 dark:text-zinc-300'
+                                    isSelected ? 'bg-[#2563EB]/5 dark:bg-[#60A5FA]/10 text-[#2563EB] dark:text-[#60A5FA]' : 'hover:bg-[#2563EB]/5 dark:hover:bg-[#60A5FA]/10 text-gray-700 dark:text-zinc-300'
                                   }`}
                                   onClick={() => setModalDepartmentFilter(prev => isSelected ? prev.filter(x => x !== d) : [...prev, d])}
                                 >

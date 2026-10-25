@@ -402,7 +402,7 @@ export default function PartyManagementPage() {
                     </td>
                     <td className="px-3 md:px-4 py-2 text-right">
                       <div className="flex items-center justify-end gap-1">
-                        <button onClick={() => openFormForEdit(party)} className="p-1.5 bg-[#2563EB]/10 text-white dark:bg-[#60A5FA]/10 dark:text-[#60A5FA] hover:bg-[#2563EB] hover:text-white dark:hover:bg-[#60A5FA] dark:hover:text-black rounded-lg transition-all" title="Edit Party"><PencilSquareIcon className="w-3.5 h-3.5" /></button>
+                        <button onClick={() => openFormForEdit(party)} className="p-1.5 bg-[#2563EB]/10 text-[#2563EB] dark:bg-[#60A5FA]/10 dark:text-[#60A5FA] hover:bg-[#2563EB] hover:text-white dark:hover:bg-[#60A5FA] dark:hover:text-black rounded-lg transition-all" title="Edit Party"><PencilSquareIcon className="w-3.5 h-3.5" /></button>
                         <button onClick={() => handleDeleteClick(party.id)} className="p-1.5 bg-[#DC2626]/10 text-[#DC2626] hover:bg-[#DC2626] hover:text-white rounded-lg transition-all" title="Delete Party"><TrashIcon className="w-3.5 h-3.5" /></button>
                       </div>
                     </td>

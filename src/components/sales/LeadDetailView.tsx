@@ -524,11 +524,11 @@ export default function LeadDetailView({ lead, initialTab, onClose, onUpdate }: 
                           ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
                           : event.status?.toLowerCase().includes('lost') || event.status?.toLowerCase().includes('not')
                             ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
-                            : 'bg-[#2563EB]/10 text-white dark:bg-[#60A5FA]/10 dark:text-[#60A5FA]'
+                            : 'bg-[#2563EB]/10 text-[#2563EB] dark:bg-[#60A5FA]/10 dark:text-[#60A5FA]'
                           }`}>
                           {event.status || 'Status Not Provided'}
                         </span>
-                        {idx === 0 && <span className="text-[14px] font-semibold text-white bg-[#2563EB]/10 px-1.5 rounded">Latest</span>}
+                        {idx === 0 && <span className="text-[14px] font-semibold text-[#2563EB] bg-[#2563EB]/10 px-1.5 rounded">Latest</span>}
                       </div>
                       <p className="text-[13px] font-semibold text-[#5B6472] mb-3">
                         {event.timestamp ? new Date(event.timestamp).toLocaleString("en-GB", { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }) : "—"}

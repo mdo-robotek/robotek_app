@@ -2103,7 +2103,7 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
                     <div>
                       <div className="flex items-center gap-3 mb-1">
                         <h2 className="text-xl font-semibold text-gray-900 dark:text-white leading-none">{logsItem.item_name}</h2>
-                        <span className="px-2 py-0.5 bg-[#2563EB]/10 text-white dark:bg-[#60A5FA]/20 dark:text-[#60A5FA] border border-[#2563EB]/20 dark:border-[#60A5FA]/30 rounded text-[13px] font-semibold">ID: {logsItem.id}</span>
+                        <span className="px-2 py-0.5 bg-[#2563EB]/10 text-[#2563EB] dark:bg-[#60A5FA]/20 dark:text-[#60A5FA] border border-[#2563EB]/20 dark:border-[#60A5FA]/30 rounded text-[13px] font-semibold">ID: {logsItem.id}</span>
                       </div>
                       <p className="text-[13px] font-bold text-gray-500">{logsItem.category}</p>
                     </div>

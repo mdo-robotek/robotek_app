@@ -677,7 +677,7 @@ export default function TicketsPage() {
                       <>
                         <button
                           onClick={() => setEditingTicket(ticket)}
-                          className="p-1.5 bg-[#2563EB]/10 text-white dark:bg-[#60A5FA]/10 dark:text-[#60A5FA] hover:bg-[#2563EB] hover:text-white dark:hover:bg-[#60A5FA] dark:hover:text-black rounded-lg transition-all border border-[#2563EB]/20 dark:border-[#60A5FA]/20"
+                          className="p-1.5 bg-[#2563EB]/10 text-[#2563EB] dark:bg-[#60A5FA]/10 dark:text-[#60A5FA] hover:bg-[#2563EB] hover:text-white dark:hover:bg-[#60A5FA] dark:hover:text-black rounded-lg transition-all border border-[#2563EB]/20 dark:border-[#60A5FA]/20"
                           title="Edit"
                         >
                           <PencilSquareIcon className="w-4 h-4" />

@@ -206,7 +206,7 @@ export default function Dashboard() {
                 )},
                 { label: 'Status', key: 'status', className: 'text-right', render: (row: any) => (
                     <span className={`px-2 py-0.5 rounded-full text-[13px]  font-semibold ${
-                        row.status === 'Open' ? 'bg-[#2563EB]/10 text-white' : 'bg-amber-500/10 text-amber-500'
+                        row.status === 'Open' ? 'bg-[#2563EB]/10 text-[#2563EB]' : 'bg-amber-500/10 text-amber-500'
                     }`}>{row.status}</span>
                 )}
             ]}

@@ -866,7 +866,7 @@ export default function HRMSModulePage({ params }: { params: Promise<{ module: s
                               </span>
                             )}
                             <div className="flex items-center gap-1 px-2 py-1 bg-white dark:bg-navy-800 rounded-full border border-slate-100 dark:border-navy-700 shadow-lg">
-                              <button onClick={e => { e.stopPropagation(); setExpandedTiles(p => ({ ...p, [item.id]: !exp })); }} className={`p-1.5 rounded-full transition-all ${exp ? "bg-[#2563EB] text-white" : "text-white dark:text-[#60A5FA] hover:bg-yellow-50"}`}><ChevronDownIcon className={`w-3.5 h-3.5 stroke-[3] transition-transform ${exp ? "rotate-180" : ""}`} /></button>
+                              <button onClick={e => { e.stopPropagation(); setExpandedTiles(p => ({ ...p, [item.id]: !exp })); }} className={`p-1.5 rounded-full transition-all ${exp ? "bg-[#2563EB] text-white" : "text-[#2563EB] dark:text-[#60A5FA] hover:bg-yellow-50"}`}><ChevronDownIcon className={`w-3.5 h-3.5 stroke-[3] transition-transform ${exp ? "rotate-180" : ""}`} /></button>
                               <button onClick={e => { e.stopPropagation(); setEditingItem(item); setFormData({ ...item }); setUploadFile(null); setIsModalOpen(true); }} className="p-1.5 text-blue-500 hover:bg-blue-50 rounded-full transition-all" title="Edit"><PencilSquareIcon className="w-3.5 h-3.5" /></button>
                               {(!item.cancelled && Array.from({ length: stepCount }).some((_, i) => (item as any)[`actual_${i + 1}`]?.trim())) && (
                                 <button onClick={e => { e.stopPropagation(); openRemoveFollowUpModal(item); }} className="p-1.5 text-[#D97706] hover:bg-[#F7F8FA] rounded-full transition-all" title="Remove Follow-up"><ArrowUturnLeftIcon className="w-3.5 h-3.5" /></button>
@@ -1693,7 +1693,7 @@ export default function HRMSModulePage({ params }: { params: Promise<{ module: s
                         </div>
                         {candidate.upload_updated_cv && (
                           <div className="col-span-2">
-                            <a href={candidate.upload_updated_cv} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#2563EB]/10 dark:bg-[#60A5FA]/10 text-white dark:text-[#60A5FA] rounded-lg text-[13px] font-semibold hover:bg-[#2563EB]/20 transition-colors">
+                            <a href={candidate.upload_updated_cv} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#2563EB]/10 dark:bg-[#60A5FA]/10 text-[#2563EB] dark:text-[#60A5FA] rounded-lg text-[13px] font-semibold hover:bg-[#2563EB]/20 transition-colors">
                               <DocumentTextIcon className="w-3.5 h-3.5" /> View Resume
                             </a>
                           </div>

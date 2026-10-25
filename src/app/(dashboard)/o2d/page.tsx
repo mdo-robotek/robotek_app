@@ -328,7 +328,7 @@ function SearchableDropdown({
                     className={`px-4 py-2 text-[14px] font-bold cursor-pointer transition-colors flex items-center justify-between ${i === activeIndex
                         ? "bg-[#2563EB] text-white dark:bg-[#60A5FA] dark:text-black"
                         : isSelected
-                          ? "bg-[#F7F8FA] text-white dark:bg-white/10 dark:text-[#60A5FA]"
+                          ? "bg-[#F7F8FA] text-[#2563EB] dark:bg-white/10 dark:text-[#60A5FA]"
                           : "text-gray-600 dark:text-gray-300 hover:bg-[#F7F8FA] dark:hover:bg-white/5"
                       }`}
                   >
@@ -2215,7 +2215,7 @@ export default function O2DPage() {
                 resetForm();
                 setIsModalOpen(true);
               }}
-              className="flex items-center gap-2 text-white dark:text-[#60A5FA] px-2 sm:px-4 py-1.5 font-semibold text-[14px] rounded-full hover:bg-[#2563EB]/5 dark:hover:bg-navy-700 transition-all"
+              className="flex items-center gap-2 text-[#2563EB] dark:text-[#60A5FA] px-2 sm:px-4 py-1.5 font-semibold text-[14px] rounded-full hover:bg-[#2563EB]/5 dark:hover:bg-navy-700 transition-all"
             >
               <PlusIcon className="w-4 h-4 stroke-[3]" />
               <span className="hidden sm:inline">New Order</span>
@@ -2229,7 +2229,7 @@ export default function O2DPage() {
               }
               className={`flex items-center gap-2 px-2 sm:px-3 py-1.5 font-semibold text-[14px]   rounded-full transition-all border-2 ${pageViewMode === "table"
                   ? "bg-[#2563EB] text-white border-[#2563EB]"
-                  : "text-white dark:text-[#60A5FA] border-transparent hover:bg-[#2563EB]/5 dark:hover:bg-navy-700"
+                  : "text-[#2563EB] dark:text-[#60A5FA] border-transparent hover:bg-[#2563EB]/5 dark:hover:bg-navy-700"
                 }`}
             >
               {pageViewMode === "panels" ? (
@@ -2245,7 +2245,7 @@ export default function O2DPage() {
 
             <button
               onClick={() => setIsExportModalOpen(true)}
-              className="flex items-center gap-2 text-white dark:text-[#60A5FA] px-2 sm:px-3 py-1.5 font-semibold text-[14px] rounded-full hover:bg-[#2563EB]/5 dark:hover:bg-navy-700 transition-all"
+              className="flex items-center gap-2 text-[#2563EB] dark:text-[#60A5FA] px-2 sm:px-3 py-1.5 font-semibold text-[14px] rounded-full hover:bg-[#2563EB]/5 dark:hover:bg-navy-700 transition-all"
             >
               <ArrowDownTrayIcon className="w-4 h-4 stroke-[3]" />
               <span className="hidden sm:inline">Export</span>
@@ -2253,7 +2253,7 @@ export default function O2DPage() {
             <div className="h-4 w-[1px] bg-[#2563EB]/10 dark:bg-[#60A5FA]/10 mx-0.5" />
             <button
               onClick={handleOpenSetup}
-              className="flex items-center gap-2 text-white dark:text-[#60A5FA] px-2 sm:px-3 py-1.5 font-semibold text-[14px] rounded-full hover:bg-[#2563EB]/5 dark:hover:bg-navy-700 transition-all"
+              className="flex items-center gap-2 text-[#2563EB] dark:text-[#60A5FA] px-2 sm:px-3 py-1.5 font-semibold text-[14px] rounded-full hover:bg-[#2563EB]/5 dark:hover:bg-navy-700 transition-all"
             >
               <Cog6ToothIcon className="w-4 h-4 stroke-[3]" />
               <span className="hidden sm:inline">Setup</span>
@@ -2261,7 +2261,7 @@ export default function O2DPage() {
             <div className="h-4 w-[1px] bg-[#2563EB]/10 dark:bg-[#60A5FA]/10 mx-0.5" />
             <button
               onClick={() => setIsBusyModalOpen(true)}
-              className="flex items-center gap-2 text-white dark:text-[#60A5FA] px-2 sm:px-3 py-1.5 font-semibold text-[14px] rounded-full hover:bg-[#2563EB]/5 dark:hover:bg-navy-700 transition-all"
+              className="flex items-center gap-2 text-[#2563EB] dark:text-[#60A5FA] px-2 sm:px-3 py-1.5 font-semibold text-[14px] rounded-full hover:bg-[#2563EB]/5 dark:hover:bg-navy-700 transition-all"
             >
               <ClipboardDocumentCheckIcon className="w-4 h-4 stroke-[3]" />
               <span className="hidden sm:inline">For Busy</span>
@@ -2535,7 +2535,7 @@ export default function O2DPage() {
                                     setSelectedOrderNo(item.order_no);
                                     setPageViewMode("panels");
                                   }}
-                                  className="p-1.5 bg-[#2563EB]/5 text-white rounded-lg hover:bg-[#2563EB] hover:text-white transition-all"
+                                  className="p-1.5 bg-[#2563EB]/5 text-[#2563EB] rounded-lg hover:bg-[#2563EB] hover:text-white transition-all"
                                 >
                                   <EyeIcon className="w-3.5 h-3.5" />
                                 </button>
@@ -2585,7 +2585,7 @@ export default function O2DPage() {
                         if (totalPages <= 1) return null;
 
                         return (
-                          <span className="px-4 py-2 bg-[#2563EB]/5 dark:bg-[#60A5FA]/5 rounded-xl border border-[#2563EB]/10 dark:border-[#60A5FA]/10 text-[14px] font-semibold text-white dark:text-[#60A5FA]">
+                          <span className="px-4 py-2 bg-[#2563EB]/5 dark:bg-[#60A5FA]/5 rounded-xl border border-[#2563EB]/10 dark:border-[#60A5FA]/10 text-[14px] font-semibold text-[#2563EB] dark:text-[#60A5FA]">
                             Page {tableCurrentPage} of {totalPages}
                           </span>
                         );
@@ -2775,7 +2775,7 @@ export default function O2DPage() {
                                       e.stopPropagation();
                                       handleEdit(no);
                                     }}
-                                    className="p-1 px-1.5 bg-[#2563EB]/5 text-white dark:bg-[#60A5FA]/10 dark:text-[#60A5FA] hover:bg-[#2563EB] hover:text-white dark:hover:bg-[#60A5FA] dark:hover:text-black rounded-lg transition-all"
+                                    className="p-1 px-1.5 bg-[#2563EB]/5 text-[#2563EB] dark:bg-[#60A5FA]/10 dark:text-[#60A5FA] hover:bg-[#2563EB] hover:text-white dark:hover:bg-[#60A5FA] dark:hover:text-black rounded-lg transition-all"
                                   >
                                     <PencilSquareIcon className="w-3 h-3" />
                                   </button>
@@ -3209,7 +3209,7 @@ export default function O2DPage() {
                       <button
                         type="button"
                         onClick={() => addItemRow(1)}
-                        className="flex items-center gap-2 text-[13px] font-semibold text-white dark:text-[#60A5FA] hover:scale-105 transition-all bg-[#2563EB]/10 dark:bg-[#60A5FA]/15 px-6 py-2.5 rounded-2xl shadow-sm border-2 border-transparent hover:border-[#2563EB]/20"
+                        className="flex items-center gap-2 text-[13px] font-semibold text-[#2563EB] dark:text-[#60A5FA] hover:scale-105 transition-all bg-[#2563EB]/10 dark:bg-[#60A5FA]/15 px-6 py-2.5 rounded-2xl shadow-sm border-2 border-transparent hover:border-[#2563EB]/20"
                       >
                         <PlusIcon className="w-4 h-4 stroke-[3]" /> Add Single Line
                       </button>
@@ -3217,7 +3217,7 @@ export default function O2DPage() {
                       <button
                         type="button"
                         onClick={() => setIsPasteModalOpen(true)}
-                        className="flex items-center gap-2 text-[13px] font-semibold text-white dark:text-[#60A5FA] hover:scale-105 transition-all bg-[#2563EB]/10 dark:bg-[#60A5FA]/15 px-6 py-2.5 rounded-2xl shadow-sm border-2 border-transparent hover:border-[#2563EB]/20"
+                        className="flex items-center gap-2 text-[13px] font-semibold text-[#2563EB] dark:text-[#60A5FA] hover:scale-105 transition-all bg-[#2563EB]/10 dark:bg-[#60A5FA]/15 px-6 py-2.5 rounded-2xl shadow-sm border-2 border-transparent hover:border-[#2563EB]/20"
                       >
                         <ClipboardDocumentCheckIcon className="w-4 h-4 stroke-[3]" /> Paste Data
                       </button>
@@ -4765,7 +4765,7 @@ function O2DDetailPanel({
                         onClick={() =>
                           setIsRemoveFollowUpModalOpen(true)
                         }
-                        className="flex items-center gap-1.5 p-1.5 sm:px-4 sm:py-1.5 bg-[#2563EB]/5 hover:bg-[#2563EB]/10 rounded-full text-white dark:text-[#60A5FA] transition-all transition-transform active:scale-90 border border-[#2563EB]/10 dark:border-[#60A5FA]/10"
+                        className="flex items-center gap-1.5 p-1.5 sm:px-4 sm:py-1.5 bg-[#2563EB]/5 hover:bg-[#2563EB]/10 rounded-full text-[#2563EB] dark:text-[#60A5FA] transition-all transition-transform active:scale-90 border border-[#2563EB]/10 dark:border-[#60A5FA]/10"
                         title="Remove Follow-up"
                       >
                         <MinusCircleIcon className="w-4 h-4" />
@@ -4796,7 +4796,7 @@ function O2DDetailPanel({
                   });
                   setIsConfirmOpen(true);
                 }}
-                className={`flex items-center gap-1.5 p-1.5 sm:px-4 sm:py-1.5 rounded-full transition-all transition-transform active:scale-90 border ${selectedOrder[0]?.hold ? "bg-[#D97706] text-white border-[#E5E7EB] shadow-md" : "bg-[#2563EB]/5 text-white/80 border-[#2563EB]/10 hover:bg-[#2563EB]/10 hover:text-white dark:text-[#60A5FA]/80 dark:border-[#60A5FA]/10 dark:hover:bg-[#60A5FA]/10 dark:hover:text-[#60A5FA]"}`}
+                className={`flex items-center gap-1.5 p-1.5 sm:px-4 sm:py-1.5 rounded-full transition-all transition-transform active:scale-90 border ${selectedOrder[0]?.hold ? "bg-[#D97706] text-white border-[#E5E7EB] shadow-md" : "bg-[#2563EB]/5 text-[#2563EB]/80 border-[#2563EB]/10 hover:bg-[#2563EB]/10 hover:text-[#2563EB] dark:text-[#60A5FA]/80 dark:border-[#60A5FA]/10 dark:hover:bg-[#60A5FA]/10 dark:hover:text-[#60A5FA]"}`}
                 title={
                   selectedOrder[0]?.hold
                     ? "Resume Order"
@@ -4817,7 +4817,7 @@ function O2DDetailPanel({
                   });
                   setIsConfirmOpen(true);
                 }}
-                className={`flex items-center gap-1.5 p-1.5 sm:px-4 sm:py-1.5 rounded-full transition-all transition-transform active:scale-90 border ${selectedOrder[0]?.cancelled ? "bg-black text-white border-black shadow-md" : "bg-[#2563EB]/5 text-white/80 border-[#2563EB]/10 hover:bg-[#2563EB]/10 hover:text-white dark:text-[#60A5FA]/80 dark:border-[#60A5FA]/10 dark:hover:bg-[#60A5FA]/10 dark:hover:text-[#60A5FA]"}`}
+                className={`flex items-center gap-1.5 p-1.5 sm:px-4 sm:py-1.5 rounded-full transition-all transition-transform active:scale-90 border ${selectedOrder[0]?.cancelled ? "bg-black text-white border-black shadow-md" : "bg-[#2563EB]/5 text-[#2563EB]/80 border-[#2563EB]/10 hover:bg-[#2563EB]/10 hover:text-[#2563EB] dark:text-[#60A5FA]/80 dark:border-[#60A5FA]/10 dark:hover:bg-[#60A5FA]/10 dark:hover:text-[#60A5FA]"}`}
                 title={
                   selectedOrder[0]?.cancelled
                     ? "Undo Cancellation"
@@ -4835,13 +4835,13 @@ function O2DDetailPanel({
               <div className="flex items-center gap-1.5 p-1 bg-[#2563EB]/5 dark:bg-black/10 rounded-full border border-[#2563EB]/10 dark:border-white/20 backdrop-blur-sm">
                 <button
                   onClick={() => setDetailViewMode("full")}
-                  className={`p-1.5 rounded-full transition-all ${detailViewMode === "full" ? "bg-[#2563EB] text-white shadow-md scale-105" : "text-white/60 hover:text-white dark:text-white/60 dark:hover:text-white"}`}
+                  className={`p-1.5 rounded-full transition-all ${detailViewMode === "full" ? "bg-[#2563EB] text-white shadow-md scale-105" : "text-[#2563EB]/60 hover:text-[#2563EB] dark:text-white/60 dark:hover:text-white"}`}
                 >
                   <Squares2X2Icon className="w-4 h-4" />
                 </button>
                 <button
                   onClick={() => setDetailViewMode("table")}
-                  className={`p-1.5 rounded-full transition-all ${detailViewMode === "table" ? "bg-[#2563EB] text-white shadow-md scale-105" : "text-white/60 hover:text-white dark:text-white/60 dark:hover:text-white"}`}
+                  className={`p-1.5 rounded-full transition-all ${detailViewMode === "table" ? "bg-[#2563EB] text-white shadow-md scale-105" : "text-[#2563EB]/60 hover:text-[#2563EB] dark:text-white/60 dark:hover:text-white"}`}
                 >
                   <ListBulletIcon className="w-4 h-4" />
                 </button>
@@ -5271,7 +5271,7 @@ function O2DDetailPanel({
                           <a
                             href={getPreviewUrl(soDoc)}
                             target="_blank"
-                            className="p-1 px-2.5 bg-[#2563EB]/5 dark:bg-[#60A5FA]/5 text-white dark:text-[#60A5FA] rounded-full text-[13px] font-semibold hover:bg-[#2563EB] hover:text-white dark:hover:bg-[#60A5FA] dark:hover:text-black transition-all flex items-center gap-1"
+                            className="p-1 px-2.5 bg-[#2563EB]/5 dark:bg-[#60A5FA]/5 text-[#2563EB] dark:text-[#60A5FA] rounded-full text-[13px] font-semibold hover:bg-[#2563EB] hover:text-white dark:hover:bg-[#60A5FA] dark:hover:text-black transition-all flex items-center gap-1"
                           >
                             <EyeIcon className="w-3 h-3" />
                             View
@@ -5279,7 +5279,7 @@ function O2DDetailPanel({
                           <a
                             href={getDownloadUrl(soDoc)}
                             target="_blank"
-                            className="flex items-center gap-1.5 px-3 py-2 bg-[#2563EB]/5 rounded-lg text-[14px] font-semibold text-white hover:bg-[#2563EB]/10 transition-all"
+                            className="flex items-center gap-1.5 px-3 py-2 bg-[#2563EB]/5 rounded-lg text-[14px] font-semibold text-[#2563EB] hover:bg-[#2563EB]/10 transition-all"
                             title="Download SO Doc"
                           >
                             <ArrowDownTrayIcon className="w-4 h-4" />
@@ -5327,7 +5327,7 @@ function O2DDetailPanel({
                           <a
                             href={getPreviewUrl(piDoc)}
                             target="_blank"
-                            className="p-1 px-2.5 bg-[#2563EB]/5 dark:bg-[#60A5FA]/5 text-white dark:text-[#60A5FA] rounded-full text-[13px] font-semibold hover:bg-[#2563EB] hover:text-white dark:hover:bg-[#60A5FA] dark:hover:text-black transition-all flex items-center gap-1"
+                            className="p-1 px-2.5 bg-[#2563EB]/5 dark:bg-[#60A5FA]/5 text-[#2563EB] dark:text-[#60A5FA] rounded-full text-[13px] font-semibold hover:bg-[#2563EB] hover:text-white dark:hover:bg-[#60A5FA] dark:hover:text-black transition-all flex items-center gap-1"
                           >
                             <EyeIcon className="w-3 h-3" />
                             View
@@ -5335,7 +5335,7 @@ function O2DDetailPanel({
                           <a
                             href={getDownloadUrl(piDoc)}
                             target="_blank"
-                            className="flex items-center gap-1.5 px-3 py-2 bg-[#2563EB]/5 rounded-lg text-[14px] font-semibold text-white hover:bg-[#2563EB]/10 transition-all"
+                            className="flex items-center gap-1.5 px-3 py-2 bg-[#2563EB]/5 rounded-lg text-[14px] font-semibold text-[#2563EB] hover:bg-[#2563EB]/10 transition-all"
                             title="Download PI Doc"
                           >
                             <ArrowDownTrayIcon className="w-4 h-4" />
@@ -5384,14 +5384,14 @@ function O2DDetailPanel({
                               <a
                                 href={getPreviewUrl(biltyDoc)}
                                 target="_blank"
-                                className="flex items-center gap-2 px-3 py-1.5 bg-[#2563EB]/5 rounded-lg text-[13px] font-semibold text-white hover:bg-[#2563EB]/10 w-fit transition-all"
+                                className="flex items-center gap-2 px-3 py-1.5 bg-[#2563EB]/5 rounded-lg text-[13px] font-semibold text-[#2563EB] hover:bg-[#2563EB]/10 w-fit transition-all"
                               >
                                 <EyeIcon className="w-3.5 h-3.5" /> Bilty
                               </a>
                               <a
                                 href={getDownloadUrl(biltyDoc)}
                                 target="_blank"
-                                className="p-1.5 bg-[#2563EB]/5 rounded-lg text-white hover:bg-[#2563EB]/10 transition-all"
+                                className="p-1.5 bg-[#2563EB]/5 rounded-lg text-[#2563EB] hover:bg-[#2563EB]/10 transition-all"
                                 title="Download Bilty"
                               >
                                 <ArrowDownTrayIcon className="w-3.5 h-3.5" />

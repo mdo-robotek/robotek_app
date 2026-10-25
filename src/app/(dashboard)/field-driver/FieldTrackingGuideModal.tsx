@@ -158,7 +158,7 @@ export default function FieldTrackingGuideModal({ open, onClose, isAdmin }: Fiel
               <a
                 key={id}
                 href={`#${id}`}
-                className="px-3 py-1 rounded-full text-[13px] font-semibold tracking-wider bg-[#2563EB]/10 dark:bg-[#60A5FA]/10 text-white dark:text-[#60A5FA] hover:opacity-80"
+                className="px-3 py-1 rounded-full text-[13px] font-semibold tracking-wider bg-[#2563EB]/10 dark:bg-[#60A5FA]/10 text-[#2563EB] dark:text-[#60A5FA] hover:opacity-80"
               >
                 {label}
               </a>

@@ -710,7 +710,7 @@ export default function CustomerTargetPage() {
               type="button"
               title="How to use this page"
               onClick={() => setGuideOpen(true)}
-              className="p-1 rounded-full text-white dark:text-[#60A5FA] hover:bg-[#2563EB]/10 dark:hover:bg-[#60A5FA]/10"
+              className="p-1 rounded-full text-[#2563EB] dark:text-[#60A5FA] hover:bg-[#2563EB]/10 dark:hover:bg-[#60A5FA]/10"
             >
               <InformationCircleIcon className="w-5 h-5" />
             </button>

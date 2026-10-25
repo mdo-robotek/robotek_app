@@ -838,7 +838,7 @@ export default function StationaryInventoryPage() {
                           <div>
                             <div className="flex items-center gap-3 mb-1">
                               <h2 className="text-xl font-semibold text-gray-900 dark:text-white leading-none">{item.item_name}</h2>
-                              <span className="px-2 py-0.5 bg-[#2563EB]/10 text-white dark:bg-[#60A5FA]/20 dark:text-[#60A5FA] border border-[#2563EB]/20 dark:border-[#60A5FA]/30 rounded text-[13px] font-semibold">{item.sku_code}</span>
+                              <span className="px-2 py-0.5 bg-[#2563EB]/10 text-[#2563EB] dark:bg-[#60A5FA]/20 dark:text-[#60A5FA] border border-[#2563EB]/20 dark:border-[#60A5FA]/30 rounded text-[13px] font-semibold">{item.sku_code}</span>
                             </div>
                             <p className="text-[13px] font-bold text-gray-500">{item.category} • Supplier: {item.from_seller || 'N/A'}</p>
                           </div>

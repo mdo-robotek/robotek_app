@@ -437,7 +437,7 @@ export default function LeavePage() {
                                     type="button"
                                     title="How Leave Management works"
                                     onClick={() => setShowInfoModal(true)}
-                                    className="p-2 rounded-full bg-[#2563EB]/10 hover:bg-[#2563EB]/20 text-white dark:bg-[#60A5FA]/15 dark:hover:bg-[#60A5FA]/25 dark:text-[#60A5FA] transition-colors"
+                                    className="p-2 rounded-full bg-[#2563EB]/10 hover:bg-[#2563EB]/20 text-[#2563EB] dark:bg-[#60A5FA]/15 dark:hover:bg-[#60A5FA]/25 dark:text-[#60A5FA] transition-colors"
                                 >
                                     <InformationCircleIcon className="w-5 h-5" />
                                 </button>

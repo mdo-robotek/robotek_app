@@ -439,7 +439,7 @@ export function UserAssetsPanel({ username }: { username?: string }) {
                                 row.status === "Available"
                                     ? "bg-emerald-500/10 text-emerald-500"
                                     : row.status === "In Use"
-                                    ? "bg-[#2563EB]/10 text-white dark:bg-blue-500/10 dark:text-blue-400"
+                                    ? "bg-[#2563EB]/10 text-[#2563EB] dark:bg-blue-500/10 dark:text-blue-400"
                                     : row.status === "Maintenance"
                                     ? "bg-amber-500/10 text-amber-500"
                                     : "bg-gray-500/10 text-gray-500"

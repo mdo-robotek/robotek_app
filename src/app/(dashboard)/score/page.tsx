@@ -2113,7 +2113,7 @@ function ScorePageContent() {
                          </div>
                          <div>
                             <h3 className="text-[14px] font-semibold text-gray-900 dark:text-white leading-tight">Company Overall</h3>
-                            <div className="px-1.5 py-0.5 bg-[#2563EB]/10 dark:bg-yellow-500/10 rounded-md text-[12px] font-semibold text-white dark:text-[#60A5FA] tracking-tighter mt-0.5 inline-block">System Snapshot</div>
+                            <div className="px-1.5 py-0.5 bg-[#2563EB]/10 dark:bg-yellow-500/10 rounded-md text-[12px] font-semibold text-[#2563EB] dark:text-[#60A5FA] tracking-tighter mt-0.5 inline-block">System Snapshot</div>
                          </div>
                       </div>
                    </div>

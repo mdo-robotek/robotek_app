@@ -1245,7 +1245,7 @@ export default function ChecklistsPage() {
                             <>
                               <button
                                 onClick={() => handleEdit(item)}
-                                className="p-1.5 bg-[#2563EB]/10 text-white dark:bg-[#60A5FA]/10 dark:text-[#60A5FA] hover:bg-[#2563EB] hover:text-white dark:hover:bg-[#60A5FA] dark:hover:text-black rounded-lg transition-all"
+                                className="p-1.5 bg-[#2563EB]/10 text-[#2563EB] dark:bg-[#60A5FA]/10 dark:text-[#60A5FA] hover:bg-[#2563EB] hover:text-white dark:hover:bg-[#60A5FA] dark:hover:text-black rounded-lg transition-all"
                                 title="Edit"
                               >
                                 <PencilSquareIcon className="w-3.5 h-3.5" />
@@ -1394,7 +1394,7 @@ export default function ChecklistsPage() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
                           {activeTab === "master" && (
-                            <span className="font-mono text-[13px] font-semibold text-white dark:text-white bg-[#2563EB]/5 dark:bg-[#60A5FA]/10 px-1.5 py-0.5 rounded">#{item.id}</span>
+                            <span className="font-mono text-[13px] font-semibold text-[#2563EB] dark:text-white bg-[#2563EB]/5 dark:bg-[#60A5FA]/10 px-1.5 py-0.5 rounded">#{item.id}</span>
                           )}
                           {getPriorityBadge(item.priority)}
                         </div>
@@ -1476,7 +1476,7 @@ export default function ChecklistsPage() {
                           <div className="flex items-center gap-1">
                             <button
                               onClick={() => handleEdit(item)}
-                              className="p-1.5 bg-[#2563EB]/10 text-white dark:bg-[#60A5FA]/10 dark:text-[#60A5FA] hover:bg-[#2563EB] hover:text-white dark:hover:bg-[#60A5FA] dark:hover:text-black rounded-xl transition-all"
+                              className="p-1.5 bg-[#2563EB]/10 text-[#2563EB] dark:bg-[#60A5FA]/10 dark:text-[#60A5FA] hover:bg-[#2563EB] hover:text-white dark:hover:bg-[#60A5FA] dark:hover:text-black rounded-xl transition-all"
                               title="Edit"
                             >
                               <PencilSquareIcon className="w-4 h-4" />
@@ -1772,7 +1772,7 @@ export default function ChecklistsPage() {
                             className={`px-3 py-1.5 text-[13px] font-semibold   rounded-lg transition-all border whitespace-nowrap shadow-sm flex-shrink-0 ${
                               isSelected 
                                 ? 'bg-[#2563EB] text-black border-[#2563EB] shadow-[#2563EB]/20' 
-                                : 'bg-white dark:bg-zinc-900 text-gray-500 border-[#E5E7EB] dark:border-zinc-800 hover:border-[#2563EB] hover:text-white dark:hover:text-[#60A5FA]'
+                                : 'bg-white dark:bg-zinc-900 text-gray-500 border-[#E5E7EB] dark:border-zinc-800 hover:border-[#2563EB] hover:text-[#2563EB] dark:hover:text-[#60A5FA]'
                             }`}
                           >
                             {freq}

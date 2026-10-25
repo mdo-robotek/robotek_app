@@ -25,6 +25,8 @@ import {
   CompactPartyCelebrationCard
 } from "./DashboardComponents";
 import CooReport from "@/components/CooReport";
+import PendingApprovalsCard from "@/components/PendingApprovalsCard";
+import CooCommandBar from "@/components/CooCommandBar";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -240,10 +242,18 @@ export default function Dashboard() {
     </div>
   );
 
+  // Pending Approvals — only the approvals this user owns; hides itself when empty.
+  const approvalsStrip = (
+    <div className="max-w-[1600px] mx-auto px-4 pb-4">
+      <PendingApprovalsCard />
+    </div>
+  );
+
   // Non-admins: personal dashboard + Busy freshness reminder (accounts team)
   if (!isAdmin) return (
     <div>
       {busyBanner}
+      {approvalsStrip}
       {myDay}
     </div>
   );
@@ -263,7 +273,7 @@ export default function Dashboard() {
             onClick={() => setView(t.id)}
             className={`shrink-0 rounded-full px-5 py-2 text-[14px] font-semibold   transition-all active:scale-95 ${
               view === t.id
-                ? "bg-[#2563EB] text-white dark:bg-[#60A5FA] dark:text-[#60A5FA] shadow-lg"
+                ? "bg-[#2563EB] text-white dark:bg-[#60A5FA] dark:text-[#0B1120] shadow-lg"
                 : "bg-white text-gray-500 ring-1 ring-black/10 dark:bg-white/5 dark:text-slate-300 dark:ring-white/10"
             }`}
           >
@@ -273,10 +283,14 @@ export default function Dashboard() {
       </div>
       {view === "coo" ? (
         <div className="max-w-[1600px] mx-auto px-4 pb-10">
+          <CooCommandBar data={cooData} />
           <CooReport data={cooData} loading={cooLoading} />
         </div>
       ) : (
-        myDay
+        <>
+          {approvalsStrip}
+          {myDay}
+        </>
       )}
     </div>
   );

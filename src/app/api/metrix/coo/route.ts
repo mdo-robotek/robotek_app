@@ -5,7 +5,7 @@ import { getChecklistsPaginated } from "@/lib/checklist-sheets";
 import { ChecklistOccurrence } from "@/types/checklist";
 import { getUsers } from "@/lib/google-sheets";
 import { getAllO2DsForAnalytics, getOutFormData, getPendingStepIdx } from "@/lib/o2d-sheets";
-import { O2D_STEPS } from "@/types/o2d";
+import { O2D_STEPS, O2D_STEP_LABELS } from "@/types/o2d";
 import { getOrderFollowupRemarks, latestRemarkByOrder } from "@/lib/o2d-remarks-sheets";
 import { getIMSItems } from "@/lib/ims-sheets";
 import { getGRNItems } from "@/lib/grn-sheets";
@@ -150,7 +150,7 @@ export async function GET(request: Request) {
       const hasOpenStep = !isHold && !isCancelled && !isArchived && pendingStepIdx !== -1;
       const isPending = hasOpenStep && pendingStepIdx <= 7;
       const isPostDispatchPending = hasOpenStep && pendingStepIdx >= 8;
-      const pendingStepName = pendingStepIdx >= 1 ? `${pendingStepIdx}. ${O2D_STEPS[pendingStepIdx - 1] || ""}` : "";
+      const pendingStepName = pendingStepIdx >= 1 ? `${pendingStepIdx}. ${O2D_STEP_LABELS[pendingStepIdx - 1] || O2D_STEPS[pendingStepIdx - 1] || ""}` : "";
 
       return { orderNo, party: firstItem.party_name, createdAt, actual7, targetDateForOTD, isOTD, isDelayed, isDispatched, totalAmount, isReconfirmed, actual4, isPending, isPostDispatchPending, pendingStepIdx, pendingStepName, firstItem };
     });
@@ -182,7 +182,7 @@ export async function GET(request: Request) {
       });
       return {
         step: i,
-        name: O2D_STEPS[i - 1] || `Step ${i}`,
+        name: O2D_STEP_LABELS[i - 1] || O2D_STEPS[i - 1] || `Step ${i}`,
         completed,
         onTimePct: completed > 0 ? Math.round((onTime / completed) * 100) : 0,
         late,

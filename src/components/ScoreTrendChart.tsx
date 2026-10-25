@@ -35,7 +35,7 @@ export default function ScoreTrendChart({ data, granularity, onGranularityChange
     return (
       <div className="flex flex-col h-full">
         {!isPrint && <ChartHeader granularity={granularity} onGranularityChange={onGranularityChange || (() => {})} />}
-        <div className="flex items-center justify-center flex-1 text-[10px] font-black text-gray-300 uppercase tracking-widest">
+        <div className="flex items-center justify-center flex-1 text-[13px] font-semibold text-[#5B6472]">
           No Trend Data
         </div>
       </div>
@@ -96,8 +96,8 @@ export default function ScoreTrendChart({ data, granularity, onGranularityChange
         <svg viewBox={`0 0 ${chartW} ${chartH}`} className="w-full h-full" preserveAspectRatio="xMidYMid meet">
           <defs>
             <linearGradient id="scoreGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#003875" stopOpacity="0.10" />
-              <stop offset="100%" stopColor="#003875" stopOpacity="0" />
+              <stop offset="0%" stopColor="#2563EB" stopOpacity="0.10" />
+              <stop offset="100%" stopColor="#2563EB" stopOpacity="0" />
             </linearGradient>
             <linearGradient id="onTimeGrad" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stopColor="#10b981" stopOpacity="0.08" />
@@ -116,7 +116,7 @@ export default function ScoreTrendChart({ data, granularity, onGranularityChange
               <text
                 x={padL - 6} y={toY(v) + 3}
                 textAnchor="end"
-                className="text-[8px] font-bold fill-gray-400"
+                className="text-[12px] font-bold fill-gray-400"
               >
                 {v}%
               </text>
@@ -130,8 +130,8 @@ export default function ScoreTrendChart({ data, granularity, onGranularityChange
           {/* Score line - thin */}
           <path
             d={makePath('score')}
-            fill="none" stroke="#003875" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"
-            className="dark:stroke-[#FFD500]"
+            fill="none" stroke="#2563EB" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"
+            className="dark:stroke-[#60A5FA]"
           />
 
           {/* On-Time line - thin dashed */}
@@ -157,14 +157,14 @@ export default function ScoreTrendChart({ data, granularity, onGranularityChange
               {/* Score dot */}
               <circle
                 cx={toX(i)} cy={toY(getDisplayVal(d.score))} r={hoveredIdx === i ? 3.5 : 2}
-                className="fill-[#003875] dark:fill-[#FFD500] transition-all duration-200"
+                className="fill-[#2563EB] dark:fill-[#60A5FA] transition-all duration-200"
                 stroke="white" strokeWidth="1"
               />
               {/* Permanent Label for Score */}
               <text
                 x={toX(i)} y={toY(getDisplayVal(d.score)) - 8}
                 textAnchor="middle"
-                className="text-[7.5px] font-black fill-[#003875] dark:fill-[#FFD500]"
+                className="text-[7.5px] font-semibold fill-[#2563EB] dark:fill-[#60A5FA]"
               >
                 {d.total === 0 ? "—" : `${getDisplayVal(d.score)}%`}
               </text>
@@ -173,7 +173,7 @@ export default function ScoreTrendChart({ data, granularity, onGranularityChange
               <text
                 x={toX(i)} y={toY(getDisplayVal(d.onTime)) - 18}
                 textAnchor="middle"
-                className="text-[7.5px] font-black fill-[#10b981]"
+                className="text-[7.5px] font-semibold fill-[#10b981]"
               >
                 {d.completed === 0 ? "—" : `${getDisplayVal(d.onTime)}%`}
               </text>
@@ -191,8 +191,8 @@ export default function ScoreTrendChart({ data, granularity, onGranularityChange
               {hoveredIdx === i && (
                 <line
                   x1={toX(i)} y1={padT} x2={toX(i)} y2={padT + plotH}
-                  stroke="#003875" strokeWidth="0.5" strokeDasharray="3 3" opacity="0.25"
-                  className="dark:stroke-[#FFD500]"
+                  stroke="#2563EB" strokeWidth="0.5" strokeDasharray="3 3" opacity="0.25"
+                  className="dark:stroke-[#60A5FA]"
                 />
               )}
 
@@ -206,7 +206,7 @@ export default function ScoreTrendChart({ data, granularity, onGranularityChange
                   <text
                     x={Math.max(48, Math.min(toX(i), chartW - 48))} y={padT - 13}
                     textAnchor="middle"
-                    className="text-[7px] font-bold fill-white"
+                    className="text-[12px] font-bold fill-white"
                   >
                     {d.total === 0 ? "No Tasks in Period" : `Score: ${getDisplayVal(d.score)}% | OT: ${d.completed === 0 ? "—" : getDisplayVal(d.onTime) + "%"}`}
                   </text>
@@ -224,7 +224,7 @@ export default function ScoreTrendChart({ data, granularity, onGranularityChange
                 x={toX(i)}
                 y={chartH - padB + 14}
                 textAnchor="middle"
-                className="text-[7px] font-bold fill-gray-400"
+                className="text-[12px] font-bold fill-gray-400"
                 transform={data.length > 10 ? `rotate(-35, ${toX(i)}, ${chartH - padB + 14})` : ''}
               >
                 {d.label}
@@ -237,7 +237,7 @@ export default function ScoreTrendChart({ data, granularity, onGranularityChange
             x={padL + plotW / 2}
             y={chartH - 2}
             textAnchor="middle"
-            className="text-[8px] font-black fill-gray-300 uppercase tracking-widest"
+            className="text-[12px] font-semibold fill-gray-300"
           >
             {granularity === 'quarterly' ? 'Quarter' : granularity === 'yearly' ? 'Year' : granularity.charAt(0).toUpperCase() + granularity.slice(1)}
           </text>
@@ -251,26 +251,26 @@ export default function ScoreTrendChart({ data, granularity, onGranularityChange
 function ChartHeader({ granularity, onGranularityChange }: { granularity: Granularity; onGranularityChange: (g: Granularity) => void }) {
   return (
     <div className="flex items-center justify-between px-3 pt-2.5 pb-1 gap-2 flex-wrap">
-      <h4 className="text-[10px] font-black text-gray-900 dark:text-white uppercase tracking-widest flex items-center gap-1.5 shrink-0">
+      <h4 className="text-[13px] font-semibold text-gray-900 dark:text-white flex items-center gap-1.5 shrink-0">
         <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 ring-2 ring-indigo-500/10" />
         Score Trend
       </h4>
       <div className="flex items-center gap-3">
         {/* Legend */}
         <div className="flex items-center gap-1">
-          <span className="w-3 h-0.5 rounded-full bg-[#003875] dark:bg-[#FFD500]" />
-          <span className="text-[7px] font-black text-gray-400 uppercase">Score</span>
+          <span className="w-3 h-0.5 rounded-full bg-[#2563EB] dark:bg-[#60A5FA]" />
+          <span className="text-[12px] font-semibold text-[#5B6472]">Score</span>
         </div>
         <div className="flex items-center gap-1">
           <span className="w-3 h-0.5 rounded-full bg-emerald-500" />
-          <span className="text-[7px] font-black text-gray-400 uppercase">On-Time</span>
+          <span className="text-[12px] font-semibold text-[#5B6472]">On-Time</span>
         </div>
         {/* Granularity dropdown */}
         <select
           value={granularity}
           onChange={(e) => onGranularityChange(e.target.value as Granularity)}
           style={{ backgroundColor: 'var(--panel-card)', borderColor: 'var(--panel-border)' }}
-          className="rounded-lg text-[8px] font-black uppercase tracking-tight px-2 py-1 text-gray-600 dark:text-gray-300 border outline-none cursor-pointer hover:border-[#003875]/30 transition-colors"
+          className="rounded-lg text-[12px] font-semibold tracking-tight px-2 py-1 text-gray-600 dark:text-gray-300 border outline-none cursor-pointer hover:border-[#2563EB]/30 transition-colors"
         >
           {GRANULARITY_OPTIONS.map(opt => (
             <option key={opt.id} value={opt.id}>{opt.label}</option>

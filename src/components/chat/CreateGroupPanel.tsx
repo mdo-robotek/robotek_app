@@ -113,7 +113,7 @@ export default function CreateGroupPanel({
         <div className="flex-1 overflow-y-auto custom-scrollbar p-6">
           <div className="flex flex-col items-center mb-8">
             <div className="w-16 h-16 rounded-full bg-[#F0F2F5] flex items-center justify-center mb-4">
-              <svg viewBox="0 0 24 24" className="w-8 h-8 text-gray-400" fill="currentColor">
+              <svg viewBox="0 0 24 24" className="w-8 h-8 text-[#5B6472]" fill="currentColor">
                 <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" />
               </svg>
             </div>
@@ -127,7 +127,7 @@ export default function CreateGroupPanel({
             />
           </div>
 
-          <p className="text-xs text-[#25D366] font-medium uppercase tracking-wide mb-3">
+          <p className="text-[14px] text-[#25D366] font-medium tracking-wide mb-3">
             Participants: {allParticipants.length}
           </p>
           <div className="space-y-1">
@@ -173,7 +173,7 @@ export default function CreateGroupPanel({
         <div>
           <h2 className="text-[19px] font-normal leading-tight">Add group members</h2>
           {selectedUsers.length > 0 && (
-            <p className="text-xs text-white/70">{selectedUsers.length} selected</p>
+            <p className="text-[14px] text-white/70">{selectedUsers.length} selected</p>
           )}
         </div>
       </div>
@@ -216,12 +216,12 @@ export default function CreateGroupPanel({
 
       <div className="flex-1 overflow-y-auto custom-scrollbar">
         {groupedUsers.length === 0 ? (
-          <div className="text-center py-8 text-gray-400 text-sm">No contacts found.</div>
+          <div className="text-center py-8 text-[#5B6472] text-sm">No contacts found.</div>
         ) : (
           groupedUsers.map(([letter, letterUsers]) => (
             <div key={letter}>
               <div className="px-4 py-1.5 bg-[#F0F2F5] sticky top-0">
-                <span className="text-xs font-medium text-[#25D366]">{letter}</span>
+                <span className="text-[14px] font-medium text-[#25D366]">{letter}</span>
               </div>
               {letterUsers.map((user) => {
                 const isSelected = selectedUsers.includes(user.username);

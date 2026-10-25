@@ -133,9 +133,9 @@ export default function TimeSeriesTable({ transactions, bucket, isLoading, searc
   }, [transactions, buckets, searchQuery]);
 
   const getHealthColors = (live: number) => {
-    if (live < 0) return "text-rose-500 font-black";
-    if (live === 0) return "text-gray-400 font-bold";
-    return "text-emerald-600 dark:text-emerald-400 font-black";
+    if (live < 0) return "text-rose-500 font-semibold";
+    if (live === 0) return "text-[#5B6472] font-bold";
+    return "text-emerald-600 dark:text-emerald-400 font-semibold";
   };
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -170,21 +170,21 @@ export default function TimeSeriesTable({ transactions, bucket, isLoading, searc
     <div className="flex flex-col h-full bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/5 rounded-xl overflow-hidden min-h-0 relative">
       {aggregatedData.length > 0 && (
         <div className="py-2 px-4 border-b border-gray-200 dark:border-white/5 flex items-center justify-between bg-gray-50/50 dark:bg-[#1f2937]/50 shrink-0">
-          <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">
+          <p className="text-[13px] font-semibold text-gray-500">
             Showing {Math.min((currentPage - 1) * itemsPerPage + 1, aggregatedData.length)} to {Math.min(currentPage * itemsPerPage, aggregatedData.length)} of {aggregatedData.length} items
           </p>
           <div className="flex gap-1">
             <button
               onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
               disabled={currentPage === 1}
-              className="px-3 py-1.5 rounded bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 text-[10px] font-black text-gray-500 uppercase tracking-widest hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
+              className="px-3 py-1.5 rounded bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 text-[13px] font-semibold text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
             >
               Prev
             </button>
             <button
               onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
               disabled={currentPage === totalPages || totalPages === 0}
-              className="px-3 py-1.5 rounded bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 text-[10px] font-black text-gray-500 uppercase tracking-widest hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
+              className="px-3 py-1.5 rounded bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 text-[13px] font-semibold text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
             >
               Next
             </button>
@@ -196,14 +196,14 @@ export default function TimeSeriesTable({ transactions, bucket, isLoading, searc
       <table className="w-full text-left border-collapse relative min-w-max">
         <thead className="bg-gray-100 dark:bg-[#1f2937] sticky top-0 z-20 shadow-sm">
           <tr>
-            <th className="py-2.5 px-3 text-[10px] font-black text-gray-500 uppercase tracking-widest border-b border-gray-200 dark:border-white/10 whitespace-nowrap sticky left-0 bg-gray-100 dark:bg-[#1f2937] z-30 shadow-[1px_0_0_0_#e5e7eb] dark:shadow-[1px_0_0_0_rgba(255,255,255,0.05)] min-w-[200px]">
+            <th className="py-2.5 px-3 text-[13px] font-semibold text-gray-500 border-b border-gray-200 dark:border-white/10 whitespace-nowrap sticky left-0 bg-gray-100 dark:bg-[#1f2937] z-30 shadow-[1px_0_0_0_#e5e7eb] dark:shadow-[1px_0_0_0_rgba(255,255,255,0.05)] min-w-[200px]">
               Item Name
             </th>
-            <th className="py-2.5 px-3 text-[10px] font-black text-gray-500 uppercase tracking-widest border-b border-gray-200 dark:border-white/10 whitespace-nowrap sticky left-[200px] bg-gray-100 dark:bg-[#1f2937] z-30 shadow-[1px_0_0_0_#e5e7eb] dark:shadow-[1px_0_0_0_rgba(255,255,255,0.05)] w-32">
+            <th className="py-2.5 px-3 text-[13px] font-semibold text-gray-500 border-b border-gray-200 dark:border-white/10 whitespace-nowrap sticky left-[200px] bg-gray-100 dark:bg-[#1f2937] z-30 shadow-[1px_0_0_0_#e5e7eb] dark:shadow-[1px_0_0_0_rgba(255,255,255,0.05)] w-32">
               Category
             </th>
             {buckets.map((b, idx) => (
-              <th key={idx} className="py-2.5 px-3 text-[10px] font-black text-gray-500 uppercase tracking-widest border-b border-gray-200 dark:border-white/10 text-center whitespace-nowrap min-w-[80px]">
+              <th key={idx} className="py-2.5 px-3 text-[13px] font-semibold text-gray-500 border-b border-gray-200 dark:border-white/10 text-center whitespace-nowrap min-w-[80px]">
                 {b.label}
               </th>
             ))}
@@ -212,14 +212,14 @@ export default function TimeSeriesTable({ transactions, bucket, isLoading, searc
         <tbody className="divide-y divide-gray-100 dark:divide-white/5">
           {paginatedData.map((item, idx) => (
             <tr key={idx} className="hover:bg-blue-50/30 dark:hover:bg-white/[0.03] even:bg-gray-50/50 dark:even:bg-[#1f2937]/30 transition-colors group">
-              <td className="py-2 px-3 text-[11px] font-black text-gray-900 dark:text-white uppercase truncate sticky left-0 z-20 transition-colors border-r shadow-[1px_0_0_0_#e5e7eb] dark:shadow-[1px_0_0_0_rgba(255,255,255,0.05)] bg-white group-even:bg-gray-50/50 dark:bg-[#111827] dark:group-even:bg-[#182031] group-hover:bg-blue-50/30 dark:group-hover:bg-[#1a2335] border-gray-100 dark:border-white/5 min-w-[200px] max-w-[200px]" title={item.item_name}>
+              <td className="py-2 px-3 text-[14px] font-semibold text-gray-900 dark:text-white truncate sticky left-0 z-20 transition-colors border-r shadow-[1px_0_0_0_#e5e7eb] dark:shadow-[1px_0_0_0_rgba(255,255,255,0.05)] bg-white group-even:bg-gray-50/50 dark:bg-[#111827] dark:group-even:bg-[#182031] group-hover:bg-blue-50/30 dark:group-hover:bg-[#1a2335] border-gray-100 dark:border-white/5 min-w-[200px] max-w-[200px]" title={item.item_name}>
                 {item.item_name}
               </td>
-              <td className="py-2 px-3 text-[11px] font-bold text-gray-500 uppercase whitespace-nowrap sticky left-[200px] z-20 transition-colors border-r shadow-[1px_0_0_0_#e5e7eb] dark:shadow-[1px_0_0_0_rgba(255,255,255,0.05)] bg-white group-even:bg-gray-50/50 dark:bg-[#111827] dark:group-even:bg-[#182031] group-hover:bg-blue-50/30 dark:group-hover:bg-[#1a2335] border-gray-100 dark:border-white/5">
+              <td className="py-2 px-3 text-[14px] font-bold text-gray-500 whitespace-nowrap sticky left-[200px] z-20 transition-colors border-r shadow-[1px_0_0_0_#e5e7eb] dark:shadow-[1px_0_0_0_rgba(255,255,255,0.05)] bg-white group-even:bg-gray-50/50 dark:bg-[#111827] dark:group-even:bg-[#182031] group-hover:bg-blue-50/30 dark:group-hover:bg-[#1a2335] border-gray-100 dark:border-white/5">
                 {item.category}
               </td>
               {item.values.map((val, vIdx) => (
-                <td key={vIdx} className="py-2 px-3 text-[12px] text-center bg-gray-50/50 dark:bg-white/[0.01]">
+                <td key={vIdx} className="py-2 px-3 text-[14px] text-center bg-gray-50/50 dark:bg-white/[0.01]">
                   <span className={getHealthColors(val)}>
                     {val}
                   </span>
@@ -229,7 +229,7 @@ export default function TimeSeriesTable({ transactions, bucket, isLoading, searc
           ))}
           {paginatedData.length === 0 && (
             <tr>
-              <td colSpan={buckets.length + 2} className="py-8 text-center text-gray-400 text-[11px] font-black uppercase">
+              <td colSpan={buckets.length + 2} className="py-8 text-center text-[#5B6472] text-[14px] font-semibold">
                 No items found
               </td>
             </tr>

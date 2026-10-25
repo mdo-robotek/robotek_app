@@ -16,9 +16,9 @@ export default function SystemInfo({ gpsOk }: { gpsOk: boolean }) {
     <FieldCard title="System Info" compact>
       <dl className="space-y-2">
         {rows.map(({ label, value }) => (
-          <div key={label} className="flex justify-between gap-4 text-xs">
+          <div key={label} className="flex justify-between gap-4 text-[14px]">
             <dt className="font-bold text-gray-500">{label}</dt>
-            <dd className="font-black text-[#062B6F] dark:text-white">{value}</dd>
+            <dd className="font-semibold text-[#1D4ED8] dark:text-white">{value}</dd>
           </div>
         ))}
       </dl>

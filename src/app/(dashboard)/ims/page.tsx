@@ -165,7 +165,7 @@ const getLiveStockFontClass = (value: number) => {
 
 const getInOutFontClass = (value: number) => {
   const length = formatMetric(value).length;
-  if (length > 11) return "text-xs sm:text-sm";
+  if (length > 11) return "text-[14px] sm:text-sm";
   if (length > 9) return "text-sm sm:text-base";
   if (length > 7) return "text-base";
   return "text-lg";
@@ -238,10 +238,10 @@ export default function IMSHub() {
               </div>
             </div>
             <div className="flex-1 min-w-0">
-              <h2 className="text-base lg:text-lg xl:text-xl font-black text-white uppercase tracking-tight leading-snug transition-colors">
+              <h2 className="text-base lg:text-lg xl:text-xl font-semibold text-white tracking-tight leading-snug transition-colors">
                 {title}
               </h2>
-              <p className="text-[10px] font-bold text-white/70 uppercase tracking-widest mt-1 leading-snug">
+              <p className="text-[13px] font-bold text-white/70 mt-1 leading-snug">
                 {subtitle}
               </p>
             </div>
@@ -260,12 +260,12 @@ export default function IMSHub() {
           <div className="relative space-y-4 z-10 min-w-0">
             <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/20 transition-colors shadow-sm min-w-0">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-black text-white/80 uppercase tracking-widest flex items-center gap-1.5">
+                <span className="text-[13px] font-semibold text-white/80 flex items-center gap-1.5">
                   <ScaleIcon className="w-4 h-4 text-white/80"/> Live Stock
                 </span>
               </div>
               <div
-                className={`${getLiveStockFontClass(data.liveStock)} font-black tracking-tight leading-none break-words [overflow-wrap:anywhere] ${data.liveStock < 0 ? "text-rose-300" : "text-white"} transition-colors`}
+                className={`${getLiveStockFontClass(data.liveStock)} font-semibold tracking-tight leading-none break-words [overflow-wrap:anywhere] ${data.liveStock < 0 ? "text-rose-300" : "text-white"} transition-colors`}
                 title={formatMetric(data.liveStock)}
               >
                 {formatMetric(data.liveStock)}
@@ -275,12 +275,12 @@ export default function IMSHub() {
             <div className="grid grid-cols-2 gap-3 min-w-0">
               <div className="bg-white/10 backdrop-blur-md rounded-2xl p-3 sm:p-4 border border-white/20 transition-colors min-w-0">
                 <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-xs sm:text-sm font-black text-white/80 uppercase tracking-widest flex items-center gap-1.5">
+                  <span className="text-[14px] sm:text-sm font-semibold text-white/80 flex items-center gap-1.5">
                     <ArrowTrendingUpIcon className="w-4 h-4 shrink-0"/> In
                   </span>
                 </div>
                 <div
-                  className={`${getInOutFontClass(data.totalIn)} font-black text-white leading-none whitespace-nowrap tabular-nums`}
+                  className={`${getInOutFontClass(data.totalIn)} font-semibold text-white leading-none whitespace-nowrap tabular-nums`}
                   title={formatMetric(data.totalIn)}
                 >
                   {formatMetric(data.totalIn)}
@@ -288,13 +288,13 @@ export default function IMSHub() {
               </div>
               <div className="bg-white/10 backdrop-blur-md rounded-2xl p-3 sm:p-4 border border-white/20 transition-colors min-w-0">
                 <div className="flex items-center justify-between mb-1.5">
-                  <span className={`font-black text-white/80 uppercase tracking-widest flex items-center gap-1.5 leading-tight ${id === "1st" || id === "sfg" ? "text-[10px] sm:text-xs" : "text-xs sm:text-sm"}`}>
+                  <span className={`font-semibold text-white/80   flex items-center gap-1.5 leading-tight ${id === "1st" || id === "sfg" ? "text-[13px] sm:text-xs" : "text-[14px] sm:text-sm"}`}>
                     <ArrowTrendingDownIcon className="w-4 h-4 shrink-0"/>
                     {id === "sfg" ? "Transfer to 1st Floor" : id === "1st" ? "Transfer to G Floor" : "Out"}
                   </span>
                 </div>
                 <div
-                  className={`${getInOutFontClass(data.totalOut)} font-black text-white leading-none whitespace-nowrap tabular-nums`}
+                  className={`${getInOutFontClass(data.totalOut)} font-semibold text-white leading-none whitespace-nowrap tabular-nums`}
                   title={formatMetric(data.totalOut)}
                 >
                   {formatMetric(data.totalOut)}
@@ -311,11 +311,11 @@ export default function IMSHub() {
     <div className="min-h-screen bg-gray-50 dark:bg-[#0a0f1c] p-6">
       <div className="w-full mx-auto">
         <div className="mb-8">
-          <h1 className="text-3xl font-black text-gray-900 dark:text-white uppercase tracking-tight mb-2 flex items-center gap-3">
-            <ClipboardDocumentListIcon className="w-8 h-8 text-[#003875] dark:text-[#FFD500]" />
+          <h1 className="text-3xl font-semibold text-gray-900 dark:text-white tracking-tight mb-2 flex items-center gap-3">
+            <ClipboardDocumentListIcon className="w-8 h-8 text-[#2563EB] dark:text-[#60A5FA]" />
             IMS Dashboard Hub
           </h1>
-          <p className="text-xs font-bold text-gray-500 uppercase tracking-widest max-w-xl">
+          <p className="text-[14px] font-bold text-gray-500 max-w-xl">
             Select an inventory management system location to view detailed stock metrics, manage inward/outward flow, and generate reports.
           </p>
         </div>
@@ -354,8 +354,8 @@ export default function IMSHub() {
             "Total Storage Overview",
             <ClipboardDocumentListIcon />,
             finalData,
-            "bg-gradient-to-br from-orange-500 to-amber-700",
-            "shadow-orange-900/20"
+            "bg-[#2563EB]",
+            ""
           )}
         </div>
 
@@ -368,10 +368,10 @@ export default function IMSHub() {
               className="w-full max-w-lg max-h-[90vh] bg-white dark:bg-[#1C1C1E] rounded-3xl shadow-2xl border border-gray-200 dark:border-white/10 overflow-hidden flex flex-col"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 dark:border-white/10 bg-[#003875]">
+              <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 dark:border-white/10 bg-[#2563EB]">
                 <div className="flex items-center gap-2 min-w-0">
-                  <InformationCircleIcon className="w-5 h-5 text-[#FFD500] shrink-0" />
-                  <h3 className="text-sm font-black text-white uppercase tracking-widest truncate">
+                  <InformationCircleIcon className="w-5 h-5 text-[#2563EB] shrink-0" />
+                  <h3 className="text-sm font-semibold text-white truncate">
                     {IMS_CALC_INFO[infoLocation].title} — Calculation
                   </h3>
                 </div>
@@ -386,23 +386,23 @@ export default function IMSHub() {
 
               <div className="p-5 space-y-4 overflow-y-auto custom-scrollbar">
                 <div className="rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 px-4 py-3">
-                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Formula</p>
-                  <p className="text-sm font-black text-[#003875] dark:text-[#FFD500]">{IMS_CALC_INFO[infoLocation].formula}</p>
+                  <p className="text-[13px] font-semibold text-[#5B6472] mb-1">Formula</p>
+                  <p className="text-sm font-semibold text-[#2563EB] dark:text-[#60A5FA]">{IMS_CALC_INFO[infoLocation].formula}</p>
                 </div>
 
                 <div className="space-y-3">
                   <div className="rounded-2xl border border-emerald-100 dark:border-emerald-500/20 bg-emerald-50/60 dark:bg-emerald-900/10 p-4">
                     <div className="flex items-center gap-2 mb-3">
                       <ArrowTrendingUpIcon className="w-4 h-4 text-emerald-600" />
-                      <p className="text-[11px] font-black text-emerald-700 dark:text-emerald-400 uppercase tracking-widest">IN</p>
+                      <p className="text-[14px] font-semibold text-emerald-700 dark:text-emerald-400">IN</p>
                     </div>
                     <ul className="space-y-3">
                       {IMS_CALC_INFO[infoLocation].inSources.map((source) => (
                         <li key={source.label} className="border-t border-emerald-100/80 dark:border-emerald-500/10 pt-3 first:border-t-0 first:pt-0">
-                          <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Data Source</p>
-                          <p className="text-xs font-bold text-gray-800 dark:text-gray-200 mb-1.5">{source.label}</p>
-                          <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">How Calculated</p>
-                          <p className="text-xs font-medium text-gray-600 dark:text-gray-300 leading-relaxed">{source.detail}</p>
+                          <p className="text-[13px] font-semibold text-[#5B6472] mb-1">Data Source</p>
+                          <p className="text-[14px] font-bold text-gray-800 dark:text-gray-200 mb-1.5">{source.label}</p>
+                          <p className="text-[13px] font-semibold text-[#5B6472] mb-1">How Calculated</p>
+                          <p className="text-[14px] font-medium text-gray-600 dark:text-gray-300 leading-relaxed">{source.detail}</p>
                         </li>
                       ))}
                     </ul>
@@ -411,15 +411,15 @@ export default function IMSHub() {
                   <div className="rounded-2xl border border-rose-100 dark:border-rose-500/20 bg-rose-50/60 dark:bg-rose-900/10 p-4">
                     <div className="flex items-center gap-2 mb-3">
                       <ArrowTrendingDownIcon className="w-4 h-4 text-rose-600" />
-                      <p className="text-[11px] font-black text-rose-700 dark:text-rose-400 uppercase tracking-widest">OUT</p>
+                      <p className="text-[14px] font-semibold text-rose-700 dark:text-rose-400">OUT</p>
                     </div>
                     <ul className="space-y-3">
                       {IMS_CALC_INFO[infoLocation].outSources.map((source) => (
                         <li key={source.label} className="border-t border-rose-100/80 dark:border-rose-500/10 pt-3 first:border-t-0 first:pt-0">
-                          <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Data Source</p>
-                          <p className="text-xs font-bold text-gray-800 dark:text-gray-200 mb-1.5">{source.label}</p>
-                          <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">How Calculated</p>
-                          <p className="text-xs font-medium text-gray-600 dark:text-gray-300 leading-relaxed">{source.detail}</p>
+                          <p className="text-[13px] font-semibold text-[#5B6472] mb-1">Data Source</p>
+                          <p className="text-[14px] font-bold text-gray-800 dark:text-gray-200 mb-1.5">{source.label}</p>
+                          <p className="text-[13px] font-semibold text-[#5B6472] mb-1">How Calculated</p>
+                          <p className="text-[14px] font-medium text-gray-600 dark:text-gray-300 leading-relaxed">{source.detail}</p>
                         </li>
                       ))}
                     </ul>
@@ -428,15 +428,15 @@ export default function IMSHub() {
                   <div className="rounded-2xl border border-blue-100 dark:border-blue-500/20 bg-blue-50/60 dark:bg-blue-900/10 p-4">
                     <div className="flex items-center gap-2 mb-2">
                       <ScaleIcon className="w-4 h-4 text-blue-600" />
-                      <p className="text-[11px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-widest">Live Stock</p>
+                      <p className="text-[14px] font-semibold text-blue-700 dark:text-blue-400">Live Stock</p>
                     </div>
-                    <p className="text-xs font-medium text-gray-600 dark:text-gray-300 leading-relaxed">{IMS_CALC_INFO[infoLocation].liveHow}</p>
+                    <p className="text-[14px] font-medium text-gray-600 dark:text-gray-300 leading-relaxed">{IMS_CALC_INFO[infoLocation].liveHow}</p>
                   </div>
 
                   {IMS_CALC_INFO[infoLocation].approvalHow && (
                     <div className="rounded-2xl border border-amber-100 dark:border-amber-500/20 bg-amber-50/60 dark:bg-amber-900/10 p-4">
-                      <p className="text-[11px] font-black text-amber-700 dark:text-amber-400 uppercase tracking-widest mb-2">Date-Wise Approval</p>
-                      <p className="text-xs font-medium text-gray-600 dark:text-gray-300 leading-relaxed">{IMS_CALC_INFO[infoLocation].approvalHow}</p>
+                      <p className="text-[14px] font-semibold text-amber-700 dark:text-amber-400 mb-2">Date-Wise Approval</p>
+                      <p className="text-[14px] font-medium text-gray-600 dark:text-gray-300 leading-relaxed">{IMS_CALC_INFO[infoLocation].approvalHow}</p>
                     </div>
                   )}
                 </div>

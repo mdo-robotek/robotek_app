@@ -48,10 +48,10 @@ const FloatingInput = ({
       disabled={disabled}
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="block px-3 pb-2.5 pt-4 w-full text-sm font-bold text-gray-900 bg-transparent rounded-lg border-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-[#FFD500] focus:outline-none focus:ring-0 focus:border-[#003875] peer uppercase disabled:opacity-50 disabled:bg-gray-100 dark:disabled:bg-white/5"
+      className="block px-3 pb-2.5 pt-4 w-full text-sm font-bold text-gray-900 bg-transparent rounded-lg border-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-[#60A5FA] focus:outline-none focus:ring-0 focus:border-[#2563EB] peer disabled:opacity-50 disabled:bg-gray-100 dark:disabled:bg-white/5"
       placeholder=" "
     />
-    <label htmlFor={name} className="absolute text-[10px] font-black text-gray-400 dark:text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white dark:bg-[#111827] px-2 peer-focus:px-2 peer-focus:text-[#003875] peer-focus:dark:text-[#FFD500] peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1 uppercase tracking-widest">{label}</label>
+    <label htmlFor={name} className="absolute text-[13px] font-semibold text-[#5B6472] dark:text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white dark:bg-[#111827] px-2 peer-focus:px-2 peer-focus:text-[#2563EB] peer-focus:dark:text-[#2563EB] peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1">{label}</label>
   </div>
 );
 
@@ -435,12 +435,12 @@ export default function StationaryInventoryPage() {
       {/* Top Header & Actions Row */}
       <div className="flex flex-col md:flex-row items-center justify-between bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/5 rounded-xl p-3 shadow-sm gap-4 shrink-0">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-[#003875] dark:bg-[#FFD500] rounded-lg shadow-inner">
-            <ClipboardDocumentListIcon className="w-5 h-5 text-white dark:text-[#003875]" />
+          <div className="p-2 bg-[#2563EB] dark:bg-[#60A5FA] rounded-lg shadow-inner">
+            <ClipboardDocumentListIcon className="w-5 h-5 text-white dark:text-[#60A5FA]" />
           </div>
           <div>
-            <h1 className="text-base font-black text-gray-900 dark:text-white uppercase tracking-widest leading-none">Stationary Inventory</h1>
-            <p className="text-gray-400 font-bold text-[10px] uppercase tracking-widest mt-1">ERP Master Module</p>
+            <h1 className="text-base font-semibold text-gray-900 dark:text-white leading-none">Stationary Inventory</h1>
+            <p className="text-[#5B6472] font-bold text-[13px] mt-1">ERP Master Module</p>
           </div>
         </div>
 
@@ -449,19 +449,19 @@ export default function StationaryInventoryPage() {
           <div className="flex items-center bg-gray-100 dark:bg-[#0a0f1c] p-1 rounded-lg border border-gray-200 dark:border-white/5 gap-1">
             <button
               onClick={() => { setActiveTab("master"); setViewingSku(null); }}
-              className={`flex items-center gap-1.5 px-4 py-1.5 rounded-md text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === "master" ? "bg-gradient-to-r from-[#003875] to-blue-600 dark:from-[#FFD500] dark:to-yellow-500 text-white dark:text-[#003875] shadow-md" : "text-gray-500 hover:bg-gray-200 dark:hover:bg-white/10"}`}
+              className={`flex items-center gap-1.5 px-4 py-1.5 rounded-md text-[13px] font-semibold   transition-all ${activeTab === "master" ? "bg-gradient-to-r from-[#2563EB] to-blue-600 dark:from-[#60A5FA] dark:to-yellow-500 text-white dark:text-[#60A5FA] shadow-md" : "text-gray-500 hover:bg-gray-200 dark:hover:bg-white/10"}`}
             >
               <ClipboardDocumentListIcon className="w-4 h-4" /> Master View
             </button>
             <button
               onClick={() => { setActiveTab("logs"); setViewingSku(null); }}
-              className={`flex items-center gap-1.5 px-4 py-1.5 rounded-md text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === "logs" ? "bg-gradient-to-r from-[#003875] to-blue-600 dark:from-[#FFD500] dark:to-yellow-500 text-white dark:text-[#003875] shadow-md" : "text-gray-500 hover:bg-gray-200 dark:hover:bg-white/10"}`}
+              className={`flex items-center gap-1.5 px-4 py-1.5 rounded-md text-[13px] font-semibold   transition-all ${activeTab === "logs" ? "bg-gradient-to-r from-[#2563EB] to-blue-600 dark:from-[#60A5FA] dark:to-yellow-500 text-white dark:text-[#60A5FA] shadow-md" : "text-gray-500 hover:bg-gray-200 dark:hover:bg-white/10"}`}
             >
               <DocumentTextIcon className="w-4 h-4" /> Ledger Logs
             </button>
             <button
               onClick={() => { setActiveTab("dashboard"); setViewingSku(null); }}
-              className={`flex items-center gap-1.5 px-4 py-1.5 rounded-md text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === "dashboard" ? "bg-gradient-to-r from-[#003875] to-blue-600 dark:from-[#FFD500] dark:to-yellow-500 text-white dark:text-[#003875] shadow-md" : "text-gray-500 hover:bg-gray-200 dark:hover:bg-white/10"}`}
+              className={`flex items-center gap-1.5 px-4 py-1.5 rounded-md text-[13px] font-semibold   transition-all ${activeTab === "dashboard" ? "bg-gradient-to-r from-[#2563EB] to-blue-600 dark:from-[#60A5FA] dark:to-yellow-500 text-white dark:text-[#60A5FA] shadow-md" : "text-gray-500 hover:bg-gray-200 dark:hover:bg-white/10"}`}
             >
               <ChartPieIcon className="w-4 h-4" /> Dashboard
             </button>
@@ -469,13 +469,13 @@ export default function StationaryInventoryPage() {
 
           <div className="h-6 w-px bg-gray-200 dark:bg-white/10 mx-1"></div>
 
-          <button onClick={() => openStockModal("IN")} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-black uppercase tracking-wider transition-all border ${selectedSkus.length > 0 ? "bg-emerald-500 text-white shadow-md border-emerald-600 animate-pulse" : "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500 hover:text-white border-emerald-500/20"}`}>
+          <button onClick={() => openStockModal("IN")} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[14px] font-semibold  tracking-wider transition-all border ${selectedSkus.length > 0 ? "bg-emerald-500 text-white shadow-md border-emerald-600 animate-pulse" : "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500 hover:text-white border-emerald-500/20"}`}>
             <ArrowDownTrayIcon className="w-4 h-4" /> Stock In {selectedSkus.length > 0 && `(${selectedSkus.length})`}
           </button>
-          <button onClick={() => openStockModal("OUT")} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-black uppercase tracking-wider transition-all border ${selectedSkus.length > 0 ? "bg-rose-500 text-white shadow-md border-rose-600 animate-pulse" : "bg-rose-500/10 text-rose-600 dark:text-rose-400 hover:bg-rose-500 hover:text-white border-rose-500/20"}`}>
+          <button onClick={() => openStockModal("OUT")} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[14px] font-semibold  tracking-wider transition-all border ${selectedSkus.length > 0 ? "bg-rose-500 text-white shadow-md border-rose-600 animate-pulse" : "bg-rose-500/10 text-rose-600 dark:text-rose-400 hover:bg-rose-500 hover:text-white border-rose-500/20"}`}>
             <ArrowUpTrayIcon className="w-4 h-4" /> Stock Out {selectedSkus.length > 0 && `(${selectedSkus.length})`}
           </button>
-          <button onClick={handleNewSkuClick} className="flex items-center gap-1.5 px-4 py-1.5 bg-[#003875] dark:bg-[#FFD500] text-white dark:text-[#003875] hover:brightness-110 rounded-lg text-[11px] font-black uppercase tracking-wider transition-all shadow-sm">
+          <button onClick={handleNewSkuClick} className="flex items-center gap-1.5 px-4 py-1.5 bg-[#2563EB] dark:bg-[#60A5FA] text-white dark:text-[#60A5FA] hover:brightness-110 rounded-lg text-[14px] font-semibold tracking-wider transition-all shadow-sm">
             <PlusIcon className="w-4 h-4" /> New SKU
           </button>
         </div>
@@ -487,31 +487,31 @@ export default function StationaryInventoryPage() {
 
           {/* Main KPI Overview Cards (Narrow height & Gradients) */}
           <div className="lg:col-span-12 grid grid-cols-4 gap-3 shrink-0">
-            <div className="bg-gradient-to-br from-[#003875] to-blue-800 text-white border-transparent rounded-xl p-3 flex items-center justify-between shadow-sm relative overflow-hidden group">
+            <div className="bg-gradient-to-br from-[#2563EB] to-blue-800 text-white border-transparent rounded-xl p-3 flex items-center justify-between shadow-sm relative overflow-hidden group">
               <div className="z-10 relative">
-                <p className="text-[10px] font-black text-white/70 uppercase tracking-widest mb-0.5">Total SKUs Tracked</p>
-                <h2 className="text-2xl font-black leading-none">{totalSkus}</h2>
+                <p className="text-[13px] font-semibold text-white/70 mb-0.5">Total SKUs Tracked</p>
+                <h2 className="text-2xl font-semibold leading-none">{totalSkus}</h2>
               </div>
               <ArchiveBoxIcon className="w-12 h-12 absolute -right-2 -bottom-2 text-white/10 rotate-12 transition-transform group-hover:scale-110" />
             </div>
             <div className="bg-gradient-to-br from-emerald-500 to-emerald-700 text-white border-transparent rounded-xl p-3 flex items-center justify-between shadow-sm relative overflow-hidden group">
               <div className="z-10 relative">
-                <p className="text-[10px] font-black text-white/70 uppercase tracking-widest mb-0.5">Overall Stock Volume</p>
-                <h2 className="text-2xl font-black leading-none">{totalStock}</h2>
+                <p className="text-[13px] font-semibold text-white/70 mb-0.5">Overall Stock Volume</p>
+                <h2 className="text-2xl font-semibold leading-none">{totalStock}</h2>
               </div>
               <ClipboardDocumentListIcon className="w-12 h-12 absolute -right-2 -bottom-2 text-white/10 rotate-12 transition-transform group-hover:scale-110" />
             </div>
             <div className="bg-gradient-to-br from-rose-500 to-red-700 text-white border-transparent rounded-xl p-3 flex items-center justify-between shadow-sm relative overflow-hidden group">
               <div className="z-10 relative">
-                <p className="text-[10px] font-black text-white/70 uppercase tracking-widest mb-0.5">Items at Critical Risk</p>
-                <h2 className="text-2xl font-black leading-none">{lowStockCount}</h2>
+                <p className="text-[13px] font-semibold text-white/70 mb-0.5">Items at Critical Risk</p>
+                <h2 className="text-2xl font-semibold leading-none">{lowStockCount}</h2>
               </div>
               <ExclamationTriangleIcon className="w-12 h-12 absolute -right-2 -bottom-2 text-white/10 rotate-12 transition-transform group-hover:scale-110" />
             </div>
             <div className="bg-gradient-to-br from-gray-700 to-gray-900 text-white border-transparent rounded-xl p-3 flex items-center justify-between shadow-sm relative overflow-hidden group">
               <div className="z-10 relative">
-                <p className="text-[10px] font-black text-white/70 uppercase tracking-widest mb-0.5">Dead Stock Items</p>
-                <h2 className="text-2xl font-black leading-none">{deadStockItems.length}</h2>
+                <p className="text-[13px] font-semibold text-white/70 mb-0.5">Dead Stock Items</p>
+                <h2 className="text-2xl font-semibold leading-none">{deadStockItems.length}</h2>
               </div>
               <ChartPieIcon className="w-12 h-12 absolute -right-2 -bottom-2 text-white/10 rotate-12 transition-transform group-hover:scale-110" />
             </div>
@@ -519,7 +519,7 @@ export default function StationaryInventoryPage() {
 
           {/* Deep Analysis Row 1 */}
           <div className="lg:col-span-8 bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/5 rounded-2xl shadow-sm p-4 flex flex-col min-h-[300px]">
-            <h3 className="text-xs font-black text-gray-500 uppercase tracking-widest mb-2">Bottom Live Stock Items (Critical Zones)</h3>
+            <h3 className="text-[14px] font-semibold text-gray-500 mb-2">Bottom Live Stock Items (Critical Zones)</h3>
             <div className="flex-1 w-full h-full min-h-[250px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={lowestStockData} layout="vertical" margin={{ top: 0, right: 30, left: 30, bottom: 0 }}>
@@ -536,7 +536,7 @@ export default function StationaryInventoryPage() {
           </div>
 
           <div className="lg:col-span-4 bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/5 rounded-2xl shadow-sm p-4 flex flex-col min-h-[300px]">
-            <h3 className="text-xs font-black text-gray-500 uppercase tracking-widest mb-0">Stock Health Distribution</h3>
+            <h3 className="text-[14px] font-semibold text-gray-500 mb-0">Stock Health Distribution</h3>
             <div className="flex-1 w-full h-full relative flex items-center justify-center min-h-[250px]">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
@@ -563,7 +563,7 @@ export default function StationaryInventoryPage() {
 
           {/* Deep Analysis Row 2 */}
           <div className="lg:col-span-4 bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/5 rounded-2xl shadow-sm p-4 flex flex-col min-h-[300px]">
-            <h3 className="text-xs font-black text-gray-500 uppercase tracking-widest mb-0">Category Volume Dispersion</h3>
+            <h3 className="text-[14px] font-semibold text-gray-500 mb-0">Category Volume Dispersion</h3>
             <div className="flex-1 w-full h-full relative flex items-center justify-center -ml-4 min-h-[250px]">
               <ResponsiveContainer width="100%" height="100%">
                 <RadarChart cx="50%" cy="50%" outerRadius="70%" data={categoryRadarData}>
@@ -577,21 +577,21 @@ export default function StationaryInventoryPage() {
           </div>
 
           <div className="lg:col-span-8 bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/5 rounded-2xl shadow-sm p-4 flex flex-col min-h-[300px]">
-            <h3 className="text-xs font-black text-gray-500 uppercase tracking-widest mb-2">Highest Daily Consumption Area Trend</h3>
+            <h3 className="text-[14px] font-semibold text-gray-500 mb-2">Highest Daily Consumption Area Trend</h3>
             <div className="flex-1 w-full h-full min-h-[250px]">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={topConsumedData} margin={{ top: 10, right: 30, left: -20, bottom: 0 }}>
                   <defs>
                     <linearGradient id="colorCons" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor={resolvedTheme === 'dark' ? '#FFD500' : '#003875'} stopOpacity={0.8} />
-                      <stop offset="95%" stopColor={resolvedTheme === 'dark' ? '#FFD500' : '#003875'} stopOpacity={0} />
+                      <stop offset="5%" stopColor={resolvedTheme === 'dark' ? '#2563EB' : '#2563EB'} stopOpacity={0.8} />
+                      <stop offset="95%" stopColor={resolvedTheme === 'dark' ? '#2563EB' : '#2563EB'} stopOpacity={0} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={resolvedTheme === 'dark' ? '#374151' : '#e5e7eb'} />
                   <XAxis dataKey="name" tick={{ fontSize: 9, fontWeight: 'bold', fill: '#9ca3af' }} axisLine={false} tickLine={false} interval={0} tickFormatter={(val) => val.length > 8 ? val.substring(0, 8) + '..' : val} />
                   <YAxis tick={{ fontSize: 9, fontWeight: 'bold', fill: '#9ca3af' }} axisLine={false} tickLine={false} />
                   <RechartsTooltip contentStyle={{ backgroundColor: resolvedTheme === 'dark' ? '#1f2937' : '#fff', border: 'none', borderRadius: '8px', fontSize: '10px', fontWeight: 'bold' }} />
-                  <Area type="monotone" dataKey="consumption" stroke={resolvedTheme === 'dark' ? '#FFD500' : '#003875'} strokeWidth={3} fillOpacity={1} fill="url(#colorCons)">
+                  <Area type="monotone" dataKey="consumption" stroke={resolvedTheme === 'dark' ? '#2563EB' : '#2563EB'} strokeWidth={3} fillOpacity={1} fill="url(#colorCons)">
                     <LabelList dataKey="consumption" position="top" fill={resolvedTheme === 'dark' ? '#fff' : '#000'} fontSize={10} fontWeight="bold" />
                   </Area>
                 </AreaChart>
@@ -608,10 +608,10 @@ export default function StationaryInventoryPage() {
               {/* Color Logic Filter */}
               <div className="flex items-center gap-2 overflow-x-auto bg-white dark:bg-[#111827] p-2 rounded-xl border border-gray-200 dark:border-white/5 flex-1 min-w-0">
                 <div className="flex items-center gap-1 px-2 shrink-0">
-                  <InformationCircleIcon className="w-4 h-4 text-gray-400" />
-                  <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest mr-2">Color Logic:</span>
+                  <InformationCircleIcon className="w-4 h-4 text-[#5B6472]" />
+                  <span className="text-[13px] font-semibold text-gray-500 mr-2">Color Logic:</span>
                 </div>
-                <div className="flex flex-wrap gap-2 text-[10px] font-black text-white text-center cursor-pointer">
+                <div className="flex flex-wrap gap-2 text-[13px] font-semibold text-white text-center cursor-pointer">
                   <div onClick={() => setLegendFilter(legendFilter === 1 ? null : 1)} className={`px-4 py-1 rounded min-w-[80px] transition-transform hover:scale-105 ${legendFilter === 1 ? 'ring-2 ring-purple-600 ring-offset-1 bg-purple-600 shadow-md' : 'bg-purple-500'}`}> {'>'} 100% <sup className="font-bold opacity-80">{bucketCounts[1]}</sup></div>
                   <div onClick={() => setLegendFilter(legendFilter === 2 ? null : 2)} className={`px-4 py-1 rounded min-w-[120px] transition-transform hover:scale-105 ${legendFilter === 2 ? 'ring-2 ring-emerald-500 ring-offset-1 bg-emerald-500 shadow-md' : 'bg-emerald-400'}`}> {'<='} 100% AND {'>'} 66% <sup className="font-bold opacity-80">{bucketCounts[2]}</sup></div>
                   <div onClick={() => setLegendFilter(legendFilter === 3 ? null : 3)} className={`text-black px-4 py-1 rounded min-w-[120px] transition-transform hover:scale-105 ${legendFilter === 3 ? 'ring-2 ring-amber-400 ring-offset-1 bg-amber-400 shadow-md' : 'bg-amber-300'}`}> {'<='} 66% AND {'>'} 33% <sup className="font-bold opacity-80">{bucketCounts[3]}</sup></div>
@@ -620,19 +620,19 @@ export default function StationaryInventoryPage() {
                   <div onClick={() => setLegendFilter(legendFilter === 6 ? null : 6)} className={`px-4 py-1 rounded min-w-[80px] transition-transform hover:scale-105 ${legendFilter === 6 ? 'ring-2 ring-gray-400 ring-offset-1 bg-gray-400 shadow-md' : 'bg-gray-300'}`}> {'<'} 0 <sup className="font-bold opacity-80">{bucketCounts[6]}</sup></div>
                 </div>
                 {legendFilter !== null && (
-                  <button onClick={() => setLegendFilter(null)} className="ml-2 px-2 py-1 bg-gray-100 dark:bg-white/10 text-gray-500 rounded text-[9px] uppercase font-black hover:bg-gray-200">Clear</button>
+                  <button onClick={() => setLegendFilter(null)} className="ml-2 px-2 py-1 bg-gray-100 dark:bg-white/10 text-gray-500 rounded text-[13px] font-semibold hover:bg-gray-200">Clear</button>
                 )}
               </div>
 
               {/* Search Bar MOVED HERE */}
               <div className="relative shrink-0">
-                <MagnifyingGlassIcon className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                <MagnifyingGlassIcon className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#5B6472]" />
                 <input
                   type="text"
                   placeholder="SEARCH SKU / ITEM..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9 pr-4 py-2.5 bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 rounded-xl text-[11px] font-black uppercase tracking-wider outline-none focus:ring-2 focus:ring-[#003875] dark:text-white w-64 transition-all shadow-sm h-full"
+                  className="pl-9 pr-4 py-2.5 bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 rounded-xl text-[14px] font-semibold tracking-wider outline-none focus:ring-2 focus:ring-[#2563EB] dark:text-white w-64 transition-all shadow-sm h-full"
                 />
               </div>
             </div>
@@ -642,13 +642,13 @@ export default function StationaryInventoryPage() {
           {activeTab === "logs" && (
             <div className="flex items-center gap-2 overflow-x-auto shrink-0 bg-white dark:bg-[#111827] p-2 rounded-xl border border-gray-200 dark:border-white/5">
               <div className="flex items-center gap-1 px-2 shrink-0">
-                <MagnifyingGlassIcon className="w-4 h-4 text-gray-400" />
-                <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest mr-2">Filter Ledger:</span>
+                <MagnifyingGlassIcon className="w-4 h-4 text-[#5B6472]" />
+                <span className="text-[13px] font-semibold text-gray-500 mr-2">Filter Ledger:</span>
               </div>
               <div className="flex gap-2">
-                <button onClick={() => setLedgerFilter("ALL")} className={`px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${ledgerFilter === "ALL" ? "bg-gray-800 text-white shadow-md dark:bg-white dark:text-gray-900" : "bg-gray-100 text-gray-500 hover:bg-gray-200 dark:bg-white/5 dark:text-gray-400 dark:hover:bg-white/10"}`}>All Transactions</button>
-                <button onClick={() => setLedgerFilter("IN")} className={`flex items-center gap-1 px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${ledgerFilter === "IN" ? "bg-emerald-500 text-white shadow-md" : "bg-emerald-50 text-emerald-600 hover:bg-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-400"}`}><ArrowDownTrayIcon className="w-3 h-3" /> Stock In Only</button>
-                <button onClick={() => setLedgerFilter("OUT")} className={`flex items-center gap-1 px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${ledgerFilter === "OUT" ? "bg-rose-500 text-white shadow-md" : "bg-rose-50 text-rose-600 hover:bg-rose-100 dark:bg-rose-500/10 dark:text-rose-400"}`}><ArrowUpTrayIcon className="w-3 h-3" /> Stock Out Only</button>
+                <button onClick={() => setLedgerFilter("ALL")} className={`px-4 py-1.5 rounded-lg text-[13px] font-semibold   transition-all ${ledgerFilter === "ALL" ? "bg-gray-800 text-white shadow-md dark:bg-white dark:text-gray-900" : "bg-gray-100 text-gray-500 hover:bg-gray-200 dark:bg-white/5 dark:text-gray-400 dark:hover:bg-white/10"}`}>All Transactions</button>
+                <button onClick={() => setLedgerFilter("IN")} className={`flex items-center gap-1 px-4 py-1.5 rounded-lg text-[13px] font-semibold   transition-all ${ledgerFilter === "IN" ? "bg-emerald-500 text-white shadow-md" : "bg-emerald-50 text-emerald-600 hover:bg-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-400"}`}><ArrowDownTrayIcon className="w-3 h-3" /> Stock In Only</button>
+                <button onClick={() => setLedgerFilter("OUT")} className={`flex items-center gap-1 px-4 py-1.5 rounded-lg text-[13px] font-semibold   transition-all ${ledgerFilter === "OUT" ? "bg-rose-500 text-white shadow-md" : "bg-rose-50 text-rose-600 hover:bg-rose-100 dark:bg-rose-500/10 dark:text-rose-400"}`}><ArrowUpTrayIcon className="w-3 h-3" /> Stock Out Only</button>
               </div>
             </div>
           )}
@@ -658,11 +658,11 @@ export default function StationaryInventoryPage() {
             <div className="grid grid-cols-4 gap-2 shrink-0">
               <div
                 onClick={() => setFilterType("ALL")}
-                className={`relative overflow-hidden bg-gradient-to-br from-[#003875] to-blue-800 dark:from-blue-900 dark:to-blue-950 text-white border rounded-xl p-3 flex items-center justify-between cursor-pointer transition-all hover:scale-[1.01] ${filterType === "ALL" ? "ring-2 ring-blue-500 shadow-lg" : "border-transparent shadow-sm"}`}
+                className={`relative overflow-hidden bg-gradient-to-br from-[#2563EB] to-blue-800 dark:from-blue-900 dark:to-blue-950 text-white border rounded-xl p-3 flex items-center justify-between cursor-pointer transition-all hover:scale-[1.01] ${filterType === "ALL" ? "ring-2 ring-blue-500 shadow-lg" : "border-transparent shadow-sm"}`}
               >
                 <div className="z-10 relative">
-                  <p className="text-[10px] font-black text-white/70 uppercase tracking-widest">Total SKUs</p>
-                  <p className="text-2xl font-black leading-none mt-1">{totalSkus}</p>
+                  <p className="text-[13px] font-semibold text-white/70">Total SKUs</p>
+                  <p className="text-2xl font-semibold leading-none mt-1">{totalSkus}</p>
                 </div>
                 <ArchiveBoxIcon className="w-16 h-16 absolute -right-2 -bottom-2 text-white/10 rotate-12 transition-transform group-hover:rotate-0" />
               </div>
@@ -672,19 +672,19 @@ export default function StationaryInventoryPage() {
                 className="relative overflow-hidden bg-gradient-to-br from-emerald-500 to-emerald-700 dark:from-emerald-700 dark:to-emerald-900 text-white border border-transparent rounded-xl p-3 flex items-center justify-between cursor-pointer transition-all hover:scale-[1.01] shadow-sm"
               >
                 <div className="z-10 relative">
-                  <p className="text-[10px] font-black text-white/70 uppercase tracking-widest">Total Items in Stock</p>
-                  <p className="text-2xl font-black leading-none mt-1">{totalStock}</p>
+                  <p className="text-[13px] font-semibold text-white/70">Total Items in Stock</p>
+                  <p className="text-2xl font-semibold leading-none mt-1">{totalStock}</p>
                 </div>
                 <ClipboardDocumentListIcon className="w-16 h-16 absolute -right-2 -bottom-2 text-white/10 rotate-12" />
               </div>
 
               <div
                 onClick={() => setFilterType("IN_TRANSIT")}
-                className={`relative overflow-hidden bg-gradient-to-br from-amber-400 to-orange-500 dark:from-amber-600 dark:to-orange-800 text-white border rounded-xl p-3 flex items-center justify-between cursor-pointer transition-all hover:scale-[1.01] ${filterType === "IN_TRANSIT" ? "ring-2 ring-amber-500 shadow-lg" : "border-transparent shadow-sm"}`}
+                className={`relative overflow-hidden bg-[#2563EB]  text-white border rounded-xl p-3 flex items-center justify-between cursor-pointer transition-all hover:scale-[1.01] ${filterType === "IN_TRANSIT" ? "ring-2 ring-amber-500 shadow-lg" : "border-transparent shadow-sm"}`}
               >
                 <div className="z-10 relative">
-                  <p className="text-[10px] font-black text-white/80 uppercase tracking-widest">Items in Transit</p>
-                  <p className="text-2xl font-black leading-none mt-1">{totalInTransit}</p>
+                  <p className="text-[13px] font-semibold text-white/80">Items in Transit</p>
+                  <p className="text-2xl font-semibold leading-none mt-1">{totalInTransit}</p>
                 </div>
                 <TruckIcon className="w-16 h-16 absolute -right-2 -bottom-2 text-white/20 rotate-12" />
               </div>
@@ -694,8 +694,8 @@ export default function StationaryInventoryPage() {
                 className={`relative overflow-hidden bg-gradient-to-br from-rose-500 to-red-700 dark:from-rose-700 dark:to-red-900 text-white border rounded-xl p-3 flex items-center justify-between cursor-pointer transition-all hover:scale-[1.01] ${filterType === "LOW_STOCK" ? "ring-2 ring-rose-500 shadow-lg" : "border-transparent shadow-sm"}`}
               >
                 <div className="z-10 relative">
-                  <p className="text-[10px] font-black text-white/80 uppercase tracking-widest">Critical / Stockout</p>
-                  <p className="text-2xl font-black leading-none mt-1">{lowStockCount}</p>
+                  <p className="text-[13px] font-semibold text-white/80">Critical / Stockout</p>
+                  <p className="text-2xl font-semibold leading-none mt-1">{lowStockCount}</p>
                 </div>
                 <ExclamationTriangleIcon className="w-16 h-16 absolute -right-2 -bottom-2 text-white/20 rotate-12" />
               </div>
@@ -727,24 +727,24 @@ export default function StationaryInventoryPage() {
                           <div className="flex items-center justify-center gap-2">
                             <input
                               type="checkbox"
-                              className="w-3.5 h-3.5 rounded border-gray-300 text-[#003875] focus:ring-[#003875] cursor-pointer"
+                              className="w-3.5 h-3.5 rounded border-gray-300 text-[#2563EB] focus:ring-[#2563EB] cursor-pointer"
                               checked={selectedSkus.length === filteredItems.length && filteredItems.length > 0}
                               onChange={toggleSelectAll}
                             />
-                            <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Acts</span>
+                            <span className="text-[13px] font-semibold text-gray-500">Acts</span>
                           </div>
                         </th>
-                        <th className="py-2.5 px-3 text-[10px] font-black text-gray-500 uppercase tracking-widest border-b border-gray-200 dark:border-white/10 whitespace-nowrap">SKU Code</th>
-                        <th className="py-2.5 px-3 text-[10px] font-black text-gray-500 uppercase tracking-widest border-b border-gray-200 dark:border-white/10 whitespace-nowrap">Category</th>
-                        <th className="py-2.5 px-3 text-[10px] font-black text-gray-500 uppercase tracking-widest border-b border-gray-200 dark:border-white/10 whitespace-nowrap">Item Name</th>
-                        <th className="py-2.5 px-3 text-[10px] font-black text-gray-500 uppercase tracking-widest border-b border-gray-200 dark:border-white/10 text-right">MOQ</th>
-                        <th className="py-2.5 px-3 text-[10px] font-black text-gray-500 uppercase tracking-widest border-b border-gray-200 dark:border-white/10 text-right">Daily Cons.</th>
-                        <th className="py-2.5 px-3 text-[10px] font-black text-gray-500 uppercase tracking-widest border-b border-gray-200 dark:border-white/10 text-right">In Transit</th>
-                        <th className="py-2.5 px-3 text-[10px] font-black text-gray-500 uppercase tracking-widest border-b border-gray-200 dark:border-white/10">Seller</th>
-                        <th className="py-2.5 px-3 text-[10px] font-black text-gray-500 uppercase tracking-widest border-b border-gray-200 dark:border-white/10 text-right" title="Lead Time (I2R)">L.T.</th>
-                        <th className="py-2.5 px-3 text-[10px] font-black text-gray-500 uppercase tracking-widest border-b border-gray-200 dark:border-white/10 text-right" title="Safety Factor">S.F.</th>
-                        <th className="py-2.5 px-3 text-[10px] font-black text-[#003875] dark:text-[#FFD500] uppercase tracking-widest border-b border-gray-200 dark:border-white/10 text-right bg-blue-50/50 dark:bg-yellow-500/5">Max Lvl</th>
-                        <th className="py-2.5 px-4 text-[10px] font-black text-gray-900 dark:text-white uppercase tracking-widest border-b border-gray-200 dark:border-white/10 text-left bg-gray-50 dark:bg-white/5 w-56">Stock Health</th>
+                        <th className="py-2.5 px-3 text-[13px] font-semibold text-gray-500 border-b border-gray-200 dark:border-white/10 whitespace-nowrap">SKU Code</th>
+                        <th className="py-2.5 px-3 text-[13px] font-semibold text-gray-500 border-b border-gray-200 dark:border-white/10 whitespace-nowrap">Category</th>
+                        <th className="py-2.5 px-3 text-[13px] font-semibold text-gray-500 border-b border-gray-200 dark:border-white/10 whitespace-nowrap">Item Name</th>
+                        <th className="py-2.5 px-3 text-[13px] font-semibold text-gray-500 border-b border-gray-200 dark:border-white/10 text-right">MOQ</th>
+                        <th className="py-2.5 px-3 text-[13px] font-semibold text-gray-500 border-b border-gray-200 dark:border-white/10 text-right">Daily Cons.</th>
+                        <th className="py-2.5 px-3 text-[13px] font-semibold text-gray-500 border-b border-gray-200 dark:border-white/10 text-right">In Transit</th>
+                        <th className="py-2.5 px-3 text-[13px] font-semibold text-gray-500 border-b border-gray-200 dark:border-white/10">Seller</th>
+                        <th className="py-2.5 px-3 text-[13px] font-semibold text-gray-500 border-b border-gray-200 dark:border-white/10 text-right" title="Lead Time (I2R)">L.T.</th>
+                        <th className="py-2.5 px-3 text-[13px] font-semibold text-gray-500 border-b border-gray-200 dark:border-white/10 text-right" title="Safety Factor">S.F.</th>
+                        <th className="py-2.5 px-3 text-[13px] font-semibold text-[#2563EB] dark:text-[#60A5FA] border-b border-gray-200 dark:border-white/10 text-right bg-blue-50/50 dark:bg-yellow-500/5">Max Lvl</th>
+                        <th className="py-2.5 px-4 text-[13px] font-semibold text-gray-900 dark:text-white border-b border-gray-200 dark:border-white/10 text-left bg-gray-50 dark:bg-white/5 w-56">Stock Health</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100 dark:divide-white/5">
@@ -764,12 +764,12 @@ export default function StationaryInventoryPage() {
                                   checked={isSelected}
                                   onChange={(e) => { e.stopPropagation(); toggleSelectSku(item.sku_code); }}
                                   onClick={(e) => e.stopPropagation()}
-                                  className="w-3.5 h-3.5 rounded border-gray-300 text-[#003875] focus:ring-[#003875] cursor-pointer mr-1"
+                                  className="w-3.5 h-3.5 rounded border-gray-300 text-[#2563EB] focus:ring-[#2563EB] cursor-pointer mr-1"
                                 />
                                 <button onClick={(e) => { e.stopPropagation(); setViewingSku(item.sku_code); }} className="text-emerald-600 dark:text-emerald-400 hover:scale-110 transition-transform" title="View Details">
                                   <EyeIcon className="w-4 h-4" />
                                 </button>
-                                <button onClick={(e) => { e.stopPropagation(); setEditingItem(item); setItemForm(item); setItemModalOpen(true); }} className="text-[#003875] dark:text-[#FFD500] hover:scale-110 transition-transform" title="Edit">
+                                <button onClick={(e) => { e.stopPropagation(); setEditingItem(item); setItemForm(item); setItemModalOpen(true); }} className="text-[#2563EB] dark:text-[#60A5FA] hover:scale-110 transition-transform" title="Edit">
                                   <PencilSquareIcon className="w-4 h-4" />
                                 </button>
                                 <button onClick={(e) => { e.stopPropagation(); confirmDelete(item.sku_code); }} className="text-rose-500 hover:scale-110 transition-transform" title="Delete">
@@ -777,23 +777,23 @@ export default function StationaryInventoryPage() {
                                 </button>
                               </div>
                             </td>
-                            <td className="py-2 px-3 text-[11px] font-black text-[#003875] dark:text-[#FFD500] whitespace-nowrap">{item.sku_code}</td>
-                            <td className="py-2 px-3 text-[11px] font-bold text-gray-500 uppercase whitespace-nowrap">{item.category}</td>
-                            <td className="py-2 px-3 text-[11px] font-black text-gray-900 dark:text-white uppercase truncate max-w-[200px]" title={item.item_name}>{item.item_name}</td>
-                            <td className="py-2 px-3 text-[11px] font-bold text-gray-600 dark:text-gray-400 text-right">{item.moq}</td>
-                            <td className="py-2 px-3 text-[11px] font-bold text-gray-600 dark:text-gray-400 text-right">{item.avg_daily_consumption}</td>
-                            <td className="py-2 px-3 text-[11px] font-bold text-gray-600 dark:text-gray-400 text-right">{item.material_in_transit}</td>
-                            <td className="py-2 px-3 text-[11px] font-bold text-gray-500 uppercase truncate max-w-[120px]" title={item.from_seller}>{item.from_seller}</td>
-                            <td className="py-2 px-3 text-[11px] font-bold text-gray-600 dark:text-gray-400 text-right">{item.lead_time}</td>
-                            <td className="py-2 px-3 text-[11px] font-bold text-gray-600 dark:text-gray-400 text-right">{item.safety_factor}</td>
-                            <td className="py-2 px-3 text-[11px] font-black text-[#003875] dark:text-[#FFD500] text-right bg-blue-50/30 dark:bg-yellow-500/5">{item.max_level?.toFixed(1) || 0}</td>
+                            <td className="py-2 px-3 text-[14px] font-semibold text-[#2563EB] dark:text-[#60A5FA] whitespace-nowrap">{item.sku_code}</td>
+                            <td className="py-2 px-3 text-[14px] font-bold text-gray-500 whitespace-nowrap">{item.category}</td>
+                            <td className="py-2 px-3 text-[14px] font-semibold text-gray-900 dark:text-white truncate max-w-[200px]" title={item.item_name}>{item.item_name}</td>
+                            <td className="py-2 px-3 text-[14px] font-bold text-gray-600 dark:text-gray-400 text-right">{item.moq}</td>
+                            <td className="py-2 px-3 text-[14px] font-bold text-gray-600 dark:text-gray-400 text-right">{item.avg_daily_consumption}</td>
+                            <td className="py-2 px-3 text-[14px] font-bold text-gray-600 dark:text-gray-400 text-right">{item.material_in_transit}</td>
+                            <td className="py-2 px-3 text-[14px] font-bold text-gray-500 truncate max-w-[120px]" title={item.from_seller}>{item.from_seller}</td>
+                            <td className="py-2 px-3 text-[14px] font-bold text-gray-600 dark:text-gray-400 text-right">{item.lead_time}</td>
+                            <td className="py-2 px-3 text-[14px] font-bold text-gray-600 dark:text-gray-400 text-right">{item.safety_factor}</td>
+                            <td className="py-2 px-3 text-[14px] font-semibold text-[#2563EB] dark:text-[#60A5FA] text-right bg-blue-50/30 dark:bg-yellow-500/5">{item.max_level?.toFixed(1) || 0}</td>
 
                             {/* Compact Stock Health Bar Component */}
                             <td className="py-1 px-4 bg-gray-50/50 dark:bg-white/[0.02]">
                               <div className="flex flex-col gap-1 w-full max-w-[180px]">
                                 <div className="flex justify-between items-baseline leading-none">
-                                  <span className={`text-xs font-black ${health.text}`}>{item.total_available}</span>
-                                  <span className="text-[9px] font-bold text-gray-400 uppercase">{health.label}</span>
+                                  <span className={`text-[14px] font-semibold ${health.text}`}>{item.total_available}</span>
+                                  <span className="text-[13px] font-bold text-[#5B6472]">{health.label}</span>
                                 </div>
                                 <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 overflow-hidden flex">
                                   <div className={`h-full ${health.color} transition-all duration-500`} style={{ width: `${health.pct}%` }}></div>
@@ -805,7 +805,7 @@ export default function StationaryInventoryPage() {
                       })}
                       {filteredItems.length === 0 && (
                         <tr>
-                          <td colSpan={12} className="py-8 text-center text-gray-400 text-[11px] font-black uppercase">No inventory records found</td>
+                          <td colSpan={12} className="py-8 text-center text-[#5B6472] text-[14px] font-semibold">No inventory records found</td>
                         </tr>
                       )}
                     </tbody>
@@ -837,39 +837,39 @@ export default function StationaryInventoryPage() {
                           </button>
                           <div>
                             <div className="flex items-center gap-3 mb-1">
-                              <h2 className="text-xl font-black text-gray-900 dark:text-white uppercase leading-none">{item.item_name}</h2>
-                              <span className="px-2 py-0.5 bg-[#003875]/10 text-[#003875] dark:bg-[#FFD500]/20 dark:text-[#FFD500] border border-[#003875]/20 dark:border-[#FFD500]/30 rounded text-[10px] font-black tracking-widest">{item.sku_code}</span>
+                              <h2 className="text-xl font-semibold text-gray-900 dark:text-white leading-none">{item.item_name}</h2>
+                              <span className="px-2 py-0.5 bg-[#2563EB]/10 text-white dark:bg-[#60A5FA]/20 dark:text-[#60A5FA] border border-[#2563EB]/20 dark:border-[#60A5FA]/30 rounded text-[13px] font-semibold">{item.sku_code}</span>
                             </div>
-                            <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">{item.category} • Supplier: {item.from_seller || 'N/A'}</p>
+                            <p className="text-[13px] font-bold text-gray-500">{item.category} • Supplier: {item.from_seller || 'N/A'}</p>
                           </div>
                         </div>
                         <div className="flex items-center gap-8 text-right">
                           <div className="text-center">
-                            <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">Total IN</p>
-                            <span className="text-xl font-black text-emerald-600 dark:text-emerald-400">{totalIn}</span>
+                            <p className="text-[13px] font-semibold text-gray-500 mb-1">Total IN</p>
+                            <span className="text-xl font-semibold text-emerald-600 dark:text-emerald-400">{totalIn}</span>
                           </div>
                           <div className="w-px h-8 bg-gray-200 dark:bg-white/10"></div>
                           <div className="text-center">
-                            <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">Total OUT</p>
-                            <span className="text-xl font-black text-rose-600 dark:text-rose-400">{totalOut}</span>
+                            <p className="text-[13px] font-semibold text-gray-500 mb-1">Total OUT</p>
+                            <span className="text-xl font-semibold text-rose-600 dark:text-rose-400">{totalOut}</span>
                           </div>
                           <div className="w-px h-8 bg-gray-200 dark:bg-white/10"></div>
                           <div className="text-right">
-                            <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">Current Stock / Max</p>
+                            <p className="text-[13px] font-semibold text-gray-500 mb-1">Current Stock / Max</p>
                             <div className="flex items-end justify-end gap-2">
-                              <span className={`text-2xl font-black leading-none ${health.text}`}>{item.total_available}</span>
-                              <span className="text-sm font-bold text-gray-400 mb-0.5">/ {item.max_level?.toFixed(1) || 0}</span>
+                              <span className={`text-2xl font-semibold leading-none ${health.text}`}>{item.total_available}</span>
+                              <span className="text-sm font-bold text-[#5B6472] mb-0.5">/ {item.max_level?.toFixed(1) || 0}</span>
                             </div>
                           </div>
                         </div>
                       </div>
 
                       <div className="p-3 bg-gray-100 dark:bg-[#1f2937] border-b border-gray-200 dark:border-white/5 flex items-center justify-between shrink-0">
-                        <h3 className="text-xs font-black text-gray-600 dark:text-gray-300 uppercase tracking-widest ml-1">Transaction History ({filteredItemLogs.length})</h3>
+                        <h3 className="text-[14px] font-semibold text-gray-600 dark:text-gray-300 ml-1">Transaction History ({filteredItemLogs.length})</h3>
                         <div className="flex gap-2">
-                          <button onClick={() => setDetailsFilter("ALL")} className={`px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${detailsFilter === "ALL" ? "bg-gray-800 text-white shadow-md dark:bg-white dark:text-gray-900" : "bg-white text-gray-500 hover:bg-gray-200 dark:bg-[#111827] dark:text-gray-400 dark:hover:bg-white/10"}`}>All</button>
-                          <button onClick={() => setDetailsFilter("IN")} className={`flex items-center gap-1 px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${detailsFilter === "IN" ? "bg-emerald-500 text-white shadow-md" : "bg-white text-emerald-600 hover:bg-emerald-50 dark:bg-[#111827] dark:text-emerald-400 dark:hover:bg-emerald-500/10"}`}><ArrowDownTrayIcon className="w-3 h-3" /> IN</button>
-                          <button onClick={() => setDetailsFilter("OUT")} className={`flex items-center gap-1 px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${detailsFilter === "OUT" ? "bg-rose-500 text-white shadow-md" : "bg-white text-rose-600 hover:bg-rose-50 dark:bg-[#111827] dark:text-rose-400 dark:hover:bg-rose-500/10"}`}><ArrowUpTrayIcon className="w-3 h-3" /> OUT</button>
+                          <button onClick={() => setDetailsFilter("ALL")} className={`px-4 py-1.5 rounded-lg text-[13px] font-semibold   transition-all ${detailsFilter === "ALL" ? "bg-gray-800 text-white shadow-md dark:bg-white dark:text-gray-900" : "bg-white text-gray-500 hover:bg-gray-200 dark:bg-[#111827] dark:text-gray-400 dark:hover:bg-white/10"}`}>All</button>
+                          <button onClick={() => setDetailsFilter("IN")} className={`flex items-center gap-1 px-4 py-1.5 rounded-lg text-[13px] font-semibold   transition-all ${detailsFilter === "IN" ? "bg-emerald-500 text-white shadow-md" : "bg-white text-emerald-600 hover:bg-emerald-50 dark:bg-[#111827] dark:text-emerald-400 dark:hover:bg-emerald-500/10"}`}><ArrowDownTrayIcon className="w-3 h-3" /> IN</button>
+                          <button onClick={() => setDetailsFilter("OUT")} className={`flex items-center gap-1 px-4 py-1.5 rounded-lg text-[13px] font-semibold   transition-all ${detailsFilter === "OUT" ? "bg-rose-500 text-white shadow-md" : "bg-white text-rose-600 hover:bg-rose-50 dark:bg-[#111827] dark:text-rose-400 dark:hover:bg-rose-500/10"}`}><ArrowUpTrayIcon className="w-3 h-3" /> OUT</button>
                         </div>
                       </div>
 
@@ -877,21 +877,21 @@ export default function StationaryInventoryPage() {
                         <table className="w-full text-left border-collapse">
                           <thead className="bg-gray-50 dark:bg-[#182031] sticky top-0 shadow-sm z-10">
                             <tr>
-                              <th className="py-2.5 px-4 text-[10px] font-black text-gray-500 uppercase tracking-widest border-b border-gray-200 dark:border-white/10 w-48">Date & Time</th>
-                              <th className="py-2.5 px-4 text-[10px] font-black text-gray-500 uppercase tracking-widest border-b border-gray-200 dark:border-white/10 w-28">Type</th>
-                              <th className="py-2.5 px-4 text-[10px] font-black text-gray-500 uppercase tracking-widest border-b border-gray-200 dark:border-white/10 text-right w-28">Quantity</th>
-                              <th className="py-2.5 px-4 text-[10px] font-black text-gray-500 uppercase tracking-widest border-b border-gray-200 dark:border-white/10">Remarks</th>
-                              <th className="py-2.5 px-4 text-[10px] font-black text-gray-500 uppercase tracking-widest border-b border-gray-200 dark:border-white/10 w-40">User</th>
+                              <th className="py-2.5 px-4 text-[13px] font-semibold text-gray-500 border-b border-gray-200 dark:border-white/10 w-48">Date & Time</th>
+                              <th className="py-2.5 px-4 text-[13px] font-semibold text-gray-500 border-b border-gray-200 dark:border-white/10 w-28">Type</th>
+                              <th className="py-2.5 px-4 text-[13px] font-semibold text-gray-500 border-b border-gray-200 dark:border-white/10 text-right w-28">Quantity</th>
+                              <th className="py-2.5 px-4 text-[13px] font-semibold text-gray-500 border-b border-gray-200 dark:border-white/10">Remarks</th>
+                              <th className="py-2.5 px-4 text-[13px] font-semibold text-gray-500 border-b border-gray-200 dark:border-white/10 w-40">User</th>
                             </tr>
                           </thead>
-                          <tbody className="divide-y divide-gray-100 dark:divide-white/5 font-mono text-[11px]">
+                          <tbody className="divide-y divide-gray-100 dark:divide-white/5 font-mono text-[14px]">
                             {filteredItemLogs.map((log, idx) => (
                               <tr key={idx} className="hover:bg-gray-50 dark:hover:bg-white/[0.02] transition-colors group">
                                 <td className="py-2.5 px-4 text-gray-500 whitespace-nowrap">
                                   {new Date(log.timestamp).toLocaleString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
                                 </td>
                                 <td className="py-2.5 px-4 whitespace-nowrap">
-                                  <span className={`flex items-center gap-1 w-max px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider ${log.transaction_type === 'IN'
+                                  <span className={`flex items-center gap-1 w-max px-2 py-0.5 rounded text-[13px] font-semibold  tracking-wider ${log.transaction_type === 'IN'
                                       ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400'
                                       : 'bg-rose-100 text-rose-700 dark:bg-rose-500/20 dark:text-rose-400'
                                     }`}>
@@ -899,16 +899,16 @@ export default function StationaryInventoryPage() {
                                     {log.transaction_type}
                                   </span>
                                 </td>
-                                <td className={`py-2.5 px-4 font-black text-right ${log.transaction_type === 'IN' ? 'text-emerald-600' : 'text-rose-600'}`}>
+                                <td className={`py-2.5 px-4 font-semibold text-right ${log.transaction_type === 'IN' ? 'text-emerald-600' : 'text-rose-600'}`}>
                                   {log.transaction_type === 'IN' ? '+' : '-'}{log.quantity}
                                 </td>
-                                <td className="py-2.5 px-4 text-gray-500 uppercase truncate max-w-[400px]" title={log.remarks}>{log.remarks || '-'}</td>
-                                <td className="py-2.5 px-4 text-gray-500 uppercase truncate font-sans font-bold">{log.user}</td>
+                                <td className="py-2.5 px-4 text-gray-500 truncate max-w-[400px]" title={log.remarks}>{log.remarks || '-'}</td>
+                                <td className="py-2.5 px-4 text-gray-500 truncate font-sans font-bold">{log.user}</td>
                               </tr>
                             ))}
                             {filteredItemLogs.length === 0 && (
                               <tr>
-                                <td colSpan={5} className="py-8 text-center text-gray-400 font-sans text-[11px] font-black uppercase">No transactions recorded for this item.</td>
+                                <td colSpan={5} className="py-8 text-center text-[#5B6472] font-sans text-[14px] font-semibold">No transactions recorded for this item.</td>
                               </tr>
                             )}
                           </tbody>
@@ -937,23 +937,23 @@ export default function StationaryInventoryPage() {
                   <table className="w-full text-left border-collapse relative">
                     <thead className="bg-gray-100 dark:bg-[#1f2937] sticky top-0 shadow-sm z-10">
                       <tr>
-                        <th className="py-2.5 px-4 text-[10px] font-black text-gray-500 uppercase tracking-widest border-b border-gray-200 dark:border-white/10 w-48">Date & Time</th>
-                        <th className="py-2.5 px-4 text-[10px] font-black text-gray-500 uppercase tracking-widest border-b border-gray-200 dark:border-white/10 w-28">Type</th>
-                        <th className="py-2.5 px-4 text-[10px] font-black text-gray-500 uppercase tracking-widest border-b border-gray-200 dark:border-white/10 w-36">SKU Code</th>
-                        <th className="py-2.5 px-4 text-[10px] font-black text-gray-500 uppercase tracking-widest border-b border-gray-200 dark:border-white/10">Item Name</th>
-                        <th className="py-2.5 px-4 text-[10px] font-black text-gray-500 uppercase tracking-widest border-b border-gray-200 dark:border-white/10 text-right w-28">Quantity</th>
-                        <th className="py-2.5 px-4 text-[10px] font-black text-gray-500 uppercase tracking-widest border-b border-gray-200 dark:border-white/10">Remarks</th>
-                        <th className="py-2.5 px-4 text-[10px] font-black text-gray-500 uppercase tracking-widest border-b border-gray-200 dark:border-white/10 w-40">User</th>
+                        <th className="py-2.5 px-4 text-[13px] font-semibold text-gray-500 border-b border-gray-200 dark:border-white/10 w-48">Date & Time</th>
+                        <th className="py-2.5 px-4 text-[13px] font-semibold text-gray-500 border-b border-gray-200 dark:border-white/10 w-28">Type</th>
+                        <th className="py-2.5 px-4 text-[13px] font-semibold text-gray-500 border-b border-gray-200 dark:border-white/10 w-36">SKU Code</th>
+                        <th className="py-2.5 px-4 text-[13px] font-semibold text-gray-500 border-b border-gray-200 dark:border-white/10">Item Name</th>
+                        <th className="py-2.5 px-4 text-[13px] font-semibold text-gray-500 border-b border-gray-200 dark:border-white/10 text-right w-28">Quantity</th>
+                        <th className="py-2.5 px-4 text-[13px] font-semibold text-gray-500 border-b border-gray-200 dark:border-white/10">Remarks</th>
+                        <th className="py-2.5 px-4 text-[13px] font-semibold text-gray-500 border-b border-gray-200 dark:border-white/10 w-40">User</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-100 dark:divide-white/5 font-mono text-[11px]">
+                    <tbody className="divide-y divide-gray-100 dark:divide-white/5 font-mono text-[14px]">
                       {filteredLogs.map((log, idx) => (
                         <tr key={idx} className="hover:bg-gray-50 dark:hover:bg-white/[0.02] transition-colors group">
                           <td className="py-2.5 px-4 text-gray-500 whitespace-nowrap">
                             {new Date(log.timestamp).toLocaleString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
                           </td>
                           <td className="py-2.5 px-4 whitespace-nowrap">
-                            <span className={`flex items-center gap-1 w-max px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider ${log.transaction_type === 'IN'
+                            <span className={`flex items-center gap-1 w-max px-2 py-0.5 rounded text-[13px] font-semibold  tracking-wider ${log.transaction_type === 'IN'
                                 ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400'
                                 : 'bg-rose-100 text-rose-700 dark:bg-rose-500/20 dark:text-rose-400'
                               }`}>
@@ -961,18 +961,18 @@ export default function StationaryInventoryPage() {
                               {log.transaction_type}
                             </span>
                           </td>
-                          <td className="py-2.5 px-4 font-black text-[#003875] dark:text-[#FFD500] whitespace-nowrap">{log.sku_code}</td>
-                          <td className="py-2.5 px-4 text-gray-900 dark:text-white uppercase truncate max-w-[250px]" title={log.item_name}>{log.item_name}</td>
-                          <td className={`py-2.5 px-4 font-black text-right ${log.transaction_type === 'IN' ? 'text-emerald-600' : 'text-rose-600'}`}>
+                          <td className="py-2.5 px-4 font-semibold text-[#2563EB] dark:text-[#60A5FA] whitespace-nowrap">{log.sku_code}</td>
+                          <td className="py-2.5 px-4 text-gray-900 dark:text-white truncate max-w-[250px]" title={log.item_name}>{log.item_name}</td>
+                          <td className={`py-2.5 px-4 font-semibold text-right ${log.transaction_type === 'IN' ? 'text-emerald-600' : 'text-rose-600'}`}>
                             {log.transaction_type === 'IN' ? '+' : '-'}{log.quantity}
                           </td>
-                          <td className="py-2.5 px-4 text-gray-500 uppercase truncate max-w-[250px]" title={log.remarks}>{log.remarks || '-'}</td>
-                          <td className="py-2.5 px-4 text-gray-500 uppercase truncate font-sans font-bold">{log.user}</td>
+                          <td className="py-2.5 px-4 text-gray-500 truncate max-w-[250px]" title={log.remarks}>{log.remarks || '-'}</td>
+                          <td className="py-2.5 px-4 text-gray-500 truncate font-sans font-bold">{log.user}</td>
                         </tr>
                       ))}
                       {filteredLogs.length === 0 && (
                         <tr>
-                          <td colSpan={7} className="py-8 text-center text-gray-400 font-sans text-[11px] font-black uppercase">No transaction logs found for this filter</td>
+                          <td colSpan={7} className="py-8 text-center text-[#5B6472] font-sans text-[14px] font-semibold">No transaction logs found for this filter</td>
                         </tr>
                       )}
                     </tbody>
@@ -998,11 +998,11 @@ export default function StationaryInventoryPage() {
               initial={{ opacity: 0, scale: 0.95, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              className="bg-white dark:bg-[#111827] rounded-2xl shadow-[0_0_40px_rgba(0,56,117,0.3)] dark:shadow-[0_0_40px_rgba(255,213,0,0.1)] w-full max-w-2xl overflow-hidden border border-[#003875]/30 dark:border-[#FFD500]/20"
+              className="bg-white dark:bg-[#111827] rounded-2xl shadow-[0_0_40px_rgba(0,56,117,0.3)] dark:shadow-[0_0_40px_rgba(255,213,0,0.1)] w-full max-w-2xl overflow-hidden border border-[#2563EB]/30 dark:border-[#60A5FA]/20"
             >
-              <div className="flex items-center justify-between p-5 border-b border-blue-800/20 dark:border-white/5 bg-gradient-to-r from-[#003875] to-blue-800 dark:from-[#1f2937] dark:to-[#111827] text-white">
-                <h3 className="text-sm font-black uppercase tracking-widest flex items-center gap-2">
-                  <ClipboardDocumentListIcon className="w-5 h-5 text-blue-200 dark:text-[#FFD500]" />
+              <div className="flex items-center justify-between p-5 border-b border-blue-800/20 dark:border-white/5 bg-gradient-to-r from-[#2563EB] to-blue-800 dark:from-[#1f2937] dark:to-[#111827] text-white">
+                <h3 className="text-sm font-semibold flex items-center gap-2">
+                  <ClipboardDocumentListIcon className="w-5 h-5 text-blue-200 dark:text-[#60A5FA]" />
                   {editingItem ? 'Edit Master Record' : 'Create Master Record'}
                 </h3>
                 <button onClick={() => setItemModalOpen(false)} className="p-1.5 text-white/70 hover:text-white bg-white/10 hover:bg-white/20 dark:bg-[#1f2937] rounded-lg shadow-sm transition-colors">
@@ -1035,8 +1035,8 @@ export default function StationaryInventoryPage() {
 
               </div>
               <div className="p-4 border-t border-gray-100 dark:border-white/5 flex justify-end gap-3 bg-gray-50/50 dark:bg-[#1f2937]/50">
-                <button onClick={() => setItemModalOpen(false)} className="px-5 py-2 rounded-xl text-xs font-black text-gray-500 uppercase tracking-widest hover:bg-white dark:hover:bg-[#111827] shadow-sm border border-gray-200 dark:border-white/10 transition-colors">Cancel</button>
-                <button onClick={handleSaveItem} className="px-6 py-2 rounded-xl text-xs font-black text-white bg-gradient-to-r from-[#003875] to-blue-600 dark:from-[#FFD500] dark:to-yellow-400 dark:text-[#003875] uppercase tracking-widest hover:brightness-110 shadow-lg shadow-blue-500/20 dark:shadow-yellow-500/20 transition-all">Save Record</button>
+                <button onClick={() => setItemModalOpen(false)} className="px-5 py-2 rounded-xl text-[14px] font-semibold text-gray-500 hover:bg-white dark:hover:bg-[#111827] shadow-sm border border-gray-200 dark:border-white/10 transition-colors">Cancel</button>
+                <button onClick={handleSaveItem} className="px-6 py-2 rounded-xl text-[14px] font-semibold text-white bg-gradient-to-r from-[#2563EB] to-blue-600 dark:from-[#60A5FA] dark:to-yellow-400 dark:text-[#60A5FA] hover:brightness-110 shadow-lg shadow-blue-500/20 dark:shadow-yellow-500/20 transition-all">Save Record</button>
               </div>
             </motion.div>
           </div>
@@ -1058,10 +1058,10 @@ export default function StationaryInventoryPage() {
                   {stockType === 'IN' ? <ArrowDownTrayIcon className="w-5 h-5" /> : <ArrowUpTrayIcon className="w-5 h-5" />}
                 </div>
                 <div>
-                  <h3 className="text-sm font-black uppercase tracking-widest leading-none">
+                  <h3 className="text-sm font-semibold leading-none">
                     Stock {stockType} Entry
                   </h3>
-                  {selectedSkus.length > 0 && <p className="text-[10px] font-bold mt-1 text-white/80 uppercase">Bulk Operation: {selectedSkus.length} Items</p>}
+                  {selectedSkus.length > 0 && <p className="text-[13px] font-bold mt-1 text-white/80">Bulk Operation: {selectedSkus.length} Items</p>}
                 </div>
                 <button onClick={() => setStockModalOpen(false)} className="ml-auto p-1.5 hover:bg-white/20 rounded-lg transition-colors">
                   <XMarkIcon className="w-5 h-5" />
@@ -1076,10 +1076,10 @@ export default function StationaryInventoryPage() {
                       const item = items.find(i => i.sku_code === sku);
                       return (
                         <div key={sku} className="relative p-5 pt-6 rounded-xl border border-gray-200 dark:border-white/10 bg-gray-50/50 dark:bg-white/[0.02] mt-4">
-                          <div className="absolute -top-3 left-4 bg-gray-50 dark:bg-[#111827] px-2 text-[10px] font-black text-[#003875] dark:text-[#FFD500] uppercase tracking-widest border border-gray-200 dark:border-white/10 rounded">
+                          <div className="absolute -top-3 left-4 bg-gray-50 dark:bg-[#111827] px-2 text-[13px] font-semibold text-[#2563EB] dark:text-[#60A5FA] border border-gray-200 dark:border-white/10 rounded">
                             {sku}
                           </div>
-                          <p className="text-xs font-bold text-gray-500 uppercase truncate mb-5">{item?.item_name}</p>
+                          <p className="text-[14px] font-bold text-gray-500 truncate mb-5">{item?.item_name}</p>
                           <div className="grid grid-cols-3 gap-6">
                             <div className="col-span-1">
                               <FloatingInput
@@ -1111,14 +1111,14 @@ export default function StationaryInventoryPage() {
                         id="select-sku"
                         value={selectedSku}
                         onChange={(e) => setSelectedSku(e.target.value)}
-                        className="block px-3 pb-2.5 pt-4 w-full text-sm font-bold text-gray-900 bg-transparent rounded-lg border-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-[#FFD500] focus:outline-none focus:ring-0 focus:border-[#003875] peer uppercase"
+                        className="block px-3 pb-2.5 pt-4 w-full text-sm font-bold text-gray-900 bg-transparent rounded-lg border-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-[#60A5FA] focus:outline-none focus:ring-0 focus:border-[#2563EB] peer"
                       >
                         <option value="" className="dark:bg-gray-800">-- CHOOSE SKU --</option>
                         {items.map(i => (
                           <option key={i.sku_code} value={i.sku_code} className="dark:bg-gray-800">{i.sku_code} - {i.item_name}</option>
                         ))}
                       </select>
-                      <label htmlFor="select-sku" className="absolute text-[10px] font-black text-gray-400 dark:text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white dark:bg-[#111827] px-2 peer-focus:px-2 peer-focus:text-[#003875] peer-focus:dark:text-[#FFD500] peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1 uppercase tracking-widest">Target SKU</label>
+                      <label htmlFor="select-sku" className="absolute text-[13px] font-semibold text-[#5B6472] dark:text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white dark:bg-[#111827] px-2 peer-focus:px-2 peer-focus:text-[#2563EB] peer-focus:dark:text-[#2563EB] peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1">Target SKU</label>
                     </div>
 
                     <FloatingInput
@@ -1140,11 +1140,11 @@ export default function StationaryInventoryPage() {
                 )}
               </div>
               <div className="p-4 border-t border-gray-100 dark:border-white/5 flex justify-end gap-3 bg-gray-50/50 dark:bg-[#1f2937]/50">
-                <button onClick={() => setStockModalOpen(false)} className="px-5 py-2 rounded-xl text-xs font-black text-gray-500 uppercase tracking-widest hover:bg-white dark:hover:bg-[#111827] shadow-sm border border-gray-200 dark:border-white/10 transition-colors disabled:opacity-50">Cancel</button>
+                <button onClick={() => setStockModalOpen(false)} className="px-5 py-2 rounded-xl text-[14px] font-semibold text-gray-500 hover:bg-white dark:hover:bg-[#111827] shadow-sm border border-gray-200 dark:border-white/10 transition-colors disabled:opacity-50">Cancel</button>
                 <button
                   onClick={handleStockTransaction}
                   disabled={(selectedSkus.length === 0 && (!selectedSku || stockForm.quantity <= 0))}
-                  className={`flex items-center px-6 py-2 rounded-xl text-xs font-black text-white uppercase tracking-widest shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed ${stockType === 'IN' ? 'bg-gradient-to-r from-emerald-500 to-emerald-400 hover:brightness-110 shadow-emerald-500/20' : 'bg-gradient-to-r from-rose-500 to-rose-400 hover:brightness-110 shadow-rose-500/20'}`}
+                  className={`flex items-center px-6 py-2 rounded-xl text-[14px] font-semibold text-white   shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed ${stockType === 'IN' ? 'bg-gradient-to-r from-emerald-500 to-emerald-400 hover:brightness-110 shadow-emerald-500/20' : 'bg-gradient-to-r from-rose-500 to-rose-400 hover:brightness-110 shadow-rose-500/20'}`}
                 >
                   Confirm {stockType}
                 </button>

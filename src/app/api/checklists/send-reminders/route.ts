@@ -74,7 +74,7 @@ export async function GET(req: Request) {
           parts.push(listLines(b.today, false));
         }
         parts.push(`\n👉 ERP kholkar complete karein: https://robotekindia.app/checklists`);
-        parts.push(`— Robotek ERP`);
+        parts.push(`— Sarthi`);
         try {
           const r = await sendWhatsAppMessage(user.phone, parts.join("\n"));
           entry.sent = !!(r as any)?.success;

@@ -399,7 +399,7 @@ export default function ChatWindow({ chatId, currentUsername, onBack, onlineUser
             <div className="flex items-center gap-2">
               <h3 className="font-medium text-[16px]">{displayName}</h3>
             </div>
-            <p className="text-xs text-white/70 truncate max-w-[min(100%,420px)]">
+            <p className="text-[14px] text-white/70 truncate max-w-[min(100%,420px)]">
               {typingUsers.length > 0
                 ? `${typingUsers.join(", ")} typing...`
                 : isGroup
@@ -485,7 +485,7 @@ export default function ChatWindow({ chatId, currentUsername, onBack, onlineUser
               <React.Fragment key={msg.id}>
                 {showDateDivider && (
                   <div className="flex justify-center my-3">
-                    <span className="text-xs font-medium text-gray-600 bg-white/90 px-3 py-1 rounded-lg shadow-sm">
+                    <span className="text-[14px] font-medium text-gray-600 bg-white/90 px-3 py-1 rounded-lg shadow-sm">
                       {getDateLabel(msg.created_at)}
                     </span>
                   </div>

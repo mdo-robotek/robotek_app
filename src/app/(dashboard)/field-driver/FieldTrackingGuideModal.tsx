@@ -44,11 +44,11 @@ function Section({
         onClick={() => setOpen((v) => !v)}
         className="w-full flex items-center justify-between gap-3 px-4 py-3 bg-gray-50/80 dark:bg-slate-900/50 hover:bg-gray-100/80 dark:hover:bg-slate-800/50 transition-colors text-left"
       >
-        <span className="flex items-center gap-2 text-sm font-black uppercase tracking-widest text-gray-900 dark:text-white">
-          {Icon && <Icon className="w-4 h-4 text-[#003875] dark:text-[#FFD500]" />}
+        <span className="flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-white">
+          {Icon && <Icon className="w-4 h-4 text-[#2563EB] dark:text-[#60A5FA]" />}
           {title}
         </span>
-        <ChevronDownIcon className={`w-4 h-4 text-gray-400 transition-transform ${open ? "rotate-180" : ""}`} />
+        <ChevronDownIcon className={`w-4 h-4 text-[#5B6472] transition-transform ${open ? "rotate-180" : ""}`} />
       </button>
       {open && <div className="p-4 space-y-3">{children}</div>}
     </section>
@@ -57,8 +57,8 @@ function Section({
 
 function Detail({ label, value }: { label: string; value: React.ReactNode }) {
   return (
-    <div className="text-xs leading-relaxed">
-      <span className="font-black uppercase tracking-wider text-[#003875] dark:text-[#FFD500]">{label}: </span>
+    <div className="text-[14px] leading-relaxed">
+      <span className="font-semibold tracking-wider text-[#2563EB] dark:text-[#60A5FA]">{label}: </span>
       <span className="text-gray-600 dark:text-gray-300">{value}</span>
     </div>
   );
@@ -66,7 +66,7 @@ function Detail({ label, value }: { label: string; value: React.ReactNode }) {
 
 function BulletList({ items }: { items: string[] }) {
   return (
-    <ul className="text-xs text-gray-600 dark:text-gray-300 space-y-1.5 list-disc pl-4 leading-relaxed">
+    <ul className="text-[14px] text-gray-600 dark:text-gray-300 space-y-1.5 list-disc pl-4 leading-relaxed">
       {items.map((item) => (
         <li key={item}>{item}</li>
       ))}
@@ -77,11 +77,11 @@ function BulletList({ items }: { items: string[] }) {
 function ColTable({ headers, rows }: { headers: string[]; rows: string[][] }) {
   return (
     <div className="overflow-x-auto rounded-xl border border-gray-100 dark:border-white/10">
-      <table className="w-full text-[11px]">
+      <table className="w-full text-[14px]">
         <thead>
           <tr className="bg-gray-50 dark:bg-slate-800/80">
             {headers.map((h) => (
-              <th key={h} className="px-3 py-2 text-left font-black uppercase tracking-wider text-gray-500 border-b border-gray-100 dark:border-white/10">
+              <th key={h} className="px-3 py-2 text-left font-semibold tracking-wider text-gray-500 border-b border-gray-100 dark:border-white/10">
                 {h}
               </th>
             ))}
@@ -122,20 +122,20 @@ export default function FieldTrackingGuideModal({ open, onClose, isAdmin }: Fiel
         {/* Header */}
         <div className="sticky top-0 z-10 flex items-start justify-between gap-4 p-5 md:p-6 pb-4 border-b border-gray-100 dark:border-white/10 bg-[var(--panel-card)]">
           <div>
-            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#003875] dark:text-[#FFD500] mb-1">
+            <p className="text-[13px] font-semibold text-[#2563EB] dark:text-[#60A5FA] mb-1">
               Complete reference
             </p>
-            <h2 id="field-tracking-guide-title" className="text-xl font-black uppercase text-gray-900 dark:text-white tracking-tight">
+            <h2 id="field-tracking-guide-title" className="text-xl font-semibold text-gray-900 dark:text-white tracking-tight">
               Field Tracking — Full System Guide
             </h2>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 font-medium">
+            <p className="text-[14px] text-gray-500 dark:text-gray-400 mt-1 font-medium">
               Login logic · Maps · Data storage · Every tab · APIs · Verification rules
             </p>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="shrink-0 p-2 rounded-xl text-gray-400 hover:text-gray-700 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
+            className="shrink-0 p-2 rounded-xl text-[#5B6472] hover:text-gray-700 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
             aria-label="Close guide"
           >
             <XMarkIcon className="w-6 h-6" />
@@ -158,7 +158,7 @@ export default function FieldTrackingGuideModal({ open, onClose, isAdmin }: Fiel
               <a
                 key={id}
                 href={`#${id}`}
-                className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-[#003875]/10 dark:bg-[#FFD500]/10 text-[#003875] dark:text-[#FFD500] hover:opacity-80"
+                className="px-3 py-1 rounded-full text-[13px] font-semibold tracking-wider bg-[#2563EB]/10 dark:bg-[#60A5FA]/10 text-white dark:text-[#60A5FA] hover:opacity-80"
               >
                 {label}
               </a>
@@ -203,7 +203,7 @@ export default function FieldTrackingGuideModal({ open, onClose, isAdmin }: Fiel
           <Section id="storage" title="How Data Is Saved" icon={CircleStackIcon}>
             <Detail label="Google Spreadsheet" value="Single spreadsheet (ID configured in field-driver-sheets.ts). Two tabs:" />
 
-            <p className="text-[11px] font-black uppercase tracking-wider text-gray-400 mt-2">Tab 1 — “Field Driver” (check-in / check-out records)</p>
+            <p className="text-[14px] font-semibold tracking-wider text-[#5B6472] mt-2">Tab 1 — “Field Driver” (check-in / check-out records)</p>
             <ColTable
               headers={["Column", "Field", "Saved when"]}
               rows={[
@@ -224,7 +224,7 @@ export default function FieldTrackingGuideModal({ open, onClose, isAdmin }: Fiel
               ]}
             />
 
-            <p className="text-[11px] font-black uppercase tracking-wider text-gray-400 mt-3">Tab 2 — “Live Tracking” (GPS route pings)</p>
+            <p className="text-[14px] font-semibold tracking-wider text-[#5B6472] mt-3">Tab 2 — “Live Tracking” (GPS route pings)</p>
             <ColTable
               headers={["Column", "Field", "Saved when"]}
               rows={[
@@ -235,7 +235,7 @@ export default function FieldTrackingGuideModal({ open, onClose, isAdmin }: Fiel
               ]}
             />
 
-            <p className="text-[11px] font-black uppercase tracking-wider text-gray-400 mt-3">Google Drive — Odometer photos</p>
+            <p className="text-[14px] font-semibold tracking-wider text-[#5B6472] mt-3">Google Drive — Odometer photos</p>
             <BulletList
               items={[
                 "Photos captured as base64 JPEG on the client.",
@@ -262,9 +262,9 @@ export default function FieldTrackingGuideModal({ open, onClose, isAdmin }: Fiel
 
           {/* ── TAB: MY TRACKING ── */}
           <Section id="tab-tracking" title="Tab 1 — My Tracking (All Users)" icon={UserIcon}>
-            <p className="text-xs text-gray-500 dark:text-gray-400">Two side-by-side panels. Default tab for every logged-in user.</p>
+            <p className="text-[14px] text-gray-500 dark:text-gray-400">Two side-by-side panels. Default tab for every logged-in user.</p>
 
-            <p className="text-[11px] font-black uppercase tracking-wider text-[#003875] dark:text-[#FFD500]">Left panel — Journey Status</p>
+            <p className="text-[14px] font-semibold tracking-wider text-[#2563EB] dark:text-[#60A5FA]">Left panel — Journey Status</p>
             <BulletList
               items={[
                 "Shows one of three states: IDLE (can check in), CHECKED_IN (timer running, can end journey), COMPLETED (journey done for today).",
@@ -277,7 +277,7 @@ export default function FieldTrackingGuideModal({ open, onClose, isAdmin }: Fiel
               ]}
             />
 
-            <p className="text-[11px] font-black uppercase tracking-wider text-[#003875] dark:text-[#FFD500] mt-2">Right panel — GPS Signal Status</p>
+            <p className="text-[14px] font-semibold tracking-wider text-[#2563EB] dark:text-[#60A5FA] mt-2">Right panel — GPS Signal Status</p>
             <BulletList
               items={[
                 "Shows GPS acquisition spinner until coordinates arrive.",
@@ -289,7 +289,7 @@ export default function FieldTrackingGuideModal({ open, onClose, isAdmin }: Fiel
               ]}
             />
 
-            <p className="text-[11px] font-black uppercase tracking-wider text-gray-400 mt-2">Background sync logic (while CHECKED_IN)</p>
+            <p className="text-[14px] font-semibold tracking-wider text-[#5B6472] mt-2">Background sync logic (while CHECKED_IN)</p>
             <BulletList
               items={[
                 "Every 60 seconds (+ immediately on check-in): POST /api/field-driver/live with current lat/lng.",
@@ -309,7 +309,7 @@ export default function FieldTrackingGuideModal({ open, onClose, isAdmin }: Fiel
                   "Date picker at top of sidebar (defaults to today in IST via getIstDateString()).",
                   "Sidebar lists every user who has GPS pings on that date — shows name + ping count.",
                   "Click a user to isolate their route; click again to show all users.",
-                  "Each user gets a unique route color (#FFD500, #003875, #EF4444, #10B981, #F59E0B, #8B5CF6).",
+                  "Each user gets a unique route color (#2563EB, #2563EB, #EF4444, #10B981, #F59E0B, #8B5CF6).",
                   "Map draws: Polyline connecting all pings, scooter emoji marker at last ping with name label, dot markers on each ping when user is selected.",
                   "Map auto-centers on first user's last ping if data exists; otherwise New Delhi.",
                   "Empty state: “No field movement recorded today.” when no pings for selected date.",
@@ -407,7 +407,7 @@ export default function FieldTrackingGuideModal({ open, onClose, isAdmin }: Fiel
           <button
             type="button"
             onClick={onClose}
-            className="w-full py-3 rounded-xl bg-[#003875] dark:bg-[#FFD500] text-white dark:text-black text-xs font-black uppercase tracking-widest hover:opacity-90 transition-opacity"
+            className="w-full py-3 rounded-xl bg-[#2563EB] dark:bg-[#60A5FA] text-white dark:text-black text-[14px] font-semibold hover:opacity-90 transition-opacity"
           >
             Got it
           </button>

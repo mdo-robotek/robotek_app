@@ -40,10 +40,10 @@ export default function DrillDownModal({ isOpen, onClose, title, columns, data }
           {/* Header */}
           <div className="p-6 bg-gray-50 dark:bg-white/5 border-b border-gray-100 dark:border-white/5 flex items-center justify-between">
             <div>
-              <h3 className="text-xl font-black text-gray-900 dark:text-white uppercase tracking-tight">
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white tracking-tight">
                 {title}
               </h3>
-              <p className="text-[11px] font-bold text-gray-400 mt-1 uppercase tracking-widest">
+              <p className="text-[14px] font-bold text-[#5B6472] mt-1">
                 {data.length} Items Total
               </p>
             </div>
@@ -58,13 +58,13 @@ export default function DrillDownModal({ isOpen, onClose, title, columns, data }
           {/* Search Bar */}
           <div className="p-4 border-b border-gray-100 dark:border-white/5 bg-white dark:bg-navy-900">
             <div className="relative">
-              <MagnifyingGlassIcon className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+              <MagnifyingGlassIcon className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-[#5B6472]" />
               <input
                 type="text"
                 placeholder="Search records..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl text-[11px] font-black uppercase tracking-widest text-gray-900 dark:text-white outline-none focus:border-[#003875] dark:focus:border-[#FFD500] transition-colors"
+                className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl text-[14px] font-semibold text-gray-900 dark:text-white outline-none focus:border-[#2563EB] dark:focus:border-[#60A5FA] transition-colors"
               />
             </div>
           </div>
@@ -73,7 +73,7 @@ export default function DrillDownModal({ isOpen, onClose, title, columns, data }
           <div className="flex-1 overflow-y-auto p-0 custom-scrollbar bg-white dark:bg-navy-900">
             <table className="w-full text-left border-collapse">
               <thead className="sticky top-0 bg-gray-50 dark:bg-navy-800 z-10 shadow-sm">
-                <tr className="text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 dark:border-white/5">
+                <tr className="text-[13px] font-semibold text-[#5B6472] border-b border-gray-100 dark:border-white/5">
                   {columns.map((col, idx) => (
                     <th key={col.key} className={`py-4 px-6 ${idx === 0 ? 'w-32' : ''}`}>{col.label}</th>
                   ))}
@@ -82,7 +82,7 @@ export default function DrillDownModal({ isOpen, onClose, title, columns, data }
               <tbody className="divide-y divide-gray-50 dark:divide-white/5">
                 {filteredData.length === 0 ? (
                   <tr>
-                    <td colSpan={columns.length} className="py-12 text-center text-gray-400 font-bold text-sm">
+                    <td colSpan={columns.length} className="py-12 text-center text-[#5B6472] font-bold text-sm">
                       No records found.
                     </td>
                   </tr>
@@ -90,7 +90,7 @@ export default function DrillDownModal({ isOpen, onClose, title, columns, data }
                   filteredData.map((item, idx) => (
                     <tr key={idx} className="hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
                       {columns.map((col) => (
-                        <td key={col.key} className="py-4 px-6 text-[11px] font-bold text-gray-800 dark:text-gray-200 uppercase truncate max-w-[200px]">
+                        <td key={col.key} className="py-4 px-6 text-[14px] font-bold text-gray-800 dark:text-gray-200 truncate max-w-[200px]">
                           {col.render ? col.render(item) : item[col.key] || '-'}
                         </td>
                       ))}

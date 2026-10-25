@@ -11,7 +11,7 @@ export default function VerificationBadge({ status }: { status: VerificationStat
     },
     LOW_GPS: {
       label: 'GPS Drop',
-      className: 'bg-orange-500/10 text-orange-600 border-orange-500/20',
+      className: 'bg-[#D97706]/10 text-[#D97706] border-[#E5E7EB]',
       icon: <ExclamationTriangleIcon className="w-3.5 h-3.5" />,
     },
     SUSPICIOUS_ODO: {
@@ -32,7 +32,7 @@ export default function VerificationBadge({ status }: { status: VerificationStat
   const cfg = map[status];
   return (
     <span
-      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-[10px] font-black uppercase ${cfg.className}`}
+      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-[13px] font-semibold  ${cfg.className}`}
     >
       {cfg.icon}
       {cfg.label}

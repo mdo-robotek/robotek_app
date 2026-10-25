@@ -25,6 +25,8 @@ import {
   CompactPartyCelebrationCard
 } from "./DashboardComponents";
 import CooReport from "@/components/CooReport";
+import PendingApprovalsCard from "@/components/PendingApprovalsCard";
+import CooCommandBar from "@/components/CooCommandBar";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -58,7 +60,7 @@ export default function Dashboard() {
   const busyBanner = busyFresh?.lastSaleDate ? (
     <div className="max-w-[1600px] mx-auto px-4 pb-3">
       <div
-        className={`rounded-2xl px-4 py-2.5 flex items-center gap-3 text-[11px] font-black uppercase tracking-widest border ${
+        className={`rounded-2xl px-4 py-2.5 flex items-center gap-3 text-[14px] font-semibold   border ${
           (busyFresh.daysOld ?? 99) >= 2
             ? "bg-rose-50 text-rose-600 border-rose-200 dark:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/20"
             : (busyFresh.daysOld ?? 99) >= 1
@@ -68,9 +70,9 @@ export default function Dashboard() {
       >
         <span className={`w-2 h-2 rounded-full shrink-0 ${(busyFresh.daysOld ?? 99) >= 2 ? "bg-rose-500 animate-pulse" : (busyFresh.daysOld ?? 99) >= 1 ? "bg-amber-500" : "bg-emerald-500"}`} />
         {(busyFresh.daysOld ?? 99) >= 2
-          ? `Busy sale data ${busyFresh.daysOld} din purana hai — Busy se sale list copy karo (Transaction → Sales → List)`
+          ? `Busy sale data is ${busyFresh.daysOld} days old — copy the sale list from Busy (Transaction → Sales → List)`
           : (busyFresh.daysOld ?? 99) >= 1
-          ? `Busy sale data: kal tak ka (${busyFresh.lastSaleDate}) — aaj ki copy pending`
+          ? `Busy sale data is up to ${busyFresh.lastSaleDate} — today's copy still pending`
           : `Busy sale data up to date (${busyFresh.lastSaleDate})`}
       </div>
     </div>
@@ -109,7 +111,7 @@ export default function Dashboard() {
   }
 
   if (error) return (
-    <div className="flex items-center justify-center min-h-[400px] text-rose-500 font-black uppercase tracking-widest bg-rose-50 dark:bg-rose-950/20 rounded-3xl border border-rose-100 italic">
+    <div className="flex items-center justify-center min-h-[400px] text-rose-500 font-semibold bg-rose-50 dark:bg-rose-950/20 rounded-3xl border border-rose-100 italic">
       Synchronizing System Core...
     </div>
   );
@@ -144,7 +146,7 @@ export default function Dashboard() {
            <StatusTile label="Absent" value={data?.summary?.outOfOffice || 0} icon={MapPinIcon} color="text-rose-600 dark:text-rose-400" bg="bg-rose-50 dark:bg-rose-900/30" />
            <StatusTile label="On Leave" value={data?.summary?.onLeave || 0} icon={UserMinusIcon} color="text-amber-600 dark:text-amber-400" bg="bg-amber-50 dark:bg-amber-900/30" />
            
-           <QuickActionSquare label="New Ticket" href="/tickets?action=new" icon={PlusIcon} color="bg-[#003875] dark:bg-[#FFD500] dark:text-[#003875]" />
+           <QuickActionSquare label="New Ticket" href="/tickets?action=new" icon={PlusIcon} color="bg-[#2563EB] dark:bg-[#60A5FA] dark:text-[#60A5FA]" />
            <QuickActionSquare label="Apply Leave" href="/leave?open=apply" icon={CalendarIcon} color="bg-rose-500" />
            <QuickActionSquare label="Attendance" href="/attendance" icon={ClockIcon} color="bg-emerald-500" />
         </div>
@@ -176,15 +178,15 @@ export default function Dashboard() {
             columns={[
                 { label: 'User', key: 'userName', render: (row: any) => (
                     <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-md bg-[#003875]/10 dark:bg-[#FFD500]/10 flex items-center justify-center text-[10px] font-black">{row.userName.charAt(0)}</div>
-                        <span className="text-xs font-bold leading-tight break-words">{row.userName}</span>
+                        <div className="w-6 h-6 rounded-md bg-[#2563EB]/10 dark:bg-[#60A5FA]/10 flex items-center justify-center text-[13px] font-semibold">{row.userName.charAt(0)}</div>
+                        <span className="text-[14px] font-bold leading-tight break-words">{row.userName}</span>
                     </div>
                 )},
                 { label: 'In', key: 'inTime', className: 'text-center', render: (row: any) => (
-                    <span className="text-emerald-500 text-xs font-bold">{row.inTime ? new Date(row.inTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '—'}</span>
+                    <span className="text-emerald-500 text-[14px] font-bold">{row.inTime ? new Date(row.inTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '—'}</span>
                 )},
                 { label: 'Out', key: 'outTime', className: 'text-center', render: (row: any) => (
-                    <span className="text-rose-500 text-xs font-bold">{row.outTime ? new Date(row.outTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '—'}</span>
+                    <span className="text-rose-500 text-[14px] font-bold">{row.outTime ? new Date(row.outTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '—'}</span>
                 )}
             ]}
         />
@@ -198,13 +200,13 @@ export default function Dashboard() {
             columns={[
                 { label: 'Topic/ID', key: 'id', render: (row: any) => (
                     <div className="flex flex-col">
-                        <span className="block font-black text-gray-900 dark:text-white uppercase leading-tight text-[11px] break-words">{row.title}</span>
-                        <span className="text-[9px] text-gray-400 font-mono italic mt-0.5">{row.id}</span>
+                        <span className="block font-semibold text-gray-900 dark:text-white leading-tight text-[14px] break-words">{row.title}</span>
+                        <span className="text-[13px] text-[#5B6472] font-mono italic mt-0.5">{row.id}</span>
                     </div>
                 )},
                 { label: 'Status', key: 'status', className: 'text-right', render: (row: any) => (
-                    <span className={`px-2 py-0.5 rounded-full text-[9px] uppercase font-black ${
-                        row.status === 'Open' ? 'bg-[#003875]/10 text-[#003875]' : 'bg-amber-500/10 text-amber-500'
+                    <span className={`px-2 py-0.5 rounded-full text-[13px]  font-semibold ${
+                        row.status === 'Open' ? 'bg-[#2563EB]/10 text-white' : 'bg-amber-500/10 text-amber-500'
                     }`}>{row.status}</span>
                 )}
             ]}
@@ -219,17 +221,17 @@ export default function Dashboard() {
             columns={[
                 { label: 'User/Reason', key: 'userName', render: (row: any) => (
                     <div className="flex flex-col">
-                        <span className="text-gray-900 dark:text-white font-black uppercase text-[11px] leading-tight break-words">{isAdmin ? row.userName : row.reason}</span>
-                        <span className="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-0.5">{new Date(row.startDate).toLocaleDateString()}</span>
+                        <span className="text-gray-900 dark:text-white font-semibold text-[14px] leading-tight break-words">{isAdmin ? row.userName : row.reason}</span>
+                        <span className="text-[13px] text-[#5B6472] font-bold mt-0.5">{new Date(row.startDate).toLocaleDateString()}</span>
                     </div>
                 )},
                       { label: 'Involved', key: 'involved', render: (row: any) => (
-                        <div className="text-[11px] text-gray-600">{(row.involved || []).join(', ')}</div>
+                        <div className="text-[14px] text-gray-600">{(row.involved || []).join(', ')}</div>
                       )},
                 { label: 'Status', key: 'status', className: 'text-right', render: (row: any) => (
-                    <span className={`px-2 py-0.5 rounded-full text-[9px] uppercase ${
-                        row.status === 'Approved' ? 'bg-emerald-500/10 text-emerald-500 font-black' : 
-                        row.status === 'Pending' ? 'bg-amber-500/10 text-amber-500 font-black' : 'bg-rose-500/10 text-rose-500 font-black'
+                    <span className={`px-2 py-0.5 rounded-full text-[13px]  ${
+                        row.status === 'Approved' ? 'bg-emerald-500/10 text-emerald-500 font-semibold' : 
+                        row.status === 'Pending' ? 'bg-amber-500/10 text-amber-500 font-semibold' : 'bg-rose-500/10 text-rose-500 font-semibold'
                     }`}>{row.status}</span>
                 )}
             ]}
@@ -240,10 +242,18 @@ export default function Dashboard() {
     </div>
   );
 
+  // Pending Approvals — only the approvals this user owns; hides itself when empty.
+  const approvalsStrip = (
+    <div className="max-w-[1600px] mx-auto px-4 pb-4">
+      <PendingApprovalsCard />
+    </div>
+  );
+
   // Non-admins: personal dashboard + Busy freshness reminder (accounts team)
   if (!isAdmin) return (
     <div>
       {busyBanner}
+      {approvalsStrip}
       {myDay}
     </div>
   );
@@ -261,9 +271,9 @@ export default function Dashboard() {
           <button
             key={t.id}
             onClick={() => setView(t.id)}
-            className={`shrink-0 rounded-full px-5 py-2 text-[11px] font-black uppercase tracking-widest transition-all active:scale-95 ${
+            className={`shrink-0 rounded-full px-5 py-2 text-[14px] font-semibold   transition-all active:scale-95 ${
               view === t.id
-                ? "bg-[#003875] text-white dark:bg-[#FFD500] dark:text-[#003875] shadow-lg"
+                ? "bg-[#2563EB] text-white dark:bg-[#60A5FA] dark:text-[#0B1120] shadow-lg"
                 : "bg-white text-gray-500 ring-1 ring-black/10 dark:bg-white/5 dark:text-slate-300 dark:ring-white/10"
             }`}
           >
@@ -273,10 +283,14 @@ export default function Dashboard() {
       </div>
       {view === "coo" ? (
         <div className="max-w-[1600px] mx-auto px-4 pb-10">
+          <CooCommandBar data={cooData} />
           <CooReport data={cooData} loading={cooLoading} />
         </div>
       ) : (
-        myDay
+        <>
+          {approvalsStrip}
+          {myDay}
+        </>
       )}
     </div>
   );

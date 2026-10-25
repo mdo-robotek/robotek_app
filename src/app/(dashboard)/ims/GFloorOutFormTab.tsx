@@ -246,22 +246,22 @@ export default function GFloorOutFormTab({
 
   return (
     <div className="flex-1 bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/5 rounded-xl overflow-hidden flex flex-col shadow-sm min-h-0 mt-2">
-      <div className="py-2 px-4 border-b border-orange-200/60 dark:border-orange-500/10 bg-orange-50/60 dark:bg-orange-500/5 flex flex-wrap items-center justify-between gap-2 shrink-0">
+      <div className="py-2 px-4 border-b border-[#E5E7EB] dark:border-[#E5E7EB] bg-[#F7F8FA] dark:bg-[#D97706]/5 flex flex-wrap items-center justify-between gap-2 shrink-0">
         <div className="flex flex-wrap items-center gap-2 min-w-0">
           <div className="relative w-[220px]">
-            <MagnifyingGlassIcon className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" />
+            <MagnifyingGlassIcon className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-[#5B6472]" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="SEARCH SO / ITEM..."
-              className="w-full pl-8 pr-3 py-1.5 bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 rounded-lg text-[10px] font-black uppercase tracking-wider outline-none focus:ring-2 focus:ring-orange-500 dark:text-white shadow-sm h-[30px]"
+              className="w-full pl-8 pr-3 py-1.5 bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 rounded-lg text-[13px] font-semibold tracking-wider outline-none focus:ring-2 focus:ring-[#E5E7EB] dark:text-white shadow-sm h-[30px]"
             />
           </div>
           <button
             type="button"
             onClick={() => setDuplicatesOnly((v) => !v)}
-            className={`px-2.5 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider border h-[30px] ${
+            className={`px-2.5 py-1.5 rounded-lg text-[13px] font-semibold  tracking-wider border h-[30px] ${
               duplicatesOnly
                 ? "bg-rose-600 text-white border-rose-600"
                 : "bg-white dark:bg-[#111827] text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-500/30"
@@ -273,7 +273,7 @@ export default function GFloorOutFormTab({
             <button
               type="button"
               onClick={selectExtraDuplicates}
-              className="px-2.5 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider bg-amber-50 dark:bg-amber-500/10 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-500/30 h-[30px]"
+              className="px-2.5 py-1.5 rounded-lg text-[13px] font-semibold tracking-wider bg-amber-50 dark:bg-amber-500/10 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-500/30 h-[30px]"
             >
               Select extras ({extraDuplicateRowIndexes.length})
             </button>
@@ -285,26 +285,26 @@ export default function GFloorOutFormTab({
               type="button"
               onClick={() => setIsConfirmOpen(true)}
               disabled={submitting}
-              className="px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-[10px] font-black uppercase tracking-widest shadow-sm disabled:opacity-50 flex items-center gap-1.5 h-[30px]"
+              className="px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-[13px] font-semibold shadow-sm disabled:opacity-50 flex items-center gap-1.5 h-[30px]"
             >
               <TrashIcon className="w-3.5 h-3.5" />
               Delete selected ({selectedRows.size})
             </button>
           )}
-          <p className="text-[10px] font-black text-orange-700 dark:text-orange-400 uppercase tracking-widest">
+          <p className="text-[13px] font-semibold text-[#D97706] dark:text-[#D97706]">
             Showing {filteredRows.length === 0 ? 0 : Math.min((currentPage - 1) * itemsPerPage + 1, filteredRows.length)} to {Math.min(currentPage * itemsPerPage, filteredRows.length)} of {filteredRows.length}
           </p>
           <button
             onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
             disabled={currentPage === 1}
-            className="px-3 py-1.5 rounded bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 text-[10px] font-black text-gray-500 uppercase tracking-widest hover:bg-gray-50 disabled:opacity-50"
+            className="px-3 py-1.5 rounded bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 text-[13px] font-semibold text-gray-500 hover:bg-gray-50 disabled:opacity-50"
           >
             Prev
           </button>
           <button
             onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
             disabled={currentPage === totalPages}
-            className="px-3 py-1.5 rounded bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 text-[10px] font-black text-gray-500 uppercase tracking-widest hover:bg-gray-50 disabled:opacity-50"
+            className="px-3 py-1.5 rounded bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 text-[13px] font-semibold text-gray-500 hover:bg-gray-50 disabled:opacity-50"
           >
             Next
           </button>
@@ -314,7 +314,7 @@ export default function GFloorOutFormTab({
       {duplicateRowCount > 0 && (
         <div className="px-4 py-2 bg-rose-50 dark:bg-rose-500/10 border-b border-rose-100 dark:border-rose-500/20 flex items-center gap-2 shrink-0">
           <ExclamationTriangleIcon className="w-4 h-4 text-rose-600 dark:text-rose-400" />
-          <p className="text-[10px] font-black uppercase tracking-wider text-rose-700 dark:text-rose-300">
+          <p className="text-[13px] font-semibold tracking-wider text-rose-700 dark:text-rose-300">
             Duplicate SO numbers are highlighted. Keep one row per SO, then delete the extras.
           </p>
         </div>
@@ -329,9 +329,9 @@ export default function GFloorOutFormTab({
           </div>
         ) : (
           <table className="w-full text-left border-collapse relative min-w-[980px]">
-            <thead className="bg-orange-50 dark:bg-orange-900/20 sticky top-0 z-20 shadow-sm">
+            <thead className="bg-[#F7F8FA] dark:bg-[#FEF3C7] sticky top-0 z-20 shadow-sm">
               <tr>
-                <th className="py-2.5 px-3 text-center border-b border-orange-200 dark:border-orange-500/20 w-10">
+                <th className="py-2.5 px-3 text-center border-b border-[#E5E7EB] dark:border-[#E5E7EB] w-10">
                   <input
                     type="checkbox"
                     checked={allPageSelected}
@@ -340,15 +340,15 @@ export default function GFloorOutFormTab({
                     className="w-3.5 h-3.5 rounded border-gray-300 text-rose-600 focus:ring-rose-500 disabled:opacity-40 cursor-pointer"
                   />
                 </th>
-                <th className="py-2.5 px-3 text-[10px] font-black text-orange-700 dark:text-orange-400 uppercase tracking-widest border-b border-orange-200 dark:border-orange-500/20">Date</th>
-                <th className="py-2.5 px-3 text-[10px] font-black text-orange-700 dark:text-orange-400 uppercase tracking-widest border-b border-orange-200 dark:border-orange-500/20">SO No</th>
-                <th className="py-2.5 px-3 text-[10px] font-black text-orange-700 dark:text-orange-400 uppercase tracking-widest border-b border-orange-200 dark:border-orange-500/20">Particulars</th>
-                <th className="py-2.5 px-3 text-[10px] font-black text-orange-700 dark:text-orange-400 uppercase tracking-widest border-b border-orange-200 dark:border-orange-500/20 min-w-[240px]">Items</th>
-                <th className="py-2.5 px-3 text-[10px] font-black text-orange-700 dark:text-orange-400 uppercase tracking-widest border-b border-orange-200 dark:border-orange-500/20 text-right">Qty</th>
-                <th className="py-2.5 px-3 text-[10px] font-black text-orange-700 dark:text-orange-400 uppercase tracking-widest border-b border-orange-200 dark:border-orange-500/20 text-center">Status</th>
+                <th className="py-2.5 px-3 text-[13px] font-semibold text-[#D97706] dark:text-[#D97706] border-b border-[#E5E7EB] dark:border-[#E5E7EB]">Date</th>
+                <th className="py-2.5 px-3 text-[13px] font-semibold text-[#D97706] dark:text-[#D97706] border-b border-[#E5E7EB] dark:border-[#E5E7EB]">SO No</th>
+                <th className="py-2.5 px-3 text-[13px] font-semibold text-[#D97706] dark:text-[#D97706] border-b border-[#E5E7EB] dark:border-[#E5E7EB]">Particulars</th>
+                <th className="py-2.5 px-3 text-[13px] font-semibold text-[#D97706] dark:text-[#D97706] border-b border-[#E5E7EB] dark:border-[#E5E7EB] min-w-[240px]">Items</th>
+                <th className="py-2.5 px-3 text-[13px] font-semibold text-[#D97706] dark:text-[#D97706] border-b border-[#E5E7EB] dark:border-[#E5E7EB] text-right">Qty</th>
+                <th className="py-2.5 px-3 text-[13px] font-semibold text-[#D97706] dark:text-[#D97706] border-b border-[#E5E7EB] dark:border-[#E5E7EB] text-center">Status</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-orange-100 dark:divide-orange-500/10">
+            <tbody className="divide-y divide-[#E5E7EB] dark:divide-[#E5E7EB]">
               {pageRows.map((row) => {
                 const so = normalizeSo(row.orderNo);
                 const isDup = duplicateSoKeys.has(so);
@@ -364,7 +364,7 @@ export default function GFloorOutFormTab({
                     className={`${
                       isDup
                         ? "bg-rose-50 dark:bg-rose-500/10"
-                        : "hover:bg-orange-50/40 dark:hover:bg-white/[0.03]"
+                        : "hover:bg-[#F7F8FA] dark:hover:bg-white/[0.03]"
                     } ${selected ? "ring-1 ring-inset ring-rose-300 dark:ring-rose-500/40" : ""}`}
                   >
                     <td className="py-2 px-3 text-center">
@@ -375,30 +375,30 @@ export default function GFloorOutFormTab({
                         className="w-3.5 h-3.5 rounded border-gray-300 text-rose-600 focus:ring-rose-500 cursor-pointer"
                       />
                     </td>
-                    <td className="py-2 px-3 text-[11px] font-bold text-gray-500 whitespace-nowrap">{formatUiDate(row.date)}</td>
-                    <td className="py-2 px-3 text-[11px] font-black text-gray-900 dark:text-white uppercase">
+                    <td className="py-2 px-3 text-[14px] font-bold text-gray-500 whitespace-nowrap">{formatUiDate(row.date)}</td>
+                    <td className="py-2 px-3 text-[14px] font-semibold text-gray-900 dark:text-white">
                       {row.orderNo || "—"}
                     </td>
-                    <td className="py-2 px-3 text-[11px] font-bold text-gray-600 dark:text-gray-300 uppercase">
+                    <td className="py-2 px-3 text-[14px] font-bold text-gray-600 dark:text-gray-300">
                       {row.partyName || "—"}
                     </td>
                     <td className="py-2 px-3 align-middle min-w-[360px]">
                       {items.length === 0 ? (
-                        <span className="text-[11px] text-gray-400">—</span>
+                        <span className="text-[14px] text-[#5B6472]">—</span>
                       ) : (
                         <div className={`flex flex-wrap items-center gap-x-2 gap-y-0.5 max-h-[3.25rem] ${expanded ? "overflow-y-auto custom-scrollbar pr-1" : "overflow-hidden"}`}>
                           {visibleItems.map((item, idx) => (
-                            <span key={`${row.rowIndex}-${idx}`} className="text-[11px] font-bold text-gray-800 dark:text-gray-200 uppercase leading-tight whitespace-nowrap">
+                            <span key={`${row.rowIndex}-${idx}`} className="text-[14px] font-bold text-gray-800 dark:text-gray-200 leading-tight whitespace-nowrap">
                               {item.description}
-                              <span className="text-gray-400"> × {formatQty(item.qty)}</span>
-                              {idx < visibleItems.length - 1 ? <span className="text-gray-300 dark:text-gray-600"> ·</span> : null}
+                              <span className="text-[#5B6472]"> × {formatQty(item.qty)}</span>
+                              {idx < visibleItems.length - 1 ? <span className="text-[#5B6472] dark:text-gray-600"> ·</span> : null}
                             </span>
                           ))}
                           {hiddenCount > 0 && (
                             <button
                               type="button"
                               onClick={() => toggleExpand(row.rowIndex)}
-                              className="text-[10px] font-black uppercase tracking-wider text-orange-600 dark:text-orange-400 hover:underline whitespace-nowrap"
+                              className="text-[13px] font-semibold tracking-wider text-[#D97706] dark:text-[#D97706] hover:underline whitespace-nowrap"
                             >
                               {expanded ? "Less" : `+${hiddenCount} more`}
                             </button>
@@ -406,16 +406,16 @@ export default function GFloorOutFormTab({
                         </div>
                       )}
                     </td>
-                    <td className="py-2 px-3 text-[11px] font-black text-rose-600 dark:text-rose-400 text-right">
+                    <td className="py-2 px-3 text-[14px] font-semibold text-rose-600 dark:text-rose-400 text-right">
                       {formatQty(row.totalQty)}
                     </td>
                     <td className="py-2 px-3 text-center">
                       {isDup ? (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-rose-100 text-rose-700 dark:bg-rose-500/20 dark:text-rose-300 text-[9px] font-black uppercase">
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-rose-100 text-rose-700 dark:bg-rose-500/20 dark:text-rose-300 text-[13px] font-semibold">
                           Duplicate SO
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300 text-[9px] font-black uppercase">
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300 text-[13px] font-semibold">
                           <CheckIcon className="w-3 h-3" /> Unique
                         </span>
                       )}
@@ -425,7 +425,7 @@ export default function GFloorOutFormTab({
               })}
               {filteredRows.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="py-10 text-center text-gray-400 text-[11px] font-black uppercase">
+                  <td colSpan={7} className="py-10 text-center text-[#5B6472] text-[14px] font-semibold">
                     {isLoading ? "Loading..." : "No Out Form rows found"}
                   </td>
                 </tr>

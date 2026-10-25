@@ -118,16 +118,16 @@ export default function AdminTable() {
             {/* Header / Filter */}
             <div className="p-6 border-b border-gray-200 dark:border-white/10 bg-gray-50/50 dark:bg-slate-800/50 flex flex-col md:flex-row items-center justify-between gap-4">
                 <div>
-                    <h2 className="text-lg font-black uppercase text-[#003875] dark:text-[#FFD500]">Attendance & Verification Logs</h2>
-                    <p className="text-xs font-bold text-gray-500">Cross-reference Odometer readings with Live GPS data</p>
+                    <h2 className="text-lg font-semibold text-[#2563EB] dark:text-[#60A5FA]">Attendance & Verification Logs</h2>
+                    <p className="text-[14px] font-bold text-gray-500">Cross-reference Odometer readings with Live GPS data</p>
                 </div>
                 <div className="flex items-center gap-3">
-                    <label className="text-xs font-black uppercase text-gray-400">Date Filter</label>
+                    <label className="text-[14px] font-semibold text-[#5B6472]">Date Filter</label>
                     <input 
                         type="date" 
                         value={dateStr}
                         onChange={(e) => setDateStr(e.target.value)}
-                        className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-white/10 rounded-lg px-4 py-2 text-sm font-bold outline-none focus:border-[#FFD500] shadow-sm"
+                        className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-white/10 rounded-lg px-4 py-2 text-sm font-bold outline-none focus:border-[#2563EB] shadow-sm"
                     />
                 </div>
             </div>
@@ -135,7 +135,7 @@ export default function AdminTable() {
             {/* Pagination Controls */}
             {enrichedRecords.length > 0 && (
                 <div className="px-6 py-3 border-b border-gray-200 dark:border-white/10 flex justify-between items-center bg-white dark:bg-slate-900">
-                    <div className="text-xs font-bold text-gray-500">
+                    <div className="text-[14px] font-bold text-gray-500">
                         Showing <span className="text-gray-900 dark:text-white">{((currentPage - 1) * itemsPerPage) + 1}</span> to <span className="text-gray-900 dark:text-white">{Math.min(currentPage * itemsPerPage, enrichedRecords.length)}</span> of <span className="text-gray-900 dark:text-white">{enrichedRecords.length}</span> entries
                     </div>
                     <div className="flex gap-2">
@@ -146,7 +146,7 @@ export default function AdminTable() {
                         >
                             <ChevronLeftIcon className="w-4 h-4" />
                         </button>
-                        <div className="px-3 py-1.5 text-xs font-black bg-gray-100 dark:bg-slate-800 rounded-lg">
+                        <div className="px-3 py-1.5 text-[14px] font-semibold bg-gray-100 dark:bg-slate-800 rounded-lg">
                             Page {currentPage} of {totalPages}
                         </div>
                         <button 
@@ -164,35 +164,35 @@ export default function AdminTable() {
             <div className="flex-1 overflow-auto">
                 {isLoading ? (
                     <div className="w-full h-full flex flex-col items-center justify-center gap-3">
-                        <div className="w-8 h-8 border-4 border-[#003875] dark:border-[#FFD500] border-t-transparent rounded-full animate-spin"></div>
-                        <div className="text-xs font-bold text-gray-400 uppercase tracking-widest">Loading Logs...</div>
+                        <div className="w-8 h-8 border-4 border-[#2563EB] dark:border-[#60A5FA] border-t-transparent rounded-full animate-spin"></div>
+                        <div className="text-[14px] font-bold text-[#5B6472]">Loading Logs...</div>
                     </div>
                 ) : enrichedRecords.length === 0 ? (
-                    <div className="w-full h-full flex flex-col items-center justify-center text-gray-400 text-sm font-bold uppercase tracking-widest">
+                    <div className="w-full h-full flex flex-col items-center justify-center text-[#5B6472] text-sm font-bold">
                         No check-ins found for this date.
                     </div>
                 ) : (
                     <table className="w-full text-left border-collapse">
                         <thead className="bg-white dark:bg-slate-900 sticky top-0 z-10 shadow-sm">
                             <tr>
-                                <th className="p-4 text-[10px] font-black uppercase tracking-widest text-gray-400 border-b border-gray-200 dark:border-white/10">Driver</th>
-                                <th className="p-4 text-[10px] font-black uppercase tracking-widest text-gray-400 border-b border-gray-200 dark:border-white/10">Date</th>
-                                <th className="p-4 text-[10px] font-black uppercase tracking-widest text-gray-400 border-b border-gray-200 dark:border-white/10">Timeline</th>
-                                <th className="p-4 text-[10px] font-black uppercase tracking-widest text-gray-400 border-b border-gray-200 dark:border-white/10">Odometer Proof</th>
-                                <th className="p-4 text-[10px] font-black uppercase tracking-widest text-[#003875] dark:text-[#FFD500] border-b border-gray-200 dark:border-white/10 text-right">Odometer KM</th>
-                                <th className="p-4 text-[10px] font-black uppercase tracking-widest text-[#003875] dark:text-[#FFD500] border-b border-gray-200 dark:border-white/10 text-right">GPS KM</th>
-                                <th className="p-4 text-[10px] font-black uppercase tracking-widest text-gray-400 border-b border-gray-200 dark:border-white/10 text-center">Status</th>
+                                <th className="p-4 text-[13px] font-semibold text-[#5B6472] border-b border-gray-200 dark:border-white/10">Driver</th>
+                                <th className="p-4 text-[13px] font-semibold text-[#5B6472] border-b border-gray-200 dark:border-white/10">Date</th>
+                                <th className="p-4 text-[13px] font-semibold text-[#5B6472] border-b border-gray-200 dark:border-white/10">Timeline</th>
+                                <th className="p-4 text-[13px] font-semibold text-[#5B6472] border-b border-gray-200 dark:border-white/10">Odometer Proof</th>
+                                <th className="p-4 text-[13px] font-semibold text-[#2563EB] dark:text-[#60A5FA] border-b border-gray-200 dark:border-white/10 text-right">Odometer KM</th>
+                                <th className="p-4 text-[13px] font-semibold text-[#2563EB] dark:text-[#60A5FA] border-b border-gray-200 dark:border-white/10 text-right">Gps Km</th>
+                                <th className="p-4 text-[13px] font-semibold text-[#5B6472] border-b border-gray-200 dark:border-white/10 text-center">Status</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100 dark:divide-white/5">
                             {paginatedRecords.map((r, idx) => (
                                 <tr key={r.id || idx} className="hover:bg-gray-50/50 dark:hover:bg-white/[0.02] transition-colors">
                                     <td className="p-4 align-top">
-                                        <div className="font-black text-sm uppercase text-gray-900 dark:text-white">{r.userName}</div>
-                                        <div className="text-[10px] font-bold text-gray-400">{r.userId}</div>
+                                        <div className="font-semibold text-sm text-gray-900 dark:text-white">{r.userName}</div>
+                                        <div className="text-[13px] font-bold text-[#5B6472]">{r.userId}</div>
                                     </td>
                                     <td className="p-4 align-top">
-                                        <div className="text-xs font-bold text-gray-500">
+                                        <div className="text-[14px] font-bold text-gray-500">
                                             {r.date}
                                         </div>
                                     </td>
@@ -201,71 +201,71 @@ export default function AdminTable() {
                                             <div>
                                                 <div className="flex items-center gap-2 mb-1">
                                                     <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
-                                                    <span className="text-xs font-bold text-gray-600 dark:text-gray-300">In: {formatTime(r.inTime)}</span>
+                                                    <span className="text-[14px] font-bold text-gray-600 dark:text-gray-300">In: {formatTime(r.inTime)}</span>
                                                 </div>
-                                                {r.inLocation && <div className="text-[9px] font-medium text-gray-400 pl-3.5 leading-tight">{r.inLocation}</div>}
+                                                {r.inLocation && <div className="text-[13px] font-medium text-[#5B6472] pl-3.5 leading-tight">{r.inLocation}</div>}
                                             </div>
                                             <div>
                                                 <div className="flex items-center gap-2 mb-1">
                                                     <span className="w-1.5 h-1.5 rounded-full bg-red-500"></span>
-                                                    <span className="text-xs font-bold text-gray-600 dark:text-gray-300">Out: {formatTime(r.outTime)}</span>
+                                                    <span className="text-[14px] font-bold text-gray-600 dark:text-gray-300">Out: {formatTime(r.outTime)}</span>
                                                 </div>
-                                                {r.outLocation && <div className="text-[9px] font-medium text-gray-400 pl-3.5 leading-tight">{r.outLocation}</div>}
+                                                {r.outLocation && <div className="text-[13px] font-medium text-[#5B6472] pl-3.5 leading-tight">{r.outLocation}</div>}
                                             </div>
                                         </div>
                                     </td>
                                     <td className="p-4 align-top">
                                         <div className="flex gap-2">
                                             {r.odometerPhotoIn && (
-                                                <button onClick={() => setSelectedPhoto(r.odometerPhotoIn)} className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 dark:bg-slate-800 rounded-lg text-xs font-bold hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors">
+                                                <button onClick={() => setSelectedPhoto(r.odometerPhotoIn)} className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 dark:bg-slate-800 rounded-lg text-[14px] font-bold hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors">
                                                     <PhotoIcon className="w-4 h-4 text-green-600" /> IN
                                                 </button>
                                             )}
                                             {r.odometerPhotoOut && (
-                                                <button onClick={() => setSelectedPhoto(r.odometerPhotoOut)} className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 dark:bg-slate-800 rounded-lg text-xs font-bold hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors">
+                                                <button onClick={() => setSelectedPhoto(r.odometerPhotoOut)} className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 dark:bg-slate-800 rounded-lg text-[14px] font-bold hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors">
                                                     <PhotoIcon className="w-4 h-4 text-red-600" /> OUT
                                                 </button>
                                             )}
                                         </div>
-                                        <div className="text-[10px] font-bold text-gray-400 mt-2">
+                                        <div className="text-[13px] font-bold text-[#5B6472] mt-2">
                                             {r.odometerIn} → {r.odometerOut || '...'}
                                         </div>
                                     </td>
                                     <td className="p-4 align-top text-right">
-                                        <div className="text-xl font-black font-mono text-gray-900 dark:text-white">
+                                        <div className="text-xl font-semibold font-mono text-gray-900 dark:text-white">
                                             {r.status === 'COMPLETED' ? r.odoKm.toFixed(1) : '--'}
                                         </div>
-                                        <div className="text-[10px] font-bold text-gray-400 uppercase">Recorded</div>
+                                        <div className="text-[13px] font-bold text-[#5B6472]">Recorded</div>
                                     </td>
                                     <td className="p-4 align-top text-right">
-                                        <div className="text-xl font-black font-mono text-[#003875] dark:text-[#FFD500]">
+                                        <div className="text-xl font-semibold font-mono text-[#2563EB] dark:text-[#60A5FA]">
                                             {r.gpsKm.toFixed(1)}
                                         </div>
-                                        <div className="text-[10px] font-bold text-gray-400 uppercase">Tracked</div>
+                                        <div className="text-[13px] font-bold text-[#5B6472]">Tracked</div>
                                     </td>
                                     <td className="p-4 align-top text-center">
                                         {r.verificationStatus === 'VERIFIED' && (
-                                            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-green-500/10 text-green-600 border border-green-500/20 rounded-full text-[10px] font-black uppercase tracking-widest">
+                                            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-green-500/10 text-green-600 border border-green-500/20 rounded-full text-[13px] font-semibold">
                                                 <CheckCircleIcon className="w-4 h-4" /> Verified
                                             </div>
                                         )}
                                         {r.verificationStatus === 'LOW_GPS' && (
-                                            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-orange-500/10 text-orange-600 border border-orange-500/20 rounded-full text-[10px] font-black uppercase tracking-widest">
+                                            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#D97706]/10 text-[#D97706] border border-[#E5E7EB] rounded-full text-[13px] font-semibold">
                                                 <ExclamationTriangleIcon className="w-4 h-4" /> GPS Drop
                                             </div>
                                         )}
                                         {r.verificationStatus === 'SUSPICIOUS_ODO' && (
-                                            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-red-500/10 text-red-600 border border-red-500/20 rounded-full text-[10px] font-black uppercase tracking-widest">
+                                            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-red-500/10 text-red-600 border border-red-500/20 rounded-full text-[13px] font-semibold">
                                                 <ExclamationTriangleIcon className="w-4 h-4" /> Review ODO
                                             </div>
                                         )}
                                         {r.verificationStatus === 'PENDING' && (
-                                            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-500/10 text-blue-600 border border-blue-500/20 rounded-full text-[10px] font-black uppercase tracking-widest">
+                                            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-500/10 text-blue-600 border border-blue-500/20 rounded-full text-[13px] font-semibold">
                                                 Active Now
                                             </div>
                                         )}
                                         {r.verificationStatus === 'NO_MOVEMENT' && (
-                                            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-gray-500/10 text-gray-500 border border-gray-500/20 rounded-full text-[10px] font-black uppercase tracking-widest">
+                                            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-gray-500/10 text-gray-500 border border-gray-500/20 rounded-full text-[13px] font-semibold">
                                                 0 KM
                                             </div>
                                         )}
@@ -283,7 +283,7 @@ export default function AdminTable() {
                     <div className="relative max-w-3xl w-full">
                         <img src={selectedPhoto} alt="Odometer" className="w-full h-auto rounded-2xl shadow-2xl" />
                         <button 
-                            className="absolute -top-4 -right-4 w-10 h-10 bg-white text-black font-black rounded-full shadow-lg border-2 border-black flex items-center justify-center hover:scale-110 transition-transform"
+                            className="absolute -top-4 -right-4 w-10 h-10 bg-white text-black font-semibold rounded-full shadow-lg border-2 border-black flex items-center justify-center hover:scale-110 transition-transform"
                             onClick={() => setSelectedPhoto(null)}
                         >
                             X

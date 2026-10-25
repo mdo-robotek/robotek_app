@@ -98,7 +98,7 @@ export default function MessageSearchSidebar({
             <button
               type="button"
               onClick={() => setQuery("")}
-              className="absolute right-2 p-1 rounded-full text-gray-400 hover:text-gray-600"
+              className="absolute right-2 p-1 rounded-full text-[#5B6472] hover:text-gray-600"
             >
               <XMarkIcon className="w-4 h-4" />
             </button>
@@ -108,17 +108,17 @@ export default function MessageSearchSidebar({
 
       <div className="flex-1 overflow-y-auto custom-scrollbar">
         {!query.trim() ? (
-          <div className="px-4 py-8 text-center text-sm text-gray-400">
+          <div className="px-4 py-8 text-center text-sm text-[#5B6472]">
             Search for messages with your contact{isGroup ? "s" : ""}.
           </div>
         ) : results.length === 0 ? (
-          <div className="px-4 py-8 text-center text-sm text-gray-400">
+          <div className="px-4 py-8 text-center text-sm text-[#5B6472]">
             No messages found for &ldquo;{query}&rdquo;
           </div>
         ) : (
           groupedResults.map((group) => (
             <div key={group.date}>
-              <p className="px-4 py-2 text-xs text-gray-500 bg-[#F0F2F5] sticky top-0">{group.date}</p>
+              <p className="px-4 py-2 text-[14px] text-gray-500 bg-[#F0F2F5] sticky top-0">{group.date}</p>
               {group.items.map((msg) => {
                 const text = getMessageSearchText(msg);
                 return (

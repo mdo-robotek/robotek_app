@@ -20,10 +20,10 @@ export default function StatusLogic({ fillHeight = false }: { fillHeight?: boole
             }`}
           >
             <span className={`w-2.5 h-2.5 rounded-full ${color}`} />
-            <p className="text-[10px] font-black uppercase text-gray-800 dark:text-white leading-tight">
+            <p className="text-[13px] font-semibold text-gray-800 dark:text-white leading-tight">
               {status.replace('_', ' ')}
             </p>
-            <p className="text-[9px] text-gray-500 leading-tight">{desc}</p>
+            <p className="text-[13px] text-gray-500 leading-tight">{desc}</p>
           </div>
         ))}
       </div>

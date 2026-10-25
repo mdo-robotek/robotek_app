@@ -3,15 +3,17 @@
 import { signIn } from "next-auth/react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import {
-  UserIcon as UserIconSolid,
-  LockClosedIcon as LockClosedIconSolid
-} from "@heroicons/react/24/solid";
-import {
-  EyeIcon,
-  EyeSlashIcon
-} from "@heroicons/react/24/outline";
+import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
+import SarthiMark from "@/components/SarthiMark";
 
+/**
+ * Sarthi login (Sahil, 25 Oct 2026).
+ * Before: a gold product-collage background image from an outside image host,
+ * white text on top of it, a "Remember Me" box that did nothing and a
+ * "Forgot Password?" link that went nowhere. Now: one calm white card, one
+ * blue accent, labels above inputs, and only controls that actually work.
+ * The sign-in logic itself is unchanged.
+ */
 export default function LoginPage() {
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
@@ -37,120 +39,125 @@ export default function LoginPage() {
         try {
           const statusRes = await fetch(`/api/users/status?identifier=${encodeURIComponent(identifier)}`);
           const statusData = await statusRes.json();
-          
+
           if (statusData.exists && statusData.isActive === false) {
-            setError("Now you are not an active user for this company. If it's wrong, then contact administration.");
+            setError("This account is no longer active. If that's a mistake, please contact your admin.");
           } else {
-            setError("Invalid username/email or password");
+            setError("Wrong ID or password. Please check and try again.");
           }
-        } catch (e) {
-          // Fallback if status check fails
-          setError("Invalid username/email or password");
+        } catch {
+          setError("Wrong ID or password. Please check and try again.");
         }
       } else {
         router.push("/");
         router.refresh();
       }
-    } catch (err) {
-      setError("An unexpected error occurred");
+    } catch {
+      setError("Something went wrong. Please try again.");
     } finally {
       setIsLoading(false);
     }
   };
 
+  const inputClass =
+    "w-full h-12 px-4 bg-white dark:bg-navy-900 border border-[#D1D5DB] dark:border-navy-700 rounded-xl text-[16px] text-[#1A1D21] dark:text-white placeholder:text-[#9CA3AF] outline-none transition-shadow focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/15";
+
   return (
-    <div 
-      className="min-h-screen bg-[length:100%_100%] bg-no-repeat flex items-stretch justify-center lg:justify-end font-sans relative overflow-hidden"
-      style={{ backgroundImage: "url('https://i.ibb.co/qLRjwyjf/1dfsd.png')" }}
-    >
-      {/* Dark overlay to ensure text/form readability if the image is too bright in some areas */}
-      <div className="absolute inset-0 bg-black/10 lg:bg-transparent z-0"></div>
+    <div className="min-h-screen bg-[#F7F8FA] dark:bg-navy-950 flex items-center justify-center px-4 py-10">
+      <div className="w-full max-w-[400px]">
+        {/* Brand */}
+        <div className="flex flex-col items-center text-center mb-8">
+          <div className="w-14 h-14 rounded-2xl bg-[#2563EB] text-white flex items-center justify-center mb-4">
+            <SarthiMark className="w-9 h-9" />
+          </div>
+          <h1 className="text-[28px] leading-tight font-semibold text-[#1A1D21] dark:text-white">
+            Sarthi
+          </h1>
+          <p className="text-[15px] text-[#5B6472] dark:text-gray-400 mt-1">
+            Your guide to every win
+          </p>
+        </div>
 
-      <div className="w-full max-w-md lg:max-w-[500px] p-8 sm:p-12 lg:p-16 relative z-10 flex flex-col justify-center min-h-screen">
-        
-        <h2 className="text-3xl font-black text-white text-center mb-8 tracking-tight drop-shadow-lg">
-          Welcome Back
-        </h2>
+        {/* Card */}
+        <div className="bg-white dark:bg-navy-900 border border-[#E5E7EB] dark:border-navy-800 rounded-2xl p-6 sm:p-8">
+          <h2 className="text-[20px] font-semibold text-[#1A1D21] dark:text-white mb-6">
+            Sign in
+          </h2>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {error && (
-            <div className="bg-red-500/20 text-red-200 px-4 py-3 rounded-xl text-sm font-medium border border-red-500/50 flex items-start gap-3 backdrop-blur-sm">
-              <div className="w-2 h-2 mt-1.5 bg-red-400 rounded-full animate-pulse shrink-0" />
-              <span>{error}</span>
-            </div>
-          )}
+          <form onSubmit={handleSubmit} className="space-y-5" noValidate>
+            {error && (
+              <div
+                role="alert"
+                className="bg-[#FEF2F2] dark:bg-rose-500/10 border border-[#FECACA] dark:border-rose-500/20 text-[#DC2626] text-[14px] leading-snug px-4 py-3 rounded-xl"
+              >
+                {error}
+              </div>
+            )}
 
-          <div className="space-y-1.5">
-            <label htmlFor="identifier" className="text-white/90 text-sm font-medium ml-1 drop-shadow-md">
-              Employee ID or Email
-            </label>
-            <div className="relative group">
-              <UserIconSolid className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/70 group-focus-within:text-white transition-colors z-10" />
+            <div>
+              <label htmlFor="identifier" className="block text-[14px] font-semibold text-[#1A1D21] dark:text-white mb-2">
+                Username or email
+              </label>
               <input
                 type="text"
                 id="identifier"
                 value={identifier}
                 onChange={(e) => setIdentifier(e.target.value)}
-                placeholder="Enter ID / Email"
+                placeholder="Your ERP username"
+                autoComplete="username"
+                autoCapitalize="none"
                 required
-                className="w-full pl-12 pr-4 py-4 bg-black/30 border border-white/20 rounded-xl focus:bg-black/50 focus:border-[#0070f3] transition-all outline-none text-white placeholder:text-white/50 backdrop-blur-sm shadow-inner"
+                className={inputClass}
               />
             </div>
-          </div>
 
-          <div className="space-y-1.5">
-            <label htmlFor="password" className="text-white/90 text-sm font-medium ml-1 drop-shadow-md">
-              Password
-            </label>
-            <div className="relative group">
-              <LockClosedIconSolid className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/70 group-focus-within:text-white transition-colors z-10" />
-              <input
-                type={showPassword ? "text" : "password"}
-                id="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter Password"
-                required
-                className="w-full pl-12 pr-12 py-4 bg-black/30 border border-white/20 rounded-xl focus:bg-black/50 focus:border-[#0070f3] transition-all outline-none text-white placeholder:text-white/50 backdrop-blur-sm shadow-inner"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 p-2 text-white/50 hover:text-white transition-colors z-10"
-              >
-                {showPassword ? (
-                  <EyeSlashIcon className="w-5 h-5" />
-                ) : (
-                  <EyeIcon className="w-5 h-5" />
-                )}
-              </button>
+            <div>
+              <label htmlFor="password" className="block text-[14px] font-semibold text-[#1A1D21] dark:text-white mb-2">
+                Password
+              </label>
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  id="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  autoComplete="current-password"
+                  required
+                  className={`${inputClass} pr-24`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-1 top-1/2 -translate-y-1/2 h-10 px-3 flex items-center gap-1.5 rounded-lg text-[14px] font-semibold text-[#5B6472] hover:text-[#1A1D21] dark:hover:text-white"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? <EyeSlashIcon className="w-5 h-5" /> : <EyeIcon className="w-5 h-5" />}
+                  {showPassword ? "Hide" : "Show"}
+                </button>
+              </div>
             </div>
-          </div>
 
-          <div className="flex justify-between items-center px-1 py-2">
-            <label className="flex items-center gap-2 cursor-pointer group">
-              <input type="checkbox" className="w-4 h-4 rounded bg-black/30 border-white/20 text-[#0070f3] focus:ring-[#0070f3] focus:ring-offset-0 cursor-pointer accent-[#0070f3]" />
-              <span className="text-sm text-white/80 group-hover:text-white transition-colors">Remember Me</span>
-            </label>
-            <a href="#" className="text-sm text-white/80 hover:text-white transition-colors">
-              Forgot Password?
-            </a>
-          </div>
+            <button
+              type="submit"
+              disabled={isLoading || !identifier.trim() || !password}
+              className="w-full h-12 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-[16px] font-semibold rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isLoading ? (
+                <span className="inline-flex items-center gap-2">
+                  <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                  Signing in…
+                </span>
+              ) : (
+                "Sign in"
+              )}
+            </button>
+          </form>
+        </div>
 
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="w-full bg-[#0052d4] hover:bg-[#4364f7] text-white font-bold py-4 rounded-xl shadow-[0_0_20px_rgba(0,112,243,0.4)] transition-all duration-300 disabled:opacity-50 active:scale-[0.98] uppercase tracking-wider text-sm mt-4 border border-white/10"
-          >
-            {isLoading ? (
-              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mx-auto" />
-            ) : (
-              "Login"
-            )}
-          </button>
-        </form>
+        <p className="text-center text-[14px] text-[#5B6472] dark:text-gray-400 mt-6">
+          Forgot your password? Ask your admin to reset it.
+        </p>
       </div>
     </div>
   );
 }
-

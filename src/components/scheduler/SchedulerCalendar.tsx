@@ -53,7 +53,7 @@ export default function SchedulerCalendar({
   const categoryColors: Record<CalendarEventType, string> = {
     delegation: "bg-blue-500",
     checklist: "bg-purple-500",
-    ticket: "bg-orange-500",
+    ticket: "bg-[#D97706]",
     o2d: "bg-emerald-500",
     meeting: "bg-rose-500",
     scot: "bg-indigo-500"
@@ -156,7 +156,7 @@ export default function SchedulerCalendar({
             className={`min-h-[120px] p-2 border-r border-b transition-colors ${!isSameMonth(d, monthStart) ? 'bg-slate-50/50 dark:bg-slate-900/50 opacity-40' : ''}`}
           >
             <div className="flex justify-between items-center mb-1">
-              <span className={`text-xs font-black w-6 h-6 flex items-center justify-center rounded-full ${isToday(d) ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 dark:text-slate-400'}`}>
+              <span className={`text-[14px] font-semibold w-6 h-6 flex items-center justify-center rounded-full ${isToday(d) ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 dark:text-slate-400'}`}>
                 {format(d, "d")}
               </span>
             </div>
@@ -165,13 +165,13 @@ export default function SchedulerCalendar({
                 <div
                   key={e.id}
                   onClick={() => onEventClick(e)}
-                  className={`px-1.5 py-0.5 rounded-lg text-[9px] font-black text-white truncate cursor-pointer hover:brightness-110 active:scale-95 transition-all ${categoryColors[e.type]}`}
+                  className={`px-1.5 py-0.5 rounded-lg text-[13px] font-semibold text-white truncate cursor-pointer hover:brightness-110 active:scale-95 transition-all ${categoryColors[e.type]}`}
                 >
                   {e.title}
                 </div>
               ))}
               {dayEvents.length > 4 && (
-                <div className="text-[9px] font-black text-slate-400 pl-1">
+                <div className="text-[13px] font-semibold text-[#5B6472] pl-1">
                   +{dayEvents.length - 4} more
                 </div>
               )}
@@ -195,7 +195,7 @@ export default function SchedulerCalendar({
       >
         <div className="grid grid-cols-7 bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 shrink-0">
           {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(d => (
-            <div key={d} className="py-3 text-center text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">
+            <div key={d} className="py-3 text-center text-[13px] font-semibold text-slate-500 dark:text-slate-400">
               {d}
             </div>
           ))}
@@ -222,8 +222,8 @@ export default function SchedulerCalendar({
           <div className="py-3 border-r border-slate-200 dark:border-slate-700"></div>
           {days.map(d => (
             <div key={d.toString()} className="py-3 text-center border-r border-slate-200 dark:border-slate-700 last:border-r-0">
-              <div className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1">{format(d, "EEE")}</div>
-              <div className={`inline-flex items-center justify-center w-8 h-8 text-sm font-black rounded-full ${isToday(d) ? 'bg-blue-600 text-white shadow-md' : 'text-slate-700 dark:text-slate-200'}`}>{format(d, "d")}</div>
+              <div className="text-[13px] font-semibold text-slate-500 dark:text-slate-400 mb-1">{format(d, "EEE")}</div>
+              <div className={`inline-flex items-center justify-center w-8 h-8 text-sm font-semibold rounded-full ${isToday(d) ? 'bg-blue-600 text-white shadow-md' : 'text-slate-700 dark:text-slate-200'}`}>{format(d, "d")}</div>
             </div>
           ))}
         </div>
@@ -233,7 +233,7 @@ export default function SchedulerCalendar({
              {/* Time labels */}
              <div className="border-r border-slate-100 dark:border-slate-800">
               {hours.map(h => (
-                <div key={h} className="h-[50px] text-[10px] font-black text-slate-400 text-center pt-2 leading-none">
+                <div key={h} className="h-[50px] text-[13px] font-semibold text-[#5B6472] text-center pt-2 leading-none">
                   {format(setHours(new Date(), h), "h aa")}
                 </div>
               ))}
@@ -265,8 +265,8 @@ export default function SchedulerCalendar({
                       }}
                       className={`absolute rounded-xl p-2 border-l-4 shadow-sm z-20 cursor-pointer overflow-hidden ${categoryColors[e.type]} bg-opacity-90 dark:bg-opacity-80 border-black/10`}
                     >
-                      <div className="text-[10px] font-black text-white leading-tight mb-1 truncate">{e.title}</div>
-                      <div className="flex items-center gap-1 text-[8px] font-bold text-white opacity-90">
+                      <div className="text-[13px] font-semibold text-white leading-tight mb-1 truncate">{e.title}</div>
+                      <div className="flex items-center gap-1 text-[12px] font-bold text-white opacity-90">
                         <ClockIcon className="w-3 h-3" />
                         {format(e.start, "h:mm aa")}
                       </div>
@@ -295,17 +295,17 @@ export default function SchedulerCalendar({
         <div className="p-6 bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-4">
             <div className={`w-14 h-14 rounded-full flex flex-col items-center justify-center ${isToday(currentDate) ? 'bg-blue-600 text-white shadow-xl shadow-blue-500/20' : 'bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-600'}`}>
-              <span className="text-xs font-black uppercase tracking-tighter opacity-70 leading-none mb-1">{format(currentDate, "EEE")}</span>
-              <span className="text-2xl font-black leading-none">{format(currentDate, "d")}</span>
+              <span className="text-[14px] font-semibold tracking-tighter opacity-70 leading-none mb-1">{format(currentDate, "EEE")}</span>
+              <span className="text-2xl font-semibold leading-none">{format(currentDate, "d")}</span>
             </div>
             <div>
-               <h3 className="text-xl font-black text-slate-900 dark:text-white leading-tight">{format(currentDate, "MMMM yyyy")}</h3>
-               <p className="text-xs font-bold text-slate-500 dark:text-slate-400">Daily breakdown of your schedules</p>
+               <h3 className="text-xl font-semibold text-slate-900 dark:text-white leading-tight">{format(currentDate, "MMMM yyyy")}</h3>
+               <p className="text-[14px] font-bold text-slate-500 dark:text-slate-400">Daily breakdown of your schedules</p>
             </div>
           </div>
           <div className="flex bg-white dark:bg-slate-700 p-1.5 rounded-2xl shadow-inner">
             <button onClick={prevDate} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-600 rounded-xl transition-all"><ChevronLeftIcon className="w-5 h-5" /></button>
-            <button onClick={() => setCurrentDate(new Date())} className="px-4 py-2 text-xs font-black text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-600 rounded-xl transition-all">Today</button>
+            <button onClick={() => setCurrentDate(new Date())} className="px-4 py-2 text-[14px] font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-600 rounded-xl transition-all">Today</button>
             <button onClick={nextDate} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-600 rounded-xl transition-all"><ChevronRightIcon className="w-5 h-5" /></button>
           </div>
         </div>
@@ -314,7 +314,7 @@ export default function SchedulerCalendar({
           <div className="relative">
             {hours.map(h => (
               <div key={h} className="h-16 border-t border-slate-100 dark:border-slate-800 flex items-start pt-2 gap-4">
-                <span className="text-[10px] font-black text-slate-400 w-12 text-right uppercase tracking-tighter">{format(setHours(new Date(), h), "h aa")}</span>
+                <span className="text-[13px] font-semibold text-[#5B6472] w-12 text-right tracking-tighter">{format(setHours(new Date(), h), "h aa")}</span>
                 <div className="flex-1 border-t border-slate-50 dark:border-slate-800/50 mt-1.5"></div>
               </div>
             ))}
@@ -344,11 +344,11 @@ export default function SchedulerCalendar({
                       className={`absolute rounded-2xl p-4 border-l-[6px] shadow-sm pointer-events-auto cursor-pointer flex flex-col transition-all hover:scale-[1.02] active:scale-95 ${categoryColors[e.type]} bg-opacity-95 dark:bg-opacity-90 border-black/20`}
                     >
                       <div className="flex justify-between items-start mb-2">
-                         <span className="text-xs font-black text-white/90 bg-black/20 px-2 py-0.5 rounded-full">{format(e.start, "hh:mm a")}</span>
-                         <span className="text-[10px] font-black uppercase tracking-widest text-white/90 px-2 border border-white/20 rounded">{e.type}</span>
+                         <span className="text-[14px] font-semibold text-white/90 bg-black/20 px-2 py-0.5 rounded-full">{format(e.start, "hh:mm a")}</span>
+                         <span className="text-[13px] font-semibold text-white/90 px-2 border border-white/20 rounded">{e.type}</span>
                       </div>
-                      <h4 className="text-sm font-black text-white mb-1 leading-tight">{e.title}</h4>
-                      {e.description && <p className="text-xs font-bold text-white/70 line-clamp-1">{e.description}</p>}
+                      <h4 className="text-sm font-semibold text-white mb-1 leading-tight">{e.title}</h4>
+                      {e.description && <p className="text-[14px] font-bold text-white/70 line-clamp-1">{e.description}</p>}
                     </motion.div>
                   );
                 })}
@@ -386,21 +386,21 @@ export default function SchedulerCalendar({
         <div className="p-6 bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-4">
              <div className="w-14 h-14 rounded-full bg-blue-500/10 flex items-center justify-center border border-blue-500/20">
-               <span className="text-sm font-black text-blue-600 dark:text-blue-400 capitalize hover:rotate-12 transition-all">{view}</span>
+               <span className="text-sm font-semibold text-blue-600 dark:text-blue-400 capitalize hover:rotate-12 transition-all">{view}</span>
              </div>
              <div>
-                <h3 className="text-xl font-black text-slate-900 dark:text-white leading-tight capitalize">{view} List</h3>
-                <p className="text-xs font-bold text-slate-500 dark:text-slate-400">All tasks for {titleScope}</p>
+                <h3 className="text-xl font-semibold text-slate-900 dark:text-white leading-tight capitalize">{view} List</h3>
+                <p className="text-[14px] font-bold text-slate-500 dark:text-slate-400">All tasks for {titleScope}</p>
              </div>
           </div>
-          <div className="bg-slate-100 dark:bg-slate-700 px-4 py-2 rounded-xl text-xs font-black text-slate-600 dark:text-slate-300">
+          <div className="bg-slate-100 dark:bg-slate-700 px-4 py-2 rounded-xl text-[14px] font-semibold text-slate-600 dark:text-slate-300">
             {currentEvents.length} Total Events
           </div>
         </div>
 
         <div className="flex-1 overflow-y-auto p-6 invisible-scrollbar">
           {currentEvents.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20 text-slate-400 dark:text-slate-500">
+            <div className="flex flex-col items-center justify-center py-20 text-[#5B6472] dark:text-slate-500">
                <span className="text-4xl mb-4 opacity-50">📋</span>
                <p className="text-sm font-bold">No tasks scheduled in this timeframe.</p>
             </div>
@@ -414,7 +414,7 @@ export default function SchedulerCalendar({
                   e.type === 'meeting' ? 'bg-rose-500/10 border-rose-500/20' :
                   e.type === 'delegation' ? 'bg-blue-500/10 border-blue-500/20' :
                   e.type === 'checklist' ? 'bg-purple-500/10 border-purple-500/20' :
-                  e.type === 'ticket' ? 'bg-orange-500/10 border-orange-500/20' :
+                  e.type === 'ticket' ? 'bg-[#D97706]/10 border-[#E5E7EB]' :
                   e.type === 'scot' ? 'bg-indigo-500/10 border-indigo-500/20' :
                   'bg-emerald-500/10 border-emerald-500/20';
 
@@ -422,7 +422,7 @@ export default function SchedulerCalendar({
                   e.type === 'meeting' ? 'text-rose-500' :
                   e.type === 'delegation' ? 'text-blue-500' :
                   e.type === 'checklist' ? 'text-purple-500' :
-                  e.type === 'ticket' ? 'text-orange-500' :
+                  e.type === 'ticket' ? 'text-[#D97706]' :
                   e.type === 'scot' ? 'text-indigo-500' :
                   'text-emerald-500';
 
@@ -442,18 +442,18 @@ export default function SchedulerCalendar({
                       
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          <span className={`text-[9px] font-black uppercase tracking-widest ${iconTextClass}`}>
+                          <span className={`text-[13px] font-semibold   ${iconTextClass}`}>
                              {e.type}
                           </span>
-                          <span className="text-[10px] font-bold text-slate-300 dark:text-slate-600">•</span>
-                          <div className="flex items-center gap-1 text-[10px] font-bold text-slate-500 dark:text-slate-400">
+                          <span className="text-[13px] font-bold text-[#5B6472] dark:text-slate-600">•</span>
+                          <div className="flex items-center gap-1 text-[13px] font-bold text-slate-500 dark:text-slate-400">
                              <ClockIcon className="w-3 h-3" />
                              {format(e.start, "EEEE, MMM dd • hh:mm a")}
                           </div>
                         </div>
-                        <h4 className="text-sm md:text-base font-black text-slate-900 dark:text-white truncate pr-4">{e.title}</h4>
+                        <h4 className="text-sm md:text-base font-semibold text-slate-900 dark:text-white truncate pr-4">{e.title}</h4>
                         {e.description && (
-                           <p className="text-xs font-bold text-slate-500 dark:text-slate-400 line-clamp-1 mt-0.5 max-w-2xl">{e.description}</p>
+                           <p className="text-[14px] font-bold text-slate-500 dark:text-slate-400 line-clamp-1 mt-0.5 max-w-2xl">{e.description}</p>
                         )}
                       </div>
                     </div>
@@ -461,18 +461,18 @@ export default function SchedulerCalendar({
                     <div className="flex flex-wrap items-center gap-3 mt-2 md:mt-0 w-full md:w-auto shrink-0 justify-start md:justify-end">
                       {e.assignedTo && typeof e.assignedTo === 'string' && (
                         <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-800 px-3 py-1.5 rounded-full border border-slate-100 dark:border-slate-700">
-                           <div className="w-5 h-5 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-600 text-[9px] font-black shadow-sm">
+                           <div className="w-5 h-5 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-600 text-[13px] font-semibold shadow-sm">
                              {e.assignedTo.substring(0, 2).toUpperCase()}
                            </div>
-                           <span className="text-[10px] font-black text-slate-600 dark:text-slate-300">
+                           <span className="text-[13px] font-semibold text-slate-600 dark:text-slate-300">
                              {e.assignedTo.split(',')[0]}
                            </span>
                         </div>
                       )}
                       
                       {e.status && (
-                        <span className={`text-[10px] font-black px-4 py-2 rounded-full whitespace-nowrap shadow-sm border border-transparent
-                          ${e.status.toLowerCase().includes('pending') ? 'bg-orange-500/10 text-orange-600 dark:text-orange-400' : 'bg-blue-500/10 text-blue-600 dark:text-blue-400'}
+                        <span className={`text-[13px] font-semibold px-4 py-2 rounded-full whitespace-nowrap shadow-sm border border-transparent
+                          ${e.status.toLowerCase().includes('pending') ? 'bg-[#D97706]/10 text-[#D97706] dark:text-[#D97706]' : 'bg-blue-500/10 text-blue-600 dark:text-blue-400'}
                         `}>
                           Status: {e.status}
                         </span>
@@ -494,12 +494,12 @@ export default function SchedulerCalendar({
       {view !== 'day' && layout !== 'list' && (
         <div className="flex items-center justify-between mb-2 shrink-0">
 
-           <h2 className="text-2xl font-black text-slate-900 dark:text-white">
+           <h2 className="text-2xl font-semibold text-slate-900 dark:text-white">
              {format(currentDate, "MMMM yyyy")}
            </h2>
            <div className="flex bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-1.5 rounded-2xl shadow-sm">
             <button onClick={prevDate} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all"><ChevronLeftIcon className="w-5 h-5 text-slate-600 dark:text-slate-400" /></button>
-            <button onClick={() => setCurrentDate(new Date())} className="px-4 py-2 text-xs font-black text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all">Today</button>
+            <button onClick={() => setCurrentDate(new Date())} className="px-4 py-2 text-[14px] font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all">Today</button>
             <button onClick={nextDate} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all"><ChevronRightIcon className="w-5 h-5 text-slate-600 dark:text-slate-400" /></button>
           </div>
         </div>

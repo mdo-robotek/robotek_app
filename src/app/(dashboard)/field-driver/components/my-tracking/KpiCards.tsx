@@ -28,9 +28,9 @@ function KpiCard({
           <Icon className="w-5 h-5" />
         </div>
       </div>
-      <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mt-3">{label}</p>
-      <p className="text-xl font-black text-[#062B6F] dark:text-white mt-1 font-mono">{value}</p>
-      {sub && <p className="text-[10px] font-bold text-gray-500 mt-1">{sub}</p>}
+      <p className="text-[13px] font-semibold text-[#5B6472] mt-3">{label}</p>
+      <p className="text-xl font-semibold text-[#1D4ED8] dark:text-white mt-1 font-mono">{value}</p>
+      {sub && <p className="text-[13px] font-bold text-gray-500 mt-1">{sub}</p>}
     </div>
   );
 }

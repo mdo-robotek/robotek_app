@@ -207,9 +207,9 @@ export default function GroupInfoSidebar({
         )}
 
         <div className="flex-1 overflow-y-auto custom-scrollbar">
-          <p className="px-4 py-2 text-xs text-[#25D366] font-medium">Contacts</p>
+          <p className="px-4 py-2 text-[14px] text-[#25D366] font-medium">Contacts</p>
           {contactsForAdd.length === 0 ? (
-            <div className="text-center py-8 text-gray-400 text-sm">No contacts found.</div>
+            <div className="text-center py-8 text-[#5B6472] text-sm">No contacts found.</div>
           ) : (
             contactsForAdd.map((user) => {
               const alreadyAdded = participantSet.has(user.username);
@@ -241,7 +241,7 @@ export default function GroupInfoSidebar({
                   <div className="min-w-0 flex-1">
                     <p className="text-[15px] text-gray-900 truncate">{user.username}</p>
                     {alreadyAdded && (
-                      <p className="text-xs text-gray-500">Already added to group</p>
+                      <p className="text-[14px] text-gray-500">Already added to group</p>
                     )}
                   </div>
                 </button>
@@ -349,7 +349,7 @@ export default function GroupInfoSidebar({
           )}
 
           <div className="relative mb-3">
-            <MagnifyingGlassIcon className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <MagnifyingGlassIcon className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#5B6472]" />
             <input
               type="text"
               placeholder="Search members"
@@ -378,7 +378,7 @@ export default function GroupInfoSidebar({
                         )}
                       </p>
                       {isAdmin && (
-                        <span className="text-[11px] text-[#25D366] font-medium">Group admin</span>
+                        <span className="text-[14px] text-[#25D366] font-medium">Group admin</span>
                       )}
                     </div>
                   </div>

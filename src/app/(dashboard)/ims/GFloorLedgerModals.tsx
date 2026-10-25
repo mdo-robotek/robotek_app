@@ -15,10 +15,10 @@ import { FloorIMS } from "@/types/ims-floor";
 import { computeAuditDiff, getGFloorItemStock, roundQty, type GFloorStockItem, GFLOOR_ENTRY_PRODUCTION, GFLOOR_ENTRY_PHYSICAL } from "@/lib/gfloor-ledger-utils";
 
 const tableInputClass =
-  "w-full px-2 py-1.5 text-[11px] font-bold text-gray-900 dark:text-white bg-white dark:bg-[#0a0f1c] border border-gray-200 dark:border-white/10 rounded-md outline-none focus:ring-1 focus:ring-[#003875] dark:focus:ring-[#FFD500] uppercase";
+  "w-full px-2 py-1.5 text-[14px] font-bold text-gray-900 dark:text-white bg-white dark:bg-[#0a0f1c] border border-gray-200 dark:border-white/10 rounded-md outline-none focus:ring-1 focus:ring-[#2563EB] dark:focus:ring-[#60A5FA] ";
 
 const thClass =
-  "py-2 px-2 text-[9px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest text-left whitespace-nowrap bg-gray-50 dark:bg-[#1f2937] border-b border-gray-200 dark:border-white/10";
+  "py-2 px-2 text-[13px] font-semibold text-gray-500 dark:text-gray-400   text-left whitespace-nowrap bg-gray-50 dark:bg-[#1f2937] border-b border-gray-200 dark:border-white/10";
 
 const tdClass = "py-1.5 px-2 align-middle border-b border-gray-100 dark:border-white/5";
 
@@ -284,14 +284,14 @@ export default function GFloorLedgerModals({
       <button
         onClick={openProduction}
         disabled={submitting}
-        className="flex items-center gap-1 px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-500/10 dark:hover:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all border border-emerald-200 dark:border-emerald-500/20 shadow-sm disabled:opacity-50 h-[30px]"
+        className="flex items-center gap-1 px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-500/10 dark:hover:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 rounded-lg text-[13px] font-semibold tracking-wider transition-all border border-emerald-200 dark:border-emerald-500/20 shadow-sm disabled:opacity-50 h-[30px]"
       >
         <PlusIcon className="w-3.5 h-3.5" /> Production IN
       </button>
       <button
         onClick={openAudit}
         disabled={submitting}
-        className="flex items-center gap-1 px-2.5 py-1.5 bg-violet-50 hover:bg-violet-100 dark:bg-violet-500/10 dark:hover:bg-violet-500/20 text-violet-700 dark:text-violet-300 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all border border-violet-300 dark:border-violet-500/30 shadow-sm disabled:opacity-50 h-[30px]"
+        className="flex items-center gap-1 px-2.5 py-1.5 bg-violet-50 hover:bg-violet-100 dark:bg-violet-500/10 dark:hover:bg-violet-500/20 text-violet-700 dark:text-violet-300 rounded-lg text-[13px] font-semibold tracking-wider transition-all border border-violet-300 dark:border-violet-500/30 shadow-sm disabled:opacity-50 h-[30px]"
       >
         <ClipboardDocumentCheckIcon className="w-3.5 h-3.5" /> Physical Check
       </button>
@@ -306,7 +306,7 @@ export default function GFloorLedgerModals({
               className="bg-white dark:bg-[#111827] rounded-2xl shadow-xl w-full max-w-4xl overflow-hidden border border-emerald-500/20 flex flex-col max-h-[90vh]"
             >
               <div className="flex items-center justify-between p-5 border-b bg-gradient-to-r from-emerald-600 to-teal-700 text-white shrink-0">
-                <h3 className="text-sm font-black uppercase tracking-widest flex items-center gap-2">
+                <h3 className="text-sm font-semibold flex items-center gap-2">
                   <ClipboardDocumentListIcon className="w-5 h-5" />
                   Production IN — G Floor
                 </h3>
@@ -315,7 +315,7 @@ export default function GFloorLedgerModals({
                 </button>
               </div>
               <div className="p-4 overflow-y-auto custom-scrollbar flex-1 min-h-0">
-                <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-3">
+                <p className="text-[13px] font-bold text-gray-500 tracking-wider mb-3">
                   Manual IN from production only. OUT entries are created via Physical Check when stock differs.
                 </p>
                 <button
@@ -325,7 +325,7 @@ export default function GFloorLedgerModals({
                       { id: Date.now().toString(), item_name: "", category: "", qty: "", date: "" },
                     ])
                   }
-                  className="mb-3 px-3 py-1.5 border border-dashed border-emerald-300 rounded-lg text-[10px] font-black uppercase text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-500/10"
+                  className="mb-3 px-3 py-1.5 border border-dashed border-emerald-300 rounded-lg text-[13px] font-semibold text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-500/10"
                 >
                   + Add Row
                 </button>
@@ -350,7 +350,7 @@ export default function GFloorLedgerModals({
                               value={row.item_name}
                               onChange={(val) => handleProductionRowChange(row.id, "item_name", val)}
                               placeholder="Select item..."
-                              className="bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 py-1.5 px-2 rounded-md text-[11px] min-h-[34px]"
+                              className="bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 py-1.5 px-2 rounded-md text-[14px] min-h-[34px]"
                             />
                           </td>
                           <td className={tdClass}>
@@ -382,7 +382,7 @@ export default function GFloorLedgerModals({
                           <td className={`${tdClass} text-center`}>
                             <button
                               onClick={() => setProductionRows((prev) => prev.filter((r) => r.id !== row.id))}
-                              className="p-1.5 text-gray-400 hover:text-rose-500 rounded-md hover:bg-rose-50 dark:hover:bg-rose-500/10"
+                              className="p-1.5 text-[#5B6472] hover:text-rose-500 rounded-md hover:bg-rose-50 dark:hover:bg-rose-500/10"
                               title="Remove row"
                             >
                               <TrashIcon className="w-4 h-4" />
@@ -395,8 +395,8 @@ export default function GFloorLedgerModals({
                 </div>
               </div>
               <div className="p-4 border-t flex justify-end gap-2 bg-gray-50/50 dark:bg-[#1f2937]/50">
-                <button onClick={() => setIsProductionOpen(false)} className="px-4 py-2 text-[10px] font-black uppercase text-gray-500">Cancel</button>
-                <button onClick={saveProduction} disabled={submitting} className="px-5 py-2 rounded-xl text-[10px] font-black uppercase text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50">
+                <button onClick={() => setIsProductionOpen(false)} className="px-4 py-2 text-[13px] font-semibold text-gray-500">Cancel</button>
+                <button onClick={saveProduction} disabled={submitting} className="px-5 py-2 rounded-xl text-[13px] font-semibold text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50">
                   {submitting ? "Saving..." : "Save IN"}
                 </button>
               </div>
@@ -415,7 +415,7 @@ export default function GFloorLedgerModals({
               className="bg-white dark:bg-[#111827] rounded-2xl shadow-xl w-full max-w-5xl overflow-hidden border border-teal-500/20 flex flex-col max-h-[90vh]"
             >
               <div className="flex items-center justify-between p-5 border-b bg-gradient-to-r from-teal-600 to-cyan-700 text-white shrink-0">
-                <h3 className="text-sm font-black uppercase tracking-widest flex items-center gap-2">
+                <h3 className="text-sm font-semibold flex items-center gap-2">
                   <ClipboardDocumentCheckIcon className="w-5 h-5" />
                   Physical Stock Check — G Floor
                 </h3>
@@ -424,7 +424,7 @@ export default function GFloorLedgerModals({
                 </button>
               </div>
               <div className="p-4 overflow-y-auto custom-scrollbar flex-1 min-h-0 space-y-3">
-                <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">
+                <p className="text-[13px] font-bold text-gray-500 tracking-wider">
                   Enter physical count. System creates IN or OUT adjustment rows in IMS-G Floor sheet.
                 </p>
                 <div className="flex flex-wrap gap-2">
@@ -432,9 +432,9 @@ export default function GFloorLedgerModals({
                     value={auditPasteText}
                     onChange={(e) => setAuditPasteText(e.target.value)}
                     placeholder={"Item Name\tPhysical Qty\n..."}
-                    className="flex-1 min-w-[200px] h-16 p-2 text-[11px] font-mono border rounded-lg dark:bg-[#0a0f1c] dark:border-white/10"
+                    className="flex-1 min-w-[200px] h-16 p-2 text-[14px] font-mono border rounded-lg dark:bg-[#0a0f1c] dark:border-white/10"
                   />
-                  <button onClick={handleAuditPaste} className="px-4 py-2 h-fit text-[10px] font-black uppercase bg-teal-50 text-teal-700 border border-teal-200 rounded-lg dark:bg-teal-500/10 dark:text-teal-300 dark:border-teal-500/20">
+                  <button onClick={handleAuditPaste} className="px-4 py-2 h-fit text-[13px] font-semibold bg-teal-50 text-teal-700 border border-teal-200 rounded-lg dark:bg-teal-500/10 dark:text-teal-300 dark:border-teal-500/20">
                     Load Paste
                   </button>
                 </div>
@@ -445,7 +445,7 @@ export default function GFloorLedgerModals({
                       { id: Date.now().toString(), item_name: "", category: "", live_stock: 0, physical_qty: "", diff_qty: 0, diff_type: "NONE" },
                     ])
                   }
-                  className="px-3 py-1.5 border border-dashed border-teal-300 rounded-lg text-[10px] font-black uppercase text-teal-700 hover:bg-teal-50 dark:hover:bg-teal-500/10"
+                  className="px-3 py-1.5 border border-dashed border-teal-300 rounded-lg text-[13px] font-semibold text-teal-700 hover:bg-teal-50 dark:hover:bg-teal-500/10"
                 >
                   + Add Row
                 </button>
@@ -470,11 +470,11 @@ export default function GFloorLedgerModals({
                               value={row.item_name}
                               onChange={(val) => handleAuditRowChange(row.id, "item_name", val)}
                               placeholder="Select item..."
-                              className="bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 py-1.5 px-2 rounded-md text-[11px] min-h-[34px]"
+                              className="bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 py-1.5 px-2 rounded-md text-[14px] min-h-[34px]"
                             />
                           </td>
                           <td className={`${tdClass} text-right`}>
-                            <span className="text-[11px] font-black text-[#003875] dark:text-[#FFD500]">{row.live_stock}</span>
+                            <span className="text-[14px] font-semibold text-[#2563EB] dark:text-[#60A5FA]">{row.live_stock}</span>
                           </td>
                           <td className={tdClass}>
                             <input
@@ -488,9 +488,9 @@ export default function GFloorLedgerModals({
                           </td>
                           <td className={`${tdClass} text-center`}>
                             {row.diff_type === "NONE" ? (
-                              <span className="text-[10px] font-bold text-gray-400">—</span>
+                              <span className="text-[13px] font-bold text-[#5B6472]">—</span>
                             ) : (
-                              <span className={`text-[10px] font-black uppercase ${row.diff_type === "IN" ? "text-emerald-600" : "text-rose-600"}`}>
+                              <span className={`text-[13px] font-semibold  ${row.diff_type === "IN" ? "text-emerald-600" : "text-rose-600"}`}>
                                 {row.diff_type} {row.diff_qty}
                               </span>
                             )}
@@ -498,7 +498,7 @@ export default function GFloorLedgerModals({
                           <td className={`${tdClass} text-center`}>
                             <button
                               onClick={() => setAuditRows((prev) => prev.filter((r) => r.id !== row.id))}
-                              className="p-1.5 text-gray-400 hover:text-rose-500 rounded-md hover:bg-rose-50 dark:hover:bg-rose-500/10"
+                              className="p-1.5 text-[#5B6472] hover:text-rose-500 rounded-md hover:bg-rose-50 dark:hover:bg-rose-500/10"
                               title="Remove row"
                             >
                               <TrashIcon className="w-4 h-4" />
@@ -511,8 +511,8 @@ export default function GFloorLedgerModals({
                 </div>
               </div>
               <div className="p-4 border-t flex justify-end gap-2 bg-gray-50/50 dark:bg-[#1f2937]/50">
-                <button onClick={() => setIsAuditOpen(false)} className="px-4 py-2 text-[10px] font-black uppercase text-gray-500">Cancel</button>
-                <button onClick={saveAudit} disabled={submitting} className="px-5 py-2 rounded-xl text-[10px] font-black uppercase text-white bg-teal-600 hover:bg-teal-700 disabled:opacity-50">
+                <button onClick={() => setIsAuditOpen(false)} className="px-4 py-2 text-[13px] font-semibold text-gray-500">Cancel</button>
+                <button onClick={saveAudit} disabled={submitting} className="px-5 py-2 rounded-xl text-[13px] font-semibold text-white bg-teal-600 hover:bg-teal-700 disabled:opacity-50">
                   {submitting ? "Saving..." : "Apply Adjustments"}
                 </button>
               </div>

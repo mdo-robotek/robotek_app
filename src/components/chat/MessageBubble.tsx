@@ -83,7 +83,7 @@ export default function MessageBubble({
       className={`flex flex-col max-w-[75%] ${isOwn ? "self-end items-end" : "self-start items-start"} mb-0.5`}
     >
       {!isOwn && isGroup && showTail && (
-        <span className="text-xs font-medium text-[#25D366] mb-0.5 ml-1">{message.sender_id}</span>
+        <span className="text-[14px] font-medium text-[#25D366] mb-0.5 ml-1">{message.sender_id}</span>
       )}
 
       <div
@@ -111,8 +111,8 @@ export default function MessageBubble({
               isOwn ? "bg-[#c8e6b0]" : "bg-gray-50"
             }`}
           >
-            <p className="text-xs font-medium text-[#25D366]">{replyToMessage.sender_id}</p>
-            <p className="text-xs text-gray-600 truncate">
+            <p className="text-[14px] font-medium text-[#25D366]">{replyToMessage.sender_id}</p>
+            <p className="text-[14px] text-gray-600 truncate">
               {replyToMessage.type === "text" ? replyToMessage.text : `[${replyToMessage.type}]`}
             </p>
           </div>
@@ -156,7 +156,7 @@ export default function MessageBubble({
               <p className="text-sm font-medium text-gray-900 truncate">
                 {message.text || "Document"}
               </p>
-              <p className="text-xs text-gray-500 mt-0.5">
+              <p className="text-[14px] text-gray-500 mt-0.5">
                 {(message.text || "").split(".").pop()?.toUpperCase() || "FILE"} · Tap to preview
               </p>
             </div>
@@ -198,7 +198,7 @@ export default function MessageBubble({
                 }}
                 className="w-full h-1 accent-[#25D366]"
               />
-              <div className="flex justify-between text-[10px] text-gray-500">
+              <div className="flex justify-between text-[13px] text-gray-500">
                 <span>{formatAudioTime(audioCurrentTime)}</span>
                 <MicrophoneIcon className="w-3 h-3" />
                 <span>{formatAudioTime(audioDuration)}</span>
@@ -214,7 +214,7 @@ export default function MessageBubble({
               <button
                 key={emoji}
                 onClick={() => onReactClick?.(message, emoji)}
-                className="text-xs bg-white rounded-full px-1.5 py-0.5 shadow border border-gray-100"
+                className="text-[14px] bg-white rounded-full px-1.5 py-0.5 shadow border border-gray-100"
               >
                 {emoji} {users.length > 1 && <span className="text-gray-500">{users.length}</span>}
               </button>
@@ -224,8 +224,8 @@ export default function MessageBubble({
 
         {/* Time + ticks */}
         <div className={`flex items-center justify-end gap-1 mt-0.5 ${emojisOnly ? "bg-white/80 rounded px-1" : ""}`}>
-          {message.edited_at && <span className="text-[10px] text-gray-500 italic">edited</span>}
-          <span className="text-[11px] text-gray-500">{formatMessageTime(message.created_at)}</span>
+          {message.edited_at && <span className="text-[13px] text-gray-500 italic">edited</span>}
+          <span className="text-[14px] text-gray-500">{formatMessageTime(message.created_at)}</span>
           {isOwn && (
             <ReadTicks read={isGroup ? isGroupRead : isRead} />
           )}
@@ -308,7 +308,7 @@ function ReadTicks({ read }: { read?: boolean }) {
     );
   }
   return (
-    <svg viewBox="0 0 16 15" className="w-4 h-3 text-gray-400" fill="currentColor">
+    <svg viewBox="0 0 16 15" className="w-4 h-3 text-[#5B6472]" fill="currentColor">
       <path d="M15.01 3.316l-.478-.372a.365.365 0 0 0-.51.063L8.666 9.88a.32.32 0 0 1-.484.033l-.358-.325a.319.319 0 0 0-.484.032l-.378.483a.418.418 0 0 0 .036.541l1.32 1.266c.143.14.361.125.484-.033l6.272-8.048a.366.366 0 0 0-.064-.512zm-4.1 0l-.478-.372a.365.365 0 0 0-.51.063L4.566 9.88a.32.32 0 0 1-.484.033L1.891 7.769a.366.366 0 0 0-.515.006l-.423.433a.364.364 0 0 0 .006.514l3.258 3.185c.143.14.361.125.484-.033l6.272-8.048a.365.365 0 0 0-.063-.51z" />
     </svg>
   );

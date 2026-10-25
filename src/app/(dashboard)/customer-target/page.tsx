@@ -90,7 +90,7 @@ function sendBlockedReason(row: CustomerTargetRow, msgType: MessageType): string
 function StatusBadge({ status }: { status: string }) {
   if (status === "SENDING" || status === "PROCESSING") {
     return (
-      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[9px] font-black uppercase tracking-widest text-white bg-gradient-to-r from-sky-500 to-blue-600 shadow-md shadow-sky-500/40">
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[13px] font-semibold text-white bg-gradient-to-r from-sky-500 to-blue-600 shadow-md shadow-sky-500/40">
         <span className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
         Sending
       </span>
@@ -98,13 +98,13 @@ function StatusBadge({ status }: { status: string }) {
   }
   const map: Record<string, string> = {
     SENT: "text-white bg-gradient-to-r from-emerald-500 to-teal-600 shadow-md shadow-emerald-500/40",
-    FAILED: "text-white bg-gradient-to-r from-rose-500 to-orange-500 shadow-md shadow-rose-500/40",
+    FAILED: "text-white bg-[#DC2626] shadow-md shadow-rose-500/40",
     SKIPPED: "text-white bg-gradient-to-r from-pink-500 to-fuchsia-600 shadow-md shadow-pink-500/40",
     NOT_SENT: "text-white bg-gradient-to-r from-slate-500 to-slate-700 shadow-md shadow-slate-500/30",
     QUEUED: "text-white bg-gradient-to-r from-indigo-500 to-violet-600 shadow-md shadow-indigo-500/40",
   };
   return (
-    <span className={`inline-flex px-2.5 py-1 rounded-xl text-[9px] font-black uppercase tracking-widest ${map[status] || map.NOT_SENT}`}>
+    <span className={`inline-flex px-2.5 py-1 rounded-xl text-[13px] font-semibold   ${map[status] || map.NOT_SENT}`}>
       {status.replace("_", " ")}
     </span>
   );
@@ -118,7 +118,7 @@ function PctBadge({ pct }: { pct: number }) {
       ? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300"
       : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300";
   return (
-    <span className={`inline-flex px-2 py-0.5 rounded-full text-[10px] font-black ${color}`}>
+    <span className={`inline-flex px-2 py-0.5 rounded-full text-[13px] font-semibold ${color}`}>
       {pct}%
     </span>
   );
@@ -705,12 +705,12 @@ export default function CustomerTargetPage() {
       <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-4">
         <div className="min-w-0">
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-black text-gray-900 dark:text-white tracking-tight">Customer Target</h1>
+            <h1 className="text-2xl font-semibold text-gray-900 dark:text-white tracking-tight">Customer Target</h1>
             <button
               type="button"
               title="How to use this page"
               onClick={() => setGuideOpen(true)}
-              className="p-1 rounded-full text-[#003875] dark:text-[#FFD500] hover:bg-[#003875]/10 dark:hover:bg-[#FFD500]/10"
+              className="p-1 rounded-full text-white dark:text-[#60A5FA] hover:bg-[#2563EB]/10 dark:hover:bg-[#60A5FA]/10"
             >
               <InformationCircleIcon className="w-5 h-5" />
             </button>
@@ -722,7 +722,7 @@ export default function CustomerTargetPage() {
 
         <div className="flex flex-wrap items-end gap-2.5">
           <div>
-            <label className="block text-[9px] font-black uppercase tracking-widest text-indigo-500 dark:text-indigo-400 mb-1">Select Month</label>
+            <label className="block text-[13px] font-semibold text-indigo-500 dark:text-indigo-400 mb-1">Select Month</label>
             <select
               value={month}
               onChange={(e) => setMonth(e.target.value as MonthName)}
@@ -734,7 +734,7 @@ export default function CustomerTargetPage() {
             </select>
           </div>
           <div>
-            <label className="block text-[9px] font-black uppercase tracking-widest text-sky-600 dark:text-sky-400 mb-1">Message Type</label>
+            <label className="block text-[13px] font-semibold text-sky-600 dark:text-sky-400 mb-1">Message Type</label>
             <div className="flex rounded-xl overflow-hidden border-2 border-sky-100 dark:border-sky-500/30 bg-sky-50/60 dark:bg-sky-950/20 p-1 gap-1">
               {([
                 { id: "TARGET" as MessageType, label: "Target", icon: FlagIcon, active: "bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-md shadow-blue-500/30" },
@@ -743,7 +743,7 @@ export default function CustomerTargetPage() {
                 <button
                   key={t.id}
                   onClick={() => setMsgType(t.id)}
-                  className={`flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${
+                  className={`flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-[14px] font-bold transition-all whitespace-nowrap ${
                     msgType === t.id
                       ? t.active
                       : "text-gray-500 hover:text-gray-800 dark:hover:text-white hover:bg-white/70 dark:hover:bg-white/5"
@@ -759,7 +759,7 @@ export default function CustomerTargetPage() {
             <>
               <button
                 onClick={() => importRef.current?.click()}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 text-white text-xs font-bold shadow-md shadow-orange-500/25 hover:brightness-105"
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#2563EB] text-white text-[14px] font-bold shadow-md hover:brightness-105"
               >
                 <ArrowUpTrayIcon className="w-4 h-4" /> Import Achievement
               </button>
@@ -768,7 +768,7 @@ export default function CustomerTargetPage() {
           )}
           <button
             onClick={exportReport}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-xs font-bold shadow-md shadow-blue-500/25 hover:brightness-105"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-[14px] font-bold shadow-md shadow-blue-500/25 hover:brightness-105"
           >
             <ArrowDownTrayIcon className="w-4 h-4" /> Export Report
           </button>
@@ -783,39 +783,39 @@ export default function CustomerTargetPage() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 shrink-0">
           <div className="rounded-2xl bg-gradient-to-br from-blue-500 to-blue-700 text-white p-3.5 shadow-md shadow-blue-500/25 ring-1 ring-white/20">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-[9px] font-black uppercase tracking-widest text-blue-100">Total Parties</p>
+              <p className="text-[13px] font-semibold text-blue-100">Total Parties</p>
               <div className="w-8 h-8 rounded-xl bg-white/15 flex items-center justify-center">
                 <UserGroupIcon className="w-4 h-4" />
               </div>
             </div>
-            <p className="text-2xl font-black leading-none">{summary.totalParties}</p>
+            <p className="text-2xl font-semibold leading-none">{summary.totalParties}</p>
           </div>
           <div className="rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 text-white p-3.5 shadow-md shadow-indigo-500/25 ring-1 ring-white/20">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-[9px] font-black uppercase tracking-widest text-indigo-100">With Target</p>
+              <p className="text-[13px] font-semibold text-indigo-100">With Target</p>
               <div className="w-8 h-8 rounded-xl bg-white/15 flex items-center justify-center">
                 <FlagIcon className="w-4 h-4" />
               </div>
             </div>
-            <p className="text-2xl font-black leading-none">{summary.withTarget}</p>
+            <p className="text-2xl font-semibold leading-none">{summary.withTarget}</p>
           </div>
           <div className="rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white p-3.5 shadow-md shadow-emerald-500/25 ring-1 ring-white/20">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-[9px] font-black uppercase tracking-widest text-emerald-100">With Achievement</p>
+              <p className="text-[13px] font-semibold text-emerald-100">With Achievement</p>
               <div className="w-8 h-8 rounded-xl bg-white/15 flex items-center justify-center">
                 <ChartBarIcon className="w-4 h-4" />
               </div>
             </div>
-            <p className="text-2xl font-black leading-none">{summary.withAchievement}</p>
+            <p className="text-2xl font-semibold leading-none">{summary.withAchievement}</p>
           </div>
-          <div className="rounded-2xl bg-gradient-to-br from-rose-500 to-orange-500 text-white p-3.5 shadow-md shadow-rose-500/25 ring-1 ring-white/20">
+          <div className="rounded-2xl bg-[#DC2626] text-white p-3.5 shadow-md shadow-rose-500/25 ring-1 ring-white/20">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-[9px] font-black uppercase tracking-widest text-rose-100">Pending Target</p>
+              <p className="text-[13px] font-semibold text-rose-100">Pending Target</p>
               <div className="w-8 h-8 rounded-xl bg-white/15 flex items-center justify-center">
                 <CurrencyRupeeIcon className="w-4 h-4" />
               </div>
             </div>
-            <p className="text-xl font-black leading-none">₹ {formatAmount(summary.pendingTarget)}</p>
+            <p className="text-xl font-semibold leading-none">₹ {formatAmount(summary.pendingTarget)}</p>
           </div>
         </div>
 
@@ -827,7 +827,7 @@ export default function CustomerTargetPage() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-[11px] font-black uppercase tracking-wide whitespace-nowrap transition-all ${
+                className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-[14px] font-semibold  tracking-wide whitespace-nowrap transition-all ${
                   activeTab === tab.id ? tab.active : tab.idle
                 }`}
               >
@@ -839,16 +839,16 @@ export default function CustomerTargetPage() {
 
           {activeTab !== "log" && canWrite && (
             <div className="flex flex-wrap items-center gap-2 pb-3 lg:pb-0">
-              <button onClick={openAdd} className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-[11px] font-bold shadow-md shadow-emerald-500/25 hover:brightness-105">
+              <button onClick={openAdd} className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-[14px] font-bold shadow-md shadow-emerald-500/25 hover:brightness-105">
                 <PlusIcon className="w-4 h-4" /> Add Party
               </button>
-              <button onClick={openEditSelected} className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-[11px] font-bold shadow-md shadow-blue-500/25 hover:brightness-105">
+              <button onClick={openEditSelected} className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-[14px] font-bold shadow-md shadow-blue-500/25 hover:brightness-105">
                 <PencilSquareIcon className="w-4 h-4" /> Edit
               </button>
-              <button onClick={openDeleteSelected} className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gradient-to-r from-rose-500 to-red-600 text-white text-[11px] font-bold shadow-md shadow-rose-500/25 hover:brightness-105">
+              <button onClick={openDeleteSelected} className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gradient-to-r from-rose-500 to-red-600 text-white text-[14px] font-bold shadow-md shadow-rose-500/25 hover:brightness-105">
                 <TrashIcon className="w-4 h-4" /> Delete
               </button>
-              <button onClick={sendTest} className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gradient-to-r from-slate-600 to-slate-800 text-white text-[11px] font-bold shadow-md shadow-slate-500/20 hover:brightness-105">
+              <button onClick={sendTest} className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gradient-to-r from-slate-600 to-slate-800 text-white text-[14px] font-bold shadow-md shadow-slate-500/20 hover:brightness-105">
                 <PaperAirplaneIcon className="w-4 h-4" /> Test Message
               </button>
             </div>
@@ -863,34 +863,34 @@ export default function CustomerTargetPage() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search party / customer / mobile"
-                className="w-full pl-9 pr-3 py-2 rounded-xl border-2 border-sky-100 dark:border-sky-500/20 bg-white dark:bg-slate-950 text-xs font-semibold focus:border-sky-400 outline-none"
+                className="w-full pl-9 pr-3 py-2 rounded-xl border-2 border-sky-100 dark:border-sky-500/20 bg-white dark:bg-slate-950 text-[14px] font-semibold focus:border-sky-400 outline-none"
               />
             </div>
             <button
               onClick={() => selectEligible("all")}
-              className="text-[10px] font-black uppercase tracking-widest px-3 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-sm shadow-emerald-500/20 hover:brightness-105"
+              className="text-[13px] font-semibold px-3 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-sm shadow-emerald-500/20 hover:brightness-105"
             >
               Select Eligible
             </button>
             <button
               onClick={() => selectEligible("failed")}
-              className="text-[10px] font-black uppercase tracking-widest px-3 py-2 rounded-xl bg-gradient-to-r from-rose-500 to-orange-500 text-white shadow-sm shadow-rose-500/20 hover:brightness-105"
+              className="text-[13px] font-semibold px-3 py-2 rounded-xl bg-[#DC2626] text-white shadow-sm shadow-rose-500/20 hover:brightness-105"
             >
               Select Failed
             </button>
             <button
               onClick={() => selectEligible("not_sent")}
-              className="text-[10px] font-black uppercase tracking-widest px-3 py-2 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 text-white shadow-sm shadow-amber-500/20 hover:brightness-105"
+              className="text-[13px] font-semibold px-3 py-2 rounded-xl bg-[#2563EB] text-white shadow-sm shadow-amber-500/20 hover:brightness-105"
             >
               Select Not Sent
             </button>
             <button
               onClick={() => selectEligible("none")}
-              className="text-[10px] font-black uppercase tracking-widest px-3 py-2 rounded-xl bg-gradient-to-r from-slate-500 to-slate-700 text-white shadow-sm hover:brightness-105"
+              className="text-[13px] font-semibold px-3 py-2 rounded-xl bg-gradient-to-r from-slate-500 to-slate-700 text-white shadow-sm hover:brightness-105"
             >
               Clear
             </button>
-            <span className="text-[10px] font-black uppercase tracking-widest ml-auto px-3 py-2 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-sm shadow-blue-500/20">
+            <span className="text-[13px] font-semibold ml-auto px-3 py-2 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-sm shadow-blue-500/20">
               Selected {selected.size} · Rows {filtered.length}
             </span>
           </div>
@@ -898,11 +898,11 @@ export default function CustomerTargetPage() {
 
         <div className="flex-1 min-h-[280px] overflow-auto">
           {isLoading ? (
-            <div className="h-64 flex items-center justify-center text-xs font-black uppercase tracking-widest text-gray-400">Loading...</div>
+            <div className="h-64 flex items-center justify-center text-[14px] font-semibold text-[#5B6472]">Loading...</div>
           ) : activeTab === "log" ? (
             <table className="w-full border-collapse text-left">
               <thead className="sticky top-0 bg-white dark:bg-slate-900 z-10">
-                <tr className="text-[9px] font-black uppercase tracking-widest text-gray-400">
+                <tr className="text-[13px] font-semibold text-[#5B6472]">
                   <th className="p-3">Time</th>
                   <th className="p-3">Party</th>
                   <th className="p-3">Mobile</th>
@@ -916,19 +916,19 @@ export default function CustomerTargetPage() {
               </thead>
               <tbody className="divide-y divide-gray-100 dark:divide-white/5">
                 {logs.length === 0 && (
-                  <tr><td colSpan={9} className="p-10 text-center text-xs font-bold text-gray-400 uppercase tracking-widest">No send log for {month} {year}</td></tr>
+                  <tr><td colSpan={9} className="p-10 text-center text-[14px] font-bold text-[#5B6472]">No send log for {month} {year}</td></tr>
                 )}
                 {logs.map((l) => (
                   <tr key={l.id} className="hover:bg-slate-50/80 dark:hover:bg-white/5">
-                    <td className="p-3 text-[11px] font-semibold text-gray-500 whitespace-nowrap">{l.timestamp ? new Date(l.timestamp).toLocaleString("en-IN") : "—"}</td>
-                    <td className="p-3 text-xs font-bold uppercase">{l.partyName}</td>
-                    <td className="p-3 text-xs font-semibold">{l.mobile}</td>
-                    <td className="p-3 text-[10px] font-black uppercase tracking-widest text-gray-500">{l.type}</td>
-                    <td className="p-3 text-right text-xs font-bold">{formatAmount(l.target)}</td>
-                    <td className="p-3 text-right text-xs font-bold">{formatAmount(l.achieved)}</td>
+                    <td className="p-3 text-[14px] font-semibold text-gray-500 whitespace-nowrap">{l.timestamp ? new Date(l.timestamp).toLocaleString("en-IN") : "—"}</td>
+                    <td className="p-3 text-[14px] font-bold">{l.partyName}</td>
+                    <td className="p-3 text-[14px] font-semibold">{l.mobile}</td>
+                    <td className="p-3 text-[13px] font-semibold text-gray-500">{l.type}</td>
+                    <td className="p-3 text-right text-[14px] font-bold">{formatAmount(l.target)}</td>
+                    <td className="p-3 text-right text-[14px] font-bold">{formatAmount(l.achieved)}</td>
                     <td className="p-3"><StatusBadge status={l.status} /></td>
-                    <td className="p-3 text-xs font-semibold text-gray-500">{l.sentBy}</td>
-                    <td className="p-3 text-[10px] text-red-500 max-w-[160px] truncate" title={l.error}>{l.error || "—"}</td>
+                    <td className="p-3 text-[14px] font-semibold text-gray-500">{l.sentBy}</td>
+                    <td className="p-3 text-[13px] text-red-500 max-w-[160px] truncate" title={l.error}>{l.error || "—"}</td>
                   </tr>
                 ))}
               </tbody>
@@ -936,7 +936,7 @@ export default function CustomerTargetPage() {
           ) : (
             <table className="w-full border-collapse text-left">
               <thead className="sticky top-0 bg-white dark:bg-slate-900 z-10">
-                <tr className="text-[9px] font-black uppercase tracking-widest text-gray-400">
+                <tr className="text-[13px] font-semibold text-[#5B6472]">
                   <th className="p-3 w-10"></th>
                   <th className="p-3">Party Name</th>
                   <th className="p-3">Customer Name</th>
@@ -985,9 +985,9 @@ export default function CustomerTargetPage() {
                           )}
                         </button>
                       </td>
-                      <td className="p-3 text-xs font-bold text-gray-900 dark:text-white">{row.partyName}</td>
-                      <td className="p-3 text-xs font-semibold text-gray-700 dark:text-gray-200">{row.customerName || "—"}</td>
-                      <td className="p-3 text-xs font-semibold">
+                      <td className="p-3 text-[14px] font-bold text-gray-900 dark:text-white">{row.partyName}</td>
+                      <td className="p-3 text-[14px] font-semibold text-gray-700 dark:text-gray-200">{row.customerName || "—"}</td>
+                      <td className="p-3 text-[14px] font-semibold">
                         {row.mobile ? (
                           isValidMobile(row.mobile) ? (
                             <span className="text-gray-600 dark:text-gray-300">{row.mobile}</span>
@@ -1002,15 +1002,15 @@ export default function CustomerTargetPage() {
                           </span>
                         )}
                       </td>
-                      <td className={`p-3 text-right text-xs font-bold ${targetZero ? "text-amber-500" : ""}`}>
+                      <td className={`p-3 text-right text-[14px] font-bold ${targetZero ? "text-amber-500" : ""}`}>
                         {formatAmount(row.target)}
                       </td>
                       {showAchievementColumns && (
                         <>
-                          <td className={`p-3 text-right text-xs font-bold ${msgType === "ACHIEVEMENT" && achievedZero ? "text-amber-500" : "text-emerald-600"}`}>
+                          <td className={`p-3 text-right text-[14px] font-bold ${msgType === "ACHIEVEMENT" && achievedZero ? "text-amber-500" : "text-emerald-600"}`}>
                             {formatAmount(row.achieved)}
                           </td>
-                          <td className="p-3 text-right text-xs font-bold text-amber-600">{formatAmount(row.pending)}</td>
+                          <td className="p-3 text-right text-[14px] font-bold text-amber-600">{formatAmount(row.pending)}</td>
                           <td className="p-3 text-right"><PctBadge pct={row.achievementPct} /></td>
                         </>
                       )}
@@ -1021,14 +1021,14 @@ export default function CustomerTargetPage() {
                         <div className="flex items-center gap-2 whitespace-nowrap">
                           <button
                             onClick={() => setPreviewParty(row)}
-                            className="px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest text-white bg-gradient-to-r from-blue-500 to-indigo-600 shadow-md shadow-blue-500/30 hover:brightness-110"
+                            className="px-3 py-1.5 rounded-xl text-[13px] font-semibold text-white bg-gradient-to-r from-blue-500 to-indigo-600 shadow-md shadow-blue-500/30 hover:brightness-110"
                           >
                             Preview
                           </button>
                           {canWrite && (
                             <button
                               onClick={() => !cannotSend && sendRowMessage(row)}
-                              className={`px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest text-white ${
+                              className={`px-3 py-1.5 rounded-xl text-[13px] font-semibold   text-white ${
                                 sending || cannotSend
                                   ? "bg-gradient-to-r from-slate-300 to-slate-400 shadow-none cursor-not-allowed"
                                   : "bg-gradient-to-r from-emerald-500 to-teal-600 shadow-md shadow-emerald-500/30 hover:brightness-110"
@@ -1044,7 +1044,7 @@ export default function CustomerTargetPage() {
                 })}
                 {paginated.length === 0 && (
                   <tr>
-                    <td colSpan={showAchievementColumns ? 10 : 7} className="p-10 text-center text-xs font-bold text-gray-400 uppercase tracking-widest">
+                    <td colSpan={showAchievementColumns ? 10 : 7} className="p-10 text-center text-[14px] font-bold text-[#5B6472]">
                       No parties found
                     </td>
                   </tr>
@@ -1055,7 +1055,7 @@ export default function CustomerTargetPage() {
         </div>
 
         {activeTab !== "log" && filtered.length > 0 && (
-          <div className="px-4 py-3 border-t border-gray-100 dark:border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs font-semibold text-gray-500">
+          <div className="px-4 py-3 border-t border-gray-100 dark:border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-[14px] font-semibold text-gray-500">
             <div className="flex items-center gap-2">
               <span>
                 Showing {(page - 1) * pageSize + 1} to {Math.min(page * pageSize, filtered.length)} of {filtered.length} entries
@@ -1076,7 +1076,7 @@ export default function CustomerTargetPage() {
                   <button
                     key={p}
                     onClick={() => setPage(p)}
-                    className={`w-8 h-8 rounded-lg text-[11px] font-black ${page === p ? "bg-[#2563eb] text-white" : "border border-gray-200 dark:border-white/10"}`}
+                    className={`w-8 h-8 rounded-lg text-[14px] font-semibold ${page === p ? "bg-[#2563eb] text-white" : "border border-gray-200 dark:border-white/10"}`}
                   >
                     {p}
                   </button>
@@ -1097,21 +1097,21 @@ export default function CustomerTargetPage() {
                 <PaperAirplaneIcon className="w-5 h-5" />
               </div>
               <div>
-                <p className="text-[10px] font-black uppercase tracking-widest text-white/80">WhatsApp Desk</p>
-                <p className="text-sm font-black leading-tight">Send & Test</p>
+                <p className="text-[13px] font-semibold text-white/80">WhatsApp Desk</p>
+                <p className="text-sm font-semibold leading-tight">Send & Test</p>
               </div>
             </div>
           </div>
 
           <div className="p-4 flex flex-col gap-4 overflow-y-auto flex-1 min-h-0">
           <div className="rounded-2xl bg-white dark:bg-slate-950/60 border border-teal-100 dark:border-teal-500/20 p-3 shadow-sm">
-            <p className="text-[10px] font-black uppercase tracking-widest text-teal-600 dark:text-teal-400 mb-2 flex items-center gap-1.5">
+            <p className="text-[13px] font-semibold text-teal-600 dark:text-teal-400 mb-2 flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-teal-500" />
               Test WhatsApp Message
             </p>
             <div className="flex flex-col gap-2">
               <div className="flex rounded-xl border-2 border-teal-100 dark:border-teal-500/30 bg-teal-50/40 dark:bg-teal-950/20 overflow-hidden focus-within:border-teal-400 transition-colors">
-                <span className="px-3 py-2.5 text-xs font-black text-teal-600 dark:text-teal-400 border-r border-teal-100 dark:border-teal-500/30 bg-teal-100/50 dark:bg-teal-900/30">+91</span>
+                <span className="px-3 py-2.5 text-[14px] font-semibold text-teal-600 dark:text-teal-400 border-r border-teal-100 dark:border-teal-500/30 bg-teal-100/50 dark:bg-teal-900/30">+91</span>
                 <input
                   value={testPhone}
                   onChange={(e) => setTestPhone(e.target.value.replace(/\D/g, "").slice(0, 10))}
@@ -1121,43 +1121,43 @@ export default function CustomerTargetPage() {
               </div>
               <button
                 onClick={sendTest}
-                className="w-full px-4 py-2.5 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white text-xs font-bold shadow-md shadow-blue-500/25 transition-all"
+                className="w-full px-4 py-2.5 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white text-[14px] font-bold shadow-md shadow-blue-500/25 transition-all"
               >
                 Send Test Message
               </button>
             </div>
-            <p className="text-[10px] text-teal-700/60 dark:text-teal-300/50 mt-2 font-medium leading-relaxed">
+            <p className="text-[13px] text-teal-700/60 dark:text-teal-300/50 mt-2 font-medium leading-relaxed">
               Uses first selected party (or first with target) as message sample.
             </p>
           </div>
 
           <div>
-            <p className="text-[10px] font-black uppercase tracking-widest text-indigo-500 dark:text-indigo-400 mb-2 flex items-center gap-1.5">
+            <p className="text-[13px] font-semibold text-indigo-500 dark:text-indigo-400 mb-2 flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
               Bulk Send Summary
             </p>
-            <div className="grid grid-cols-2 gap-2 text-xs">
+            <div className="grid grid-cols-2 gap-2 text-[14px]">
               <div className="rounded-2xl bg-gradient-to-br from-slate-600 to-slate-800 text-white px-3 py-2.5 shadow-md shadow-slate-500/20">
-                <p className="text-white/70 font-bold text-[9px] uppercase tracking-wider">Selected</p>
-                <p className="text-xl font-black leading-tight mt-0.5">{bulkStats.selected}</p>
+                <p className="text-white/70 font-bold text-[13px] tracking-wider">Selected</p>
+                <p className="text-xl font-semibold leading-tight mt-0.5">{bulkStats.selected}</p>
               </div>
               <div className="rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white px-3 py-2.5 shadow-md shadow-emerald-500/25">
-                <p className="text-emerald-100 font-bold text-[9px] uppercase tracking-wider">Will be Sent</p>
-                <p className="text-xl font-black leading-tight mt-0.5">{bulkStats.willSend}</p>
+                <p className="text-emerald-100 font-bold text-[13px] tracking-wider">Will be Sent</p>
+                <p className="text-xl font-semibold leading-tight mt-0.5">{bulkStats.willSend}</p>
               </div>
-              <div className="rounded-2xl bg-gradient-to-br from-rose-500 to-orange-500 text-white px-3 py-2.5 shadow-md shadow-rose-500/25">
-                <p className="text-rose-100 font-bold text-[9px] uppercase tracking-wider">Failed</p>
-                <p className="text-xl font-black leading-tight mt-0.5">{bulkStats.failedLatest}</p>
+              <div className="rounded-2xl bg-[#DC2626] text-white px-3 py-2.5 shadow-md shadow-rose-500/25">
+                <p className="text-rose-100 font-bold text-[13px] tracking-wider">Failed</p>
+                <p className="text-xl font-semibold leading-tight mt-0.5">{bulkStats.failedLatest}</p>
               </div>
               <div className="rounded-2xl bg-gradient-to-br from-violet-500 to-purple-600 text-white px-3 py-2.5 shadow-md shadow-violet-500/25">
-                <p className="text-violet-100 font-bold text-[9px] uppercase tracking-wider">Already Sent</p>
-                <p className="text-xl font-black leading-tight mt-0.5">{bulkStats.alreadySent}</p>
+                <p className="text-violet-100 font-bold text-[13px] tracking-wider">Already Sent</p>
+                <p className="text-xl font-semibold leading-tight mt-0.5">{bulkStats.alreadySent}</p>
               </div>
             </div>
           </div>
 
           <div>
-            <p className="text-[10px] font-black uppercase tracking-widest text-amber-600 dark:text-amber-400 mb-2 flex items-center gap-1.5">
+            <p className="text-[13px] font-semibold text-amber-600 dark:text-amber-400 mb-2 flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
               Send Mode
             </p>
@@ -1190,7 +1190,7 @@ export default function CustomerTargetPage() {
               ]).map((opt) => (
                 <label
                   key={opt.id}
-                  className={`flex items-start gap-2.5 cursor-pointer text-xs font-semibold rounded-xl border-2 px-3 py-2.5 transition-all ${
+                  className={`flex items-start gap-2.5 cursor-pointer text-[14px] font-semibold rounded-xl border-2 px-3 py-2.5 transition-all ${
                     sendScope === opt.id ? opt.active : `bg-white dark:bg-slate-950/40 text-gray-700 dark:text-gray-200 ${opt.idle}`
                   }`}
                 >
@@ -1204,7 +1204,7 @@ export default function CustomerTargetPage() {
                   <span className="flex-1 leading-snug">
                     {opt.label}
                     {opt.badge && (
-                      <span className={`ml-1.5 inline-block px-1.5 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest ${opt.badgeClass}`}>
+                      <span className={`ml-1.5 inline-block px-1.5 py-0.5 rounded-md text-[13px] font-semibold   ${opt.badgeClass}`}>
                         {opt.badge}
                       </span>
                     )}
@@ -1218,7 +1218,7 @@ export default function CustomerTargetPage() {
             <button
               onClick={openBulkConfirm}
               disabled={sending || recipientsForScope.length === 0}
-              className="flex items-center justify-center gap-2 w-full px-4 py-3.5 rounded-2xl bg-gradient-to-r from-[#128C7E] via-[#25D366] to-emerald-500 hover:brightness-105 text-white text-sm font-black shadow-lg shadow-emerald-500/30 disabled:opacity-40 disabled:shadow-none transition-all"
+              className="flex items-center justify-center gap-2 w-full px-4 py-3.5 rounded-2xl bg-gradient-to-r from-[#128C7E] via-[#25D366] to-emerald-500 hover:brightness-105 text-white text-sm font-semibold shadow-lg shadow-emerald-500/30 disabled:opacity-40 disabled:shadow-none transition-all"
             >
               {sending ? (
                 <>
@@ -1240,12 +1240,12 @@ export default function CustomerTargetPage() {
                     style={{ width: `${sendProgress.total ? (sendProgress.done / sendProgress.total) * 100 : 0}%` }}
                   />
                 </div>
-                <p className="text-[10px] text-emerald-700 dark:text-emerald-300 font-bold mt-1.5">
+                <p className="text-[13px] text-emerald-700 dark:text-emerald-300 font-bold mt-1.5">
                   Sent {sendProgress.sent} · Failed {sendProgress.failed} · Skipped {sendProgress.skipped}
                 </p>
               </div>
             )}
-            <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium leading-relaxed">
+            <p className="text-[13px] text-slate-500 dark:text-slate-400 font-medium leading-relaxed">
               Status updates row-by-row. Retry failed after completion.
             </p>
             {lastFailed.length > 0 && (
@@ -1260,7 +1260,7 @@ export default function CustomerTargetPage() {
                   a.click();
                   URL.revokeObjectURL(url);
                 }}
-                className="text-[10px] font-black uppercase tracking-widest text-rose-600 bg-rose-50 dark:bg-rose-900/30 border border-rose-200 dark:border-rose-500/30 rounded-xl px-3 py-2 text-left hover:bg-rose-100 transition-colors"
+                className="text-[13px] font-semibold text-rose-600 bg-rose-50 dark:bg-rose-900/30 border border-rose-200 dark:border-rose-500/30 rounded-xl px-3 py-2 text-left hover:bg-rose-100 transition-colors"
               >
                 Download Failed ({lastFailed.length})
               </button>
@@ -1275,12 +1275,12 @@ export default function CustomerTargetPage() {
       {previewParty && (
         <div className="fixed inset-0 z-[200] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-white dark:bg-slate-900 rounded-3xl w-full max-w-lg shadow-2xl border border-white/10 overflow-hidden">
-            <div className="px-5 py-4 border-b border-gray-100 dark:border-white/10 flex items-center justify-between bg-[#003875] text-white">
+            <div className="px-5 py-4 border-b border-gray-100 dark:border-white/10 flex items-center justify-between bg-[#2563EB] text-white">
               <div>
-                <p className="text-[10px] font-black uppercase tracking-widest text-white/70">Message Preview · {msgType}</p>
-                <h3 className="font-black uppercase">{previewParty.customerName || previewParty.partyName}</h3>
+                <p className="text-[13px] font-semibold text-white/70">Message Preview · {msgType}</p>
+                <h3 className="font-semibold">{previewParty.customerName || previewParty.partyName}</h3>
                 {previewParty.customerName && previewParty.customerName !== previewParty.partyName && (
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-white/70">{previewParty.partyName}</p>
+                  <p className="text-[13px] font-bold text-white/70">{previewParty.partyName}</p>
                 )}
               </div>
               <button onClick={() => setPreviewParty(null)}><XMarkIcon className="w-5 h-5" /></button>
@@ -1297,30 +1297,30 @@ export default function CustomerTargetPage() {
         <div className="fixed inset-0 z-[200] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-white dark:bg-slate-900 rounded-3xl w-full max-w-2xl shadow-2xl border border-white/10 overflow-hidden max-h-[90vh] flex flex-col">
             <div className="px-5 py-4 border-b border-gray-100 dark:border-white/10 flex items-center justify-between">
-              <h3 className="text-sm font-black uppercase tracking-widest">{editing ? "Edit Party" : "Add Party"}</h3>
+              <h3 className="text-sm font-semibold">{editing ? "Edit Party" : "Add Party"}</h3>
               <button onClick={() => setCrudOpen(false)}><XMarkIcon className="w-5 h-5" /></button>
             </div>
             <div className="p-5 space-y-4 overflow-y-auto">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <div>
-                  <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Party Name</label>
+                  <label className="text-[13px] font-semibold text-[#5B6472]">Party Name</label>
                   <input value={formName} onChange={(e) => setFormName(e.target.value)} className="mt-1 w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-white/10 bg-transparent text-sm font-bold" />
                 </div>
                 <div>
-                  <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Customer Name</label>
+                  <label className="text-[13px] font-semibold text-[#5B6472]">Customer Name</label>
                   <input value={formCustomerName} onChange={(e) => setFormCustomerName(e.target.value)} className="mt-1 w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-white/10 bg-transparent text-sm font-bold" />
                 </div>
                 <div>
-                  <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Mobile Num</label>
+                  <label className="text-[13px] font-semibold text-[#5B6472]">Mobile Num</label>
                   <input value={formMobile} onChange={(e) => setFormMobile(e.target.value)} className="mt-1 w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-white/10 bg-transparent text-sm font-bold" />
                 </div>
               </div>
               <div>
-                <p className="text-[9px] font-black uppercase tracking-widest text-gray-400 mb-2">Monthly Targets</p>
+                <p className="text-[13px] font-semibold text-[#5B6472] mb-2">Monthly Targets</p>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                   {MONTH_NAMES.map((m) => (
                     <div key={m}>
-                      <label className="text-[9px] font-bold text-gray-400">{m}</label>
+                      <label className="text-[13px] font-bold text-[#5B6472]">{m}</label>
                       <input
                         type="number"
                         value={formMonths[m] === "" ? "" : formMonths[m]}
@@ -1330,19 +1330,19 @@ export default function CustomerTargetPage() {
                             [m]: e.target.value === "" ? "" : Number(e.target.value),
                           }))
                         }
-                        className="mt-0.5 w-full px-2 py-1.5 rounded-lg border border-gray-200 dark:border-white/10 bg-transparent text-xs font-bold"
+                        className="mt-0.5 w-full px-2 py-1.5 rounded-lg border border-gray-200 dark:border-white/10 bg-transparent text-[14px] font-bold"
                       />
                     </div>
                   ))}
                 </div>
                 {editing && (
-                  <p className="text-[10px] text-amber-600 mt-2 font-bold">Leave a month blank to keep its existing target unchanged.</p>
+                  <p className="text-[13px] text-amber-600 mt-2 font-bold">Leave a month blank to keep its existing target unchanged.</p>
                 )}
               </div>
             </div>
             <div className="p-4 border-t border-gray-100 dark:border-white/10 flex justify-end gap-2">
-              <button onClick={() => setCrudOpen(false)} className="px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest text-gray-500">Cancel</button>
-              <button onClick={savePlanned} className="px-5 py-2 rounded-xl text-xs font-black uppercase tracking-widest bg-[#003875] text-white dark:bg-[#FFD500] dark:text-black">Save</button>
+              <button onClick={() => setCrudOpen(false)} className="px-4 py-2 rounded-xl text-[14px] font-semibold text-gray-500">Cancel</button>
+              <button onClick={savePlanned} className="px-5 py-2 rounded-xl text-[14px] font-semibold bg-[#2563EB] text-white dark:bg-[#60A5FA] dark:text-black">Save</button>
             </div>
           </div>
         </div>
@@ -1352,28 +1352,28 @@ export default function CustomerTargetPage() {
         <div className="fixed inset-0 z-[200] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-white dark:bg-slate-900 rounded-3xl w-full max-w-2xl shadow-2xl border border-white/10 overflow-hidden max-h-[90vh] flex flex-col">
             <div className="px-5 py-4 border-b border-gray-100 dark:border-white/10 shrink-0">
-              <h3 className="text-sm font-black uppercase tracking-widest">Import {month} Achievement</h3>
-              <p className="text-[10px] font-bold text-gray-400 mt-1">
+              <h3 className="text-sm font-semibold">Import {month} Achievement</h3>
+              <p className="text-[13px] font-bold text-[#5B6472] mt-1">
                 {importPreview.fileName} · {importPreview.rows.length} rows
               </p>
               <div className="flex flex-wrap gap-2 mt-3">
-                <span className="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-emerald-100 text-emerald-700">
+                <span className="px-2.5 py-1 rounded-full text-[13px] font-semibold bg-emerald-100 text-emerald-700">
                   Matched {importMatchStats.matched}
                 </span>
-                <span className="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-rose-100 text-rose-700">
+                <span className="px-2.5 py-1 rounded-full text-[13px] font-semibold bg-rose-100 text-rose-700">
                   Not found {importMatchStats.unmatched}
                 </span>
               </div>
               {importMatchStats.unmatched > 0 && (
-                <p className="text-[11px] font-semibold text-rose-600 mt-2">
+                <p className="text-[14px] font-semibold text-rose-600 mt-2">
                   Red rows are not in Sheet1. Match Mobile No first, then No, then Customer / Party Name. Fix Sheet1, then import again.
                 </p>
               )}
             </div>
             <div className="p-5 flex-1 min-h-0 overflow-auto">
-              <table className="w-full text-left text-xs">
+              <table className="w-full text-left text-[14px]">
                 <thead className="sticky top-0 bg-white dark:bg-slate-900">
-                  <tr className="text-[9px] font-black uppercase tracking-widest text-gray-400">
+                  <tr className="text-[13px] font-semibold text-[#5B6472]">
                     <th className="py-1 pr-2">#</th>
                     <th className="py-1">Customer Name</th>
                     <th className="py-1">No / Mobile</th>
@@ -1394,19 +1394,19 @@ export default function CustomerTargetPage() {
                             : "border-rose-100 bg-rose-50 dark:bg-rose-900/20 dark:border-rose-500/20"
                         }`}
                       >
-                        <td className="py-1.5 pr-2 text-gray-400 font-bold">{i + 1}</td>
+                        <td className="py-1.5 pr-2 text-[#5B6472] font-bold">{i + 1}</td>
                         <td className={`py-1.5 font-bold ${matched ? "text-gray-900 dark:text-white" : "text-rose-700 dark:text-rose-300"}`}>
                           {r.customerName || "—"}
                         </td>
                         <td className={`py-1.5 font-bold tabular-nums ${matched ? "text-gray-900 dark:text-white" : "text-rose-700 dark:text-rose-300"}`}>
                           {id}
                         </td>
-                        <td className="py-1.5 text-right font-black tabular-nums">{formatAmount(r.amount)}</td>
+                        <td className="py-1.5 text-right font-semibold tabular-nums">{formatAmount(r.amount)}</td>
                         <td className="py-1.5 text-right pl-2">
                           {matched ? (
-                            <span className="text-[9px] font-black uppercase tracking-widest text-emerald-600">OK</span>
+                            <span className="text-[13px] font-semibold text-emerald-600">OK</span>
                           ) : (
-                            <span className="text-[9px] font-black uppercase tracking-widest text-rose-600">Missing</span>
+                            <span className="text-[13px] font-semibold text-rose-600">Missing</span>
                           )}
                         </td>
                       </tr>
@@ -1416,15 +1416,15 @@ export default function CustomerTargetPage() {
               </table>
             </div>
             <div className="p-4 border-t border-gray-100 dark:border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-2 shrink-0">
-              <p className="text-[10px] font-bold text-gray-400">
+              <p className="text-[13px] font-bold text-[#5B6472]">
                 Only matched rows will import. Files can be No + Amount, or Customer Name + Mobile No + Amount.
               </p>
               <div className="flex justify-end gap-2">
-                <button onClick={() => setImportPreview(null)} className="px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest text-gray-500">Cancel</button>
+                <button onClick={() => setImportPreview(null)} className="px-4 py-2 rounded-xl text-[14px] font-semibold text-gray-500">Cancel</button>
                 <button
                   onClick={confirmImport}
                   disabled={importMatchStats.matched === 0}
-                  className="px-5 py-2 rounded-xl text-xs font-black uppercase tracking-widest bg-emerald-600 text-white disabled:opacity-40"
+                  className="px-5 py-2 rounded-xl text-[14px] font-semibold bg-emerald-600 text-white disabled:opacity-40"
                 >
                   Confirm Import → {month} ({importMatchStats.matched})
                 </button>
@@ -1440,16 +1440,16 @@ export default function CustomerTargetPage() {
             <div className="px-5 py-4 border-b border-gray-100 dark:border-white/10 flex gap-3 items-start">
               <ExclamationTriangleIcon className={`w-6 h-6 shrink-0 ${sendScope === "selected_force" ? "text-red-500" : "text-amber-500"}`} />
               <div>
-                <h3 className="text-sm font-black uppercase tracking-widest">Confirm Bulk WhatsApp</h3>
-                <p className="text-xs text-gray-500 mt-1 font-bold">{msgType} · {month} {year} · {sendScope.replace(/_/g, " ")}</p>
+                <h3 className="text-sm font-semibold">Confirm Bulk WhatsApp</h3>
+                <p className="text-[14px] text-gray-500 mt-1 font-bold">{msgType} · {month} {year} · {sendScope.replace(/_/g, " ")}</p>
               </div>
             </div>
             <div className="p-5 space-y-3">
               <div className="rounded-2xl bg-white dark:bg-white/5 border border-gray-100 dark:border-white/10 p-4 text-center">
-                <p className="text-[9px] font-black uppercase tracking-widest text-gray-400">Recipients</p>
-                <p className="text-3xl font-black text-[#2563eb]">{recipientsForScope.length}</p>
+                <p className="text-[13px] font-semibold text-[#5B6472]">Recipients</p>
+                <p className="text-3xl font-semibold text-[#2563eb]">{recipientsForScope.length}</p>
               </div>
-              <div className="max-h-40 overflow-auto text-[11px] font-bold text-gray-600 dark:text-gray-300 space-y-1">
+              <div className="max-h-40 overflow-auto text-[14px] font-bold text-gray-600 dark:text-gray-300 space-y-1">
                 {recipientsForScope.slice(0, 40).map((r) => (
                   <div key={r.partyName} className="flex justify-between gap-2 border-b border-gray-50 dark:border-white/5 py-1">
                     <span>{r.customerName || r.partyName}</span>
@@ -1459,18 +1459,18 @@ export default function CustomerTargetPage() {
               </div>
               {sendScope === "selected_force" && (
                 <div>
-                  <p className="text-[10px] font-black uppercase tracking-widest text-red-500 mb-1">Type FORCE to confirm</p>
-                  <input value={forceConfirm} onChange={(e) => setForceConfirm(e.target.value)} className="w-full px-3 py-2 rounded-xl border border-red-300 bg-red-50 dark:bg-red-900/20 text-sm font-black" placeholder="FORCE" />
+                  <p className="text-[13px] font-semibold text-red-500 mb-1">Type FORCE to confirm</p>
+                  <input value={forceConfirm} onChange={(e) => setForceConfirm(e.target.value)} className="w-full px-3 py-2 rounded-xl border border-red-300 bg-red-50 dark:bg-red-900/20 text-sm font-semibold" placeholder="FORCE" />
                 </div>
               )}
-              <p className="text-[10px] text-gray-400 font-bold flex items-center gap-1">
+              <p className="text-[13px] text-[#5B6472] font-bold flex items-center gap-1">
                 <CheckCircleIcon className="w-4 h-4 text-emerald-500" />
                 Already SENT parties are never re-messaged unless Force Resend.
               </p>
             </div>
             <div className="p-4 border-t border-gray-100 dark:border-white/10 flex justify-end gap-2">
-              <button onClick={() => setSendOpen(false)} className="px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest text-gray-500">Cancel</button>
-              <button onClick={runBulkSend} disabled={recipientsForScope.length === 0} className="px-5 py-2 rounded-xl text-xs font-black uppercase tracking-widest bg-emerald-500 text-white disabled:opacity-40">
+              <button onClick={() => setSendOpen(false)} className="px-4 py-2 rounded-xl text-[14px] font-semibold text-gray-500">Cancel</button>
+              <button onClick={runBulkSend} disabled={recipientsForScope.length === 0} className="px-5 py-2 rounded-xl text-[14px] font-semibold bg-emerald-500 text-white disabled:opacity-40">
                 Send {recipientsForScope.length}
               </button>
             </div>
@@ -1481,20 +1481,20 @@ export default function CustomerTargetPage() {
       {guideOpen && (
         <div className="fixed inset-0 z-[210] bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4" onClick={() => setGuideOpen(false)}>
           <div className="bg-white dark:bg-slate-900 rounded-3xl w-full max-w-3xl shadow-2xl border border-white/10 overflow-hidden max-h-[min(92vh,900px)] flex flex-col" onClick={(e) => e.stopPropagation()}>
-            <div className="shrink-0 px-5 py-4 border-b border-gray-100 dark:border-white/10 bg-[#003875] text-white flex items-center justify-between gap-3">
+            <div className="shrink-0 px-5 py-4 border-b border-gray-100 dark:border-white/10 bg-[#2563EB] text-white flex items-center justify-between gap-3">
               <div className="flex items-center gap-2 min-w-0">
-                <InformationCircleIcon className="w-5 h-5 text-[#FFD500] shrink-0" />
+                <InformationCircleIcon className="w-5 h-5 text-[#2563EB] shrink-0" />
                 <div>
-                  <h3 className="text-sm font-black uppercase tracking-widest">Customer Target — How To Use</h3>
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-white/70 mt-0.5">Full page guidance</p>
+                  <h3 className="text-sm font-semibold">Customer Target — How To Use</h3>
+                  <p className="text-[13px] font-bold text-white/70 mt-0.5">Full page guidance</p>
                 </div>
               </div>
               <button type="button" onClick={() => setGuideOpen(false)} className="p-1.5 rounded-full hover:bg-white/10"><XMarkIcon className="w-5 h-5" /></button>
             </div>
             <div className="flex-1 min-h-0 overflow-y-auto p-5 space-y-4 text-sm">
               <section className="rounded-2xl border border-amber-200 dark:border-amber-500/30 bg-amber-50 dark:bg-amber-900/20 px-4 py-3">
-                <p className="text-[10px] font-black uppercase tracking-widest text-amber-700 dark:text-amber-300 mb-1">Who can do what</p>
-                <ul className="space-y-1 text-xs font-bold text-amber-900/90 dark:text-amber-100/90">
+                <p className="text-[13px] font-semibold text-amber-700 dark:text-amber-300 mb-1">Who can do what</p>
+                <ul className="space-y-1 text-[14px] font-bold text-amber-900/90 dark:text-amber-100/90">
                   <li>ADMIN / EA — Add/Edit/Delete, Import, Test, Bulk Send, Force Resend.</li>
                   <li>Others — View / search / preview only.</li>
                   <li>Always Send Test to your number before bulk. Target data is confidential.</li>
@@ -1510,14 +1510,14 @@ export default function CustomerTargetPage() {
                   ["Send WhatsApp button", "Confirms recipients then sends sequentially. Failed parties can be retried without re-messaging SENT ones."],
                 ].map(([t, b]) => (
                   <div key={t} className="rounded-xl border border-gray-100 dark:border-white/10 px-3 py-2.5">
-                    <p className="text-[11px] font-black uppercase tracking-widest text-[#003875] dark:text-[#FFD500]">{t}</p>
-                    <p className="text-xs font-medium text-gray-600 dark:text-gray-300 mt-1">{b}</p>
+                    <p className="text-[14px] font-semibold text-[#2563EB] dark:text-[#60A5FA]">{t}</p>
+                    <p className="text-[14px] font-medium text-gray-600 dark:text-gray-300 mt-1">{b}</p>
                   </div>
                 ))}
               </section>
             </div>
             <div className="shrink-0 p-4 border-t border-gray-100 dark:border-white/10 flex justify-end">
-              <button type="button" onClick={() => setGuideOpen(false)} className="px-5 py-2 rounded-xl text-xs font-black uppercase tracking-widest bg-[#003875] text-white dark:bg-[#FFD500] dark:text-black">Got It</button>
+              <button type="button" onClick={() => setGuideOpen(false)} className="px-5 py-2 rounded-xl text-[14px] font-semibold bg-[#2563EB] text-white dark:bg-[#60A5FA] dark:text-black">Got It</button>
             </div>
           </div>
         </div>
@@ -1540,12 +1540,12 @@ export default function CustomerTargetPage() {
         >
           <div className="relative w-72 rounded-2xl bg-gradient-to-br from-slate-900 via-[#1e293b] to-amber-950 text-white shadow-[0_12px_40px_rgba(245,158,11,0.35)] ring-1 ring-amber-400/50 px-4 py-3">
             <div className="flex items-start gap-2.5">
-              <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 shadow-md shadow-amber-500/40">
+              <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-[#2563EB] shadow-md shadow-amber-500/40">
                 <ExclamationTriangleIcon className="w-4 h-4 text-white" />
               </span>
               <div>
-                <p className="text-[9px] font-black uppercase tracking-[0.18em] text-amber-300">Cannot send</p>
-                <p className="mt-1 text-xs font-bold leading-relaxed text-white/95">{rowTip.text}</p>
+                <p className="text-[13px] font-semibold tracking-[0.18em] text-amber-300">Cannot send</p>
+                <p className="mt-1 text-[14px] font-bold leading-relaxed text-white/95">{rowTip.text}</p>
               </div>
             </div>
             <span className="absolute left-6 top-full h-0 w-0 border-x-[7px] border-x-transparent border-t-[8px] border-t-amber-900" />

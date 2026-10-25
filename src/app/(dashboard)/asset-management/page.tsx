@@ -51,7 +51,7 @@ const CATEGORIES = [
     id: "ALL",
     label: "All Categories",
     icon: ArchiveBoxIcon,
-    activeColor: "bg-[#007AFF] text-white shadow-md shadow-[#007AFF]/20",
+    activeColor: "bg-[#2563EB] text-white shadow-md shadow-[#2563EB]/20",
     inactiveColor:
       "bg-white text-gray-600 border border-gray-200/70 hover:bg-gray-50 dark:bg-[#1C1C1E] dark:border-white/10 dark:hover:bg-white/5 dark:text-gray-300",
   },
@@ -67,9 +67,9 @@ const CATEGORIES = [
     id: "Desktop",
     label: "Desktop",
     icon: CubeIcon,
-    activeColor: "bg-[#007AFF] text-white shadow-md shadow-[#007AFF]/20",
+    activeColor: "bg-[#2563EB] text-white shadow-md shadow-[#2563EB]/20",
     inactiveColor:
-      "bg-white text-[#007AFF] border border-[#007AFF]/20 hover:bg-[#007AFF]/5 dark:bg-[#1C1C1E] dark:border-[#007AFF]/20 dark:hover:bg-[#007AFF]/10",
+      "bg-white text-[#2563EB] border border-[#2563EB]/20 hover:bg-[#2563EB]/5 dark:bg-[#1C1C1E] dark:border-[#2563EB]/20 dark:hover:bg-[#2563EB]/10",
   },
   {
     id: "Monitor",
@@ -136,9 +136,9 @@ const getCategoryMeta = (category: string | undefined) => {
 };
 
 const FORM_LABEL =
-  "block text-[11px] font-semibold text-gray-500 dark:text-gray-400 mb-1.5 tracking-wide";
+  "block text-[14px] font-semibold text-gray-500 dark:text-gray-400 mb-1.5 tracking-wide";
 const FORM_INPUT =
-  "w-full bg-white dark:bg-[#2C2C2E] border border-gray-200 dark:border-white/10 rounded-2xl py-2.5 text-sm font-semibold text-gray-900 dark:text-white placeholder:text-gray-400 focus:ring-2 focus:ring-[#007AFF]/25 focus:border-[#007AFF] outline-none transition-all shadow-[inset_0_1px_2px_rgba(0,0,0,0.03)] dark:shadow-none disabled:opacity-60 disabled:cursor-not-allowed disabled:bg-[#E5E5EA] dark:disabled:bg-white/5";
+  "w-full bg-white dark:bg-[#2C2C2E] border border-gray-200 dark:border-white/10 rounded-2xl py-2.5 text-sm font-semibold text-gray-900 dark:text-white placeholder:text-gray-400 focus:ring-2 focus:ring-[#2563EB]/25 focus:border-[#2563EB] outline-none transition-all shadow-[inset_0_1px_2px_rgba(0,0,0,0.03)] dark:shadow-none disabled:opacity-60 disabled:cursor-not-allowed disabled:bg-[#E5E5EA] dark:disabled:bg-white/5";
 const FORM_INPUT_WITH_ICON = `${FORM_INPUT} pl-10`;
 const FORM_INPUT_PLAIN = `${FORM_INPUT} px-3.5`;
 
@@ -171,7 +171,7 @@ const OutlineInput = ({
     </label>
     <div className="relative">
       {Icon && (
-        <div className="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-[#007AFF]/70 dark:text-[#0A84FF]/80">
+        <div className="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-[#2563EB]/70 dark:text-[#0A84FF]/80">
           <Icon className="w-4 h-4" />
         </div>
       )}
@@ -214,7 +214,7 @@ const OutlineSelect = ({
     </label>
     <div className="relative">
       {Icon && (
-        <div className="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-[#007AFF]/70 dark:text-[#0A84FF]/80 z-10">
+        <div className="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-[#2563EB]/70 dark:text-[#0A84FF]/80 z-10">
           <Icon className="w-4 h-4" />
         </div>
       )}
@@ -286,7 +286,7 @@ const SearchableUserSelect = ({
       <label className={FORM_LABEL}>{label}</label>
       <div className="relative">
         {Icon && (
-          <div className="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-[#007AFF]/70 dark:text-[#0A84FF]/80 z-10">
+          <div className="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-[#2563EB]/70 dark:text-[#0A84FF]/80 z-10">
             <Icon className="w-4 h-4" />
           </div>
         )}
@@ -312,7 +312,7 @@ const SearchableUserSelect = ({
             filteredOptions.map((opt) => (
               <div
                 key={opt}
-                className="px-4 py-2.5 text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-[#007AFF]/8 dark:hover:bg-[#0A84FF]/15 cursor-pointer transition-colors first:rounded-t-2xl last:rounded-b-2xl"
+                className="px-4 py-2.5 text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-[#2563EB]/8 dark:hover:bg-[#0A84FF]/15 cursor-pointer transition-colors first:rounded-t-2xl last:rounded-b-2xl"
                 onClick={() => {
                   onChange(opt);
                   setIsOpen(false);
@@ -322,7 +322,7 @@ const SearchableUserSelect = ({
               </div>
             ))
           ) : (
-            <div className="px-4 py-3 text-xs font-semibold text-gray-400 text-center">
+            <div className="px-4 py-3 text-[14px] font-semibold text-[#5B6472] text-center">
               No users found
             </div>
           )}
@@ -528,7 +528,7 @@ export default function AssetManagementPage() {
       case "Available":
         return "bg-green-100 text-green-700 dark:bg-[#34C759]/20 dark:text-[#34C759]";
       case "In Use":
-        return "bg-blue-100 text-blue-700 dark:bg-[#007AFF]/20 dark:text-[#0A84FF]";
+        return "bg-blue-100 text-blue-700 dark:bg-[#2563EB]/20 dark:text-[#0A84FF]";
       case "Maintenance":
         return "bg-amber-100 text-amber-700 dark:bg-[#FF9500]/20 dark:text-[#FF9500]";
       case "Retired":
@@ -543,7 +543,7 @@ export default function AssetManagementPage() {
       case "Available":
         return "bg-[#34C759]";
       case "In Use":
-        return "bg-[#007AFF] dark:bg-[#0A84FF]";
+        return "bg-[#2563EB] dark:bg-[#0A84FF]";
       case "Maintenance":
         return "bg-[#FF9500]";
       case "Retired":
@@ -558,25 +558,25 @@ export default function AssetManagementPage() {
       case "Available":
         return "text-emerald-500 bg-emerald-50 dark:bg-emerald-500/10";
       case "In Use":
-        return "text-blue-500 bg-blue-50 dark:bg-[#007AFF]/10";
+        return "text-blue-500 bg-blue-50 dark:bg-[#2563EB]/10";
       case "Maintenance":
         return "text-amber-500 bg-amber-50 dark:bg-[#FF9500]/10";
       case "Retired":
-        return "text-gray-400 bg-gray-100 dark:bg-gray-800";
+        return "text-[#5B6472] bg-gray-100 dark:bg-gray-800";
       default:
-        return "text-gray-400 bg-gray-100 dark:bg-gray-800";
+        return "text-[#5B6472] bg-gray-100 dark:bg-gray-800";
     }
   };
 
   const getFormStatusStyle = (status: string, active: boolean) => {
     if (!active) {
-      return "bg-[#F2F2F7] dark:bg-[#2C2C2E] text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-white/10 hover:border-[#007AFF]/40";
+      return "bg-[#F2F2F7] dark:bg-[#2C2C2E] text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-white/10 hover:border-[#2563EB]/40";
     }
     switch (status) {
       case "Available":
         return "bg-[#34C759] text-white shadow-md shadow-[#34C759]/30";
       case "In Use":
-        return "bg-[#007AFF] text-white shadow-md shadow-[#007AFF]/30";
+        return "bg-[#2563EB] text-white shadow-md shadow-[#2563EB]/30";
       case "Maintenance":
         return "bg-[#FF9500] text-white shadow-md shadow-[#FF9500]/30";
       case "Retired":
@@ -592,9 +592,9 @@ export default function AssetManagementPage() {
       label: "Total Assets",
       count: totalAssets,
       suffix: "Items",
-      bg: "bg-[#007AFF]",
-      shadow: "shadow-[#007AFF]/20",
-      ring: "ring-[#007AFF]/50",
+      bg: "bg-[#2563EB]",
+      shadow: "shadow-[#2563EB]/20",
+      ring: "ring-[#2563EB]/50",
       icon: ArchiveBoxIcon,
     },
     {
@@ -659,17 +659,17 @@ export default function AssetManagementPage() {
 
       <div className="flex flex-col md:flex-row items-center justify-between bg-white/80 dark:bg-[#1C1C1E]/80 backdrop-blur-xl border border-gray-200/50 dark:border-white/10 rounded-3xl p-3 shadow-sm gap-4 shrink-0">
         <div className="flex items-center gap-3 ml-2">
-          <div className="p-2.5 bg-[#007AFF] rounded-2xl shadow-inner">
+          <div className="p-2.5 bg-[#2563EB] rounded-2xl shadow-inner">
             <ComputerDesktopIcon className="w-5 h-5 text-white" />
           </div>
           <div>
             <h1
-              className="text-base font-black text-gray-900 dark:text-white tracking-wide leading-none"
+              className="text-base font-semibold text-gray-900 dark:text-white tracking-wide leading-none"
               style={{ fontFamily: "system-ui, -apple-system, sans-serif" }}
             >
               Asset Management
             </h1>
-            <p className="text-gray-500 dark:text-gray-400 font-semibold text-[10px] uppercase tracking-wider mt-1">
+            <p className="text-gray-500 dark:text-gray-400 font-semibold text-[13px] tracking-wider mt-1">
               Resource Tracking & Inventory
             </p>
           </div>
@@ -677,24 +677,24 @@ export default function AssetManagementPage() {
 
         <div className="flex flex-wrap items-center gap-2.5 mr-1">
           <div className="relative">
-            <MagnifyingGlassIcon className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <MagnifyingGlassIcon className="w-4 h-4 text-[#5B6472] absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               placeholder="Search..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9 pr-4 py-2 bg-gray-100/50 dark:bg-black/20 border border-gray-200/50 dark:border-white/5 rounded-full text-xs font-semibold text-gray-900 dark:text-white focus:ring-2 focus:ring-[#007AFF] focus:border-transparent outline-none transition-all w-full md:w-56"
+              className="pl-9 pr-4 py-2 bg-gray-100/50 dark:bg-black/20 border border-gray-200/50 dark:border-white/5 rounded-full text-[14px] font-semibold text-gray-900 dark:text-white focus:ring-2 focus:ring-[#2563EB] focus:border-transparent outline-none transition-all w-full md:w-56"
             />
           </div>
           <button
             onClick={exportToCSV}
-            className="flex items-center gap-1.5 px-4 py-2 bg-gray-100 dark:bg-white/10 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-white/20 rounded-full text-[11px] font-bold tracking-wide transition-all"
+            className="flex items-center gap-1.5 px-4 py-2 bg-gray-100 dark:bg-white/10 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-white/20 rounded-full text-[14px] font-bold tracking-wide transition-all"
           >
             <ArrowDownTrayIcon className="w-4 h-4" /> Export CSV
           </button>
           <button
             onClick={handleNewAssetClick}
-            className="flex items-center gap-1.5 px-4 py-2 bg-[#007AFF] text-white hover:bg-[#005bb5] rounded-full text-[11px] font-bold tracking-wide transition-all shadow-md shadow-[#007AFF]/20"
+            className="flex items-center gap-1.5 px-4 py-2 bg-[#2563EB] text-white hover:bg-[#005bb5] rounded-full text-[14px] font-bold tracking-wide transition-all shadow-md shadow-[#2563EB]/20"
           >
             <PlusIcon className="w-4 h-4" /> New Asset
           </button>
@@ -710,10 +710,10 @@ export default function AssetManagementPage() {
               className={`cursor-pointer ${card.bg} text-white rounded-3xl p-4 shadow-lg ${card.shadow} relative overflow-hidden group transition-all transform hover:scale-[1.02] ${statusFilter === card.key ? `ring-4 ${card.ring} ring-offset-2 dark:ring-offset-[#0a0f1c]` : ""}`}
             >
               <div className="z-10 relative">
-                <p className="text-[11px] font-bold text-white/80 tracking-wide mb-1">{card.label}</p>
-                <h2 className="text-3xl font-black leading-none" style={{ letterSpacing: "-0.02em" }}>
+                <p className="text-[14px] font-bold text-white/80 tracking-wide mb-1">{card.label}</p>
+                <h2 className="text-3xl font-semibold leading-none" style={{ letterSpacing: "-0.02em" }}>
                   {card.count}{" "}
-                  <span className="text-xs font-semibold opacity-80">{card.suffix}</span>
+                  <span className="text-[14px] font-semibold opacity-80">{card.suffix}</span>
                 </h2>
               </div>
               <card.icon className="w-16 h-16 absolute -right-3 -bottom-3 text-white/10 rotate-12 transition-transform group-hover:scale-110" />
@@ -730,7 +730,7 @@ export default function AssetManagementPage() {
               <button
                 key={c.id}
                 onClick={() => setActiveCategory(c.id)}
-                className={`px-4 py-2 rounded-full text-[11px] font-bold tracking-wide whitespace-nowrap transition-all ${activeCategory === c.id ? c.activeColor : c.inactiveColor}`}
+                className={`px-4 py-2 rounded-full text-[14px] font-bold tracking-wide whitespace-nowrap transition-all ${activeCategory === c.id ? c.activeColor : c.inactiveColor}`}
               >
                 <div className="flex items-center gap-1.5">
                   <c.icon className="w-4 h-4" />
@@ -752,7 +752,7 @@ export default function AssetManagementPage() {
           ) : (
             <div className="flex flex-col gap-3">
               {filteredItems.length > 0 && (
-                <div className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 px-1">
+                <div className="text-[13px] font-semibold text-gray-500 mb-1 px-1">
                   {statusFilter === "ALL" ? "All Assets" : `Filtered: ${statusFilter}`}
                   {activeCategory !== "ALL" ? ` · ${activeCategory}` : ""}
                 </div>
@@ -775,7 +775,7 @@ export default function AssetManagementPage() {
                         <CatIcon className="w-8 h-8" />
                       </div>
                       <span
-                        className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider text-center ${getStatusBadgeStyle(item.status)}`}
+                        className={`px-3 py-1 rounded-full text-[13px] font-bold  tracking-wider text-center ${getStatusBadgeStyle(item.status)}`}
                       >
                         {item.status}
                       </span>
@@ -788,7 +788,7 @@ export default function AssetManagementPage() {
                       >
                         {item.asset_name}
                       </h3>
-                      <p className="text-sm font-bold text-[#007AFF] dark:text-[#0A84FF] mb-2">{item.asset_id}</p>
+                      <p className="text-sm font-bold text-[#2563EB] dark:text-[#0A84FF] mb-2">{item.asset_id}</p>
                       <div className="flex flex-col gap-1.5">
                         <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
                           <UserCircleIcon className="w-4 h-4 shrink-0" />
@@ -796,7 +796,7 @@ export default function AssetManagementPage() {
                             {item.assigned_to || "Unassigned"}
                           </p>
                         </div>
-                        <div className="text-[11px] font-semibold text-gray-400 tracking-wide">
+                        <div className="text-[14px] font-semibold text-[#5B6472] tracking-wide">
                           Category:{" "}
                           <span className="text-gray-600 dark:text-gray-300">
                             {normalizeCategory(item.category)}
@@ -807,7 +807,7 @@ export default function AssetManagementPage() {
 
                     <div className="flex gap-6 lg:gap-8 min-w-[220px] border-l border-gray-100 dark:border-white/5 pl-4 lg:pl-6 shrink-0">
                       <div>
-                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">
+                        <p className="text-[13px] font-bold text-[#5B6472] mb-1.5">
                           Serial No.
                         </p>
                         <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">
@@ -815,7 +815,7 @@ export default function AssetManagementPage() {
                         </p>
                       </div>
                       <div>
-                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">
+                        <p className="text-[13px] font-bold text-[#5B6472] mb-1.5">
                           Purchase Date
                         </p>
                         <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">
@@ -825,14 +825,14 @@ export default function AssetManagementPage() {
                     </div>
 
                     <div className="min-w-[120px] text-left lg:text-right border-l border-gray-100 dark:border-white/5 pl-4 lg:pl-6 shrink-0">
-                      <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">
+                      <p className="text-[13px] font-bold text-[#5B6472] mb-1.5">
                         Location
                       </p>
                       <p className="text-base font-bold text-gray-800 dark:text-gray-200">
                         {item.location || "-"}
                       </p>
                       {item.remarks && (
-                        <p className="text-[10px] font-semibold text-gray-400 mt-1 truncate max-w-[140px]" title={item.remarks}>
+                        <p className="text-[13px] font-semibold text-[#5B6472] mt-1 truncate max-w-[140px]" title={item.remarks}>
                           {item.remarks}
                         </p>
                       )}
@@ -845,7 +845,7 @@ export default function AssetManagementPage() {
                           setItemForm(item);
                           setItemModalOpen(true);
                         }}
-                        className="p-2 text-[#007AFF] bg-blue-50 hover:bg-blue-100 dark:text-[#0A84FF] dark:bg-[#007AFF]/10 dark:hover:bg-[#007AFF]/20 rounded-lg transition-colors"
+                        className="p-2 text-[#2563EB] bg-blue-50 hover:bg-blue-100 dark:text-[#0A84FF] dark:bg-[#2563EB]/10 dark:hover:bg-[#2563EB]/20 rounded-lg transition-colors"
                       >
                         <PencilSquareIcon className="w-4 h-4" />
                       </button>
@@ -861,7 +861,7 @@ export default function AssetManagementPage() {
               })}
 
               {filteredItems.length === 0 && (
-                <div className="p-8 text-center text-xs font-bold text-gray-400 uppercase tracking-widest bg-white dark:bg-[#1C1C1E] rounded-3xl border border-gray-200 dark:border-white/5">
+                <div className="p-8 text-center text-[14px] font-bold text-[#5B6472] bg-white dark:bg-[#1C1C1E] rounded-3xl border border-gray-200 dark:border-white/5">
                   No assets found for this filter
                 </div>
               )}
@@ -873,16 +873,16 @@ export default function AssetManagementPage() {
       {isItemModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
           <div className="bg-white/95 dark:bg-[#1C1C1E]/95 backdrop-blur-xl w-full max-w-2xl rounded-3xl shadow-2xl border border-gray-200/50 dark:border-white/10 overflow-hidden flex flex-col max-h-[90vh]">
-            <div className="p-5 flex items-center justify-between shrink-0 bg-[#007AFF]">
+            <div className="p-5 flex items-center justify-between shrink-0 bg-[#2563EB]">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-white/20 rounded-2xl">
                   <ComputerDesktopIcon className="w-4 h-4 text-white" />
                 </div>
                 <div>
-                  <h2 className="text-sm font-black text-white tracking-wide leading-none">
+                  <h2 className="text-sm font-semibold text-white tracking-wide leading-none">
                     {editingItem ? "Edit Asset" : "New Asset"}
                   </h2>
-                  <p className="text-[10px] font-semibold text-white/70 mt-0.5 uppercase tracking-wider">
+                  <p className="text-[13px] font-semibold text-white/70 mt-0.5 tracking-wider">
                     {itemForm.asset_id}
                   </p>
                 </div>
@@ -937,7 +937,7 @@ export default function AssetManagementPage() {
                         key={status}
                         type="button"
                         onClick={() => setItemForm({ ...itemForm, status })}
-                        className={`px-4 py-2 rounded-xl text-[11px] font-bold tracking-wide transition-all ${getFormStatusStyle(status, itemForm.status === status)}`}
+                        className={`px-4 py-2 rounded-xl text-[14px] font-bold tracking-wide transition-all ${getFormStatusStyle(status, itemForm.status === status)}`}
                       >
                         {status}
                       </button>
@@ -983,7 +983,7 @@ export default function AssetManagementPage() {
             <div className="p-4 border-t border-gray-200/70 dark:border-white/10 bg-white dark:bg-[#1C1C1E] flex justify-end gap-3 shrink-0">
               <button
                 onClick={() => setItemModalOpen(false)}
-                className="px-6 py-2.5 rounded-2xl text-xs font-bold text-gray-500 hover:bg-gray-200 dark:hover:bg-white/10 transition-all"
+                className="px-6 py-2.5 rounded-2xl text-[14px] font-bold text-gray-500 hover:bg-gray-200 dark:hover:bg-white/10 transition-all"
                 disabled={submitting}
               >
                 Cancel
@@ -991,7 +991,7 @@ export default function AssetManagementPage() {
               <button
                 onClick={handleSaveItem}
                 disabled={submitting || !itemForm.asset_name}
-                className="px-6 py-2.5 rounded-2xl text-xs font-bold bg-[#007AFF] text-white hover:bg-[#005bb5] shadow-md shadow-[#007AFF]/20 transition-all disabled:opacity-50"
+                className="px-6 py-2.5 rounded-2xl text-[14px] font-bold bg-[#2563EB] text-white hover:bg-[#005bb5] shadow-md shadow-[#2563EB]/20 transition-all disabled:opacity-50"
               >
                 {submitting ? "Saving..." : "Save Asset"}
               </button>

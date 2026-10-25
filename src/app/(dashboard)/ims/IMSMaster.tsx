@@ -87,7 +87,7 @@ const getTxSourceBadgeClass = (source?: string) => {
   if (source === "GRN") {
     return "bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300";
   }
-  return "bg-orange-100 text-orange-700 dark:bg-orange-500/20 dark:text-orange-300";
+  return "bg-[#F7F8FA] text-[#D97706] dark:bg-[#D97706]/20 dark:text-[#D97706]";
 };
 
 const FloatingInput = ({
@@ -103,10 +103,10 @@ const FloatingInput = ({
       disabled={disabled}
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="block px-3 pb-2.5 pt-4 w-full text-sm font-bold text-gray-900 bg-transparent rounded-lg border-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-[#FFD500] focus:outline-none focus:ring-0 focus:border-[#003875] peer uppercase disabled:opacity-50 disabled:bg-gray-100 dark:disabled:bg-white/5"
+      className="block px-3 pb-2.5 pt-4 w-full text-sm font-bold text-gray-900 bg-transparent rounded-lg border-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-[#60A5FA] focus:outline-none focus:ring-0 focus:border-[#2563EB] peer disabled:opacity-50 disabled:bg-gray-100 dark:disabled:bg-white/5"
       placeholder=" "
     />
-    <label htmlFor={name} className="absolute text-[10px] font-black text-gray-400 dark:text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white dark:bg-[#111827] px-2 peer-focus:px-2 peer-focus:text-[#003875] peer-focus:dark:text-[#FFD500] peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1 uppercase tracking-widest">{label}</label>
+    <label htmlFor={name} className="absolute text-[13px] font-semibold text-[#5B6472] dark:text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white dark:bg-[#111827] px-2 peer-focus:px-2 peer-focus:text-[#2563EB] peer-focus:dark:text-[#2563EB] peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1">{label}</label>
   </div>
 );
 
@@ -210,7 +210,7 @@ const sourceBadgeClass = (source?: string) => {
     case "GRN":
       return "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300";
     case "O2D":
-      return "bg-orange-100 text-orange-700 dark:bg-orange-500/20 dark:text-orange-300";
+      return "bg-[#F7F8FA] text-[#D97706] dark:bg-[#D97706]/20 dark:text-[#D97706]";
     case "GRN, O2D":
       return "bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-300";
     default:
@@ -1452,7 +1452,7 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
       <th
         onClick={() => toggleSort(column)}
         title={`Sort by ${label}`}
-        className={`py-2.5 px-3 text-[10px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-widest border-b border-blue-200 dark:border-blue-500/20 whitespace-nowrap cursor-pointer select-none hover:bg-blue-100/70 dark:hover:bg-blue-500/10 transition-colors ${
+        className={`py-2.5 px-3 text-[13px] font-semibold text-blue-700 dark:text-blue-400   border-b border-blue-200 dark:border-blue-500/20 whitespace-nowrap cursor-pointer select-none hover:bg-blue-100/70 dark:hover:bg-blue-500/10 transition-colors ${
           align === "right" ? "text-right" : "text-left"
         } ${opts?.className || ""}`}
       >
@@ -1483,7 +1483,7 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
       <th
         onClick={() => toggleDatewiseSort(column)}
         title={`Sort by ${label}`}
-        className={`py-2.5 px-3 text-[10px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-widest border-b border-gray-200 dark:border-white/10 whitespace-nowrap cursor-pointer select-none hover:bg-blue-50 dark:hover:bg-white/5 transition-colors ${
+        className={`py-2.5 px-3 text-[13px] font-semibold text-blue-700 dark:text-blue-400   border-b border-gray-200 dark:border-white/10 whitespace-nowrap cursor-pointer select-none hover:bg-blue-50 dark:hover:bg-white/5 transition-colors ${
           align === "right" ? "text-right" : align === "center" ? "text-center" : "text-left"
         } ${opts?.className || ""}`}
       >
@@ -1527,8 +1527,8 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
                 <ClipboardDocumentListIcon className="w-6 h-6 text-white" />
               </div>
               <div className="min-w-0">
-                <h1 className="text-xl font-black text-blue-800 dark:text-blue-400 uppercase tracking-tight leading-none">IMS - G Floor</h1>
-                <p className="text-[9px] font-black text-blue-600/70 dark:text-blue-400/70 uppercase tracking-widest mt-0.5">Ground Floor Storage</p>
+                <h1 className="text-xl font-semibold text-blue-800 dark:text-blue-400 tracking-tight leading-none">IMS - G Floor</h1>
+                <p className="text-[13px] font-semibold text-blue-600/70 dark:text-blue-400/70 mt-0.5">Ground Floor Storage</p>
               </div>
             </div>
           </div>
@@ -1537,7 +1537,7 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
           <div className="flex items-center gap-0.5 bg-gray-100 dark:bg-white/5 p-0.5 rounded-lg shrink-0 h-[30px]">
             <button
               onClick={() => setViewMode('default')}
-              className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider transition-all h-full ${
+              className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-[13px] font-semibold  tracking-wider transition-all h-full ${
                 viewMode === 'default'
                   ? 'bg-white dark:bg-[#111827] text-blue-700 dark:text-blue-400 shadow-sm'
                   : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
@@ -1547,7 +1547,7 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
             </button>
             <button
               onClick={() => setViewMode('timeseries')}
-              className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider transition-all h-full ${
+              className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-[13px] font-semibold  tracking-wider transition-all h-full ${
                 viewMode === 'timeseries'
                   ? 'bg-white dark:bg-[#111827] text-blue-700 dark:text-blue-400 shadow-sm'
                   : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
@@ -1557,7 +1557,7 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
             </button>
             <button
               onClick={() => setViewMode('datewise')}
-              className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider transition-all h-full ${
+              className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-[13px] font-semibold  tracking-wider transition-all h-full ${
                 viewMode === 'datewise'
                   ? 'bg-white dark:bg-[#111827] text-blue-700 dark:text-blue-400 shadow-sm'
                   : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
@@ -1567,9 +1567,9 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
             </button>
             <button
               onClick={() => setViewMode('outform')}
-              className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider transition-all h-full ${
+              className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-[13px] font-semibold  tracking-wider transition-all h-full ${
                 viewMode === 'outform'
-                  ? 'bg-white dark:bg-[#111827] text-orange-700 dark:text-orange-400 shadow-sm'
+                  ? 'bg-white dark:bg-[#111827] text-[#D97706] dark:text-[#D97706] shadow-sm'
                   : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
               }`}
             >
@@ -1585,10 +1585,10 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
               onChange={handleFileUpload}
               className="hidden"
             />
-            <button onClick={() => fileInputRef.current?.click()} disabled={isImporting || submitting} className="flex items-center gap-1 px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 dark:bg-blue-500/10 dark:hover:bg-blue-500/20 text-blue-700 dark:text-blue-400 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all border border-blue-200 dark:border-blue-500/20 shadow-sm disabled:opacity-50 h-[30px]">
+            <button onClick={() => fileInputRef.current?.click()} disabled={isImporting || submitting} className="flex items-center gap-1 px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 dark:bg-blue-500/10 dark:hover:bg-blue-500/20 text-blue-700 dark:text-blue-400 rounded-lg text-[13px] font-semibold tracking-wider transition-all border border-blue-200 dark:border-blue-500/20 shadow-sm disabled:opacity-50 h-[30px]">
               <ArrowUpTrayIcon className="w-3.5 h-3.5" /> Import
             </button>
-            <button onClick={handleExport} className="flex items-center gap-1 px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 dark:bg-blue-500/10 dark:hover:bg-blue-500/20 text-blue-700 dark:text-blue-400 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all border border-blue-200 dark:border-blue-500/20 shadow-sm h-[30px]">
+            <button onClick={handleExport} className="flex items-center gap-1 px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 dark:bg-blue-500/10 dark:hover:bg-blue-500/20 text-blue-700 dark:text-blue-400 rounded-lg text-[13px] font-semibold tracking-wider transition-all border border-blue-200 dark:border-blue-500/20 shadow-sm h-[30px]">
               <ArrowDownTrayIcon className="w-3.5 h-3.5" /> Export
             </button>
             <GFloorLedgerModals
@@ -1603,7 +1603,7 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
             setEditingItem(null);
             setItemForm({ item_name: "", est_amount_item: "", gst: "", final_amount: "", category: "" });
             setItemModalOpen(true);
-          }} className="flex items-center gap-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-[10px] font-black uppercase tracking-wider transition-all shadow-sm h-[30px]">
+          }} className="flex items-center gap-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-[13px] font-semibold tracking-wider transition-all shadow-sm h-[30px]">
             <PlusIcon className="w-3.5 h-3.5 stroke-2" /> Add Item
           </button>
         </div>
@@ -1613,13 +1613,13 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
       {viewMode !== "outform" && (
       <div className="flex flex-wrap items-center gap-2 shrink-0 w-full">
         <div className="relative shrink-0 w-[220px]">
-          <MagnifyingGlassIcon className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" />
+          <MagnifyingGlassIcon className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-[#5B6472]" />
           <input
             type="text"
             placeholder="SEARCH ID / ITEM..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-8 pr-3 py-1.5 bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 rounded-lg text-[10px] font-black uppercase tracking-wider outline-none focus:ring-2 focus:ring-[#003875] dark:text-white transition-all shadow-sm h-[30px]"
+            className="w-full pl-8 pr-3 py-1.5 bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 rounded-lg text-[13px] font-semibold tracking-wider outline-none focus:ring-2 focus:ring-[#2563EB] dark:text-white transition-all shadow-sm h-[30px]"
           />
         </div>
 
@@ -1630,7 +1630,7 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
               value={categoryFilters}
               onChange={setCategoryFilters}
               placeholder="Categories"
-              className="bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 py-1.5 px-2 rounded-lg text-[10px]"
+              className="bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 py-1.5 px-2 rounded-lg text-[13px]"
               accentClass="border-blue-500 ring-blue-500/20"
             />
           </div>
@@ -1640,7 +1640,7 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
               value={sourceFilters}
               onChange={setSourceFilters}
               placeholder="Source"
-              className="bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 py-1.5 px-2 rounded-lg text-[10px]"
+              className="bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 py-1.5 px-2 rounded-lg text-[13px]"
               accentClass="border-blue-500 ring-blue-500/20"
             />
           </div>
@@ -1650,14 +1650,14 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
               value={itemNameFilters}
               onChange={setItemNameFilters}
               placeholder="Items"
-              className="bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 py-1.5 px-2 rounded-lg text-[10px]"
+              className="bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 py-1.5 px-2 rounded-lg text-[13px]"
               accentClass="border-blue-500 ring-blue-500/20"
             />
           </div>
           <select
             value={activeFilter}
             onChange={(e) => setActiveFilter(e.target.value as ActiveStatusFilter)}
-            className="px-2 py-1.5 bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 rounded-lg text-[10px] font-black uppercase tracking-wider outline-none focus:ring-2 focus:ring-blue-500 dark:text-white h-[30px] cursor-pointer shrink-0"
+            className="px-2 py-1.5 bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 rounded-lg text-[13px] font-semibold tracking-wider outline-none focus:ring-2 focus:ring-blue-500 dark:text-white h-[30px] cursor-pointer shrink-0"
           >
             <option value="ALL">All Status</option>
             <option value="ACTIVE">Active</option>
@@ -1671,7 +1671,7 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
                 setSourceFilters([]);
                 setActiveFilter("ALL");
               }}
-              className="px-2 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-wider text-blue-700 dark:text-blue-400 bg-blue-50 hover:bg-blue-100 dark:bg-blue-500/10 dark:hover:bg-blue-500/20 border border-blue-200 dark:border-blue-500/20 transition-colors shrink-0 h-[30px]"
+              className="px-2 py-1.5 rounded-lg text-[13px] font-semibold tracking-wider text-blue-700 dark:text-blue-400 bg-blue-50 hover:bg-blue-100 dark:bg-blue-500/10 dark:hover:bg-blue-500/20 border border-blue-200 dark:border-blue-500/20 transition-colors shrink-0 h-[30px]"
             >
               Clear
             </button>
@@ -1699,7 +1699,7 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
         <div className="flex flex-wrap items-center gap-2 shrink-0 w-full bg-white dark:bg-[#111827] px-3 py-2 rounded-xl border border-gray-200 dark:border-white/5 shadow-sm">
           <div className="flex items-center gap-1.5 shrink-0 pr-1">
             <ExclamationTriangleIcon className="w-4 h-4 text-blue-500" />
-            <span className="text-[10px] font-black text-gray-600 dark:text-gray-300 uppercase tracking-widest">Color Logic</span>
+            <span className="text-[13px] font-semibold text-gray-600 dark:text-gray-300">Color Logic</span>
           </div>
           <div className="flex flex-1 flex-wrap items-stretch gap-1.5 min-w-0">
             {([
@@ -1718,8 +1718,8 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
                   onClick={() => setLegendFilter(selected ? null : chip.id)}
                   className={`flex-1 min-w-[88px] h-11 px-2.5 rounded-xl flex items-center justify-center gap-2 transition-all duration-200 cursor-pointer shadow-md ${chip.text} ${chip.fill} ${selected ? `${chip.ring} scale-[1.02]` : 'hover:scale-[1.02] hover:brightness-110 active:scale-[0.98]'}`}
                 >
-                  <span className="text-[11px] font-black uppercase tracking-wide whitespace-nowrap">{chip.label}</span>
-                  <span className={`min-w-[1.6rem] h-6 px-1.5 rounded-md text-[12px] font-black tabular-nums flex items-center justify-center ${
+                  <span className="text-[14px] font-semibold tracking-wide whitespace-nowrap">{chip.label}</span>
+                  <span className={`min-w-[1.6rem] h-6 px-1.5 rounded-md text-[14px] font-semibold tabular-nums flex items-center justify-center ${
                     chip.id === 3 || chip.id === 6
                       ? 'bg-black/15 text-inherit'
                       : 'bg-white/25 text-white'
@@ -1734,7 +1734,7 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
             <button
               type="button"
               onClick={() => setLegendFilter(null)}
-              className="h-11 px-3 rounded-xl text-[10px] uppercase font-black tracking-wider text-gray-600 dark:text-gray-300 bg-gray-100 hover:bg-gray-200 dark:bg-white/10 dark:hover:bg-white/15 border border-gray-200 dark:border-white/10 shrink-0 transition-colors"
+              className="h-11 px-3 rounded-xl text-[13px] font-semibold tracking-wider text-gray-600 dark:text-gray-300 bg-gray-100 hover:bg-gray-200 dark:bg-white/10 dark:hover:bg-white/15 border border-gray-200 dark:border-white/10 shrink-0 transition-colors"
             >
               Clear
             </button>
@@ -1757,7 +1757,7 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
         <div className="flex-1 bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/5 rounded-xl overflow-hidden flex flex-col shadow-sm min-h-0 mt-2">
           {datewiseActiveFiltered.length > 0 && !showTimeSeriesLoading && (
             <div className="py-2 px-4 border-b border-blue-200/50 dark:border-blue-500/10 flex flex-wrap items-center justify-between gap-2 bg-blue-50/50 dark:bg-[#1f2937]/50 shrink-0">
-              <p className="text-[10px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-widest">
+              <p className="text-[13px] font-semibold text-blue-700 dark:text-blue-400">
                 Showing {Math.min((currentPage - 1) * itemsPerPage + 1, datewiseActiveFiltered.length)} to {Math.min(currentPage * itemsPerPage, datewiseActiveFiltered.length)} of {datewiseActiveFiltered.length} transactions
               </p>
               <div className="flex items-center gap-2">
@@ -1765,7 +1765,7 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
                   <button
                     onClick={handleBulkMarkChecked}
                     disabled={isChecking || isApproving}
-                    className="px-4 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-black uppercase tracking-widest shadow-sm disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-1.5"
+                    className="px-4 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-[13px] font-semibold shadow-sm disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-1.5"
                   >
                     <CheckIcon className="w-3.5 h-3.5" />
                     Mark Checked ({selectedCheckableCount})
@@ -1775,7 +1775,7 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
                   <button
                     onClick={handleBulkApprove}
                     disabled={isApproving || isChecking}
-                    className="px-4 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-black uppercase tracking-widest shadow-sm disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-1.5"
+                    className="px-4 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[13px] font-semibold shadow-sm disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-1.5"
                   >
                     <CheckIcon className="w-3.5 h-3.5" />
                     Approve Selected ({selectedApprovableCount})
@@ -1784,14 +1784,14 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
                 <button
                   onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                   disabled={currentPage === 1}
-                  className="px-3 py-1.5 rounded bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 text-[10px] font-black text-gray-500 uppercase tracking-widest hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
+                  className="px-3 py-1.5 rounded bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 text-[13px] font-semibold text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
                 >
                   Prev
                 </button>
                 <button
                   onClick={() => setCurrentPage(prev => Math.min(prev + 1, datewiseTotalPages))}
                   disabled={currentPage === datewiseTotalPages || datewiseTotalPages === 0}
-                  className="px-3 py-1.5 rounded bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 text-[10px] font-black text-gray-500 uppercase tracking-widest hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
+                  className="px-3 py-1.5 rounded bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 text-[13px] font-semibold text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
                 >
                   Next
                 </button>
@@ -1819,7 +1819,7 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
                         title="Select all on this page"
                       />
                     </th>
-                    <th className="py-2.5 px-2 text-[10px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-widest border-b border-gray-200 dark:border-white/10 text-center w-20">
+                    <th className="py-2.5 px-2 text-[13px] font-semibold text-blue-700 dark:text-blue-400 border-b border-gray-200 dark:border-white/10 text-center w-20">
                       Acts
                     </th>
                     {datewiseSortableTh("Date", "date", { className: "px-4" })}
@@ -1873,40 +1873,40 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
                             </button>
                           </div>
                         ) : (
-                          <span className="text-[9px] font-black text-gray-300 dark:text-gray-600">—</span>
+                          <span className="text-[13px] font-semibold text-[#5B6472] dark:text-gray-600">—</span>
                         )}
                       </td>
-                      <td className="py-2 px-4 text-[11px] font-bold text-gray-500">
+                      <td className="py-2 px-4 text-[14px] font-bold text-gray-500">
                         {new Date(log.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: '2-digit' })}
                       </td>
-                      <td className="py-2 px-3 text-[11px] font-bold text-gray-500 uppercase">{log.category}</td>
+                      <td className="py-2 px-3 text-[14px] font-bold text-gray-500">{log.category}</td>
                       <td className="py-2 px-3">
-                        <span className={`inline-flex px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-wider ${getTxSourceBadgeClass(log.source)}`}>
+                        <span className={`inline-flex px-1.5 py-0.5 rounded text-[12px] font-semibold  tracking-wider ${getTxSourceBadgeClass(log.source)}`}>
                           {formatTxSourceLabel(log.source)}
                         </span>
                       </td>
-                      <td className="py-2 px-3 text-[11px] font-black text-gray-900 dark:text-white uppercase whitespace-normal break-words min-w-[200px] max-w-[320px] leading-snug">{log.item_name}</td>
-                      <td className="py-2 px-3 text-[11px] font-black text-emerald-600 dark:text-emerald-400 text-right">{log.in_qty > 0 ? `+${log.in_qty}` : "-"}</td>
-                      <td className="py-2 px-3 text-[11px] font-black text-rose-600 dark:text-rose-400 text-right">{log.out_qty > 0 ? `-${log.out_qty}` : "-"}</td>
-                      <td className="py-2 px-4 text-[11px] font-black text-[#003875] dark:text-[#FFD500] text-right">{(log as any).running_stock}</td>
+                      <td className="py-2 px-3 text-[14px] font-semibold text-gray-900 dark:text-white whitespace-normal break-words min-w-[200px] max-w-[320px] leading-snug">{log.item_name}</td>
+                      <td className="py-2 px-3 text-[14px] font-semibold text-emerald-600 dark:text-emerald-400 text-right">{log.in_qty > 0 ? `+${log.in_qty}` : "-"}</td>
+                      <td className="py-2 px-3 text-[14px] font-semibold text-rose-600 dark:text-rose-400 text-right">{log.out_qty > 0 ? `-${log.out_qty}` : "-"}</td>
+                      <td className="py-2 px-4 text-[14px] font-semibold text-[#2563EB] dark:text-[#60A5FA] text-right">{(log as any).running_stock}</td>
                       <td className="py-2 px-3 text-center">
                         {isChecked ? (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300 text-[9px] font-black uppercase tracking-wider">
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300 text-[13px] font-semibold tracking-wider">
                             <CheckIcon className="w-3 h-3" />
                             Checked
                           </span>
                         ) : (
-                          <span className="text-[9px] font-black uppercase tracking-wider text-amber-600 dark:text-amber-400">Pending</span>
+                          <span className="text-[13px] font-semibold tracking-wider text-amber-600 dark:text-amber-400">Pending</span>
                         )}
                       </td>
                       <td className="py-2 px-3 text-center">
                         {isApproved ? (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300 text-[9px] font-black uppercase tracking-wider">
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300 text-[13px] font-semibold tracking-wider">
                             <CheckIcon className="w-3 h-3" />
                             Approved
                           </span>
                         ) : (
-                          <span className="text-[9px] font-black uppercase tracking-wider text-gray-400">Pending</span>
+                          <span className="text-[13px] font-semibold tracking-wider text-[#5B6472]">Pending</span>
                         )}
                       </td>
                     </tr>
@@ -1914,7 +1914,7 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
                   })}
                   {datewiseActiveFiltered.length === 0 && (
                     <tr>
-                      <td colSpan={11} className="py-8 text-center text-gray-400 text-[11px] font-black uppercase">No items found</td>
+                      <td colSpan={11} className="py-8 text-center text-[#5B6472] text-[14px] font-semibold">No items found</td>
                     </tr>
                   )}
                 </tbody>
@@ -1929,21 +1929,21 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
           <>
             {filteredItems.length > 0 && !masterLoading && (
               <div className="py-2 px-4 border-b border-blue-200/50 dark:border-blue-500/10 flex items-center justify-between bg-blue-50/50 dark:bg-[#1f2937]/50 shrink-0">
-                <p className="text-[10px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-widest">
+                <p className="text-[13px] font-semibold text-blue-700 dark:text-blue-400">
                   Showing {Math.min((currentPage - 1) * itemsPerPage + 1, filteredItems.length)} to {Math.min(currentPage * itemsPerPage, filteredItems.length)} of {filteredItems.length} entries
                 </p>
                 <div className="flex gap-1">
                   <button
                     onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                     disabled={currentPage === 1}
-                    className="px-3 py-1.5 rounded bg-white dark:bg-[#111827] border border-blue-200 dark:border-blue-500/20 text-[10px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-widest hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
+                    className="px-3 py-1.5 rounded bg-white dark:bg-[#111827] border border-blue-200 dark:border-blue-500/20 text-[13px] font-semibold text-blue-700 dark:text-blue-400 hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
                   >
                     Prev
                   </button>
                   <button
                     onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                     disabled={currentPage === totalPages || totalPages === 0}
-                    className="px-3 py-1.5 rounded bg-white dark:bg-[#111827] border border-blue-200 dark:border-blue-500/20 text-[10px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-widest hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
+                    className="px-3 py-1.5 rounded bg-white dark:bg-[#111827] border border-blue-200 dark:border-blue-500/20 text-[13px] font-semibold text-blue-700 dark:text-blue-400 hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
                   >
                     Next
                   </button>
@@ -1968,14 +1968,14 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
                     <thead className="bg-blue-50 dark:bg-blue-900/20 sticky top-0 z-20 shadow-sm">
                       <tr>
                         <th className="py-2.5 px-3 border-b border-blue-200 dark:border-blue-500/20 text-center sticky left-0 bg-blue-50 dark:bg-blue-900/20 z-30 shadow-[1px_0_0_0_#bfdbfe] dark:shadow-[1px_0_0_0_rgba(59,130,246,0.2)] w-24">
-                          <span className="text-[10px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-widest">Acts</span>
+                          <span className="text-[13px] font-semibold text-blue-700 dark:text-blue-400">Acts</span>
                         </th>
                         {sortableTh("ID", "id")}
                         {sortableTh("Category", "category")}
                         {sortableTh("Source", "source")}
                         {sortableTh("Item Name", "item_name", { className: "min-w-[200px]" })}
-                        <th className="py-2.5 px-3 text-[10px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-widest border-b border-blue-200 dark:border-blue-500/20 whitespace-nowrap">SKU</th>
-                        <th className="py-2.5 px-3 text-[10px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-widest border-b border-blue-200 dark:border-blue-500/20 text-center whitespace-nowrap">Active</th>
+                        <th className="py-2.5 px-3 text-[13px] font-semibold text-blue-700 dark:text-blue-400 border-b border-blue-200 dark:border-blue-500/20 whitespace-nowrap">SKU</th>
+                        <th className="py-2.5 px-3 text-[13px] font-semibold text-blue-700 dark:text-blue-400 border-b border-blue-200 dark:border-blue-500/20 text-center whitespace-nowrap">Active</th>
                         {sortableTh("Est. Amt", "est_amount_item", { align: "right" })}
                         {sortableTh("GST", "gst", { align: "right" })}
                         {sortableTh("Final Amt", "final_amount_num", { align: "right" })}
@@ -2002,7 +2002,7 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
                           >
                             <td className="py-1 px-2 text-center sticky left-0 z-20 transition-colors border-r shadow-[1px_0_0_0_#bfdbfe] dark:shadow-[1px_0_0_0_rgba(59,130,246,0.2)] bg-white group-even:bg-blue-50/30 dark:bg-[#111827] dark:group-even:bg-[#182031] group-hover:bg-blue-50/50 dark:group-hover:bg-[#1a2335] border-blue-100 dark:border-blue-500/10">
                               <div className="flex items-center justify-center gap-2">
-                                <button onClick={() => { setLogsItem(item); setLogsModalOpen(true); }} className="text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:scale-110 transition-all" title="View Transaction Logs">
+                                <button onClick={() => { setLogsItem(item); setLogsModalOpen(true); }} className="text-[#5B6472] hover:text-indigo-600 dark:hover:text-indigo-400 hover:scale-110 transition-all" title="View Transaction Logs">
                                   <EyeIcon className="w-4 h-4" />
                                 </button>
                                 <button
@@ -2017,7 +2017,7 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
                                     });
                                     setItemModalOpen(true);
                                   }}
-                                  className="text-[#003875] dark:text-[#FFD500] hover:scale-110 transition-transform"
+                                  className="text-[#2563EB] dark:text-[#60A5FA] hover:scale-110 transition-transform"
                                   title={pending ? "Add to Details sheet" : "Edit"}
                                 >
                                   <PencilSquareIcon className="w-4 h-4" />
@@ -2029,24 +2029,24 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
                                 )}
                               </div>
                             </td>
-                            <td className="py-2 px-3 text-[11px] font-black text-[#003875] dark:text-[#FFD500] whitespace-nowrap">
+                            <td className="py-2 px-3 text-[14px] font-semibold text-[#2563EB] dark:text-[#60A5FA] whitespace-nowrap">
                               {pending ? (
-                                <span className="text-[9px] font-black uppercase tracking-wider text-amber-600 dark:text-amber-400">Pending</span>
+                                <span className="text-[13px] font-semibold tracking-wider text-amber-600 dark:text-amber-400">Pending</span>
                               ) : (
                                 item.id
                               )}
                             </td>
-                            <td className="py-2 px-3 text-[11px] font-bold text-gray-500 uppercase whitespace-nowrap">{item.category || (pending ? "—" : "")}</td>
+                            <td className="py-2 px-3 text-[14px] font-bold text-gray-500 whitespace-nowrap">{item.category || (pending ? "—" : "")}</td>
                             <td className="py-2 px-3 whitespace-nowrap">
-                              <span className={`inline-block px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider ${sourceBadgeClass(item.source)}`}>
+                              <span className={`inline-block px-2 py-0.5 rounded-md text-[13px] font-semibold  tracking-wider ${sourceBadgeClass(item.source)}`}>
                                 {item.source || "—"}
                               </span>
                             </td>
-                            <td className="py-2 px-3 text-[11px] font-black text-gray-900 dark:text-white uppercase whitespace-normal break-words min-w-[200px] max-w-[320px] leading-snug">{item.item_name}</td>
-                            <td className="py-2 px-3 text-[11px] font-bold text-gray-600 dark:text-gray-300 uppercase whitespace-nowrap">{item.sku_code || "—"}</td>
+                            <td className="py-2 px-3 text-[14px] font-semibold text-gray-900 dark:text-white whitespace-normal break-words min-w-[200px] max-w-[320px] leading-snug">{item.item_name}</td>
+                            <td className="py-2 px-3 text-[14px] font-bold text-gray-600 dark:text-gray-300 whitespace-nowrap">{item.sku_code || "—"}</td>
                             <td className="py-2 px-3 text-center">
                               {item.active_status ? (
-                                <span className={`inline-block px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider ${
+                                <span className={`inline-block px-2 py-0.5 rounded-md text-[13px] font-semibold  tracking-wider ${
                                   item.active_status.toLowerCase() === "active"
                                     ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400"
                                     : "bg-gray-200 text-gray-600 dark:bg-white/10 dark:text-gray-400"
@@ -2054,24 +2054,24 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
                                   {item.active_status}
                                 </span>
                               ) : (
-                                <span className="text-[9px] font-black uppercase tracking-wider text-amber-600 dark:text-amber-400">Not set</span>
+                                <span className="text-[13px] font-semibold tracking-wider text-amber-600 dark:text-amber-400">Not set</span>
                               )}
                             </td>
-                            <td className="py-2 px-3 text-[11px] font-bold text-gray-600 dark:text-gray-400 text-right">{pending && !item.est_amount_item ? "—" : item.est_amount_item}</td>
-                            <td className="py-2 px-3 text-[11px] font-bold text-gray-600 dark:text-gray-400 text-right">{pending && !item.gst ? "—" : item.gst ? `${item.gst}%` : ""}</td>
-                            <td className="py-2 px-3 text-[11px] font-black text-gray-800 dark:text-gray-200 text-right">{pending && !item.final_amount_num ? "—" : `₹${item.final_amount_num.toFixed(2)}`}</td>
-                            <td className="py-2 px-3 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 text-right">{item.in_qty}</td>
-                            <td className="py-2 px-3 text-[11px] font-bold text-rose-600 dark:text-rose-400 text-right">{item.out_qty}</td>
-                            <td className="py-2 px-3 text-[11px] font-bold text-indigo-600 dark:text-indigo-400 text-right">{item.sale_percent}%</td>
-                            <td className="py-2 px-3 text-[11px] font-bold text-gray-600 dark:text-gray-400 text-right">{item.avg_daily_con}</td>
-                            <td className="py-2 px-3 text-[11px] font-bold text-gray-600 dark:text-gray-400 text-right">{item.lead_time}</td>
-                            <td className="py-2 px-3 text-[11px] font-bold text-gray-600 dark:text-gray-400 text-right">{item.safety_factor}</td>
-                            <td className="py-2 px-3 text-[11px] font-bold text-[#003875] dark:text-[#FFD500] text-right">{item.max_level}</td>
+                            <td className="py-2 px-3 text-[14px] font-bold text-gray-600 dark:text-gray-400 text-right">{pending && !item.est_amount_item ? "—" : item.est_amount_item}</td>
+                            <td className="py-2 px-3 text-[14px] font-bold text-gray-600 dark:text-gray-400 text-right">{pending && !item.gst ? "—" : item.gst ? `${item.gst}%` : ""}</td>
+                            <td className="py-2 px-3 text-[14px] font-semibold text-gray-800 dark:text-gray-200 text-right">{pending && !item.final_amount_num ? "—" : `₹${item.final_amount_num.toFixed(2)}`}</td>
+                            <td className="py-2 px-3 text-[14px] font-bold text-emerald-600 dark:text-emerald-400 text-right">{item.in_qty}</td>
+                            <td className="py-2 px-3 text-[14px] font-bold text-rose-600 dark:text-rose-400 text-right">{item.out_qty}</td>
+                            <td className="py-2 px-3 text-[14px] font-bold text-indigo-600 dark:text-indigo-400 text-right">{item.sale_percent}%</td>
+                            <td className="py-2 px-3 text-[14px] font-bold text-gray-600 dark:text-gray-400 text-right">{item.avg_daily_con}</td>
+                            <td className="py-2 px-3 text-[14px] font-bold text-gray-600 dark:text-gray-400 text-right">{item.lead_time}</td>
+                            <td className="py-2 px-3 text-[14px] font-bold text-gray-600 dark:text-gray-400 text-right">{item.safety_factor}</td>
+                            <td className="py-2 px-3 text-[14px] font-bold text-[#2563EB] dark:text-[#60A5FA] text-right">{item.max_level}</td>
                             <td className="py-1 px-4 bg-gray-50/50 dark:bg-white/[0.02]">
                               <div className="flex flex-col gap-1 w-full max-w-[180px]">
                                 <div className="flex justify-between items-baseline leading-none">
-                                  <span className={`text-xs font-black ${health.text}`}>{item.live_stock}</span>
-                                  <span className="text-[9px] font-bold text-gray-400 uppercase">{health.label}</span>
+                                  <span className={`text-[14px] font-semibold ${health.text}`}>{item.live_stock}</span>
+                                  <span className="text-[13px] font-bold text-[#5B6472]">{health.label}</span>
                                 </div>
                                 <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 overflow-hidden flex">
                                   <div className={`h-full ${health.color} transition-all duration-500`} style={{ width: `${health.pct}%` }}></div>
@@ -2083,7 +2083,7 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
                       })}
                       {filteredItems.length === 0 && (
                         <tr>
-                          <td colSpan={18} className="py-8 text-center text-gray-400 text-[11px] font-black uppercase">No items found</td>
+                          <td colSpan={18} className="py-8 text-center text-[#5B6472] text-[14px] font-semibold">No items found</td>
                         </tr>
                       )}
                     </tbody>
@@ -2102,25 +2102,25 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
                     </button>
                     <div>
                       <div className="flex items-center gap-3 mb-1">
-                        <h2 className="text-xl font-black text-gray-900 dark:text-white uppercase leading-none">{logsItem.item_name}</h2>
-                        <span className="px-2 py-0.5 bg-[#003875]/10 text-[#003875] dark:bg-[#FFD500]/20 dark:text-[#FFD500] border border-[#003875]/20 dark:border-[#FFD500]/30 rounded text-[10px] font-black tracking-widest">ID: {logsItem.id}</span>
+                        <h2 className="text-xl font-semibold text-gray-900 dark:text-white leading-none">{logsItem.item_name}</h2>
+                        <span className="px-2 py-0.5 bg-[#2563EB]/10 text-white dark:bg-[#60A5FA]/20 dark:text-[#60A5FA] border border-[#2563EB]/20 dark:border-[#60A5FA]/30 rounded text-[13px] font-semibold">ID: {logsItem.id}</span>
                       </div>
-                      <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">{logsItem.category}</p>
+                      <p className="text-[13px] font-bold text-gray-500">{logsItem.category}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-8 text-right">
                     <div className="text-center">
-                      <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">Total IN</p>
-                      <span className="text-xl font-black text-emerald-600 dark:text-emerald-400">{logsItem.in_qty}</span>
+                      <p className="text-[13px] font-semibold text-gray-500 mb-1">Total IN</p>
+                      <span className="text-xl font-semibold text-emerald-600 dark:text-emerald-400">{logsItem.in_qty}</span>
                     </div>
                     <div className="text-center">
-                      <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">Total OUT</p>
-                      <span className="text-xl font-black text-rose-600 dark:text-rose-400">{logsItem.out_qty}</span>
+                      <p className="text-[13px] font-semibold text-gray-500 mb-1">Total OUT</p>
+                      <span className="text-xl font-semibold text-rose-600 dark:text-rose-400">{logsItem.out_qty}</span>
                     </div>
                     <div className="h-8 w-px bg-gray-200 dark:bg-white/10 mx-2"></div>
                     <div className="text-center">
-                      <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">Live Stock</p>
-                      <span className={`text-xl font-black ${getHealth(logsItem.live_stock, logsItem.max_level || 0).text}`}>{logsItem.live_stock}</span>
+                      <p className="text-[13px] font-semibold text-gray-500 mb-1">Live Stock</p>
+                      <span className={`text-xl font-semibold ${getHealth(logsItem.live_stock, logsItem.max_level || 0).text}`}>{logsItem.live_stock}</span>
                     </div>
                   </div>
                 </div>
@@ -2128,40 +2128,40 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
                 <div className="flex-1 overflow-auto custom-scrollbar p-0 bg-white dark:bg-[#111827]">
                   {logsLoading ? (
                     <div className="p-8 flex justify-center items-center h-full">
-                      <div className="w-8 h-8 border-4 border-[#003875] dark:border-[#FFD500] border-t-transparent rounded-full animate-spin"></div>
+                      <div className="w-8 h-8 border-4 border-[#2563EB] dark:border-[#60A5FA] border-t-transparent rounded-full animate-spin"></div>
                     </div>
                   ) : logsData.length > 0 ? (
                     <table className="w-full text-left border-collapse">
                       <thead className="bg-gray-100 dark:bg-[#1f2937] sticky top-0 shadow-sm z-10">
                         <tr>
-                          <th className="py-2.5 px-6 text-[10px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-widest border-b border-gray-200 dark:border-white/10 w-40">Date</th>
-                          <th className="py-2.5 px-6 text-[10px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-widest border-b border-gray-200 dark:border-white/10 w-32">Type</th>
-                          <th className="py-2.5 px-6 text-[10px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-widest border-b border-gray-200 dark:border-white/10 text-right w-32">Quantity</th>
-                          <th className="py-2.5 px-6 text-[10px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-widest border-b border-gray-200 dark:border-white/10">Remarks</th>
+                          <th className="py-2.5 px-6 text-[13px] font-semibold text-blue-700 dark:text-blue-400 border-b border-gray-200 dark:border-white/10 w-40">Date</th>
+                          <th className="py-2.5 px-6 text-[13px] font-semibold text-blue-700 dark:text-blue-400 border-b border-gray-200 dark:border-white/10 w-32">Type</th>
+                          <th className="py-2.5 px-6 text-[13px] font-semibold text-blue-700 dark:text-blue-400 border-b border-gray-200 dark:border-white/10 text-right w-32">Quantity</th>
+                          <th className="py-2.5 px-6 text-[13px] font-semibold text-blue-700 dark:text-blue-400 border-b border-gray-200 dark:border-white/10">Remarks</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-gray-100 dark:divide-white/5 font-mono text-[11px]">
+                      <tbody className="divide-y divide-gray-100 dark:divide-white/5 font-mono text-[14px]">
                         {logsData.map((log: any, idx: number) => (
                           <tr key={idx} className="hover:bg-gray-50 dark:hover:bg-white/[0.02] transition-colors group">
                             <td className="py-3 px-6 text-gray-500 font-bold whitespace-nowrap">{formatDate(log.date)}</td>
                             <td className="py-3 px-6 whitespace-nowrap">
-                              <span className={`flex items-center gap-1.5 w-max px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider ${log.type === 'IN' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400' : 'bg-rose-100 text-rose-700 dark:bg-rose-500/20 dark:text-rose-400'}`}>
+                              <span className={`flex items-center gap-1.5 w-max px-2.5 py-1 rounded-md text-[13px] font-semibold  tracking-wider ${log.type === 'IN' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400' : 'bg-rose-100 text-rose-700 dark:bg-rose-500/20 dark:text-rose-400'}`}>
                                 {log.type === 'IN' ? <ArrowDownTrayIcon className="w-3.5 h-3.5" /> : <ArrowUpTrayIcon className="w-3.5 h-3.5" />}
                                 {log.type}
                               </span>
                             </td>
-                            <td className={`py-3 px-6 font-black text-right text-sm ${log.type === 'IN' ? 'text-emerald-600' : 'text-rose-600'}`}>
+                            <td className={`py-3 px-6 font-semibold text-right text-sm ${log.type === 'IN' ? 'text-emerald-600' : 'text-rose-600'}`}>
                               {log.type === 'IN' ? '+' : '-'}{log.qty}
                             </td>
-                            <td className="py-3 px-6 text-gray-600 dark:text-gray-400 font-bold uppercase truncate max-w-[400px]" title={log.remarks}>{log.remarks || '-'}</td>
+                            <td className="py-3 px-6 text-gray-600 dark:text-gray-400 font-bold truncate max-w-[400px]" title={log.remarks}>{log.remarks || '-'}</td>
                           </tr>
                         ))}
                       </tbody>
                     </table>
                   ) : (
-                    <div className="p-8 text-center text-gray-400 flex flex-col items-center justify-center h-full">
+                    <div className="p-8 text-center text-[#5B6472] flex flex-col items-center justify-center h-full">
                       <ArchiveBoxIcon className="w-12 h-12 mb-3 opacity-20" />
-                      <p className="font-sans text-[11px] font-black uppercase tracking-widest mt-2">No transaction logs found</p>
+                      <p className="font-sans text-[14px] font-semibold mt-2">No transaction logs found</p>
                     </div>
                   )}
                 </div>
@@ -2184,11 +2184,11 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
               initial={{ opacity: 0, scale: 0.95, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              className="bg-white dark:bg-[#111827] rounded-2xl shadow-[0_0_40px_rgba(0,56,117,0.3)] dark:shadow-[0_0_40px_rgba(255,213,0,0.1)] w-full max-w-2xl overflow-hidden border border-[#003875]/30 dark:border-[#FFD500]/20"
+              className="bg-white dark:bg-[#111827] rounded-2xl shadow-[0_0_40px_rgba(0,56,117,0.3)] dark:shadow-[0_0_40px_rgba(255,213,0,0.1)] w-full max-w-2xl overflow-hidden border border-[#2563EB]/30 dark:border-[#60A5FA]/20"
             >
-              <div className="flex items-center justify-between p-5 border-b border-blue-800/20 dark:border-white/5 bg-gradient-to-r from-[#003875] to-blue-800 dark:from-[#1f2937] dark:to-[#111827] text-white">
-                <h3 className="text-sm font-black uppercase tracking-widest flex items-center gap-2">
-                  <ClipboardDocumentListIcon className="w-5 h-5 text-blue-200 dark:text-[#FFD500]" />
+              <div className="flex items-center justify-between p-5 border-b border-blue-800/20 dark:border-white/5 bg-gradient-to-r from-[#2563EB] to-blue-800 dark:from-[#1f2937] dark:to-[#111827] text-white">
+                <h3 className="text-sm font-semibold flex items-center gap-2">
+                  <ClipboardDocumentListIcon className="w-5 h-5 text-blue-200 dark:text-[#60A5FA]" />
                   {editingItem && isPendingItem(editingItem) ? 'Add to Details Sheet' : editingItem ? 'Edit IMS Record' : 'Create IMS Record'}
                 </h3>
                 <button onClick={() => setItemModalOpen(false)} className="p-1.5 text-white/70 hover:text-white bg-white/10 hover:bg-white/20 dark:bg-[#1f2937] rounded-lg shadow-sm transition-colors">
@@ -2218,8 +2218,8 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
                 </div>
               </div>
               <div className="p-4 border-t border-gray-100 dark:border-white/5 flex justify-end gap-3 bg-gray-50/50 dark:bg-[#1f2937]/50">
-                <button onClick={() => setItemModalOpen(false)} className="px-5 py-2 rounded-xl text-xs font-black text-gray-500 uppercase tracking-widest hover:bg-white dark:hover:bg-[#111827] shadow-sm border border-gray-200 dark:border-white/10 transition-colors">Cancel</button>
-                <button onClick={handleSaveItem} className="px-6 py-2 rounded-xl text-xs font-black text-white bg-gradient-to-r from-[#003875] to-blue-600 dark:from-[#FFD500] dark:to-yellow-400 dark:text-[#003875] uppercase tracking-widest hover:brightness-110 shadow-lg shadow-blue-500/20 dark:shadow-yellow-500/20 transition-all">Save Record</button>
+                <button onClick={() => setItemModalOpen(false)} className="px-5 py-2 rounded-xl text-[14px] font-semibold text-gray-500 hover:bg-white dark:hover:bg-[#111827] shadow-sm border border-gray-200 dark:border-white/10 transition-colors">Cancel</button>
+                <button onClick={handleSaveItem} className="px-6 py-2 rounded-xl text-[14px] font-semibold text-white bg-gradient-to-r from-[#2563EB] to-blue-600 dark:from-[#60A5FA] dark:to-yellow-400 dark:text-[#60A5FA] hover:brightness-110 shadow-lg shadow-blue-500/20 dark:shadow-yellow-500/20 transition-all">Save Record</button>
               </div>
             </motion.div>
           </div>
@@ -2254,7 +2254,7 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
               className="bg-white dark:bg-[#111827] rounded-2xl shadow-[0_0_40px_rgba(0,0,0,0.2)] w-full max-w-md overflow-hidden border border-gray-200 dark:border-white/10"
             >
               <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-white/5 shrink-0 bg-blue-50 dark:bg-blue-900/20">
-                <h3 className="text-sm font-black uppercase tracking-widest flex items-center gap-2 text-gray-900 dark:text-white">
+                <h3 className="text-sm font-semibold flex items-center gap-2 text-gray-900 dark:text-white">
                   <PencilSquareIcon className="w-5 h-5 text-blue-600" />
                   Edit G Floor Entry
                 </h3>
@@ -2271,7 +2271,7 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
 
               <div className="p-6 space-y-4 bg-white dark:bg-[#111827]">
                 <div className="p-3 rounded-xl bg-gray-50 dark:bg-white/[0.02] border border-gray-100 dark:border-white/5 space-y-2">
-                  <p className="text-[9px] font-black uppercase tracking-widest text-gray-400">Item Name</p>
+                  <p className="text-[13px] font-semibold text-[#5B6472]">Item Name</p>
                   <SearchableSelect
                     label=""
                     options={renameItemOptions}
@@ -2291,9 +2291,9 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
                       );
                     }}
                     placeholder="Select item..."
-                    className="bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 py-2 px-3 rounded-lg text-[11px] min-h-[38px]"
+                    className="bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 py-2 px-3 rounded-lg text-[14px] min-h-[38px]"
                   />
-                  <p className="text-[10px] font-bold text-gray-500 uppercase">
+                  <p className="text-[13px] font-bold text-gray-500">
                     {editingFloorTx.category} · {formatDate(editingFloorTx.date)}
                   </p>
                 </div>
@@ -2303,7 +2303,7 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
                     <button
                       type="button"
                       onClick={() => setEditingFloorTx((prev) => (prev ? { ...prev, type: "IN" } : prev))}
-                      className={`px-4 py-2 rounded-md text-[10px] font-black uppercase tracking-wider transition-all ${
+                      className={`px-4 py-2 rounded-md text-[13px] font-semibold  tracking-wider transition-all ${
                         editingFloorTx.type === "IN"
                           ? "bg-emerald-500 text-white shadow-sm"
                           : "text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
@@ -2314,7 +2314,7 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
                     <button
                       type="button"
                       onClick={() => setEditingFloorTx((prev) => (prev ? { ...prev, type: "OUT" } : prev))}
-                      className={`px-4 py-2 rounded-md text-[10px] font-black uppercase tracking-wider transition-all ${
+                      className={`px-4 py-2 rounded-md text-[13px] font-semibold  tracking-wider transition-all ${
                         editingFloorTx.type === "OUT"
                           ? "bg-rose-500 text-white shadow-sm"
                           : "text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
@@ -2343,7 +2343,7 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
                     setIsFloorEditOpen(false);
                     setEditingFloorTx(null);
                   }}
-                  className="px-5 py-2 rounded-xl text-xs font-black text-gray-500 uppercase tracking-widest hover:bg-white dark:hover:bg-[#111827] shadow-sm border border-gray-200 dark:border-white/10 transition-colors"
+                  className="px-5 py-2 rounded-xl text-[14px] font-semibold text-gray-500 hover:bg-white dark:hover:bg-[#111827] shadow-sm border border-gray-200 dark:border-white/10 transition-colors"
                 >
                   Cancel
                 </button>
@@ -2351,7 +2351,7 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
                   type="button"
                   onClick={handleSaveFloorEdit}
                   disabled={submitting}
-                  className="px-6 py-2 rounded-xl text-xs font-black text-white uppercase tracking-widest bg-gradient-to-r from-blue-600 to-indigo-700 hover:brightness-110 shadow-lg shadow-blue-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-6 py-2 rounded-xl text-[14px] font-semibold text-white bg-gradient-to-r from-blue-600 to-indigo-700 hover:brightness-110 shadow-lg shadow-blue-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {submitting ? "Saving..." : "Save Changes"}
                 </button>
@@ -2364,18 +2364,18 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
       {importPreview && (
         <div className="fixed inset-0 z-[220] bg-black/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
           <div className="bg-white dark:bg-slate-900 rounded-[28px] w-full max-w-2xl max-h-[calc(100vh-1.5rem)] my-auto shadow-2xl border border-white/10 overflow-hidden flex flex-col">
-            <div className="shrink-0 px-5 sm:px-6 py-4 border-b border-gray-100 dark:border-white/10 bg-[#003875] text-white">
+            <div className="shrink-0 px-5 sm:px-6 py-4 border-b border-gray-100 dark:border-white/10 bg-[#2563EB] text-white">
               <div className="flex items-center justify-between gap-4">
                 <div>
-                  <h3 className="text-lg font-black uppercase tracking-widest">Import Out Form</h3>
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-white/70 mt-1">{importFileName}</p>
+                  <h3 className="text-lg font-semibold">Import Out Form</h3>
+                  <p className="text-[13px] font-bold text-white/70 mt-1">{importFileName}</p>
                 </div>
                 {isImporting && (
                   <div className="text-right">
-                    <p className="text-[9px] font-black uppercase tracking-widest text-emerald-200">
+                    <p className="text-[13px] font-semibold text-emerald-200">
                       {importPhase === "scanning" ? "Scanning File" : importPhase === "uploading" ? "Uploading Data" : "Completed"}
                     </p>
-                    <p className="text-2xl font-black text-white">{importProgress}%</p>
+                    <p className="text-2xl font-semibold text-white">{importProgress}%</p>
                   </div>
                 )}
               </div>
@@ -2386,9 +2386,9 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
                 <div className="px-4 py-3 border-b border-slate-800 flex items-center justify-between bg-slate-900/90">
                   <div className="flex items-center gap-2">
                     <DocumentTextIcon className="w-4 h-4 text-emerald-400" />
-                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-300">File Preview</span>
+                    <span className="text-[13px] font-semibold text-[#5B6472]">File Preview</span>
                   </div>
-                  <span className="text-[9px] font-bold uppercase tracking-widest text-slate-500">XLSX</span>
+                  <span className="text-[13px] font-bold text-slate-500">XLSX</span>
                 </div>
 
                 <div className="relative h-28 sm:h-32 overflow-hidden bg-[linear-gradient(180deg,#0f172a_0%,#111827_100%)]">
@@ -2403,8 +2403,8 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
                   </div>
 
                   <div className="absolute inset-x-4 top-4 rounded-lg border border-emerald-500/20 bg-emerald-500/5 px-3 py-2">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-emerald-300">Out Form Import</p>
-                    <p className="text-[9px] font-medium text-slate-400 mt-1 truncate">{importFileName}</p>
+                    <p className="text-[13px] font-semibold text-emerald-300">Out Form Import</p>
+                    <p className="text-[13px] font-medium text-[#5B6472] mt-1 truncate">{importFileName}</p>
                   </div>
 
                   <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-emerald-400/10 to-transparent pointer-events-none" />
@@ -2423,7 +2423,7 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
 
               {isImporting && (
                 <div className="space-y-2">
-                  <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-slate-500">
+                  <div className="flex items-center justify-between text-[13px] font-semibold text-slate-500">
                     <span>
                       {importPhase === "scanning"
                         ? "Scanning Out Form rows"
@@ -2445,16 +2445,16 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
               {!isImporting && (
                 <div className="grid grid-cols-3 gap-2 sm:gap-3">
                   <div className="rounded-2xl bg-emerald-50 dark:bg-emerald-900/20 p-3 sm:p-4 text-center">
-                    <p className="text-[9px] font-black uppercase tracking-widest text-emerald-700 dark:text-emerald-300">Vouchers</p>
-                    <p className="text-2xl font-black text-emerald-800 dark:text-emerald-200">{importPreview.voucherCount}</p>
+                    <p className="text-[13px] font-semibold text-emerald-700 dark:text-emerald-300">Vouchers</p>
+                    <p className="text-2xl font-semibold text-emerald-800 dark:text-emerald-200">{importPreview.voucherCount}</p>
                   </div>
                   <div className="rounded-2xl bg-blue-50 dark:bg-blue-900/20 p-3 sm:p-4 text-center">
-                    <p className="text-[9px] font-black uppercase tracking-widest text-blue-700 dark:text-blue-300">Line Items</p>
-                    <p className="text-2xl font-black text-blue-800 dark:text-blue-200">{importPreview.itemCount}</p>
+                    <p className="text-[13px] font-semibold text-blue-700 dark:text-blue-300">Line Items</p>
+                    <p className="text-2xl font-semibold text-blue-800 dark:text-blue-200">{importPreview.itemCount}</p>
                   </div>
                   <div className="rounded-2xl bg-amber-50 dark:bg-amber-900/20 p-3 sm:p-4 text-center">
-                    <p className="text-[9px] font-black uppercase tracking-widest text-amber-700 dark:text-amber-300">Target</p>
-                    <p className="text-sm font-black text-amber-800 dark:text-amber-200 mt-2">Out Form</p>
+                    <p className="text-[13px] font-semibold text-amber-700 dark:text-amber-300">Target</p>
+                    <p className="text-sm font-semibold text-amber-800 dark:text-amber-200 mt-2">Out Form</p>
                   </div>
                 </div>
               )}
@@ -2466,11 +2466,11 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
                     <span className="w-2.5 h-2.5 rounded-full bg-amber-400/80" />
                     <span className="w-2.5 h-2.5 rounded-full bg-emerald-400/80" />
                   </div>
-                  <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">Import Console</span>
+                  <span className="text-[13px] font-semibold text-[#5B6472]">Import Console</span>
                 </div>
                 <div
                   ref={importLogRef}
-                  className="h-28 sm:h-32 overflow-y-auto p-3 font-mono text-[10px] leading-5 text-emerald-300 bg-[#020617]"
+                  className="h-28 sm:h-32 overflow-y-auto p-3 font-mono text-[13px] leading-5 text-emerald-300 bg-[#020617]"
                 >
                   {importLogs.length === 0 ? (
                     <p className="text-slate-500">Waiting to start import...</p>
@@ -2489,7 +2489,7 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
               </div>
 
               {!isImporting && (
-                <p className="text-[11px] font-medium text-gray-500 dark:text-gray-400">
+                <p className="text-[14px] font-medium text-gray-500 dark:text-gray-400">
                   Voucher groups will be appended to the Out Form sheet. Line items are stored as JSON per voucher.
                 </p>
               )}
@@ -2499,14 +2499,14 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
               <button
                 onClick={resetImportModal}
                 disabled={isImporting}
-                className="px-5 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest text-gray-500 hover:bg-gray-100 dark:hover:bg-slate-800 transition disabled:opacity-50"
+                className="px-5 py-2.5 rounded-full text-[13px] font-semibold text-gray-500 hover:bg-gray-100 dark:hover:bg-slate-800 transition disabled:opacity-50"
               >
                 Cancel
               </button>
               <button
                 onClick={handleConfirmOutFormImport}
                 disabled={isImporting || importPreview.groups.length === 0}
-                className="px-5 py-2.5 rounded-full bg-emerald-600 text-white text-[10px] font-black uppercase tracking-widest shadow-lg disabled:opacity-50 flex items-center gap-2"
+                className="px-5 py-2.5 rounded-full bg-emerald-600 text-white text-[13px] font-semibold shadow-lg disabled:opacity-50 flex items-center gap-2"
               >
                 {isImporting ? <ArrowPathIcon className="w-4 h-4 animate-spin" /> : <ArrowUpTrayIcon className="w-4 h-4" />}
                 {isImporting ? "Processing..." : "Confirm Import"}

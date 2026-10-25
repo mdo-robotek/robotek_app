@@ -515,12 +515,12 @@ export default function IMSFinal({ onBack }: { onBack: () => void }) {
             <ArrowLeftIcon className="w-5 h-5" />
           </button>
           <div className="flex items-center gap-2">
-            <div className="p-2 bg-gradient-to-br from-orange-500 to-amber-700 rounded-lg shadow-md shadow-orange-900/20">
+            <div className="p-2 bg-[#2563EB] rounded-lg shadow-md">
               <ClipboardDocumentListIcon className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h1 className="text-lg font-black text-orange-600 dark:text-orange-500 uppercase tracking-tight leading-none">Final IMS</h1>
-              <p className="text-[9px] font-black text-orange-600/70 dark:text-orange-500/70 uppercase tracking-widest mt-0.5">Total Storage Overview</p>
+              <h1 className="text-lg font-semibold text-[#D97706] dark:text-[#D97706] tracking-tight leading-none">Final IMS</h1>
+              <p className="text-[13px] font-semibold text-[#D97706] dark:text-[#D97706] mt-0.5">Total Storage Overview</p>
             </div>
           </div>
         </div>
@@ -529,9 +529,9 @@ export default function IMSFinal({ onBack }: { onBack: () => void }) {
           <div className="flex items-center gap-0.5 bg-gray-100 dark:bg-white/5 p-0.5 rounded-lg">
             <button
               onClick={() => setViewMode('default')}
-              className={`flex items-center gap-1 px-2.5 py-1.5 rounded-md text-[10px] font-black uppercase tracking-wider transition-all ${
+              className={`flex items-center gap-1 px-2.5 py-1.5 rounded-md text-[13px] font-semibold  tracking-wider transition-all ${
                 viewMode === 'default'
-                  ? 'bg-white dark:bg-[#111827] text-orange-600 dark:text-[#FFD500] shadow-sm'
+                  ? 'bg-white dark:bg-[#111827] text-[#D97706] dark:text-[#60A5FA] shadow-sm'
                   : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
               }`}
             >
@@ -539,9 +539,9 @@ export default function IMSFinal({ onBack }: { onBack: () => void }) {
             </button>
             <button
               onClick={() => setViewMode('timeseries')}
-              className={`flex items-center gap-1 px-2.5 py-1.5 rounded-md text-[10px] font-black uppercase tracking-wider transition-all ${
+              className={`flex items-center gap-1 px-2.5 py-1.5 rounded-md text-[13px] font-semibold  tracking-wider transition-all ${
                 viewMode === 'timeseries'
-                  ? 'bg-white dark:bg-[#111827] text-orange-600 dark:text-[#FFD500] shadow-sm'
+                  ? 'bg-white dark:bg-[#111827] text-[#D97706] dark:text-[#60A5FA] shadow-sm'
                   : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
               }`}
             >
@@ -549,9 +549,9 @@ export default function IMSFinal({ onBack }: { onBack: () => void }) {
             </button>
             <button
               onClick={() => setViewMode('datewise')}
-              className={`flex items-center gap-1 px-2.5 py-1.5 rounded-md text-[10px] font-black uppercase tracking-wider transition-all ${
+              className={`flex items-center gap-1 px-2.5 py-1.5 rounded-md text-[13px] font-semibold  tracking-wider transition-all ${
                 viewMode === 'datewise'
-                  ? 'bg-white dark:bg-[#111827] text-orange-600 dark:text-[#FFD500] shadow-sm'
+                  ? 'bg-white dark:bg-[#111827] text-[#D97706] dark:text-[#60A5FA] shadow-sm'
                   : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
               }`}
             >
@@ -560,7 +560,7 @@ export default function IMSFinal({ onBack }: { onBack: () => void }) {
           </div>
           <button
             onClick={handleExport}
-            className="flex items-center gap-1 px-2.5 py-1.5 bg-orange-50 hover:bg-orange-100 dark:bg-orange-500/10 dark:hover:bg-orange-500/20 text-orange-600 dark:text-orange-500 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all border border-orange-200 dark:border-orange-500/20 shadow-sm h-[34px]"
+            className="flex items-center gap-1 px-2.5 py-1.5 bg-[#F7F8FA] hover:bg-[#F7F8FA] dark:bg-[#D97706]/10 dark:hover:bg-[#D97706]/20 text-[#D97706] dark:text-[#D97706] rounded-lg text-[13px] font-semibold tracking-wider transition-all border border-[#E5E7EB] dark:border-[#E5E7EB] shadow-sm h-[34px]"
           >
             <ArrowDownTrayIcon className="w-3.5 h-3.5" /> Export
           </button>
@@ -570,13 +570,13 @@ export default function IMSFinal({ onBack }: { onBack: () => void }) {
       {/* Row 2: Search + Categories / Items + date */}
       <div className="flex flex-wrap items-center gap-1.5 shrink-0 w-full">
         <div className="relative w-[180px] shrink-0">
-          <MagnifyingGlassIcon className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
+          <MagnifyingGlassIcon className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#5B6472]" />
           <input
             type="text"
             placeholder="SEARCH ITEM..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-8 pr-3 py-1.5 bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 rounded-lg text-[10px] font-black uppercase tracking-wider outline-none focus:ring-2 focus:ring-orange-500 dark:text-white transition-all shadow-sm h-[34px]"
+            className="w-full pl-8 pr-3 py-1.5 bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 rounded-lg text-[13px] font-semibold tracking-wider outline-none focus:ring-2 focus:ring-[#E5E7EB] dark:text-white transition-all shadow-sm h-[34px]"
           />
         </div>
         <div className="flex-1 min-w-[140px]">
@@ -585,8 +585,8 @@ export default function IMSFinal({ onBack }: { onBack: () => void }) {
             value={categoryFilters}
             onChange={setCategoryFilters}
             placeholder="Categories"
-            className="bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 py-1.5 px-2 rounded-lg text-[10px] h-[34px]"
-            accentClass="border-orange-500 ring-orange-500/20"
+            className="bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 py-1.5 px-2 rounded-lg text-[13px] h-[34px]"
+            accentClass="border-[#E5E7EB] ring-[#E5E7EB]"
           />
         </div>
         <div className="flex-1 min-w-[160px]">
@@ -595,14 +595,14 @@ export default function IMSFinal({ onBack }: { onBack: () => void }) {
             value={itemNameFilters}
             onChange={setItemNameFilters}
             placeholder="Items"
-            className="bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 py-1.5 px-2 rounded-lg text-[10px] h-[34px]"
-            accentClass="border-orange-500 ring-orange-500/20"
+            className="bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 py-1.5 px-2 rounded-lg text-[13px] h-[34px]"
+            accentClass="border-[#E5E7EB] ring-[#E5E7EB]"
           />
         </div>
         <select
           value={activeFilter}
           onChange={(e) => setActiveFilter(e.target.value as ActiveStatusFilter)}
-          className="px-2.5 py-1.5 bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 rounded-lg text-[10px] font-black uppercase tracking-wider outline-none focus:ring-2 focus:ring-orange-500 dark:text-white shadow-sm h-[34px] cursor-pointer shrink-0"
+          className="px-2.5 py-1.5 bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 rounded-lg text-[13px] font-semibold tracking-wider outline-none focus:ring-2 focus:ring-[#E5E7EB] dark:text-white shadow-sm h-[34px] cursor-pointer shrink-0"
         >
           <option value="ALL">All Status</option>
           <option value="ACTIVE">Active</option>
@@ -616,7 +616,7 @@ export default function IMSFinal({ onBack }: { onBack: () => void }) {
               setSearchQuery("");
               setActiveFilter("ALL");
             }}
-            className="px-2.5 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-wider text-orange-700 dark:text-orange-400 bg-orange-50 hover:bg-orange-100 dark:bg-orange-500/10 dark:hover:bg-orange-500/20 border border-orange-200 dark:border-orange-500/20 transition-colors shrink-0 h-[34px]"
+            className="px-2.5 py-1.5 rounded-lg text-[13px] font-semibold tracking-wider text-[#D97706] dark:text-[#D97706] bg-[#F7F8FA] hover:bg-[#F7F8FA] dark:bg-[#D97706]/10 dark:hover:bg-[#D97706]/20 border border-[#E5E7EB] dark:border-[#E5E7EB] transition-colors shrink-0 h-[34px]"
           >
             Clear
           </button>
@@ -641,8 +641,8 @@ export default function IMSFinal({ onBack }: { onBack: () => void }) {
       {viewMode === 'default' && (
         <div className="flex flex-wrap items-center gap-2 shrink-0 w-full bg-white dark:bg-[#111827] px-3 py-2 rounded-xl border border-gray-200 dark:border-white/5 shadow-sm">
           <div className="flex items-center gap-1.5 shrink-0 pr-1">
-            <ExclamationTriangleIcon className="w-4 h-4 text-orange-500" />
-            <span className="text-[10px] font-black text-gray-600 dark:text-gray-300 uppercase tracking-widest">Color Logic</span>
+            <ExclamationTriangleIcon className="w-4 h-4 text-[#D97706]" />
+            <span className="text-[13px] font-semibold text-gray-600 dark:text-gray-300">Color Logic</span>
           </div>
           <div className="flex flex-1 flex-wrap items-stretch gap-1.5 min-w-0">
             {([
@@ -661,8 +661,8 @@ export default function IMSFinal({ onBack }: { onBack: () => void }) {
                   onClick={() => setLegendFilter(selected ? null : chip.id)}
                   className={`flex-1 min-w-[88px] h-11 px-2.5 rounded-xl flex items-center justify-center gap-2 transition-all duration-200 cursor-pointer shadow-md ${chip.text} ${chip.fill} ${selected ? `${chip.ring} scale-[1.02]` : 'hover:scale-[1.02] hover:brightness-110 active:scale-[0.98]'}`}
                 >
-                  <span className="text-[11px] font-black uppercase tracking-wide whitespace-nowrap">{chip.label}</span>
-                  <span className={`min-w-[1.6rem] h-6 px-1.5 rounded-md text-[12px] font-black tabular-nums flex items-center justify-center ${
+                  <span className="text-[14px] font-semibold tracking-wide whitespace-nowrap">{chip.label}</span>
+                  <span className={`min-w-[1.6rem] h-6 px-1.5 rounded-md text-[14px] font-semibold tabular-nums flex items-center justify-center ${
                     chip.id === 3 || chip.id === 6
                       ? 'bg-black/15 text-inherit'
                       : 'bg-white/25 text-white'
@@ -677,7 +677,7 @@ export default function IMSFinal({ onBack }: { onBack: () => void }) {
             <button
               type="button"
               onClick={() => setLegendFilter(null)}
-              className="h-11 px-3 rounded-xl text-[10px] uppercase font-black tracking-wider text-gray-600 dark:text-gray-300 bg-gray-100 hover:bg-gray-200 dark:bg-white/10 dark:hover:bg-white/15 border border-gray-200 dark:border-white/10 shrink-0 transition-colors"
+              className="h-11 px-3 rounded-xl text-[13px] font-semibold tracking-wider text-gray-600 dark:text-gray-300 bg-gray-100 hover:bg-gray-200 dark:bg-white/10 dark:hover:bg-white/15 border border-gray-200 dark:border-white/10 shrink-0 transition-colors"
             >
               Clear
             </button>
@@ -688,22 +688,22 @@ export default function IMSFinal({ onBack }: { onBack: () => void }) {
       {viewMode === 'datewise' ? (
         <div className="flex-1 bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/5 rounded-xl overflow-hidden flex flex-col shadow-sm min-h-0">
           {filteredDatewiseTransactions.length > 0 && !isLoading && (
-            <div className="py-2 px-4 border-b border-orange-200/50 dark:border-orange-500/10 flex items-center justify-between bg-orange-50/50 dark:bg-orange-500/5 shrink-0">
-              <p className="text-[10px] font-black text-orange-600 dark:text-orange-500 uppercase tracking-widest">
+            <div className="py-2 px-4 border-b border-[#E5E7EB] dark:border-[#E5E7EB] flex items-center justify-between bg-[#F7F8FA] dark:bg-[#D97706]/5 shrink-0">
+              <p className="text-[13px] font-semibold text-[#D97706] dark:text-[#D97706]">
                 Showing {Math.min((currentPage - 1) * itemsPerPage + 1, filteredDatewiseTransactions.length)} to {Math.min(currentPage * itemsPerPage, filteredDatewiseTransactions.length)} of {filteredDatewiseTransactions.length} transactions
               </p>
               <div className="flex gap-1">
                 <button
                   onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                   disabled={currentPage === 1}
-                  className="px-3 py-1.5 rounded bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 text-[10px] font-black text-gray-500 uppercase tracking-widest hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
+                  className="px-3 py-1.5 rounded bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 text-[13px] font-semibold text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
                 >
                   Prev
                 </button>
                 <button
                   onClick={() => setCurrentPage(prev => Math.min(prev + 1, datewiseTotalPages))}
                   disabled={currentPage === datewiseTotalPages || datewiseTotalPages === 0}
-                  className="px-3 py-1.5 rounded bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 text-[10px] font-black text-gray-500 uppercase tracking-widest hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
+                  className="px-3 py-1.5 rounded bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 text-[13px] font-semibold text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
                 >
                   Next
                 </button>
@@ -719,25 +719,25 @@ export default function IMSFinal({ onBack }: { onBack: () => void }) {
               </div>
             ) : (
               <table className="w-full text-left border-collapse relative">
-                <thead className="bg-orange-50 dark:bg-orange-900/20 sticky top-0 z-20 shadow-sm">
+                <thead className="bg-[#F7F8FA] dark:bg-[#FEF3C7] sticky top-0 z-20 shadow-sm">
                   <tr>
-                    <th className="py-2.5 px-4 text-[10px] font-black text-orange-600 dark:text-orange-500 uppercase tracking-widest border-b border-orange-200 dark:border-orange-500/20">Date</th>
-                    <th className="py-2.5 px-3 text-[10px] font-black text-orange-600 dark:text-orange-500 uppercase tracking-widest border-b border-orange-200 dark:border-orange-500/20">Source</th>
-                    <th className="py-2.5 px-3 text-[10px] font-black text-orange-600 dark:text-orange-500 uppercase tracking-widest border-b border-orange-200 dark:border-orange-500/20">Category</th>
-                    <th className="py-2.5 px-3 text-[10px] font-black text-orange-600 dark:text-orange-500 uppercase tracking-widest border-b border-orange-200 dark:border-orange-500/20">Item Name</th>
-                    <th className="py-2.5 px-3 text-[10px] font-black text-orange-600 dark:text-orange-500 uppercase tracking-widest border-b border-orange-200 dark:border-orange-500/20 text-right">In</th>
-                    <th className="py-2.5 px-3 text-[10px] font-black text-orange-600 dark:text-orange-500 uppercase tracking-widest border-b border-orange-200 dark:border-orange-500/20 text-right">Out</th>
-                    <th className="py-2.5 px-4 text-[10px] font-black text-orange-600 dark:text-orange-500 uppercase tracking-widest border-b border-orange-200 dark:border-orange-500/20 text-right">Live Stock</th>
+                    <th className="py-2.5 px-4 text-[13px] font-semibold text-[#D97706] dark:text-[#D97706] border-b border-[#E5E7EB] dark:border-[#E5E7EB]">Date</th>
+                    <th className="py-2.5 px-3 text-[13px] font-semibold text-[#D97706] dark:text-[#D97706] border-b border-[#E5E7EB] dark:border-[#E5E7EB]">Source</th>
+                    <th className="py-2.5 px-3 text-[13px] font-semibold text-[#D97706] dark:text-[#D97706] border-b border-[#E5E7EB] dark:border-[#E5E7EB]">Category</th>
+                    <th className="py-2.5 px-3 text-[13px] font-semibold text-[#D97706] dark:text-[#D97706] border-b border-[#E5E7EB] dark:border-[#E5E7EB]">Item Name</th>
+                    <th className="py-2.5 px-3 text-[13px] font-semibold text-[#D97706] dark:text-[#D97706] border-b border-[#E5E7EB] dark:border-[#E5E7EB] text-right">In</th>
+                    <th className="py-2.5 px-3 text-[13px] font-semibold text-[#D97706] dark:text-[#D97706] border-b border-[#E5E7EB] dark:border-[#E5E7EB] text-right">Out</th>
+                    <th className="py-2.5 px-4 text-[13px] font-semibold text-[#D97706] dark:text-[#D97706] border-b border-[#E5E7EB] dark:border-[#E5E7EB] text-right">Live Stock</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-orange-100 dark:divide-orange-500/10">
+                <tbody className="divide-y divide-[#E5E7EB] dark:divide-[#E5E7EB]">
                   {paginatedDatewiseTransactions.map((log, index) => (
-                    <tr key={index} className="hover:bg-orange-50/50 dark:hover:bg-orange-500/[0.03] even:bg-orange-50/30 dark:even:bg-orange-900/10 transition-colors group">
-                      <td className="py-2 px-4 text-[11px] font-bold text-gray-500">
+                    <tr key={index} className="hover:bg-[#F7F8FA] dark:hover:bg-[#D97706]/[0.03] even:bg-[#F7F8FA] dark:even:bg-[#FEF3C7] transition-colors group">
+                      <td className="py-2 px-4 text-[14px] font-bold text-gray-500">
                         {new Date(log.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: '2-digit' })}
                       </td>
-                      <td className="py-2 px-3 text-[11px] font-black uppercase">
-        <span className={`inline-block px-2 py-0.5 rounded border text-[10px] font-black uppercase tracking-wider ${
+                      <td className="py-2 px-3 text-[14px] font-semibold">
+        <span className={`inline-block px-2 py-0.5 rounded border text-[13px] font-semibold  tracking-wider ${
                           log.source === 'IMS - G Floor' ? 'border-blue-200 dark:border-blue-500/20 bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400' :
                           log.source === 'SFG IMS' ? 'border-teal-200 dark:border-teal-500/20 bg-teal-50 dark:bg-teal-500/10 text-teal-600 dark:text-teal-400' :
                           'border-purple-200 dark:border-purple-500/20 bg-purple-50 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400'
@@ -745,16 +745,16 @@ export default function IMSFinal({ onBack }: { onBack: () => void }) {
                           {log.source}
                         </span>
                       </td>
-                      <td className="py-2 px-3 text-[11px] font-bold text-gray-500 uppercase">{log.category}</td>
-                      <td className="py-2 px-3 text-[11px] font-black text-gray-900 dark:text-white uppercase">{log.item_name}</td>
-                      <td className="py-2 px-3 text-[11px] font-black text-emerald-600 dark:text-emerald-400 text-right">{log.in_qty > 0 ? `+${log.in_qty}` : "-"}</td>
-                      <td className="py-2 px-3 text-[11px] font-black text-rose-600 dark:text-rose-400 text-right">{log.out_qty > 0 ? `-${log.out_qty}` : "-"}</td>
-                      <td className="py-2 px-4 text-[11px] font-black text-orange-600 dark:text-[#FFD500] text-right">{(log as any).running_stock}</td>
+                      <td className="py-2 px-3 text-[14px] font-bold text-gray-500">{log.category}</td>
+                      <td className="py-2 px-3 text-[14px] font-semibold text-gray-900 dark:text-white">{log.item_name}</td>
+                      <td className="py-2 px-3 text-[14px] font-semibold text-emerald-600 dark:text-emerald-400 text-right">{log.in_qty > 0 ? `+${log.in_qty}` : "-"}</td>
+                      <td className="py-2 px-3 text-[14px] font-semibold text-rose-600 dark:text-rose-400 text-right">{log.out_qty > 0 ? `-${log.out_qty}` : "-"}</td>
+                      <td className="py-2 px-4 text-[14px] font-semibold text-[#D97706] dark:text-[#60A5FA] text-right">{(log as any).running_stock}</td>
                     </tr>
                   ))}
                   {filteredDatewiseTransactions.length === 0 && (
                     <tr>
-                      <td colSpan={7} className="py-8 text-center text-gray-400 text-[11px] font-black uppercase">No items found</td>
+                      <td colSpan={7} className="py-8 text-center text-[#5B6472] text-[14px] font-semibold">No items found</td>
                     </tr>
                   )}
                 </tbody>
@@ -773,22 +773,22 @@ export default function IMSFinal({ onBack }: { onBack: () => void }) {
       ) : (
         <div className="flex-1 bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/5 rounded-xl overflow-hidden flex flex-col shadow-sm min-h-0">
           {filteredItems.length > 0 && !isLoading && (
-            <div className="py-2 px-4 border-b border-orange-200/50 dark:border-orange-500/10 flex items-center justify-between bg-orange-50/50 dark:bg-orange-500/5 shrink-0">
-              <p className="text-[10px] font-black text-orange-600 dark:text-orange-500 uppercase tracking-widest">
+            <div className="py-2 px-4 border-b border-[#E5E7EB] dark:border-[#E5E7EB] flex items-center justify-between bg-[#F7F8FA] dark:bg-[#D97706]/5 shrink-0">
+              <p className="text-[13px] font-semibold text-[#D97706] dark:text-[#D97706]">
                 Showing {Math.min((currentPage - 1) * itemsPerPage + 1, filteredItems.length)} to {Math.min(currentPage * itemsPerPage, filteredItems.length)} of {filteredItems.length} unique items
               </p>
               <div className="flex gap-1">
                 <button
                   onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                   disabled={currentPage === 1}
-                  className="px-3 py-1.5 rounded bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 text-[10px] font-black text-gray-500 uppercase tracking-widest hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
+                  className="px-3 py-1.5 rounded bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 text-[13px] font-semibold text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
                 >
                   Prev
                 </button>
                 <button
                   onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                   disabled={currentPage === totalPages || totalPages === 0}
-                  className="px-3 py-1.5 rounded bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 text-[10px] font-black text-gray-500 uppercase tracking-widest hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
+                  className="px-3 py-1.5 rounded bg-white dark:bg-[#111827] border border-gray-200 dark:border-white/10 text-[13px] font-semibold text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
                 >
                   Next
                 </button>
@@ -811,33 +811,33 @@ export default function IMSFinal({ onBack }: { onBack: () => void }) {
               </div>
             ) : (
               <table className="w-full text-left border-collapse relative min-w-[1100px]">
-                <thead className="bg-orange-50 dark:bg-orange-900/20 sticky top-0 z-20 shadow-sm">
+                <thead className="bg-[#F7F8FA] dark:bg-[#FEF3C7] sticky top-0 z-20 shadow-sm">
                   <tr>
-                    <th className="py-2.5 px-3 text-[10px] font-black text-orange-600 dark:text-orange-500 uppercase tracking-widest border-b border-orange-200 dark:border-orange-500/20 text-center w-12">Acts</th>
-                    <th className="py-2.5 px-3 text-[10px] font-black text-orange-600 dark:text-orange-500 uppercase tracking-widest border-b border-orange-200 dark:border-orange-500/20 whitespace-nowrap">SKU</th>
-                    <th className="py-2.5 px-3 text-[10px] font-black text-orange-600 dark:text-orange-500 uppercase tracking-widest border-b border-orange-200 dark:border-orange-500/20 whitespace-nowrap">Category</th>
-                    <th className="py-2.5 px-3 text-[10px] font-black text-orange-600 dark:text-orange-500 uppercase tracking-widest border-b border-orange-200 dark:border-orange-500/20 min-w-[200px]">Item Name</th>
-                    <th className="py-2.5 px-3 text-[10px] font-black text-orange-600 dark:text-orange-500 uppercase tracking-widest border-b border-orange-200 dark:border-orange-500/20 text-center whitespace-nowrap">Active</th>
-                    <th className="py-2.5 px-4 text-[10px] font-black text-orange-700 dark:text-orange-400 uppercase tracking-widest border-b border-orange-200 dark:border-orange-500/20 text-left bg-orange-100/50 dark:bg-orange-500/10 w-56">Stock Health</th>
-                    <th className="py-2.5 px-3 text-[10px] font-black text-orange-600 dark:text-orange-500 uppercase tracking-widest border-b border-orange-200 dark:border-orange-500/20 text-right">Max</th>
-                    <th className="py-2.5 px-3 text-[10px] font-black text-orange-600 dark:text-orange-500 uppercase tracking-widest border-b border-orange-200 dark:border-orange-500/20 text-right">IN Qty</th>
-                    <th className="py-2.5 px-3 text-[10px] font-black text-orange-600 dark:text-orange-500 uppercase tracking-widest border-b border-orange-200 dark:border-orange-500/20 text-right">OUT Qty</th>
-                    <th className="py-2.5 px-3 text-[10px] font-black text-orange-600 dark:text-orange-500 uppercase tracking-widest border-b border-orange-200 dark:border-orange-500/20 text-right">Sale %</th>
-                    <th className="py-2.5 px-3 text-[10px] font-black text-orange-600 dark:text-orange-500 uppercase tracking-widest border-b border-orange-200 dark:border-orange-500/20 text-right whitespace-nowrap">Avg. Con</th>
-                    <th className="py-2.5 px-3 text-[10px] font-black text-orange-600 dark:text-orange-500 uppercase tracking-widest border-b border-orange-200 dark:border-orange-500/20 text-right">Lead</th>
-                    <th className="py-2.5 px-3 text-[10px] font-black text-orange-600 dark:text-orange-500 uppercase tracking-widest border-b border-orange-200 dark:border-orange-500/20 text-right whitespace-nowrap">G Floor</th>
-                    <th className="py-2.5 px-3 text-[10px] font-black text-teal-600 dark:text-teal-400 uppercase tracking-widest border-b border-orange-200 dark:border-orange-500/20 text-right whitespace-nowrap">SFG</th>
-                    <th className="py-2.5 px-3 text-[10px] font-black text-orange-600 dark:text-orange-500 uppercase tracking-widest border-b border-orange-200 dark:border-orange-500/20 text-right whitespace-nowrap">1st Floor</th>
-                    <th className="py-2.5 px-3 text-[10px] font-black text-orange-600 dark:text-orange-500 uppercase tracking-widest border-b border-orange-200 dark:border-orange-500/20 text-right">SF</th>
+                    <th className="py-2.5 px-3 text-[13px] font-semibold text-[#D97706] dark:text-[#D97706] border-b border-[#E5E7EB] dark:border-[#E5E7EB] text-center w-12">Acts</th>
+                    <th className="py-2.5 px-3 text-[13px] font-semibold text-[#D97706] dark:text-[#D97706] border-b border-[#E5E7EB] dark:border-[#E5E7EB] whitespace-nowrap">SKU</th>
+                    <th className="py-2.5 px-3 text-[13px] font-semibold text-[#D97706] dark:text-[#D97706] border-b border-[#E5E7EB] dark:border-[#E5E7EB] whitespace-nowrap">Category</th>
+                    <th className="py-2.5 px-3 text-[13px] font-semibold text-[#D97706] dark:text-[#D97706] border-b border-[#E5E7EB] dark:border-[#E5E7EB] min-w-[200px]">Item Name</th>
+                    <th className="py-2.5 px-3 text-[13px] font-semibold text-[#D97706] dark:text-[#D97706] border-b border-[#E5E7EB] dark:border-[#E5E7EB] text-center whitespace-nowrap">Active</th>
+                    <th className="py-2.5 px-4 text-[13px] font-semibold text-[#D97706] dark:text-[#D97706] border-b border-[#E5E7EB] dark:border-[#E5E7EB] text-left bg-[#F7F8FA] dark:bg-[#D97706]/10 w-56">Stock Health</th>
+                    <th className="py-2.5 px-3 text-[13px] font-semibold text-[#D97706] dark:text-[#D97706] border-b border-[#E5E7EB] dark:border-[#E5E7EB] text-right">Max</th>
+                    <th className="py-2.5 px-3 text-[13px] font-semibold text-[#D97706] dark:text-[#D97706] border-b border-[#E5E7EB] dark:border-[#E5E7EB] text-right">IN Qty</th>
+                    <th className="py-2.5 px-3 text-[13px] font-semibold text-[#D97706] dark:text-[#D97706] border-b border-[#E5E7EB] dark:border-[#E5E7EB] text-right">OUT Qty</th>
+                    <th className="py-2.5 px-3 text-[13px] font-semibold text-[#D97706] dark:text-[#D97706] border-b border-[#E5E7EB] dark:border-[#E5E7EB] text-right">Sale %</th>
+                    <th className="py-2.5 px-3 text-[13px] font-semibold text-[#D97706] dark:text-[#D97706] border-b border-[#E5E7EB] dark:border-[#E5E7EB] text-right whitespace-nowrap">Avg. Con</th>
+                    <th className="py-2.5 px-3 text-[13px] font-semibold text-[#D97706] dark:text-[#D97706] border-b border-[#E5E7EB] dark:border-[#E5E7EB] text-right">Lead</th>
+                    <th className="py-2.5 px-3 text-[13px] font-semibold text-[#D97706] dark:text-[#D97706] border-b border-[#E5E7EB] dark:border-[#E5E7EB] text-right whitespace-nowrap">G Floor</th>
+                    <th className="py-2.5 px-3 text-[13px] font-semibold text-teal-600 dark:text-teal-400 border-b border-[#E5E7EB] dark:border-[#E5E7EB] text-right whitespace-nowrap">SFG</th>
+                    <th className="py-2.5 px-3 text-[13px] font-semibold text-[#D97706] dark:text-[#D97706] border-b border-[#E5E7EB] dark:border-[#E5E7EB] text-right whitespace-nowrap">1st Floor</th>
+                    <th className="py-2.5 px-3 text-[13px] font-semibold text-[#D97706] dark:text-[#D97706] border-b border-[#E5E7EB] dark:border-[#E5E7EB] text-right">SF</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-orange-100 dark:divide-orange-500/10">
+                <tbody className="divide-y divide-[#E5E7EB] dark:divide-[#E5E7EB]">
                   {paginatedItems.map((item) => {
                     const health = getHealth(item.live_stock, item.max_level || 0);
                     return (
                       <tr
                         key={item.item_name}
-                        className="hover:bg-orange-50/30 dark:hover:bg-white/[0.03] even:bg-gray-50/50 dark:even:bg-[#1f2937]/30 transition-colors group"
+                        className="hover:bg-[#F7F8FA] dark:hover:bg-white/[0.03] even:bg-gray-50/50 dark:even:bg-[#1f2937]/30 transition-colors group"
                       >
                         <td className="py-2 px-3 text-center">
                           <button
@@ -845,7 +845,7 @@ export default function IMSFinal({ onBack }: { onBack: () => void }) {
                             onClick={() => openMasterEdit(item)}
                             className={`hover:scale-110 transition-transform ${
                               item.in_master
-                                ? "text-orange-600 dark:text-orange-400"
+                                ? "text-[#D97706] dark:text-[#D97706]"
                                 : "text-amber-500 dark:text-amber-400"
                             }`}
                             title={item.in_master ? "Edit Master item" : "Add to Master — fill SKU, Category, Active, Lead Time, Safety Factor"}
@@ -853,18 +853,18 @@ export default function IMSFinal({ onBack }: { onBack: () => void }) {
                             <PencilSquareIcon className="w-4 h-4 mx-auto" />
                           </button>
                         </td>
-                        <td className="py-2 px-3 text-[11px] font-bold text-gray-600 dark:text-gray-300 uppercase whitespace-nowrap">{item.sku_code || "—"}</td>
+                        <td className="py-2 px-3 text-[14px] font-bold text-gray-600 dark:text-gray-300 whitespace-nowrap">{item.sku_code || "—"}</td>
                         <td className="py-2 px-3">
-                          <span className="inline-block px-2 py-0.5 rounded border border-gray-200 dark:border-white/10 bg-gray-100 dark:bg-white/5 text-[10px] font-black text-gray-600 dark:text-gray-300 uppercase tracking-wider">
+                          <span className="inline-block px-2 py-0.5 rounded border border-gray-200 dark:border-white/10 bg-gray-100 dark:bg-white/5 text-[13px] font-semibold text-gray-600 dark:text-gray-300 tracking-wider">
                             {item.category}
                           </span>
                         </td>
-                        <td className="py-2 px-3 text-[11px] font-black text-[#003875] dark:text-[#FFD500] uppercase whitespace-normal break-words min-w-[200px] max-w-[320px] leading-snug">
+                        <td className="py-2 px-3 text-[14px] font-semibold text-[#2563EB] dark:text-[#60A5FA] whitespace-normal break-words min-w-[200px] max-w-[320px] leading-snug">
                           {item.item_name}
                         </td>
                         <td className="py-2 px-3 text-center">
                           {item.active_status ? (
-                            <span className={`inline-block px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider ${
+                            <span className={`inline-block px-2 py-0.5 rounded-md text-[13px] font-semibold  tracking-wider ${
                               item.active_status.toLowerCase() === "active"
                                 ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400"
                                 : "bg-gray-200 text-gray-600 dark:bg-white/10 dark:text-gray-400"
@@ -872,40 +872,40 @@ export default function IMSFinal({ onBack }: { onBack: () => void }) {
                               {item.active_status}
                             </span>
                           ) : (
-                            <span className="text-[9px] font-black uppercase tracking-wider text-amber-600 dark:text-amber-400">Not set</span>
+                            <span className="text-[13px] font-semibold tracking-wider text-amber-600 dark:text-amber-400">Not set</span>
                           )}
                         </td>
                         <td className="py-1 px-4 bg-gray-50/50 dark:bg-white/[0.02]">
                           <div className="flex flex-col gap-1 w-full max-w-[180px]">
                             <div className="flex justify-between items-baseline leading-none">
-                              <span className={`text-xs font-black ${health.text}`}>{item.live_stock.toLocaleString()}</span>
-                              <span className="text-[9px] font-bold text-gray-400 uppercase">{health.label}</span>
+                              <span className={`text-[14px] font-semibold ${health.text}`}>{item.live_stock.toLocaleString()}</span>
+                              <span className="text-[13px] font-bold text-[#5B6472]">{health.label}</span>
                             </div>
                             <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 overflow-hidden flex">
                               <div className={`h-full ${health.color} transition-all duration-500`} style={{ width: `${health.pct}%` }} />
                             </div>
                           </div>
                         </td>
-                        <td className="py-2 px-3 text-[11px] font-bold text-[#003875] dark:text-[#FFD500] text-right">{item.max_level || "—"}</td>
-                        <td className="py-2 px-3 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 text-right">
+                        <td className="py-2 px-3 text-[14px] font-bold text-[#2563EB] dark:text-[#60A5FA] text-right">{item.max_level || "—"}</td>
+                        <td className="py-2 px-3 text-[14px] font-bold text-emerald-600 dark:text-emerald-400 text-right">
                           {item.in_qty !== 0 ? item.in_qty.toLocaleString() : "—"}
                         </td>
-                        <td className="py-2 px-3 text-[11px] font-bold text-rose-600 dark:text-rose-400 text-right">
+                        <td className="py-2 px-3 text-[14px] font-bold text-rose-600 dark:text-rose-400 text-right">
                           {item.out_qty !== 0 ? item.out_qty.toLocaleString() : "—"}
                         </td>
-                        <td className="py-2 px-3 text-[11px] font-bold text-indigo-600 dark:text-indigo-400 text-right">{item.sale_percent}%</td>
-                        <td className="py-2 px-3 text-[11px] font-bold text-gray-600 dark:text-gray-400 text-right">{item.avg_daily_con || "—"}</td>
-                        <td className="py-2 px-3 text-[11px] font-bold text-gray-600 dark:text-gray-400 text-right">{item.lead_time}</td>
-                        <td className="py-2 px-3 text-[11px] font-bold text-blue-600 dark:text-blue-400 text-right">{item.g_floor_stock.toLocaleString()}</td>
-                        <td className="py-2 px-3 text-[11px] font-bold text-teal-600 dark:text-teal-400 text-right">{item.sfg_stock.toLocaleString()}</td>
-                        <td className="py-2 px-3 text-[11px] font-bold text-purple-600 dark:text-purple-400 text-right">{item.first_floor_stock.toLocaleString()}</td>
-                        <td className="py-2 px-3 text-[11px] font-bold text-gray-600 dark:text-gray-400 text-right">{item.safety_factor}</td>
+                        <td className="py-2 px-3 text-[14px] font-bold text-indigo-600 dark:text-indigo-400 text-right">{item.sale_percent}%</td>
+                        <td className="py-2 px-3 text-[14px] font-bold text-gray-600 dark:text-gray-400 text-right">{item.avg_daily_con || "—"}</td>
+                        <td className="py-2 px-3 text-[14px] font-bold text-gray-600 dark:text-gray-400 text-right">{item.lead_time}</td>
+                        <td className="py-2 px-3 text-[14px] font-bold text-blue-600 dark:text-blue-400 text-right">{item.g_floor_stock.toLocaleString()}</td>
+                        <td className="py-2 px-3 text-[14px] font-bold text-teal-600 dark:text-teal-400 text-right">{item.sfg_stock.toLocaleString()}</td>
+                        <td className="py-2 px-3 text-[14px] font-bold text-purple-600 dark:text-purple-400 text-right">{item.first_floor_stock.toLocaleString()}</td>
+                        <td className="py-2 px-3 text-[14px] font-bold text-gray-600 dark:text-gray-400 text-right">{item.safety_factor}</td>
                       </tr>
                     );
                   })}
                   {paginatedItems.length === 0 && (
                     <tr>
-                      <td colSpan={16} className="py-12 text-center text-gray-400 text-[11px] font-black uppercase tracking-widest">
+                      <td colSpan={16} className="py-12 text-center text-[#5B6472] text-[14px] font-semibold">
                         {categoryFilters.length > 0 || itemNameFilters.length > 0 || searchQuery || legendFilter !== null || activeFilter !== "ALL"
                           ? "No items found matching filters"
                           : "No items available"}
@@ -928,9 +928,9 @@ export default function IMSFinal({ onBack }: { onBack: () => void }) {
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
               className="bg-white dark:bg-[#111827] rounded-2xl shadow-[0_0_40px_rgba(0,0,0,0.2)] w-full max-w-md overflow-hidden border border-gray-200 dark:border-white/10"
             >
-              <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-white/5 bg-orange-50 dark:bg-orange-900/20">
-                <h3 className="text-sm font-black uppercase tracking-widest flex items-center gap-2 text-gray-900 dark:text-white">
-                  <PencilSquareIcon className="w-5 h-5 text-orange-600" />
+              <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-white/5 bg-[#F7F8FA] dark:bg-[#FEF3C7]">
+                <h3 className="text-sm font-semibold flex items-center gap-2 text-gray-900 dark:text-white">
+                  <PencilSquareIcon className="w-5 h-5 text-[#D97706]" />
                   {editingItem.in_master ? "Edit Master Item" : "Add to Master"}
                 </h3>
                 <button
@@ -943,24 +943,24 @@ export default function IMSFinal({ onBack }: { onBack: () => void }) {
               </div>
               <div className="p-6 space-y-4 bg-white dark:bg-[#111827]">
                 <div className="p-3 rounded-xl bg-gray-50 dark:bg-white/[0.02] border border-gray-100 dark:border-white/5">
-                  <p className="text-[9px] font-black uppercase tracking-widest text-gray-400">Item Name</p>
-                  <p className="text-[11px] font-black text-gray-900 dark:text-white uppercase mt-1">{editingItem.item_name}</p>
+                  <p className="text-[13px] font-semibold text-[#5B6472]">Item Name</p>
+                  <p className="text-[14px] font-semibold text-gray-900 dark:text-white mt-1">{editingItem.item_name}</p>
                 </div>
                 <div>
-                  <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">SKU Code</label>
+                  <label className="text-[13px] font-semibold text-[#5B6472]">SKU Code</label>
                   <input
                     value={masterForm.sku_code}
                     onChange={(e) => setMasterForm((prev) => ({ ...prev, sku_code: e.target.value }))}
-                    className="mt-1 w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-white/10 bg-white dark:bg-[#0a0f1c] text-[11px] font-bold uppercase outline-none focus:ring-2 focus:ring-orange-500"
+                    className="mt-1 w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-white/10 bg-white dark:bg-[#0a0f1c] text-[14px] font-bold outline-none focus:ring-2 focus:ring-[#E5E7EB]"
                   />
                 </div>
                 <div>
-                  <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Category</label>
+                  <label className="text-[13px] font-semibold text-[#5B6472]">Category</label>
                   <input
                     list="final-ims-master-categories"
                     value={masterForm.category}
                     onChange={(e) => setMasterForm((prev) => ({ ...prev, category: e.target.value }))}
-                    className="mt-1 w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-white/10 bg-white dark:bg-[#0a0f1c] text-[11px] font-bold uppercase outline-none focus:ring-2 focus:ring-orange-500"
+                    className="mt-1 w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-white/10 bg-white dark:bg-[#0a0f1c] text-[14px] font-bold outline-none focus:ring-2 focus:ring-[#E5E7EB]"
                   />
                   <datalist id="final-ims-master-categories">
                     {uniqueCategories.map((cat) => (
@@ -969,11 +969,11 @@ export default function IMSFinal({ onBack }: { onBack: () => void }) {
                   </datalist>
                 </div>
                 <div>
-                  <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Active / Inactive</label>
+                  <label className="text-[13px] font-semibold text-[#5B6472]">Active / Inactive</label>
                   <select
                     value={masterForm.active_status}
                     onChange={(e) => setMasterForm((prev) => ({ ...prev, active_status: e.target.value }))}
-                    className="mt-1 w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-white/10 bg-white dark:bg-[#0a0f1c] text-[11px] font-black uppercase outline-none focus:ring-2 focus:ring-orange-500"
+                    className="mt-1 w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-white/10 bg-white dark:bg-[#0a0f1c] text-[14px] font-semibold outline-none focus:ring-2 focus:ring-[#E5E7EB]"
                   >
                     <option value="Active">Active</option>
                     <option value="Inactive">Inactive</option>
@@ -981,24 +981,24 @@ export default function IMSFinal({ onBack }: { onBack: () => void }) {
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Lead Time</label>
+                    <label className="text-[13px] font-semibold text-[#5B6472]">Lead Time</label>
                     <input
                       type="number"
                       min="0"
                       value={masterForm.lead_time}
                       onChange={(e) => setMasterForm((prev) => ({ ...prev, lead_time: e.target.value }))}
-                      className="mt-1 w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-white/10 bg-white dark:bg-[#0a0f1c] text-[11px] font-bold outline-none focus:ring-2 focus:ring-orange-500"
+                      className="mt-1 w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-white/10 bg-white dark:bg-[#0a0f1c] text-[14px] font-bold outline-none focus:ring-2 focus:ring-[#E5E7EB]"
                     />
                   </div>
                   <div>
-                    <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Safety Factor</label>
+                    <label className="text-[13px] font-semibold text-[#5B6472]">Safety Factor</label>
                     <input
                       type="number"
                       min="0"
                       step="0.1"
                       value={masterForm.safety_factor}
                       onChange={(e) => setMasterForm((prev) => ({ ...prev, safety_factor: e.target.value }))}
-                      className="mt-1 w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-white/10 bg-white dark:bg-[#0a0f1c] text-[11px] font-bold outline-none focus:ring-2 focus:ring-orange-500"
+                      className="mt-1 w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-white/10 bg-white dark:bg-[#0a0f1c] text-[14px] font-bold outline-none focus:ring-2 focus:ring-[#E5E7EB]"
                     />
                   </div>
                 </div>
@@ -1007,7 +1007,7 @@ export default function IMSFinal({ onBack }: { onBack: () => void }) {
                 <button
                   type="button"
                   onClick={() => setEditingItem(null)}
-                  className="px-5 py-2 rounded-xl text-xs font-black text-gray-500 uppercase tracking-widest hover:bg-white dark:hover:bg-[#111827] shadow-sm border border-gray-200 dark:border-white/10 transition-colors"
+                  className="px-5 py-2 rounded-xl text-[14px] font-semibold text-gray-500 hover:bg-white dark:hover:bg-[#111827] shadow-sm border border-gray-200 dark:border-white/10 transition-colors"
                 >
                   Cancel
                 </button>
@@ -1015,7 +1015,7 @@ export default function IMSFinal({ onBack }: { onBack: () => void }) {
                   type="button"
                   onClick={handleSaveMaster}
                   disabled={savingMaster}
-                  className="px-6 py-2 rounded-xl text-xs font-black text-white bg-orange-600 hover:bg-orange-700 uppercase tracking-widest shadow-lg disabled:opacity-50"
+                  className="px-6 py-2 rounded-xl text-[14px] font-semibold text-white bg-[#FEF3C7] hover:bg-[#FEF3C7] shadow-lg disabled:opacity-50"
                 >
                   Save Master
                 </button>

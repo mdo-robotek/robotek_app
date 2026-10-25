@@ -871,8 +871,8 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
   const SortIcon = ({ column }: { column: keyof Delegation }) => {
     if (sortConfig?.key !== column) return <div className="w-3 h-3 ml-1 opacity-20" />;
     return sortConfig.direction === 'asc' ? 
-      <ChevronUpIcon className="w-3 h-3 ml-1 text-[#FFD500]" /> : 
-      <ChevronDownIcon className="w-3 h-3 ml-1 text-[#FFD500]" />;
+      <ChevronUpIcon className="w-3 h-3 ml-1 text-[#2563EB]" /> : 
+      <ChevronDownIcon className="w-3 h-3 ml-1 text-[#2563EB]" />;
   };
 
   const togglePlay = () => {
@@ -935,7 +935,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
     }
 
     return (
-      <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-black uppercase tracking-widest rounded-md border ${config.color}`}>
+      <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-[13px] font-semibold   rounded-md border ${config.color}`}>
         <config.icon className="w-3 h-3" />
         {config.label}
       </span>
@@ -971,7 +971,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
     }
 
     return (
-      <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-black uppercase tracking-widest rounded-md border ${config.color}`}>
+      <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-[13px] font-semibold   rounded-md border ${config.color}`}>
         <config.icon className="w-3 h-3" />
         {config.label}
       </span>
@@ -980,7 +980,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
   const getDepartmentBadge = (dept: string) => {
     return (
-      <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-slate-50 text-slate-600 border border-slate-200 dark:bg-slate-900/40 dark:text-slate-400 dark:border-slate-800 text-[10px] font-black uppercase tracking-widest rounded-md">
+      <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-slate-50 text-slate-600 border border-slate-200 dark:bg-slate-900/40 dark:text-slate-400 dark:border-slate-800 text-[13px] font-semibold rounded-md">
         <TagIcon className="w-3 h-3" />
         {dept || "General"}
       </span>
@@ -990,7 +990,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
   const getEvidenceBadge = (evidence: string) => {
     const isYes = evidence?.toLowerCase() === 'yes';
     return (
-      <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-black uppercase tracking-widest rounded-md border ${
+      <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-[13px] font-semibold   rounded-md border ${
         isYes 
           ? "bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800"
           : "bg-gray-50 text-gray-600 border-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-700"
@@ -1008,14 +1008,14 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
     return (
       <div className="flex items-center gap-2">
-        <div className="w-7 h-7 rounded-full bg-[#003875]/10 dark:bg-[#FFD500]/10 border border-[#003875]/20 dark:border-[#FFD500]/20 flex items-center justify-center text-[10px] font-black text-[#003875] dark:text-[#FFD500] overflow-hidden shrink-0">
+        <div className="w-7 h-7 rounded-full bg-[#2563EB]/10 dark:bg-[#60A5FA]/10 border border-[#2563EB]/20 dark:border-[#60A5FA]/20 flex items-center justify-center text-[13px] font-semibold text-white dark:text-[#60A5FA] overflow-hidden shrink-0">
           {imageUrl ? (
             <img src={imageUrl} alt={username} className="w-full h-full object-cover" />
           ) : (
             initials
           )}
         </div>
-        <span className="text-xs font-black text-gray-800 dark:text-gray-200 truncate">{username || "—"}</span>
+        <span className="text-[14px] font-semibold text-gray-800 dark:text-gray-200 truncate">{username || "—"}</span>
       </div>
     );
   };
@@ -1031,24 +1031,24 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
         {/* Responsive Title Row */}
       <div className="flex flex-col lg:flex-row items-center gap-4 px-1">
         <div className="w-full lg:w-1/3 text-center lg:text-left min-w-0">
-          <h1 className="text-xl md:text-2xl font-black text-gray-900 dark:text-white tracking-tight truncate">Delegations</h1>
-          <p className="text-gray-500 dark:text-slate-300 font-bold text-[8px] md:text-[10px] uppercase tracking-wider truncate">Task Assignment System</p>
+          <h1 className="text-xl md:text-2xl font-semibold text-gray-900 dark:text-white tracking-tight truncate">Delegations</h1>
+          <p className="text-gray-500 dark:text-slate-300 font-bold text-[12px] md:text-[10px] tracking-wider truncate">Task Assignment System</p>
         </div>
         
         <div className="w-full lg:w-1/3 flex justify-center flex-shrink-0 min-w-0">
-          <div className="flex items-center gap-1.5 rounded-full border-2 border-b-4 border-[#003875] dark:border-[#FFD500] bg-white dark:bg-navy-800 shadow-sm transition-all active:translate-y-[2px] active:border-b-2 p-1 overflow-x-auto no-scrollbar max-w-full">
+          <div className="flex items-center gap-1.5 rounded-full border-2 border-b-4 border-[#2563EB] dark:border-[#60A5FA] bg-white dark:bg-navy-800 shadow-sm transition-all active:translate-y-[2px] active:border-b-2 p-1 overflow-x-auto no-scrollbar max-w-full">
           {/* View Toggle */}
           <div className="flex items-center bg-gray-100 dark:bg-navy-900 rounded-full p-0.5 mr-1">
             <button
               onClick={() => setViewMode('list')}
-              className={`p-1.5 rounded-full transition-all ${viewMode === 'list' ? 'bg-[#003875] text-white shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}
+              className={`p-1.5 rounded-full transition-all ${viewMode === 'list' ? 'bg-[#2563EB] text-white shadow-sm' : 'text-[#5B6472] hover:text-gray-600'}`}
               title="List View"
             >
               <ListBulletIcon className="w-3.5 h-3.5" />
             </button>
             <button
               onClick={() => setViewMode('tile')}
-              className={`p-1.5 rounded-full transition-all ${viewMode === 'tile' ? 'bg-[#003875] text-white shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}
+              className={`p-1.5 rounded-full transition-all ${viewMode === 'tile' ? 'bg-[#2563EB] text-white shadow-sm' : 'text-[#5B6472] hover:text-gray-600'}`}
               title="Tile View"
             >
               <Squares2X2Icon className="w-3.5 h-3.5" />
@@ -1059,7 +1059,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
           <button
             onClick={handleExport}
-            className="flex items-center justify-center gap-2 text-[#003875] dark:text-[#FFD500] px-3 md:px-5 py-2 font-black transition-colors hover:bg-gray-100 dark:hover:bg-navy-700 uppercase tracking-widest text-[9px] md:text-[10px] rounded-full whitespace-nowrap"
+            className="flex items-center justify-center gap-2 text-[#2563EB] dark:text-[#60A5FA] px-3 md:px-5 py-2 font-semibold transition-colors hover:bg-gray-100 dark:hover:bg-navy-700 text-[13px] md:text-[10px] rounded-full whitespace-nowrap"
             title="Export to CSV"
           >
             <ArrowDownTrayIcon className="w-4 h-4" />
@@ -1070,13 +1070,13 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
           <button
             onClick={setIsFilterModalOpen.bind(null, true)}
-            className="flex items-center justify-center gap-2 text-[#003875] dark:text-[#FFD500] px-3 md:px-5 py-2 font-black transition-colors hover:bg-gray-100 dark:hover:bg-navy-700 uppercase tracking-widest text-[9px] md:text-[10px] rounded-full whitespace-nowrap relative group"
+            className="flex items-center justify-center gap-2 text-[#2563EB] dark:text-[#60A5FA] px-3 md:px-5 py-2 font-semibold transition-colors hover:bg-gray-100 dark:hover:bg-navy-700 text-[13px] md:text-[10px] rounded-full whitespace-nowrap relative group"
             title="Advanced Filters"
           >
             <FunnelIcon className="w-4 h-4" />
             <span className="hidden sm:inline">Filter</span>
             {(modalStatusFilter.length > 0 || modalAssignedByFilter.length > 0 || modalAssignedToFilter.length > 0 || modalDepartmentFilter.length > 0 || modalPriorityFilter.length > 0 || filterStartDate || filterEndDate) && (
-              <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-[#CE2029] animate-pulse border-2 border-white dark:border-navy-800" />
+              <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-[#DC2626] animate-pulse border-2 border-white dark:border-navy-800" />
             )}
           </button>
 
@@ -1087,7 +1087,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
               resetForm();
               setIsModalOpen(true);
             }}
-            className="flex items-center justify-center hover:bg-gray-100 dark:hover:bg-navy-700 text-[#003875] dark:text-[#FFD500] px-3 py-2 transition-colors rounded-full"
+            className="flex items-center justify-center hover:bg-gray-100 dark:hover:bg-navy-700 text-[#2563EB] dark:text-[#60A5FA] px-3 py-2 transition-colors rounded-full"
             title="New Delegation"
           >
             <PlusIcon className="w-5 h-5" />
@@ -1134,15 +1134,15 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                   }
                   setCurrentPage(1);
                 }}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-[10px] font-black uppercase tracking-widest transition-all ${
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-[13px] font-semibold   transition-all ${
                   isActive 
-                    ? 'bg-[#003875] dark:bg-[#FFD500] text-white dark:text-black border-[#003875] dark:border-[#FFD500] shadow-md scale-105' 
+                    ? 'bg-[#2563EB] dark:bg-[#60A5FA] text-white dark:text-black border-[#2563EB] dark:border-[#60A5FA] shadow-md scale-105' 
                     : `${tile.color} hover:scale-[1.02] hover:shadow-sm`
                 }`}
               >
                 {tile.icon}
                 {tile.label}
-                <span className={`ml-1 px-1.5 py-0.5 rounded-full text-[9px] ${
+                <span className={`ml-1 px-1.5 py-0.5 rounded-full text-[13px] ${
                   isActive 
                     ? 'bg-white/20 dark:bg-black/20' 
                     : 'bg-black/5 dark:bg-white/10'
@@ -1165,34 +1165,34 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
             {/* Search & Assignment Row */}
             <div className="flex flex-row items-center gap-2 w-full lg:w-auto lg:flex-1 lg:max-w-md">
               <div className="relative group flex-1">
-                <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-[#FFD500] transition-colors" />
+                <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5B6472] group-focus-within:text-[#2563EB] transition-colors" />
                 <input
                   type="text"
                   placeholder="Search..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-9 pr-3 py-1.5 bg-gray-50 dark:bg-navy-900 border-2 border-gray-100 dark:border-navy-700/50 rounded-xl focus:border-[#FFD500] outline-none font-bold text-[11px] text-gray-700 dark:text-white transition-all shadow-sm"
+                  className="w-full pl-9 pr-3 py-1.5 bg-gray-50 dark:bg-navy-900 border-2 border-gray-100 dark:border-navy-700/50 rounded-xl focus:border-[#2563EB] outline-none font-bold text-[14px] text-gray-700 dark:text-white transition-all shadow-sm"
                 />
               </div>
 
               <div className="flex items-center bg-gray-50 dark:bg-navy-900 p-0.5 rounded-xl border border-gray-100 dark:border-white/5 shadow-sm shrink-0">
                 <button
                   onClick={() => { setAssignmentFilter(assignmentFilter === 'ToMe' ? 'All' : 'ToMe'); setCurrentPage(1); }}
-                  className={`px-2 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all flex items-center gap-1 ${assignmentFilter === 'ToMe' ? 'bg-[#003875] text-white shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                  className={`px-2 py-1 rounded-lg text-[13px] font-semibold   transition-all flex items-center gap-1 ${assignmentFilter === 'ToMe' ? 'bg-[#2563EB] text-white shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
                   title="To Me"
                 >
                   <span className="hidden xs:inline">To Me</span>
                   <span className="xs:hidden">To</span>
-                  <span className="text-[8px] opacity-70">{baseDelegations.filter(d => d.assigned_to === ((session?.user as any)?.username || "")).length}</span>
+                  <span className="text-[12px] opacity-70">{baseDelegations.filter(d => d.assigned_to === ((session?.user as any)?.username || "")).length}</span>
                 </button>
                 <button 
                   onClick={() => { setAssignmentFilter(assignmentFilter === 'ByMe' ? 'All' : 'ByMe'); setCurrentPage(1); }}
-                  className={`px-2 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all flex items-center gap-1 ${assignmentFilter === 'ByMe' ? 'bg-[#003875] text-white shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                  className={`px-2 py-1 rounded-lg text-[13px] font-semibold   transition-all flex items-center gap-1 ${assignmentFilter === 'ByMe' ? 'bg-[#2563EB] text-white shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
                   title="By Me"
                 >
                   <span className="hidden xs:inline">By Me</span>
                   <span className="xs:hidden">By</span>
-                  <span className="text-[8px] opacity-70">{baseDelegations.filter(d => d.assigned_by === ((session?.user as any)?.username || "")).length}</span>
+                  <span className="text-[12px] opacity-70">{baseDelegations.filter(d => d.assigned_by === ((session?.user as any)?.username || "")).length}</span>
                 </button>
               </div>
             </div>
@@ -1217,14 +1217,14 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                       setDateFilters(newFilters);
                       setCurrentPage(1);
                     }}
-                    className={`px-3 py-1.5 rounded-full border text-[10px] font-black uppercase tracking-widest transition-all h-[30px] flex items-center gap-1.5 whitespace-nowrap ${
+                    className={`px-3 py-1.5 rounded-full border text-[13px] font-semibold   transition-all h-[30px] flex items-center gap-1.5 whitespace-nowrap ${
                       isActive 
-                        ? 'bg-[#003875] dark:bg-[#FFD500] text-white dark:text-black border-[#003875] dark:border-[#FFD500] shadow-sm scale-105' 
+                        ? 'bg-[#2563EB] dark:bg-[#60A5FA] text-white dark:text-black border-[#2563EB] dark:border-[#60A5FA] shadow-sm scale-105' 
                         : `${f.color} hover:shadow-sm hover:scale-[1.02]`
                     }`}
                   >
                     {f.label}
-                    <span className={`px-1 py-0.5 rounded-full text-[9px] ${isActive ? 'bg-white/20 dark:bg-black/20' : 'bg-black/5 dark:bg-white/10'}`}>
+                    <span className={`px-1 py-0.5 rounded-full text-[13px] ${isActive ? 'bg-white/20 dark:bg-black/20' : 'bg-black/5 dark:bg-white/10'}`}>
                       {count}
                     </span>
                   </button>
@@ -1235,27 +1235,27 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
           <div className="flex flex-wrap items-center gap-3 md:gap-4">
             <div className="flex items-center gap-2">
-              <p className="text-[9px] md:text-[10px] font-black text-gray-400 uppercase tracking-widest whitespace-nowrap">
-                Page <span className="text-[#003875] dark:text-[#FFD500]">{currentPage}</span> of {totalPages || 1}
+              <p className="text-[13px] md:text-[10px] font-semibold text-[#5B6472] whitespace-nowrap">
+                Page <span className="text-[#2563EB] dark:text-[#60A5FA]">{currentPage}</span> of {totalPages || 1}
               </p>
               <div className="flex gap-0.5">
-                <button onClick={() => setCurrentPage(1)} disabled={currentPage === 1} className="px-1.5 py-1 text-[9px] md:text-[10px] font-bold text-gray-400 hover:text-black dark:hover:text-white hover:bg-white dark:hover:bg-white/5 disabled:opacity-30 rounded-md transition-all">First</button>
-                <button onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))} disabled={currentPage === 1} className="p-1 text-gray-400 hover:text-black dark:hover:text-white hover:bg-white dark:hover:bg-white/5 disabled:opacity-30 rounded-md transition-all">
+                <button onClick={() => setCurrentPage(1)} disabled={currentPage === 1} className="px-1.5 py-1 text-[13px] md:text-[10px] font-bold text-[#5B6472] hover:text-black dark:hover:text-white hover:bg-white dark:hover:bg-white/5 disabled:opacity-30 rounded-md transition-all">First</button>
+                <button onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))} disabled={currentPage === 1} className="p-1 text-[#5B6472] hover:text-black dark:hover:text-white hover:bg-white dark:hover:bg-white/5 disabled:opacity-30 rounded-md transition-all">
                   <ChevronLeftIcon className="w-3.5 h-3.5" />
                 </button>
-                <button onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))} disabled={currentPage === totalPages || totalPages === 0} className="p-1 text-gray-400 hover:text-black dark:hover:text-white hover:bg-white dark:hover:bg-white/5 disabled:opacity-30 rounded-md transition-all">
+                <button onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))} disabled={currentPage === totalPages || totalPages === 0} className="p-1 text-[#5B6472] hover:text-black dark:hover:text-white hover:bg-white dark:hover:bg-white/5 disabled:opacity-30 rounded-md transition-all">
                   <ChevronRightIcon className="w-3.5 h-3.5" />
                 </button>
-                <button onClick={() => setCurrentPage(totalPages)} disabled={currentPage === totalPages || totalPages === 0} className="px-1.5 py-1 text-[9px] md:text-[10px] font-bold text-gray-400 hover:text-black dark:hover:text-white hover:bg-white dark:hover:bg-white/5 disabled:opacity-30 rounded-md transition-all">Last</button>
+                <button onClick={() => setCurrentPage(totalPages)} disabled={currentPage === totalPages || totalPages === 0} className="px-1.5 py-1 text-[13px] md:text-[10px] font-bold text-[#5B6472] hover:text-black dark:hover:text-white hover:bg-white dark:hover:bg-white/5 disabled:opacity-30 rounded-md transition-all">Last</button>
               </div>
             </div>
             <div className="hidden xs:block h-4 w-[1px] bg-gray-200 dark:bg-white/10" />
             <div className="flex items-center gap-2">
-              <label className="text-[9px] md:text-[10px] font-black text-gray-400 uppercase tracking-widest">Show</label>
+              <label className="text-[13px] md:text-[10px] font-semibold text-[#5B6472]">Show</label>
               <select 
                 value={itemsPerPage}
                 onChange={(e) => { setItemsPerPage(Number(e.target.value)); setCurrentPage(1); }}
-                className="bg-transparent border-none p-0 text-[10px] font-bold outline-none dark:text-white cursor-pointer"
+                className="bg-transparent border-none p-0 text-[13px] font-bold outline-none dark:text-white cursor-pointer"
               >
                 <option value={10}>10</option>
                 <option value={25}>25</option>
@@ -1274,55 +1274,55 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
           >
             <table className="w-full text-left border-collapse table-auto min-w-[800px]">
               <thead>
-                <tr className="bg-[#003875] dark:bg-navy-950 text-white dark:text-slate-200 whitespace-nowrap">
-                  <th onClick={() => handleSort('id')} className="px-4 py-3 text-[10px] font-black uppercase tracking-widest cursor-pointer hover:bg-white/5 transition-colors text-center w-12">
+                <tr className="bg-[#2563EB] dark:bg-navy-950 text-white dark:text-slate-200 whitespace-nowrap">
+                  <th onClick={() => handleSort('id')} className="px-4 py-3 text-[13px] font-semibold cursor-pointer hover:bg-white/5 transition-colors text-center w-12">
                     <div className="flex items-center justify-center">ID <SortIcon column="id" /></div>
                   </th>
-                  <th onClick={() => handleSort('title')} className="px-4 py-3 text-[10px] font-black uppercase tracking-widest cursor-pointer hover:bg-white/5 transition-colors min-w-[200px]">
+                  <th onClick={() => handleSort('title')} className="px-4 py-3 text-[13px] font-semibold cursor-pointer hover:bg-white/5 transition-colors min-w-[200px]">
                     <div className="flex items-center">Title &amp; Desc <SortIcon column="title" /></div>
                   </th>
-                  <th onClick={() => handleSort('assigned_to')} className="px-4 py-3 text-[10px] font-black uppercase tracking-widest cursor-pointer hover:bg-white/5 transition-colors hidden sm:table-cell">
+                  <th onClick={() => handleSort('assigned_to')} className="px-4 py-3 text-[13px] font-semibold cursor-pointer hover:bg-white/5 transition-colors hidden sm:table-cell">
                     <div className="flex items-center">Assigned To <SortIcon column="assigned_to" /></div>
                   </th>
-                  <th onClick={() => handleSort('assigned_by')} className="px-4 py-3 text-[10px] font-black uppercase tracking-widest cursor-pointer hover:bg-white/5 transition-colors hidden sm:table-cell">
+                  <th onClick={() => handleSort('assigned_by')} className="px-4 py-3 text-[13px] font-semibold cursor-pointer hover:bg-white/5 transition-colors hidden sm:table-cell">
                     <div className="flex items-center">Assigned By <SortIcon column="assigned_by" /></div>
                   </th>
-                  <th onClick={() => handleSort('department')} className="px-4 py-3 text-[10px] font-black uppercase tracking-widest cursor-pointer hover:bg-white/5 transition-colors hidden md:table-cell">
+                  <th onClick={() => handleSort('department')} className="px-4 py-3 text-[13px] font-semibold cursor-pointer hover:bg-white/5 transition-colors hidden md:table-cell">
                     <div className="flex items-center">Dept <SortIcon column="department" /></div>
                   </th>
-                  <th onClick={() => handleSort('priority')} className="px-4 py-3 text-[10px] font-black uppercase tracking-widest cursor-pointer hover:bg-white/5 transition-colors hidden sm:table-cell">
+                  <th onClick={() => handleSort('priority')} className="px-4 py-3 text-[13px] font-semibold cursor-pointer hover:bg-white/5 transition-colors hidden sm:table-cell">
                     <div className="flex items-center">Priority <SortIcon column="priority" /></div>
                   </th>
-                  <th onClick={() => handleSort('status')} className="px-4 py-3 text-[10px] font-black uppercase tracking-widest cursor-pointer hover:bg-white/5 transition-colors">
+                  <th onClick={() => handleSort('status')} className="px-4 py-3 text-[13px] font-semibold cursor-pointer hover:bg-white/5 transition-colors">
                     <div className="flex items-center">Status <SortIcon column="status" /></div>
                   </th>
-                  <th onClick={() => handleSort('due_date')} className="px-4 py-3 text-[10px) font-black uppercase tracking-widest cursor-pointer hover:bg-white/5 transition-colors">
+                  <th onClick={() => handleSort('due_date')} className="px-4 py-3 text-[10px) font-semibold cursor-pointer hover:bg-white/5 transition-colors">
                     <div className="flex items-center">Due <SortIcon column="due_date" /></div>
                   </th>
-                  <th className="px-4 py-3 text-[10px) font-black uppercase tracking-widest text-right">Actions</th>
+                  <th className="px-4 py-3 text-[10px) font-semibold text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-white/10">
                 {isLoading ? (
                   <tr>
                     <td colSpan={9} className="px-4 py-10 text-center">
-                      <div className="w-6 h-6 border-2 border-gray-100 border-t-[#FFD500] rounded-full animate-spin mx-auto mb-2" />
-                      <p className="text-gray-400 font-bold uppercase tracking-widest text-[8px]">Syncing...</p>
+                      <div className="w-6 h-6 border-2 border-gray-100 border-t-[#2563EB] rounded-full animate-spin mx-auto mb-2" />
+                      <p className="text-[#5B6472] font-bold text-[12px]">Syncing...</p>
                     </td>
                   </tr>
                 ) : paginatedDelegations.length === 0 ? (
                   <tr>
-                    <td colSpan={9} className="px-4 py-10 text-center text-gray-400 text-xs">No delegations found</td>
+                    <td colSpan={9} className="px-4 py-10 text-center text-[#5B6472] text-[14px]">No delegations found</td>
                   </tr>
                 ) : (
                   paginatedDelegations.map((del) => (
-                    <tr key={del.id} className="hover:bg-orange-50/10 border-b-2 border-gray-200 dark:border-white/10 last:border-0 transition-colors group">
+                    <tr key={del.id} className="hover:bg-[#F7F8FA] border-b-2 border-gray-200 dark:border-white/10 last:border-0 transition-colors group">
                       <td className="px-4 py-3 text-center">
-                        <span className="font-mono text-[10px] text-gray-400 font-bold">#{del.id}</span>
+                        <span className="font-mono text-[13px] text-[#5B6472] font-bold">#{del.id}</span>
                       </td>
                       <td className="px-4 py-3">
-                        <p className="font-black text-xs text-gray-900 dark:text-white leading-tight">{del.title}</p>
-                        <p className="font-bold text-[10px] text-gray-500 dark:text-gray-400 leading-tight line-clamp-1 mt-0.5">{del.description}</p>
+                        <p className="font-semibold text-[14px] text-gray-900 dark:text-white leading-tight">{del.title}</p>
+                        <p className="font-bold text-[13px] text-gray-500 dark:text-gray-400 leading-tight line-clamp-1 mt-0.5">{del.description}</p>
                       </td>
                       <td className="px-4 py-3 hidden sm:table-cell">
                         {renderUserAvatar(del.assigned_to)}
@@ -1340,15 +1340,15 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                         {getStatusBadge(getDisplayStatus(del))}
                       </td>
                       <td className="px-4 py-3">
-                        <p className="text-[10px] md:text-xs font-bold text-gray-600 dark:text-slate-300">{formatDateDisplay(del.due_date) || "—"}</p>
+                        <p className="text-[13px] md:text-xs font-bold text-gray-600 dark:text-slate-300">{formatDateDisplay(del.due_date) || "—"}</p>
                       </td>
                       <td className="px-4 py-3 text-right">
                         <div className="flex items-center justify-end gap-1">
                           <button onClick={() => setSelectedTask(del)} className="p-1.5 bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400 hover:bg-emerald-600 hover:text-white dark:hover:bg-emerald-500 dark:hover:text-black rounded-lg transition-all" title="Follow Up"><ArrowTopRightOnSquareIcon className="w-3.5 h-3.5" /></button>
                           {(['ADMIN', 'EA'].includes(userRole?.toUpperCase()) || del.assigned_by === currentUser) && (
                             <>
-                              <button onClick={() => handleEdit(del)} className="p-1.5 bg-[#003875]/10 text-[#003875] dark:bg-[#FFD500]/10 dark:text-[#FFD500] hover:bg-[#003875] hover:text-white dark:hover:bg-[#FFD500] dark:hover:text-black rounded-lg transition-all" title="Edit"><PencilSquareIcon className="w-3.5 h-3.5" /></button>
-                              <button onClick={() => handleDeleteClick(del.id)} className="p-1.5 bg-[#CE2029]/10 text-[#CE2029] hover:bg-[#CE2029] hover:text-white rounded-lg transition-all" title="Delete"><TrashIcon className="w-3.5 h-3.5" /></button>
+                              <button onClick={() => handleEdit(del)} className="p-1.5 bg-[#2563EB]/10 text-white dark:bg-[#60A5FA]/10 dark:text-[#60A5FA] hover:bg-[#2563EB] hover:text-white dark:hover:bg-[#60A5FA] dark:hover:text-black rounded-lg transition-all" title="Edit"><PencilSquareIcon className="w-3.5 h-3.5" /></button>
+                              <button onClick={() => handleDeleteClick(del.id)} className="p-1.5 bg-[#DC2626]/10 text-[#DC2626] hover:bg-[#DC2626] hover:text-white rounded-lg transition-all" title="Delete"><TrashIcon className="w-3.5 h-3.5" /></button>
                             </>
                           )}
                         </div>
@@ -1364,13 +1364,13 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
           <div className="p-2 bg-gray-50/20 dark:bg-navy-950/20 min-h-[400px] w-full overflow-hidden">
             {isLoading ? (
               <div className="flex flex-col items-center justify-center py-20">
-                <div className="w-8 h-8 border-3 border-gray-100 border-t-[#FFD500] rounded-full animate-spin mb-4" />
-                <p className="text-gray-400 font-black uppercase tracking-widest text-[10px]">Syncing Delegations...</p>
+                <div className="w-8 h-8 border-3 border-gray-100 border-t-[#2563EB] rounded-full animate-spin mb-4" />
+                <p className="text-[#5B6472] font-semibold text-[13px]">Syncing Delegations...</p>
               </div>
             ) : paginatedDelegations.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-20 bg-white/50 dark:bg-navy-900/50 rounded-2xl border-2 border-dashed border-gray-200 dark:border-white/5">
                 <DocumentTextIcon className="w-10 h-10 text-gray-200 dark:text-white/10 mb-2" />
-                <p className="text-xs text-gray-400 font-bold uppercase tracking-widest">No delegations found</p>
+                <p className="text-[14px] text-[#5B6472] font-bold">No delegations found</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -1398,10 +1398,10 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                       <div className="p-3 md:p-4 border-b border-gray-50 dark:border-white/5 flex items-start justify-between gap-3 bg-gray-50/30 dark:bg-white/5">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1">
-                            <span className="font-mono text-[9px] font-black text-[#003875] dark:text-[#FFD500] bg-[#003875]/5 dark:bg-[#FFD500]/10 px-1.5 py-0.5 rounded">#{del.id}</span>
+                            <span className="font-mono text-[13px] font-semibold text-white dark:text-white bg-[#2563EB]/5 dark:bg-[#60A5FA]/10 px-1.5 py-0.5 rounded">#{del.id}</span>
                             {getPriorityBadge(del.priority)}
                           </div>
-                          <h3 className="font-black text-sm text-gray-900 dark:text-white leading-tight line-clamp-2 uppercase tracking-wide group-hover:text-[#003875] dark:group-hover:text-[#FFD500] transition-colors">{del.title}</h3>
+                          <h3 className="font-semibold text-sm text-gray-900 dark:text-white leading-tight line-clamp-2 tracking-wide group-hover:text-[#2563EB] dark:group-hover:text-[#60A5FA] transition-colors">{del.title}</h3>
                         </div>
                         <div className="flex-shrink-0">
                           {getStatusBadge(status)}
@@ -1410,28 +1410,28 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
                       {/* Card Body */}
                       <div className="p-3 md:p-4 flex-1 flex flex-col gap-4">
-                        <p className="text-[11px] font-bold text-gray-500 dark:text-gray-400 leading-relaxed line-clamp-3">
+                        <p className="text-[14px] font-bold text-gray-500 dark:text-gray-400 leading-relaxed line-clamp-3">
                           {del.description || "No description provided."}
                         </p>
 
                         <div className="grid grid-cols-2 gap-3 mt-auto pt-4 border-t border-gray-50 dark:border-white/5">
                           <div className="flex flex-col gap-1 overflow-hidden">
-                            <span className="text-[8px] font-black text-gray-400 uppercase tracking-widest">Assigned To</span>
-                            <span className="text-[10px] font-black text-gray-800 dark:text-gray-200 truncate">{del.assigned_to || "—"}</span>
+                            <span className="text-[12px] font-semibold text-[#5B6472]">Assigned To</span>
+                            <span className="text-[13px] font-semibold text-gray-800 dark:text-gray-200 truncate">{del.assigned_to || "—"}</span>
                           </div>
                           <div className="flex flex-col gap-1 overflow-hidden">
-                            <span className="text-[8px] font-black text-gray-400 uppercase tracking-widest">Dept</span>
+                            <span className="text-[12px] font-semibold text-[#5B6472]">Dept</span>
                             <div className="scale-75 origin-left">
                               {getDepartmentBadge(del.department)}
                             </div>
                           </div>
                           <div className="flex flex-col gap-1 overflow-hidden">
-                            <span className="text-[8px] font-black text-gray-400 uppercase tracking-widest">Due Date</span>
-                            <span className="text-[10px] font-black text-gray-700 dark:text-slate-300 truncate">{formatDateDisplay(del.due_date) || "—"}</span>
+                            <span className="text-[12px] font-semibold text-[#5B6472]">Due Date</span>
+                            <span className="text-[13px] font-semibold text-gray-700 dark:text-slate-300 truncate">{formatDateDisplay(del.due_date) || "—"}</span>
                           </div>
                           <div className="flex flex-col gap-1 overflow-hidden">
-                            <span className="text-[8px] font-black text-gray-400 uppercase tracking-widest">Assigned By</span>
-                            <span className="text-[10px] font-bold text-gray-500 dark:text-gray-400 truncate">{del.assigned_by || "—"}</span>
+                            <span className="text-[12px] font-semibold text-[#5B6472]">Assigned By</span>
+                            <span className="text-[13px] font-bold text-gray-500 dark:text-gray-400 truncate">{del.assigned_by || "—"}</span>
                           </div>
                         </div>
                       </div>
@@ -1440,7 +1440,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                       <div className="p-2 md:p-3 bg-gray-50/50 dark:bg-white/5 border-t border-gray-50 dark:border-white/5 flex items-center justify-between gap-2">
                          <button
                             onClick={() => setSelectedTask(del)}
-                            className="flex-1 flex items-center justify-center gap-1.5 py-2 px-2 bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400 hover:bg-emerald-600 hover:text-white dark:hover:bg-emerald-500 dark:hover:text-black rounded-xl transition-all font-black text-[9px] uppercase tracking-widest whitespace-nowrap overflow-hidden"
+                            className="flex-1 flex items-center justify-center gap-1.5 py-2 px-2 bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400 hover:bg-emerald-600 hover:text-white dark:hover:bg-emerald-500 dark:hover:text-black rounded-xl transition-all font-semibold text-[13px] whitespace-nowrap overflow-hidden"
                           >
                             <ArrowTopRightOnSquareIcon className="w-3.5 h-3.5 flex-shrink-0" />
                             <span className="truncate">Follow Up</span>
@@ -1450,14 +1450,14 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                               <>
                                 <button
                                   onClick={() => handleEdit(del)}
-                                  className="p-1.5 bg-[#003875]/10 text-[#003875] dark:bg-[#FFD500]/10 dark:text-[#FFD500] hover:bg-[#003875] hover:text-white dark:hover:bg-[#FFD500] dark:hover:text-black rounded-xl transition-all"
+                                  className="p-1.5 bg-[#2563EB]/10 text-white dark:bg-[#60A5FA]/10 dark:text-[#60A5FA] hover:bg-[#2563EB] hover:text-white dark:hover:bg-[#60A5FA] dark:hover:text-black rounded-xl transition-all"
                                   title="Edit"
                                 >
                                   <PencilSquareIcon className="w-4 h-4" />
                                 </button>
                                 <button
                                   onClick={() => handleDeleteClick(del.id)}
-                                  className="p-1.5 bg-[#CE2029]/10 text-[#CE2029] hover:bg-[#CE2029] hover:text-white rounded-xl transition-all"
+                                  className="p-1.5 bg-[#DC2626]/10 text-[#DC2626] hover:bg-[#DC2626] hover:text-white rounded-xl transition-all"
                                   title="Delete"
                                 >
                                   <TrashIcon className="w-4 h-4" />
@@ -1487,17 +1487,17 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
             {/* Sidebar Content */}
             <div className="relative h-full w-full max-w-md bg-white dark:bg-navy-900 shadow-[-20px_0_50px_-12px_rgba(0,0,0,0.3)] flex flex-col animate-in slide-in-from-right duration-500 border-l border-gray-100 dark:border-white/5">
               {/* Header */}
-              <div className="py-3 px-4 md:px-6 flex items-start justify-between bg-[#CE2029] shadow-xl shadow-red-900/20">
+              <div className="py-3 px-4 md:px-6 flex items-start justify-between bg-[#DC2626] shadow-xl shadow-red-900/20">
                 <div className="flex items-start gap-4 flex-1 min-w-0">
                   <div className="p-2.5 bg-white/10 rounded-xl text-white backdrop-blur-md border border-white/20 shrink-0 mt-1">
                     <ArrowPathIcon className="w-6 h-6 animate-spin-slow" />
                   </div>
                   <div className="flex-1 min-w-0 py-1">
                     <div className="flex items-center gap-2 mb-1">
-                      <h2 className="text-xl font-black text-white tracking-tight">Follow Up</h2>
-                      <span className="text-[10px] font-mono text-white bg-white/10 px-2 py-0.5 rounded border border-white/20 uppercase tracking-widest font-black shrink-0">#{selectedTask.id}</span>
+                      <h2 className="text-xl font-semibold text-white tracking-tight">Follow Up</h2>
+                      <span className="text-[13px] font-mono text-white bg-white/10 px-2 py-0.5 rounded border border-white/20 font-semibold shrink-0">#{selectedTask.id}</span>
                     </div>
-                    <p className="text-[10px] font-black text-white/90 uppercase tracking-widest leading-normal break-words">
+                    <p className="text-[13px] font-semibold text-white/90 leading-normal break-words">
                       {selectedTask.title}
                     </p>
                   </div>
@@ -1532,21 +1532,21 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                   {/* Row 1: Stakeholders */}
                   <div className="grid grid-cols-2">
                     <div className="p-3 border-r border-gray-100 dark:border-white/5 flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-gray-900 dark:bg-[#FFD500] flex items-center justify-center text-white dark:text-black text-[10px] font-black">
+                      <div className="w-8 h-8 rounded-lg bg-gray-900 dark:bg-[#60A5FA] flex items-center justify-center text-white dark:text-black text-[13px] font-semibold">
                         {selectedTask.assigned_to?.substring(0, 2).toUpperCase() || "TO"}
                       </div>
                       <div>
-                        <p className="text-[8px] font-black text-gray-400 uppercase tracking-tighter leading-none mb-1">Assigned To</p>
-                        <p className="text-xs font-black text-gray-900 dark:text-white truncate max-w-[120px]">{selectedTask.assigned_to}</p>
+                        <p className="text-[12px] font-semibold text-[#5B6472] tracking-tighter leading-none mb-1">Assigned To</p>
+                        <p className="text-[14px] font-semibold text-gray-900 dark:text-white truncate max-w-[120px]">{selectedTask.assigned_to}</p>
                       </div>
                     </div>
                     <div className="p-3 flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-gray-200 dark:bg-white/10 flex items-center justify-center text-gray-500 dark:text-gray-400 text-[10px] font-black">
+                      <div className="w-8 h-8 rounded-lg bg-gray-200 dark:bg-white/10 flex items-center justify-center text-gray-500 dark:text-gray-400 text-[13px] font-semibold">
                         {selectedTask.assigned_by?.substring(0, 2).toUpperCase() || "BY"}
                       </div>
                       <div>
-                        <p className="text-[8px] font-black text-gray-400 uppercase tracking-tighter leading-none mb-1">Assigned By</p>
-                        <p className="text-xs font-bold text-gray-600 dark:text-slate-400 truncate max-w-[120px]">{selectedTask.assigned_by}</p>
+                        <p className="text-[12px] font-semibold text-[#5B6472] tracking-tighter leading-none mb-1">Assigned By</p>
+                        <p className="text-[14px] font-bold text-gray-600 dark:text-slate-400 truncate max-w-[120px]">{selectedTask.assigned_by}</p>
                       </div>
                     </div>
                   </div>
@@ -1558,8 +1558,8 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                         <TagIcon className="w-4 h-4" />
                       </div>
                       <div>
-                        <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">Department</p>
-                        <p className="text-xs font-black text-gray-900 dark:text-white">{selectedTask.department}</p>
+                        <p className="text-[12px] font-semibold text-[#5B6472] leading-none mb-1">Department</p>
+                        <p className="text-[14px] font-semibold text-gray-900 dark:text-white">{selectedTask.department}</p>
                       </div>
                     </div>
                     <div className="p-3 flex items-center gap-3">
@@ -1567,8 +1567,8 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                         <CalendarDaysIcon className="w-4 h-4" />
                       </div>
                       <div>
-                        <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">Due Date</p>
-                        <p className="text-xs font-black text-gray-900 dark:text-white">{formatDateDisplay(selectedTask.due_date)}</p>
+                        <p className="text-[12px] font-semibold text-[#5B6472] leading-none mb-1">Due Date</p>
+                        <p className="text-[14px] font-semibold text-gray-900 dark:text-white">{formatDateDisplay(selectedTask.due_date)}</p>
                       </div>
                     </div>
                   </div>
@@ -1580,8 +1580,8 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                         <ClockIcon className="w-4 h-4" />
                       </div>
                       <div>
-                        <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">Registered</p>
-                        <p className="text-[10px] font-bold text-gray-600 dark:text-slate-400">{formatDateDisplay(selectedTask.created_at)}</p>
+                        <p className="text-[12px] font-semibold text-[#5B6472] leading-none mb-1">Registered</p>
+                        <p className="text-[13px] font-bold text-gray-600 dark:text-slate-400">{formatDateDisplay(selectedTask.created_at)}</p>
                       </div>
                     </div>
                     {selectedTask.updated_at && (
@@ -1590,8 +1590,8 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                           <ArrowPathIcon className="w-4 h-4" />
                         </div>
                         <div>
-                          <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">Updated</p>
-                          <p className="text-[10px] font-bold text-gray-600 dark:text-slate-400">{formatDateDisplay(selectedTask.updated_at)}</p>
+                          <p className="text-[12px] font-semibold text-[#5B6472] leading-none mb-1">Updated</p>
+                          <p className="text-[13px] font-bold text-gray-600 dark:text-slate-400">{formatDateDisplay(selectedTask.updated_at)}</p>
                         </div>
                       </div>
                     )}
@@ -1603,7 +1603,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                   <div className="col-span-4">
                     {selectedTask.voice_note_url ? (
                       <div className="p-4 bg-red-50/30 dark:bg-red-900/10 rounded-2xl border border-red-100/50 dark:border-red-900/30 overflow-hidden relative group transition-all duration-300 h-full">
-                        <h4 className="text-[9px] font-black text-red-600 dark:text-red-400 uppercase tracking-widest mb-3 flex items-center gap-2 relative z-10">
+                        <h4 className="text-[13px] font-semibold text-red-600 dark:text-red-400 mb-3 flex items-center gap-2 relative z-10">
                             <MicrophoneIcon className="w-4 h-4" /> Voice Briefing
                             {isPlaying && <span className="flex h-2 w-2 rounded-full bg-red-500 animate-ping"></span>}
                         </h4>
@@ -1640,8 +1640,8 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                                 className="w-full h-1 bg-gray-200 dark:bg-white/10 rounded-lg appearance-none cursor-pointer accent-red-500"
                               />
                               <div className="flex justify-between mt-1.5">
-                                <span className="text-[9px] font-mono text-gray-500 dark:text-gray-400 font-bold">{formatAudioTime(audioCurrentTime)}</span>
-                                <span className="text-[9px] font-mono text-gray-400 font-bold">{formatAudioTime(audioDuration)}</span>
+                                <span className="text-[13px] font-mono text-gray-500 dark:text-gray-400 font-bold">{formatAudioTime(audioCurrentTime)}</span>
+                                <span className="text-[13px] font-mono text-[#5B6472] font-bold">{formatAudioTime(audioDuration)}</span>
                               </div>
                             </div>
                           </div>
@@ -1662,8 +1662,8 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                       </div>
                     ) : (
                       <div className="p-4 bg-red-50/10 dark:bg-red-950/5 rounded-2xl border border-dashed border-red-100 dark:border-red-900/20 text-center flex flex-col items-center justify-center h-full">
-                        <MicrophoneIcon className="w-6 h-6 text-gray-300 mb-2" />
-                        <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">No Voice note</p>
+                        <MicrophoneIcon className="w-6 h-6 text-[#5B6472] mb-2" />
+                        <p className="text-[13px] font-semibold text-[#5B6472]">No Voice note</p>
                       </div>
                     )}
                   </div>
@@ -1693,13 +1693,13 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                              <PaperClipIcon className="w-5 h-5 text-red-500" />
                           )}
                         </div>
-                        <p className="text-[8px] font-black uppercase tracking-tighter text-red-600 dark:text-red-400 text-center">Open Doc</p>
+                        <p className="text-[12px] font-semibold tracking-tighter text-red-600 dark:text-red-400 text-center">Open Doc</p>
                       </a>
                     ) : (
 
                       <div className="p-4 bg-red-50/10 dark:bg-red-950/5 rounded-2xl border border-dashed border-red-100 dark:border-red-900/20 text-center flex flex-col items-center justify-center h-full">
-                        <PaperClipIcon className="w-6 h-6 text-gray-300 mb-2" />
-                        <p className="text-[8px] font-black text-gray-400 uppercase tracking-tighter">No Doc</p>
+                        <PaperClipIcon className="w-6 h-6 text-[#5B6472] mb-2" />
+                        <p className="text-[12px] font-semibold text-[#5B6472] tracking-tighter">No Doc</p>
                       </div>
                     )}
                   </div>
@@ -1708,7 +1708,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                 {/* Status Update & Remarks Section */}
                 <div className="space-y-6 border-t border-gray-100 dark:border-white/5 pt-6 pb-2">
                   <div className="w-full">
-                    <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-4 flex items-center gap-2 px-1">
+                    <h4 className="text-[13px] font-semibold text-[#5B6472] mb-4 flex items-center gap-2 px-1">
                       <BoltIcon className="w-4 h-4 text-amber-500" /> Quick Status Update
                     </h4>
                     <div className="grid grid-cols-3 gap-1.5">
@@ -1725,9 +1725,9 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                         <button
                           key={item.label}
                           onClick={() => setUpdatingStatus(item.label === updatingStatus ? "" : item.label)}
-                          className={`flex items-center gap-1.5 px-2 py-2 rounded-xl text-[9px] font-black uppercase tracking-tight border transition-all ${
+                          className={`flex items-center gap-1.5 px-2 py-2 rounded-xl text-[13px] font-semibold  tracking-tight border transition-all ${
                             updatingStatus === item.label
-                              ? 'bg-[#CE2029] text-white border-[#CE2029] shadow-lg shadow-red-500/30 scale-[1.02]'
+                              ? 'bg-[#DC2626] text-white border-[#DC2626] shadow-lg shadow-red-500/30 scale-[1.02]'
                               : `${item.color} hover:scale-[1.02]`
                           }`}
                         >
@@ -1741,24 +1741,24 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                   {/* Conditional: Revised Due Date */}
                   {['Need Revision', 'Hold', 'Re-Open'].includes(updatingStatus) && (
                     <div className="animate-in fade-in slide-in-from-top-2 duration-300">
-                      <label className="text-[9px] font-black text-red-600 dark:text-red-400 uppercase tracking-widest mb-1.5 block">Revised Due Date & Time</label>
+                      <label className="text-[13px] font-semibold text-red-600 dark:text-red-400 mb-1.5 block">Revised Due Date & Time</label>
                       <div className="relative group/date">
                         <input
                           type="datetime-local"
                           value={revisedDueDate}
                           onChange={(e) => setRevisedDueDate(e.target.value)}
-                          className="w-full px-4 py-2.5 bg-red-50/30 dark:bg-red-900/10 border border-red-100 dark:border-red-900/30 rounded-xl text-xs dark:text-white outline-none focus:ring-2 focus:ring-red-500/50 appearance-none cursor-pointer transition-all hover:bg-red-50 dark:hover:bg-red-900/20 font-bold"
+                          className="w-full px-4 py-2.5 bg-red-50/30 dark:bg-red-900/10 border border-red-100 dark:border-red-900/30 rounded-xl text-[14px] dark:text-white outline-none focus:ring-2 focus:ring-red-500/50 appearance-none cursor-pointer transition-all hover:bg-red-50 dark:hover:bg-red-900/20 font-bold"
                         />
                         <CalendarDaysIcon className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-red-400 pointer-events-none group-hover/date:scale-110 transition-transform" />
                       </div>
-                      <p className="text-[7px] text-gray-400 mt-1 font-bold italic tracking-tighter">* Set the new target completion time</p>
+                      <p className="text-[12px] text-[#5B6472] mt-1 font-bold italic tracking-tighter">* Set the new target completion time</p>
                     </div>
                   )}
 
                   {/* Conditional: Evidence Upload */}
                   {updatingStatus === 'Completed' && selectedTask.evidence_required === 'Yes' && (
                     <div className="animate-in fade-in slide-in-from-top-2 duration-300">
-                      <label className="text-[9px] font-black text-red-600 dark:text-red-400 uppercase tracking-widest mb-1.5 block">Upload Evidence (Required)</label>
+                      <label className="text-[13px] font-semibold text-red-600 dark:text-red-400 mb-1.5 block">Upload Evidence (Required)</label>
                       <div className="relative group/file">
                         <input
                           type="file"
@@ -1768,7 +1768,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                         />
                         <label
                           htmlFor="evidence-upload"
-                          className="w-full flex items-center justify-between px-4 py-2.5 bg-red-50/30 dark:bg-red-900/10 border border-dashed border-red-200 dark:border-red-900/30 rounded-xl text-xs text-red-600 dark:text-red-400 cursor-pointer hover:bg-red-50 transition-colors"
+                          className="w-full flex items-center justify-between px-4 py-2.5 bg-red-50/30 dark:bg-red-900/10 border border-dashed border-red-200 dark:border-red-900/30 rounded-xl text-[14px] text-red-600 dark:text-red-400 cursor-pointer hover:bg-red-50 transition-colors"
                         >
                           <span className="truncate">{evidenceFile?.name || "Select performance proof..."}</span>
                           <PaperClipIcon className="w-4 h-4" />
@@ -1780,12 +1780,12 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                   {/* Optional Reason for status change */}
                   {updatingStatus && (
                     <div className="animate-in fade-in slide-in-from-top-2 duration-300">
-                      <label className="text-[9px] font-black text-red-600 dark:text-red-400 uppercase tracking-widest mb-1.5 block">Reason for Status Change</label>
+                      <label className="text-[13px] font-semibold text-red-600 dark:text-red-400 mb-1.5 block">Reason for Status Change</label>
                       <textarea
                         value={revisionReason}
                         onChange={(e) => setRevisionReason(e.target.value)}
                         placeholder="Explain why this status change is happening..."
-                        className="w-full px-4 py-2 bg-red-50/30 dark:bg-red-900/10 border border-red-100 dark:border-red-900/30 rounded-xl text-xs dark:text-white outline-none focus:ring-2 focus:ring-red-500/50 min-h-[80px] resize-none"
+                        className="w-full px-4 py-2 bg-red-50/30 dark:bg-red-900/10 border border-red-100 dark:border-red-900/30 rounded-xl text-[14px] dark:text-white outline-none focus:ring-2 focus:ring-red-500/50 min-h-[80px] resize-none"
                       />
                     </div>
                   )}
@@ -1793,14 +1793,14 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                   {/* Remarks Input - Only show if NO status is being updated */}
                   {!updatingStatus && (
                     <div className="pt-2 animate-in fade-in slide-in-from-top-2 duration-300">
-                      <h4 className="text-[10px] font-black text-red-600 dark:text-red-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                      <h4 className="text-[13px] font-semibold text-red-600 dark:text-red-400 mb-3 flex items-center gap-2">
                         <DocumentTextIcon className="w-4 h-4" /> New Remark
                       </h4>
                       <textarea
                         value={remarkText}
                         onChange={(e) => setRemarkText(e.target.value)}
                         placeholder="Type a internal contextual remark..."
-                        className="w-full px-4 py-2 bg-red-50/30 dark:bg-red-900/10 border border-red-100 dark:border-red-900/30 rounded-xl text-xs dark:text-white outline-none focus:ring-2 focus:ring-red-500/50 min-h-[80px] resize-none"
+                        className="w-full px-4 py-2 bg-red-50/30 dark:bg-red-900/10 border border-red-100 dark:border-red-900/30 rounded-xl text-[14px] dark:text-white outline-none focus:ring-2 focus:ring-red-500/50 min-h-[80px] resize-none"
                       />
                     </div>
                   )}
@@ -1808,14 +1808,14 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
                 {/* History Timeline Tracking */}
                 <div className="pt-8 border-t border-gray-100 dark:border-white/5 pb-10 w-full">
-                  <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-6 flex items-center gap-2 px-1">
+                  <h4 className="text-[13px] font-semibold text-[#5B6472] mb-6 flex items-center gap-2 px-1">
                     <ClockIcon className="w-4 h-4 text-blue-500" /> Activity History
                   </h4>
                   
                   {isLoadingHistory ? (
                     <div className="flex flex-col items-center justify-center py-8 opacity-40">
                       <ArrowPathIcon className="w-6 h-6 animate-spin mb-2" />
-                      <p className="text-[10px] font-bold uppercase tracking-widest">Fetching history...</p>
+                      <p className="text-[13px] font-bold">Fetching history...</p>
                     </div>
                   ) : taskHistory.length > 0 ? (
                     <div className="relative pl-6 space-y-6 before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-[2px] before:bg-gray-100 dark:before:bg-white/5">
@@ -1827,21 +1827,21 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                           
                           <div className="flex flex-col gap-1">
                             <div className="flex items-center justify-between">
-                              <span className="text-[10px] font-black text-gray-900 dark:text-white uppercase tracking-tight">
+                              <span className="text-[13px] font-semibold text-gray-900 dark:text-white tracking-tight">
                                 {item.type === 'remark' ? item.username : `Status -> ${item.new_status}`}
                               </span>
-                              <span className="text-[8px] font-bold text-gray-400">{formatDateDisplay(item.created_at)}</span>
+                              <span className="text-[12px] font-bold text-[#5B6472]">{formatDateDisplay(item.created_at)}</span>
                             </div>
                             
                             {item.type === 'remark' ? (
-                              <p className="text-xs text-gray-600 dark:text-slate-400 leading-relaxed font-medium bg-blue-50/30 dark:bg-blue-900/5 p-3 rounded-xl border border-blue-100/30 dark:border-blue-900/20 italic">
+                              <p className="text-[14px] text-gray-600 dark:text-slate-400 leading-relaxed font-medium bg-blue-50/30 dark:bg-blue-900/5 p-3 rounded-xl border border-blue-100/30 dark:border-blue-900/20 italic">
                                 "{item.remark}"
                               </p>
                             ) : (
-                              <div className="text-[10px] text-gray-500 dark:text-slate-500 bg-amber-50/30 dark:bg-amber-900/5 p-3 rounded-xl border border-amber-100/30 dark:border-amber-900/20">
+                              <div className="text-[13px] text-gray-500 dark:text-slate-500 bg-amber-50/30 dark:bg-amber-900/5 p-3 rounded-xl border border-amber-100/30 dark:border-amber-900/20">
                                 {item.reason && <p className="font-bold text-gray-700 dark:text-slate-300 mb-1">Reason: {item.reason}</p>}
                                 <div className="flex flex-wrap gap-x-4 gap-y-1 opacity-80">
-                                  <span>From: <b className="text-[#CE2029]">{item.old_status}</b></span>
+                                  <span>From: <b className="text-[#DC2626]">{item.old_status}</b></span>
                                   {item.old_due_date !== item.new_due_date && (
                                     <span>Due Date: <b className="text-emerald-600">{formatDateDisplay(item.new_due_date)}</b></span>
                                   )}
@@ -1850,7 +1850,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                                   <a 
                                     href={item.evidence_urls.startsWith('http') ? item.evidence_urls : `https://drive.google.com/file/d/${item.evidence_urls}/view`} 
                                     target="_blank" 
-                                    className="mt-2 inline-flex items-center gap-1.5 text-[9px] font-black text-amber-600 uppercase tracking-widest hover:underline"
+                                    className="mt-2 inline-flex items-center gap-1.5 text-[13px] font-semibold text-amber-600 hover:underline"
                                   >
                                     <PaperClipIcon className="w-3 h-3" /> View Evidence Attachment
                                   </a>
@@ -1864,7 +1864,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                   ) : (
                     <div className="text-center py-8 opacity-30 select-none">
                       <SparklesIconOutline className="w-8 h-8 mx-auto mb-2" />
-                      <p className="text-[10px] font-black uppercase tracking-widest">No history yet</p>
+                      <p className="text-[13px] font-semibold">No history yet</p>
                     </div>
                   )}
                 </div>
@@ -1875,8 +1875,8 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                 <button
                   onClick={handleUpdateStatus}
                   disabled={!updatingStatus || isSubmittingUpdate}
-                  className="w-[70%] px-4 py-3.5 bg-[#CE2029] hover:bg-red-700 disabled:bg-gray-300 text-white rounded-2xl text-[12px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 active:scale-95 no-underline border-none"
-                  style={{ backgroundColor: '#CE2029' }}
+                  className="w-[70%] px-4 py-3.5 bg-[#DC2626] hover:bg-red-700 disabled:bg-gray-300 text-white rounded-2xl text-[14px] font-semibold transition-all flex items-center justify-center gap-2 active:scale-95 no-underline border-none"
+                  style={{ backgroundColor: '#DC2626' }}
                 >
                   {isSubmittingUpdate && updatingStatus ? (
                     <ArrowPathIcon className="w-5 h-5 animate-spin" />
@@ -1888,8 +1888,8 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                 <button
                   onClick={handleAddRemark}
                   disabled={!remarkText.trim() || isSubmittingUpdate}
-                  className="w-[30%] px-4 py-3.5 bg-[#FFD500] hover:bg-yellow-500 disabled:bg-gray-300 text-navy-900 rounded-2xl text-[12px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 active:scale-95 no-underline border-none"
-                  style={{ backgroundColor: '#FFD500' }}
+                  className="w-[30%] px-4 py-3.5 bg-[#2563EB] hover:bg-yellow-500 disabled:bg-gray-300 text-navy-900 rounded-2xl text-[14px] font-semibold transition-all flex items-center justify-center gap-2 active:scale-95 no-underline border-none"
+                  style={{ backgroundColor: '#2563EB' }}
                 >
                   {isSubmittingUpdate && remarkText.trim() ? (
                     <ArrowPathIcon className="w-5 h-5 animate-spin" />
@@ -1909,16 +1909,16 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
           <Portal>
           <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4">
             <div className="absolute inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-sm" onClick={() => setIsModalOpen(false)} />
-            <div className="relative bg-[#FFFBF0] dark:bg-navy-900 w-full max-w-3xl rounded-2xl shadow-2xl border border-orange-100/50 dark:border-white/10 overflow-hidden animate-in fade-in zoom-in duration-300">
-              <div className="p-4 border-b border-orange-100/50 dark:border-zinc-800 flex items-center justify-between">
+            <div className="relative bg-[#FFFFFF] dark:bg-navy-900 w-full max-w-3xl rounded-2xl shadow-2xl border border-[#E5E7EB] dark:border-white/10 overflow-hidden animate-in fade-in zoom-in duration-300">
+              <div className="p-4 border-b border-[#E5E7EB] dark:border-zinc-800 flex items-center justify-between">
                 <div>
-                  <h2 className="text-lg font-black text-gray-900 dark:text-white tracking-tight">
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white tracking-tight">
                     {editingDelegation ? "Edit Delegation" : "Create Delegation"}
                   </h2>
                   <div className="flex items-center gap-2 mt-1">
-                    <p className="text-gray-400 dark:text-slate-400 font-bold text-[8px] uppercase tracking-widest">Task Configuration</p>
+                    <p className="text-[#5B6472] dark:text-slate-400 font-bold text-[12px]">Task Configuration</p>
                     {editingDelegation && (
-                      <span className="px-2 py-0.5 bg-orange-50 dark:bg-zinc-800 text-[8px] font-black text-gray-500 rounded border border-orange-100 dark:border-zinc-700">
+                      <span className="px-2 py-0.5 bg-[#F7F8FA] dark:bg-zinc-800 text-[12px] font-semibold text-gray-500 rounded border border-[#E5E7EB] dark:border-zinc-700">
                         ID: {editingDelegation?.id}
                       </span>
                     )}
@@ -1926,7 +1926,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                 </div>
                 <button
                   onClick={() => setIsModalOpen(false)}
-                  className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-zinc-200 transition-colors"
+                  className="p-2 text-[#5B6472] hover:text-gray-600 dark:hover:text-zinc-200 transition-colors"
                 >
                   <XMarkIcon className="w-8 h-8" />
                 </button>
@@ -1936,23 +1936,23 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                 
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black text-[#FFD500] uppercase tracking-widest block">Task Title</label>
+                    <label className="text-[13px] font-semibold text-[#2563EB] block">Task Title</label>
                     <input
                       type="text"
                       value={formData.title}
                       onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                      className="w-full bg-[#FFFBF0] dark:bg-zinc-900 px-3 py-2 rounded-lg border border-orange-100 dark:border-zinc-800 focus:border-[#FFD500] focus:bg-white dark:focus:bg-zinc-900 outline-none font-black text-sm text-gray-900 dark:text-white transition-all shadow-sm"
+                      className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-3 py-2 rounded-lg border border-[#E5E7EB] dark:border-zinc-800 focus:border-[#2563EB] focus:bg-white dark:focus:bg-zinc-900 outline-none font-semibold text-sm text-gray-900 dark:text-white transition-all shadow-sm"
                       required
                       placeholder="Brief title for this delegation..."
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block">Description / Task Details</label>
+                    <label className="text-[13px] font-semibold text-[#5B6472] block">Description / Task Details</label>
                     <textarea
                       value={formData.description}
                       onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                      className="w-full bg-[#FFFBF0] dark:bg-zinc-900 px-3 py-2 rounded-lg border border-orange-100 dark:border-zinc-800 focus:border-[#FFD500] focus:bg-white dark:focus:bg-zinc-900 outline-none font-bold text-xs text-gray-800 dark:text-zinc-100 transition-all shadow-sm min-h-[80px]"
+                      className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-3 py-2 rounded-lg border border-[#E5E7EB] dark:border-zinc-800 focus:border-[#2563EB] focus:bg-white dark:focus:bg-zinc-900 outline-none font-bold text-[14px] text-gray-800 dark:text-zinc-100 transition-all shadow-sm min-h-[80px]"
                       required
                       placeholder="Enter full task description..."
                     />
@@ -1963,9 +1963,9 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Assigned By Dropdown */}
                   <div className="relative">
-                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2">Assigned By</label>
+                    <label className="text-[13px] font-semibold text-[#5B6472] block mb-2">Assigned By</label>
                     <div 
-                      className={`w-full bg-[#FFFBF0] dark:bg-zinc-900 border border-orange-100 dark:border-zinc-800 rounded-lg shadow-sm ${isRegularUser ? 'cursor-not-allowed opacity-75' : 'cursor-pointer'}`}
+                      className={`w-full bg-[#FFFFFF] dark:bg-zinc-900 border border-[#E5E7EB] dark:border-zinc-800 rounded-lg shadow-sm ${isRegularUser ? 'cursor-not-allowed opacity-75' : 'cursor-pointer'}`}
                       onClick={() => {
                         if (!isRegularUser) {
                           setAssignedByOpen(!assignedByOpen)
@@ -1974,36 +1974,36 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                         }
                       }}
                     >
-                      <div className="px-3 py-1.5 font-bold text-xs text-gray-800 dark:text-zinc-100 flex justify-between items-center group-hover:border-[#FFD500] transition-colors">
+                      <div className="px-3 py-1.5 font-bold text-[14px] text-gray-800 dark:text-zinc-100 flex justify-between items-center group-hover:border-[#2563EB] transition-colors">
                         <div className="flex items-center gap-2">
-                          <UserIcon className="w-3.5 h-3.5 text-gray-400" />
+                          <UserIcon className="w-3.5 h-3.5 text-[#5B6472]" />
                           <span>{formData.assigned_by || (isRegularUser ? currentUser : "Select User...")}</span>
                         </div>
-                        {!isRegularUser && <ChevronDownIcon className="w-3 h-3 text-gray-400" />}
+                        {!isRegularUser && <ChevronDownIcon className="w-3 h-3 text-[#5B6472]" />}
                       </div>
                     </div>
                     {assignedByOpen && !isRegularUser && (
-                      <div className="absolute z-[10000] w-full mt-1 bg-white dark:bg-zinc-900 border border-orange-100 dark:border-zinc-800 rounded-lg shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-                        <div className="p-2 border-b border-orange-50 dark:border-zinc-800">
+                      <div className="absolute z-[10000] w-full mt-1 bg-white dark:bg-zinc-900 border border-[#E5E7EB] dark:border-zinc-800 rounded-lg shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                        <div className="p-2 border-b border-[#E5E7EB] dark:border-zinc-800">
                           <input 
                             type="text" placeholder="Search users..." value={assignedBySearch}
                             onChange={(e) => setAssignedBySearch(e.target.value)}
                             onClick={(e) => e.stopPropagation()}
-                            className="w-full bg-gray-50 dark:bg-zinc-950 px-2 py-1 rounded border border-gray-100 dark:border-zinc-800 outline-none text-[10px] font-bold text-gray-700 dark:text-gray-300"
+                            className="w-full bg-gray-50 dark:bg-zinc-950 px-2 py-1 rounded border border-gray-100 dark:border-zinc-800 outline-none text-[13px] font-bold text-gray-700 dark:text-gray-300"
                           />
                         </div>
                         <div className="max-h-40 overflow-y-auto">
                           {usersList.filter(u => u.username.toLowerCase().includes(assignedBySearch.toLowerCase())).map(u => (
                             <div key={`by-${u.id}`}
-                              className="px-3 py-2 text-xs font-bold text-gray-700 dark:text-gray-300 hover:bg-[#003875]/5 dark:hover:bg-[#FFD500]/10 cursor-pointer flex justify-between items-center"
+                              className="px-3 py-2 text-[14px] font-bold text-gray-700 dark:text-gray-300 hover:bg-[#2563EB]/5 dark:hover:bg-[#60A5FA]/10 cursor-pointer flex justify-between items-center"
                               onClick={() => { setFormData({ ...formData, assigned_by: u.username }); setAssignedByOpen(false); setAssignedBySearch(""); }}
                             >
                               <span>{u.username}</span>
-                              {u.role_name && <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-gray-100 dark:bg-zinc-800 text-gray-500 uppercase">{u.role_name}</span>}
+                              {u.role_name && <span className="text-[13px] px-1.5 py-0.5 rounded-full bg-gray-100 dark:bg-zinc-800 text-gray-500">{u.role_name}</span>}
                             </div>
                           ))}
                           {usersList.filter(u => u.username.toLowerCase().includes(assignedBySearch.toLowerCase())).length === 0 && (
-                            <div className="px-3 py-2 text-[10px] text-gray-400 text-center">No users found</div>
+                            <div className="px-3 py-2 text-[13px] text-[#5B6472] text-center">No users found</div>
                           )}
                         </div>
                       </div>
@@ -2012,45 +2012,45 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
                   {/* Assigned To Dropdown */}
                   <div className="relative">
-                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2">Assigned To</label>
+                    <label className="text-[13px] font-semibold text-[#5B6472] block mb-2">Assigned To</label>
                     <div 
-                      className="w-full bg-[#FFFBF0] dark:bg-zinc-900 border border-orange-100 dark:border-zinc-800 rounded-lg shadow-sm cursor-pointer"
+                      className="w-full bg-[#FFFFFF] dark:bg-zinc-900 border border-[#E5E7EB] dark:border-zinc-800 rounded-lg shadow-sm cursor-pointer"
                       onClick={() => {
                         setAssignedToOpen(!assignedToOpen)
                         setAssignedByOpen(false)
                         setDepartmentOpen(false)
                       }}
                     >
-                      <div className="px-3 py-1.5 font-bold text-xs text-gray-800 dark:text-zinc-100 flex justify-between items-center group-hover:border-[#FFD500] transition-colors">
+                      <div className="px-3 py-1.5 font-bold text-[14px] text-gray-800 dark:text-zinc-100 flex justify-between items-center group-hover:border-[#2563EB] transition-colors">
                         <div className="flex items-center gap-2">
-                          <UserIcon className="w-3.5 h-3.5 text-gray-400" />
+                          <UserIcon className="w-3.5 h-3.5 text-[#5B6472]" />
                           <span>{formData.assigned_to || "Select User..."}</span>
                         </div>
-                        <ChevronDownIcon className="w-3 h-3 text-gray-400" />
+                        <ChevronDownIcon className="w-3 h-3 text-[#5B6472]" />
                       </div>
                     </div>
                     {assignedToOpen && (
-                      <div className="absolute z-[10000] w-full mt-1 bg-white dark:bg-zinc-900 border border-orange-100 dark:border-zinc-800 rounded-lg shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-                        <div className="p-2 border-b border-orange-50 dark:border-zinc-800">
+                      <div className="absolute z-[10000] w-full mt-1 bg-white dark:bg-zinc-900 border border-[#E5E7EB] dark:border-zinc-800 rounded-lg shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                        <div className="p-2 border-b border-[#E5E7EB] dark:border-zinc-800">
                           <input 
                             type="text" placeholder="Search users..." value={assignedToSearch}
                             onChange={(e) => setAssignedToSearch(e.target.value)}
                             onClick={(e) => e.stopPropagation()}
-                            className="w-full bg-gray-50 dark:bg-zinc-950 px-2 py-1 rounded border border-gray-100 dark:border-zinc-800 outline-none text-[10px] font-bold text-gray-700 dark:text-gray-300"
+                            className="w-full bg-gray-50 dark:bg-zinc-950 px-2 py-1 rounded border border-gray-100 dark:border-zinc-800 outline-none text-[13px] font-bold text-gray-700 dark:text-gray-300"
                           />
                         </div>
                         <div className="max-h-40 overflow-y-auto">
                           {usersList.filter(u => u.username.toLowerCase().includes(assignedToSearch.toLowerCase())).map(u => (
                             <div key={`to-${u.id}`}
-                              className="px-3 py-2 text-xs font-bold text-gray-700 dark:text-gray-300 hover:bg-[#003875]/5 dark:hover:bg-[#FFD500]/10 cursor-pointer flex justify-between items-center"
+                              className="px-3 py-2 text-[14px] font-bold text-gray-700 dark:text-gray-300 hover:bg-[#2563EB]/5 dark:hover:bg-[#60A5FA]/10 cursor-pointer flex justify-between items-center"
                               onClick={() => { setFormData({ ...formData, assigned_to: u.username }); setAssignedToOpen(false); setAssignedToSearch(""); }}
                             >
                               <span>{u.username}</span>
-                              {u.role_name && <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-gray-100 dark:bg-zinc-800 text-gray-500 uppercase">{u.role_name}</span>}
+                              {u.role_name && <span className="text-[13px] px-1.5 py-0.5 rounded-full bg-gray-100 dark:bg-zinc-800 text-gray-500">{u.role_name}</span>}
                             </div>
                           ))}
                           {usersList.filter(u => u.username.toLowerCase().includes(assignedToSearch.toLowerCase())).length === 0 && (
-                            <div className="px-3 py-2 text-[10px] text-gray-400 text-center">No users found</div>
+                            <div className="px-3 py-2 text-[13px] text-[#5B6472] text-center">No users found</div>
                           )}
                         </div>
                       </div>
@@ -2061,12 +2061,12 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                 {/* Row 2: Priority + Evidence Required */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2">Priority</label>
+                    <label className="text-[13px] font-semibold text-[#5B6472] block mb-2">Priority</label>
                     <div className="flex bg-gray-100 dark:bg-zinc-900/50 p-1 rounded-xl">
                       {(['Low', 'Medium', 'High'] as const).map((pri) => (
                         <button key={pri} type="button"
                           onClick={() => setFormData({ ...formData, priority: pri })}
-                          className={`flex-1 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all ${
+                          className={`flex-1 py-1.5 text-[13px] font-semibold   rounded-lg transition-all ${
                             formData.priority === pri 
                               ? pri === 'Low' ? 'bg-green-500 text-white shadow-md'
                               : pri === 'Medium' ? 'bg-yellow-500 text-white shadow-md'
@@ -2079,12 +2079,12 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                   </div>
 
                   <div>
-                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2">Evidence Required?</label>
+                    <label className="text-[13px] font-semibold text-[#5B6472] block mb-2">Evidence Required?</label>
                     <div className="flex bg-gray-100 dark:bg-zinc-900/50 p-1 rounded-xl">
                       {(['No', 'Yes'] as const).map((val) => (
                         <button key={val} type="button"
                           onClick={() => setFormData({ ...formData, evidence_required: val })}
-                          className={`flex-1 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all ${
+                          className={`flex-1 py-1.5 text-[13px] font-semibold   rounded-lg transition-all ${
                             formData.evidence_required === val
                               ? val === 'Yes' ? 'bg-emerald-500 text-white shadow-md' : 'bg-gray-400 text-white shadow-md'
                               : 'text-gray-500 dark:text-gray-400 hover:bg-white dark:hover:bg-zinc-800 hover:text-gray-900 dark:hover:text-white'
@@ -2099,37 +2099,37 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Department Dropdown */}
                   <div className="relative">
-                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2">Department</label>
+                    <label className="text-[13px] font-semibold text-[#5B6472] block mb-2">Department</label>
                     <div 
-                      className="w-full bg-[#FFFBF0] dark:bg-zinc-900 border border-orange-100 dark:border-zinc-800 rounded-lg shadow-sm cursor-pointer"
+                      className="w-full bg-[#FFFFFF] dark:bg-zinc-900 border border-[#E5E7EB] dark:border-zinc-800 rounded-lg shadow-sm cursor-pointer"
                       onClick={() => { setDepartmentOpen(!departmentOpen); setAssignedByOpen(false); setAssignedToOpen(false); }}
                     >
-                      <div className="px-3 py-1.5 font-bold text-xs text-gray-800 dark:text-zinc-100 flex justify-between items-center group-hover:border-[#FFD500] transition-colors">
+                      <div className="px-3 py-1.5 font-bold text-[14px] text-gray-800 dark:text-zinc-100 flex justify-between items-center group-hover:border-[#2563EB] transition-colors">
                         <div className="flex items-center gap-2">
-                          <TagIcon className="w-3.5 h-3.5 text-gray-400" />
+                          <TagIcon className="w-3.5 h-3.5 text-[#5B6472]" />
                           <span>{formData.department || "Select Department..."}</span>
                         </div>
-                        <ChevronDownIcon className="w-3 h-3 text-gray-400" />
+                        <ChevronDownIcon className="w-3 h-3 text-[#5B6472]" />
                       </div>
                     </div>
                     {departmentOpen && (
-                      <div className="absolute z-[10000] w-full mt-1 bg-white dark:bg-zinc-900 border border-orange-100 dark:border-zinc-800 rounded-lg shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-                        <div className="p-2 border-b border-orange-50 dark:border-zinc-800">
+                      <div className="absolute z-[10000] w-full mt-1 bg-white dark:bg-zinc-900 border border-[#E5E7EB] dark:border-zinc-800 rounded-lg shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                        <div className="p-2 border-b border-[#E5E7EB] dark:border-zinc-800">
                           <input type="text" placeholder="Search departments..." value={departmentSearch}
                             onChange={(e) => setDepartmentSearch(e.target.value)}
                             onClick={(e) => e.stopPropagation()}
-                            className="w-full bg-gray-50 dark:bg-zinc-950 px-2 py-1 rounded border border-gray-100 dark:border-zinc-800 outline-none text-[10px] font-bold text-gray-700 dark:text-gray-300"
+                            className="w-full bg-gray-50 dark:bg-zinc-950 px-2 py-1 rounded border border-gray-100 dark:border-zinc-800 outline-none text-[13px] font-bold text-gray-700 dark:text-gray-300"
                           />
                         </div>
                         <div className="max-h-40 overflow-y-auto">
                           {predefinedDepartments.filter(d => d.toLowerCase().includes(departmentSearch.toLowerCase())).map(d => (
                             <div key={`dept-${d}`}
-                              className="px-3 py-2 text-xs font-bold text-gray-700 dark:text-gray-300 hover:bg-[#003875]/5 dark:hover:bg-[#FFD500]/10 cursor-pointer"
+                              className="px-3 py-2 text-[14px] font-bold text-gray-700 dark:text-gray-300 hover:bg-[#2563EB]/5 dark:hover:bg-[#60A5FA]/10 cursor-pointer"
                               onClick={() => { setFormData({ ...formData, department: d }); setDepartmentOpen(false); setDepartmentSearch(""); }}
                             >{d}</div>
                           ))}
                           {predefinedDepartments.filter(d => d.toLowerCase().includes(departmentSearch.toLowerCase())).length === 0 && (
-                            <div className="px-3 py-2 text-xs font-bold text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 cursor-pointer flex items-center gap-2"
+                            <div className="px-3 py-2 text-[14px] font-bold text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 cursor-pointer flex items-center gap-2"
                               onClick={() => { setFormData({ ...formData, department: departmentSearch }); setDepartmentOpen(false); setDepartmentSearch(""); }}
                             ><PlusIcon className="w-3 h-3" /> Add "{departmentSearch}"</div>
                           )}
@@ -2140,14 +2140,14 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
                   {/* Due Date & Time */}
                   <div>
-                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2">Due Date &amp; Time</label>
+                    <label className="text-[13px] font-semibold text-[#5B6472] block mb-2">Due Date &amp; Time</label>
                   <div className="relative group/date">
-                    <CalendarDaysIcon className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none group-focus-within/date:text-[#FFD500]" />
+                    <CalendarDaysIcon className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5B6472] pointer-events-none group-focus-within/date:text-[#2563EB]" />
                     <input
                       type="datetime-local"
                       value={formData.due_date}
                       onChange={(e) => setFormData({ ...formData, due_date: e.target.value })}
-                      className="w-full bg-[#FFFBF0] dark:bg-zinc-900 pr-10 pl-3 py-1.5 rounded-lg border border-orange-100 dark:border-zinc-800 focus:border-[#FFD500] focus:bg-white dark:focus:bg-zinc-900 outline-none font-bold text-xs text-gray-800 dark:text-zinc-100 transition-all shadow-sm cursor-pointer"
+                      className="w-full bg-[#FFFFFF] dark:bg-zinc-900 pr-10 pl-3 py-1.5 rounded-lg border border-[#E5E7EB] dark:border-zinc-800 focus:border-[#2563EB] focus:bg-white dark:focus:bg-zinc-900 outline-none font-bold text-[14px] text-gray-800 dark:text-zinc-100 transition-all shadow-sm cursor-pointer"
                     />
                   </div>
                   </div>
@@ -2155,8 +2155,8 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 
                 {/* Attachments */}
-                <div className="space-y-4 pt-4 border-t border-orange-50 dark:border-zinc-800/50">
-                  <p className="text-[10px] font-black text-[#FFD500] uppercase tracking-[0.2em]">Attachments</p>
+                <div className="space-y-4 pt-4 border-t border-[#E5E7EB] dark:border-zinc-800/50">
+                  <p className="text-[13px] font-semibold text-[#2563EB]">Attachments</p>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     
                     {/* Voice Note Upload / Record */}
@@ -2192,10 +2192,10 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                             >
                               <StopCircleIcon className="w-8 h-8" />
                             </button>
-                            <p className="mt-3 font-black text-red-600 dark:text-red-400 font-mono text-lg tracking-widest">
+                            <p className="mt-3 font-semibold text-red-600 dark:text-red-400 font-mono text-lg">
                               {formatDuration(recordingDuration)}
                             </p>
-                            <p className="text-[10px] font-bold text-red-500/70 uppercase tracking-widest mt-1 animate-pulse">Recording Live...</p>
+                            <p className="text-[13px] font-bold text-red-500/70 mt-1 animate-pulse">Recording Live...</p>
                           </>
                         ) : (
                           <div className="flex w-full items-center gap-4">
@@ -2209,17 +2209,17 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                             </button>
                             
                             <div className="flex-1 text-left border-l-2 border-gray-200 dark:border-zinc-700 pl-4 h-full flex flex-col justify-center">
-                              <p className="text-sm font-black text-gray-800 dark:text-zinc-200">
+                              <p className="text-sm font-semibold text-gray-800 dark:text-zinc-200">
                                 {voiceNoteFile ? "Voice Note Ready" : "Record Live"}
                               </p>
-                              <p className="text-[10px] font-bold text-gray-500 mt-0.5 max-w-[150px] truncate">
+                              <p className="text-[13px] font-bold text-gray-500 mt-0.5 max-w-[150px] truncate">
                                 {voiceNoteFile ? voiceNoteFile.name : (formData.voice_note_url ? "Existing Clip Linked" : "Click mic to start recording")}
                               </p>
                             </div>
                             
                             <label className="flex items-center gap-2 cursor-pointer bg-white dark:bg-zinc-800 px-3 py-1.5 rounded border border-gray-200 dark:border-zinc-700 shadow-sm hover:bg-gray-50 dark:hover:bg-zinc-700 transition-colors tooltip justify-center flex-shrink-0" title="Upload File instead">
                               <PaperClipIcon className="w-4 h-4 text-gray-500 dark:text-zinc-400" />
-                              <span className="text-[10px] font-bold uppercase tracking-widest text-gray-500">Upload</span>
+                              <span className="text-[13px] font-bold text-gray-500">Upload</span>
                               <input
                                 type="file"
                                 accept="audio/*"
@@ -2240,11 +2240,11 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                     <div className="p-4 bg-gray-50 dark:bg-zinc-900/50 rounded-xl border border-dashed border-gray-300 dark:border-zinc-700">
                       <label className="flex items-center gap-3 cursor-pointer group">
                         <div className="p-3 bg-white dark:bg-zinc-800 rounded-lg shadow-sm group-hover:scale-105 transition-transform">
-                          <PaperClipIcon className="w-5 h-5 text-gray-400 dark:text-zinc-400 group-hover:text-[#003875] dark:group-hover:text-[#FFD500] transition-colors" />
+                          <PaperClipIcon className="w-5 h-5 text-[#5B6472] dark:text-zinc-400 group-hover:text-[#2563EB] dark:group-hover:text-[#60A5FA] transition-colors" />
                         </div>
                         <div>
-                          <p className="text-xs font-black text-gray-800 dark:text-zinc-200">Reference Doc</p>
-                          <p className="text-[10px] font-bold text-gray-400 mt-0.5">
+                          <p className="text-[14px] font-semibold text-gray-800 dark:text-zinc-200">Reference Doc</p>
+                          <p className="text-[13px] font-bold text-[#5B6472] mt-0.5">
                             {refDocFile ? refDocFile.name : (formData.reference_docs ? "[Existing File Linked]" : "Click to upload document")}
                           </p>
                         </div>
@@ -2263,18 +2263,18 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                   </div>
                 </div>
 
-                <div className="pt-4 mt-6 border-t border-orange-100/50 dark:border-zinc-800 flex gap-2">
+                <div className="pt-4 mt-6 border-t border-[#E5E7EB] dark:border-zinc-800 flex gap-2">
                   <button
                     type="button"
                     onClick={() => setIsModalOpen(false)}
-                    className="flex-1 px-4 py-2 rounded-xl font-black text-gray-400 hover:text-gray-600 hover:bg-gray-50 dark:hover:bg-zinc-800 transition-all uppercase tracking-widest text-[10px]"
+                    className="flex-1 px-4 py-2 rounded-xl font-semibold text-[#5B6472] hover:text-gray-600 hover:bg-gray-50 dark:hover:bg-zinc-800 transition-all text-[13px]"
                   >
                     Cancel
                   </button>
                    <button
                      type="submit"
                      disabled={submitting}
-                     className="flex-1 bg-[#CE2029] hover:bg-[#8E161D] text-white px-4 py-2 rounded-xl font-black transition-all shadow-lg active:scale-95 uppercase tracking-widest text-[10px] flex items-center justify-center gap-2 disabled:opacity-50"
+                     className="flex-1 bg-[#DC2626] hover:bg-[#8E161D] text-white px-4 py-2 rounded-xl font-semibold transition-all shadow-lg active:scale-95 text-[13px] flex items-center justify-center gap-2 disabled:opacity-50"
                    >
                      {submitting ? (
                        <>
@@ -2297,54 +2297,54 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
           <Portal>
           <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4">
             <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={setIsFilterModalOpen.bind(null, false)} />
-            <div className="relative bg-white dark:bg-zinc-950 w-full max-w-2xl rounded-3xl shadow-2xl border border-orange-100 dark:border-zinc-800 overflow-hidden animate-in fade-in zoom-in duration-300">
+            <div className="relative bg-white dark:bg-zinc-950 w-full max-w-2xl rounded-3xl shadow-2xl border border-[#E5E7EB] dark:border-zinc-800 overflow-hidden animate-in fade-in zoom-in duration-300">
               {/* Header */}
-              <div className="p-6 bg-[#FFD500] border-b border-orange-200 dark:border-zinc-800 flex items-center justify-between">
-                <div className="flex items-center gap-3 text-[#003875]">
+              <div className="p-6 bg-[#2563EB] border-b border-[#E5E7EB] dark:border-zinc-800 flex items-center justify-between">
+                <div className="flex items-center gap-3 text-[#2563EB]">
                   <div className="p-2 bg-white/20 rounded-xl">
                     <FunnelIcon className="w-6 h-6" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-black tracking-tight">Advanced Filters</h2>
-                    <p className="text-[10px] font-black opacity-60 uppercase tracking-widest">Refine your delegation list</p>
+                    <h2 className="text-xl font-semibold tracking-tight">Advanced Filters</h2>
+                    <p className="text-[13px] font-semibold opacity-60">Refine your delegation list</p>
                   </div>
                 </div>
                 <button
                   onClick={setIsFilterModalOpen.bind(null, false)}
                   className="p-2 hover:bg-black/5 rounded-xl transition-all group"
                 >
-                  <XMarkIcon className="w-6 h-6 text-[#003875] group-hover:rotate-90 transition-transform" />
+                  <XMarkIcon className="w-6 h-6 text-[#2563EB] group-hover:rotate-90 transition-transform" />
                 </button>
               </div>
 
               <div className="p-6 space-y-6 max-h-[70vh] overflow-y-auto custom-scrollbar bg-white dark:bg-zinc-950">
                 {/* Due Date Range */}
                 <div className="space-y-3">
-                  <label className="text-[11px] font-black text-[#CE2029] uppercase tracking-[0.2em] flex items-center gap-2">
+                  <label className="text-[14px] font-semibold text-[#DC2626] flex items-center gap-2">
                     <CalendarDaysIcon className="w-4 h-4" /> Due Date Range
                   </label>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-1.5">
-                      <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest px-1">Start Date</span>
+                      <span className="text-[13px] font-semibold text-[#5B6472] px-1">Start Date</span>
                       <div className="relative group/date">
-                        <CalendarDaysIcon className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none group-focus-within/date:text-[#FFD500]" />
+                        <CalendarDaysIcon className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5B6472] pointer-events-none group-focus-within/date:text-[#2563EB]" />
                         <input 
                           type="date"
                           value={filterStartDate}
                           onChange={(e) => setFilterStartDate(e.target.value)}
-                          className="w-full pl-4 pr-10 py-2.5 bg-[#FFFBF0] dark:bg-zinc-900 border-2 border-orange-50 dark:border-zinc-800 rounded-xl text-xs font-bold text-gray-700 dark:text-zinc-100 outline-none focus:border-[#FFD500] transition-all"
+                          className="w-full pl-4 pr-10 py-2.5 bg-[#FFFFFF] dark:bg-zinc-900 border-2 border-[#E5E7EB] dark:border-zinc-800 rounded-xl text-[14px] font-bold text-gray-700 dark:text-zinc-100 outline-none focus:border-[#2563EB] transition-all"
                         />
                       </div>
                     </div>
                     <div className="space-y-1.5">
-                      <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest px-1">End Date</span>
+                      <span className="text-[13px] font-semibold text-[#5B6472] px-1">End Date</span>
                       <div className="relative group/date">
-                        <CalendarDaysIcon className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none group-focus-within/date:text-[#FFD500]" />
+                        <CalendarDaysIcon className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5B6472] pointer-events-none group-focus-within/date:text-[#2563EB]" />
                         <input 
                           type="date"
                           value={filterEndDate}
                           onChange={(e) => setFilterEndDate(e.target.value)}
-                          className="w-full pl-4 pr-10 py-2.5 bg-[#FFFBF0] dark:bg-zinc-900 border-2 border-orange-50 dark:border-zinc-800 rounded-xl text-xs font-bold text-gray-700 dark:text-zinc-100 outline-none focus:border-[#FFD500] transition-all"
+                          className="w-full pl-4 pr-10 py-2.5 bg-[#FFFFFF] dark:bg-zinc-900 border-2 border-[#E5E7EB] dark:border-zinc-800 rounded-xl text-[14px] font-bold text-gray-700 dark:text-zinc-100 outline-none focus:border-[#2563EB] transition-all"
                         />
                       </div>
                     </div>
@@ -2354,23 +2354,23 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   {/* Status Filter */}
                   <div className="relative">
-                    <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2 block">Status</label>
+                    <label className="text-[14px] font-semibold text-[#5B6472] mb-2 block">Status</label>
                     <div 
-                      className="w-full bg-[#FFFBF0] dark:bg-zinc-900 border-2 border-orange-50 dark:border-zinc-800 rounded-xl px-4 py-2.5 cursor-pointer flex justify-between items-center"
+                      className="w-full bg-[#FFFFFF] dark:bg-zinc-900 border-2 border-[#E5E7EB] dark:border-zinc-800 rounded-xl px-4 py-2.5 cursor-pointer flex justify-between items-center"
                       onClick={() => setModalStatusOpen(!modalStatusOpen)}
                     >
-                      <span className="text-xs font-bold truncate">
+                      <span className="text-[14px] font-bold truncate">
                         {modalStatusFilter.length > 0 ? `${modalStatusFilter.length} Selected` : "All Statuses"}
                       </span>
-                      <ChevronDownIcon className={`w-4 h-4 text-gray-400 transition-transform ${modalStatusOpen ? 'rotate-180' : ''}`} />
+                      <ChevronDownIcon className={`w-4 h-4 text-[#5B6472] transition-transform ${modalStatusOpen ? 'rotate-180' : ''}`} />
                     </div>
                     {modalStatusOpen && (
-                      <div className="absolute z-20 w-full mt-2 bg-white dark:bg-zinc-900 border border-orange-50 dark:border-zinc-800 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2">
-                        <div className="p-2 border-b border-orange-50 dark:border-zinc-800">
+                      <div className="absolute z-20 w-full mt-2 bg-white dark:bg-zinc-900 border border-[#E5E7EB] dark:border-zinc-800 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2">
+                        <div className="p-2 border-b border-[#E5E7EB] dark:border-zinc-800">
                           <input 
                             type="text" placeholder="Search status..." value={modalStatusSearch}
                             onChange={(e) => setModalStatusSearch(e.target.value)}
-                            className="w-full bg-[#FFFBF0] dark:bg-zinc-950 px-3 py-1.5 rounded-lg border-none outline-none text-xs font-bold"
+                            className="w-full bg-[#FFFFFF] dark:bg-zinc-950 px-3 py-1.5 rounded-lg border-none outline-none text-[14px] font-bold"
                           />
                         </div>
                         <div className="max-h-48 overflow-y-auto p-1">
@@ -2381,18 +2381,18 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                               const isSelected = modalStatusFilter.includes(s);
                               return (
                                 <div key={s} 
-                                  className={`px-3 py-2 rounded-lg text-xs font-bold cursor-pointer flex items-center justify-between group transition-colors ${
-                                    isSelected ? 'bg-[#003875]/5 dark:bg-[#FFD500]/10 text-[#003875] dark:text-[#FFD500]' : 'hover:bg-[#003875]/5 dark:hover:bg-[#FFD500]/10 text-gray-700 dark:text-zinc-300'
+                                  className={`px-3 py-2 rounded-lg text-[14px] font-bold cursor-pointer flex items-center justify-between group transition-colors ${
+                                    isSelected ? 'bg-[#2563EB]/5 dark:bg-[#60A5FA]/10 text-white dark:text-[#60A5FA]' : 'hover:bg-[#2563EB]/5 dark:hover:bg-[#60A5FA]/10 text-gray-700 dark:text-zinc-300'
                                   }`}
                                   onClick={() => setModalStatusFilter(prev => isSelected ? prev.filter(x => x !== s) : [...prev, s])}
                                 >
                                   <div className="flex items-center gap-2">
-                                    <div className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-all ${isSelected ? 'bg-[#003875] border-[#003875]' : 'border-gray-300 dark:border-zinc-600'}`}>
+                                    <div className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-all ${isSelected ? 'bg-[#2563EB] border-[#2563EB]' : 'border-gray-300 dark:border-zinc-600'}`}>
                                       {isSelected && <CheckCircleIcon className="w-3 h-3 text-white" />}
                                     </div>
                                     <span>{s}</span>
                                   </div>
-                                  <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${isSelected ? 'bg-[#003875] text-white' : 'bg-gray-100 dark:bg-zinc-800 text-gray-500'}`}>
+                                  <span className={`text-[13px] px-1.5 py-0.5 rounded-full ${isSelected ? 'bg-[#2563EB] text-white' : 'bg-gray-100 dark:bg-zinc-800 text-gray-500'}`}>
                                     {count}
                                   </span>
                                 </div>
@@ -2405,36 +2405,36 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
                   {/* Priority Filter */}
                   <div className="relative">
-                    <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2 block">Priority</label>
+                    <label className="text-[14px] font-semibold text-[#5B6472] mb-2 block">Priority</label>
                     <div 
-                      className="w-full bg-[#FFFBF0] dark:bg-zinc-900 border-2 border-orange-50 dark:border-zinc-800 rounded-xl px-4 py-2.5 cursor-pointer flex justify-between items-center"
+                      className="w-full bg-[#FFFFFF] dark:bg-zinc-900 border-2 border-[#E5E7EB] dark:border-zinc-800 rounded-xl px-4 py-2.5 cursor-pointer flex justify-between items-center"
                       onClick={() => setModalPriorityOpen(!modalPriorityOpen)}
                     >
-                      <span className="text-xs font-bold truncate">
+                      <span className="text-[14px] font-bold truncate">
                         {modalPriorityFilter.length > 0 ? `${modalPriorityFilter.length} Selected` : "All Priorities"}
                       </span>
-                      <ChevronDownIcon className={`w-4 h-4 text-gray-400 transition-transform ${modalPriorityOpen ? 'rotate-180' : ''}`} />
+                      <ChevronDownIcon className={`w-4 h-4 text-[#5B6472] transition-transform ${modalPriorityOpen ? 'rotate-180' : ''}`} />
                     </div>
                     {modalPriorityOpen && (
-                      <div className="absolute z-20 w-full mt-2 bg-white dark:bg-zinc-900 border border-orange-50 dark:border-zinc-800 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2">
+                      <div className="absolute z-20 w-full mt-2 bg-white dark:bg-zinc-900 border border-[#E5E7EB] dark:border-zinc-800 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2">
                         <div className="p-1 max-h-48 overflow-y-auto">
                           {['Low', 'Medium', 'High'].map(p => {
                             const count = baseDelegations.filter(d => d.priority === p).length;
                             const isSelected = modalPriorityFilter.includes(p);
                             return (
                               <div key={p} 
-                                className={`px-3 py-2 rounded-lg text-xs font-bold cursor-pointer flex items-center justify-between group transition-colors ${
-                                  isSelected ? 'bg-[#003875]/5 dark:bg-[#FFD500]/10 text-[#003875] dark:text-[#FFD500]' : 'hover:bg-[#003875]/5 dark:hover:bg-[#FFD500]/10 text-gray-700 dark:text-zinc-300'
+                                className={`px-3 py-2 rounded-lg text-[14px] font-bold cursor-pointer flex items-center justify-between group transition-colors ${
+                                  isSelected ? 'bg-[#2563EB]/5 dark:bg-[#60A5FA]/10 text-white dark:text-[#60A5FA]' : 'hover:bg-[#2563EB]/5 dark:hover:bg-[#60A5FA]/10 text-gray-700 dark:text-zinc-300'
                                 }`}
                                 onClick={() => setModalPriorityFilter(prev => isSelected ? prev.filter(x => x !== p) : [...prev, p])}
                               >
                                 <div className="flex items-center gap-2">
-                                  <div className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-all ${isSelected ? 'bg-[#003875] border-[#003875]' : 'border-gray-300 dark:border-zinc-600'}`}>
+                                  <div className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-all ${isSelected ? 'bg-[#2563EB] border-[#2563EB]' : 'border-gray-300 dark:border-zinc-600'}`}>
                                     {isSelected && <CheckCircleIcon className="w-3 h-3 text-white" />}
                                   </div>
                                   <span>{p}</span>
                                 </div>
-                                <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${isSelected ? 'bg-[#003875] text-white' : 'bg-gray-100 dark:bg-zinc-800 text-gray-500'}`}>
+                                <span className={`text-[13px] px-1.5 py-0.5 rounded-full ${isSelected ? 'bg-[#2563EB] text-white' : 'bg-gray-100 dark:bg-zinc-800 text-gray-500'}`}>
                                   {count}
                                 </span>
                               </div>
@@ -2447,23 +2447,23 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
                   {/* Assigned To Filter */}
                   <div className="relative">
-                    <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2 block">Assigned To</label>
+                    <label className="text-[14px] font-semibold text-[#5B6472] mb-2 block">Assigned To</label>
                     <div 
-                      className="w-full bg-[#FFFBF0] dark:bg-zinc-900 border-2 border-orange-50 dark:border-zinc-800 rounded-xl px-4 py-2.5 cursor-pointer flex justify-between items-center"
+                      className="w-full bg-[#FFFFFF] dark:bg-zinc-900 border-2 border-[#E5E7EB] dark:border-zinc-800 rounded-xl px-4 py-2.5 cursor-pointer flex justify-between items-center"
                       onClick={() => setModalAssignedToOpen(!modalAssignedToOpen)}
                     >
-                      <span className="text-xs font-bold truncate">
+                      <span className="text-[14px] font-bold truncate">
                         {modalAssignedToFilter.length > 0 ? `${modalAssignedToFilter.length} Selected` : "Everyone"}
                       </span>
-                      <ChevronDownIcon className={`w-4 h-4 text-gray-400 transition-transform ${modalAssignedToOpen ? 'rotate-180' : ''}`} />
+                      <ChevronDownIcon className={`w-4 h-4 text-[#5B6472] transition-transform ${modalAssignedToOpen ? 'rotate-180' : ''}`} />
                     </div>
                     {modalAssignedToOpen && (
-                      <div className="absolute z-20 w-full mt-2 bg-white dark:bg-zinc-900 border border-orange-50 dark:border-zinc-800 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2">
-                        <div className="p-2 border-b border-orange-50 dark:border-zinc-800">
+                      <div className="absolute z-20 w-full mt-2 bg-white dark:bg-zinc-900 border border-[#E5E7EB] dark:border-zinc-800 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2">
+                        <div className="p-2 border-b border-[#E5E7EB] dark:border-zinc-800">
                           <input 
                             type="text" placeholder="Search users..." value={modalAssignedToSearch}
                             onChange={(e) => setModalAssignedToSearch(e.target.value)}
-                            className="w-full bg-[#FFFBF0] dark:bg-zinc-950 px-3 py-1.5 rounded-lg border-none outline-none text-xs font-bold"
+                            className="w-full bg-[#FFFFFF] dark:bg-zinc-950 px-3 py-1.5 rounded-lg border-none outline-none text-[14px] font-bold"
                           />
                         </div>
                         <div className="max-h-48 overflow-y-auto p-1">
@@ -2474,18 +2474,18 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                               const isSelected = modalAssignedToFilter.includes(u.username);
                               return (
                                 <div key={u.id} 
-                                  className={`px-3 py-2 rounded-lg text-xs font-bold cursor-pointer flex items-center justify-between group transition-colors ${
-                                    isSelected ? 'bg-[#003875]/5 dark:bg-[#FFD500]/10 text-[#003875] dark:text-[#FFD500]' : 'hover:bg-[#003875]/5 dark:hover:bg-[#FFD500]/10 text-gray-700 dark:text-zinc-300'
+                                  className={`px-3 py-2 rounded-lg text-[14px] font-bold cursor-pointer flex items-center justify-between group transition-colors ${
+                                    isSelected ? 'bg-[#2563EB]/5 dark:bg-[#60A5FA]/10 text-white dark:text-[#60A5FA]' : 'hover:bg-[#2563EB]/5 dark:hover:bg-[#60A5FA]/10 text-gray-700 dark:text-zinc-300'
                                   }`}
                                   onClick={() => setModalAssignedToFilter(prev => isSelected ? prev.filter(x => x !== u.username) : [...prev, u.username])}
                                 >
                                   <div className="flex items-center gap-2">
-                                    <div className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-all ${isSelected ? 'bg-[#003875] border-[#003875]' : 'border-gray-300 dark:border-zinc-600'}`}>
+                                    <div className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-all ${isSelected ? 'bg-[#2563EB] border-[#2563EB]' : 'border-gray-300 dark:border-zinc-600'}`}>
                                       {isSelected && <CheckCircleIcon className="w-3 h-3 text-white" />}
                                     </div>
                                     <span>{u.username}</span>
                                   </div>
-                                  <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${isSelected ? 'bg-[#003875] text-white' : 'bg-gray-100 dark:bg-zinc-800 text-gray-500'}`}>
+                                  <span className={`text-[13px] px-1.5 py-0.5 rounded-full ${isSelected ? 'bg-[#2563EB] text-white' : 'bg-gray-100 dark:bg-zinc-800 text-gray-500'}`}>
                                     {count}
                                   </span>
                                 </div>
@@ -2498,23 +2498,23 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
                   {/* Assigned By Filter */}
                   <div className="relative">
-                    <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2 block">Assigned By</label>
+                    <label className="text-[14px] font-semibold text-[#5B6472] mb-2 block">Assigned By</label>
                     <div 
-                      className="w-full bg-[#FFFBF0] dark:bg-zinc-900 border-2 border-orange-50 dark:border-zinc-800 rounded-xl px-4 py-2.5 cursor-pointer flex justify-between items-center"
+                      className="w-full bg-[#FFFFFF] dark:bg-zinc-900 border-2 border-[#E5E7EB] dark:border-zinc-800 rounded-xl px-4 py-2.5 cursor-pointer flex justify-between items-center"
                       onClick={() => setModalAssignedByOpen(!modalAssignedByOpen)}
                     >
-                      <span className="text-xs font-bold truncate">
+                      <span className="text-[14px] font-bold truncate">
                         {modalAssignedByFilter.length > 0 ? `${modalAssignedByFilter.length} Selected` : "All Senders"}
                       </span>
-                      <ChevronDownIcon className={`w-4 h-4 text-gray-400 transition-transform ${modalAssignedByOpen ? 'rotate-180' : ''}`} />
+                      <ChevronDownIcon className={`w-4 h-4 text-[#5B6472] transition-transform ${modalAssignedByOpen ? 'rotate-180' : ''}`} />
                     </div>
                     {modalAssignedByOpen && (
-                      <div className="absolute z-20 w-full mt-2 bg-white dark:bg-zinc-900 border border-orange-50 dark:border-zinc-800 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2">
-                        <div className="p-2 border-b border-orange-50 dark:border-zinc-800">
+                      <div className="absolute z-20 w-full mt-2 bg-white dark:bg-zinc-900 border border-[#E5E7EB] dark:border-zinc-800 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2">
+                        <div className="p-2 border-b border-[#E5E7EB] dark:border-zinc-800">
                           <input 
                             type="text" placeholder="Search users..." value={modalAssignedBySearch}
                             onChange={(e) => setModalAssignedBySearch(e.target.value)}
-                            className="w-full bg-[#FFFBF0] dark:bg-zinc-950 px-3 py-1.5 rounded-lg border-none outline-none text-xs font-bold"
+                            className="w-full bg-[#FFFFFF] dark:bg-zinc-950 px-3 py-1.5 rounded-lg border-none outline-none text-[14px] font-bold"
                           />
                         </div>
                         <div className="max-h-48 overflow-y-auto p-1">
@@ -2525,18 +2525,18 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                               const isSelected = modalAssignedByFilter.includes(u.username);
                               return (
                                 <div key={u.id} 
-                                  className={`px-3 py-2 rounded-lg text-xs font-bold cursor-pointer flex items-center justify-between group transition-colors ${
-                                    isSelected ? 'bg-[#003875]/5 dark:bg-[#FFD500]/10 text-[#003875] dark:text-[#FFD500]' : 'hover:bg-[#003875]/5 dark:hover:bg-[#FFD500]/10 text-gray-700 dark:text-zinc-300'
+                                  className={`px-3 py-2 rounded-lg text-[14px] font-bold cursor-pointer flex items-center justify-between group transition-colors ${
+                                    isSelected ? 'bg-[#2563EB]/5 dark:bg-[#60A5FA]/10 text-white dark:text-[#60A5FA]' : 'hover:bg-[#2563EB]/5 dark:hover:bg-[#60A5FA]/10 text-gray-700 dark:text-zinc-300'
                                   }`}
                                   onClick={() => setModalAssignedByFilter(prev => isSelected ? prev.filter(x => x !== u.username) : [...prev, u.username])}
                                 >
                                   <div className="flex items-center gap-2">
-                                    <div className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-all ${isSelected ? 'bg-[#003875] border-[#003875]' : 'border-gray-300 dark:border-zinc-600'}`}>
+                                    <div className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-all ${isSelected ? 'bg-[#2563EB] border-[#2563EB]' : 'border-gray-300 dark:border-zinc-600'}`}>
                                       {isSelected && <CheckCircleIcon className="w-3 h-3 text-white" />}
                                     </div>
                                     <span>{u.username}</span>
                                   </div>
-                                  <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${isSelected ? 'bg-[#003875] text-white' : 'bg-gray-100 dark:bg-zinc-800 text-gray-500'}`}>
+                                  <span className={`text-[13px] px-1.5 py-0.5 rounded-full ${isSelected ? 'bg-[#2563EB] text-white' : 'bg-gray-100 dark:bg-zinc-800 text-gray-500'}`}>
                                     {count}
                                   </span>
                                 </div>
@@ -2549,23 +2549,23 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
                   {/* Department Filter */}
                   <div className="relative">
-                    <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2 block">Department</label>
+                    <label className="text-[14px] font-semibold text-[#5B6472] mb-2 block">Department</label>
                     <div 
-                      className="w-full bg-[#FFFBF0] dark:bg-zinc-900 border-2 border-orange-50 dark:border-zinc-800 rounded-xl px-4 py-2.5 cursor-pointer flex justify-between items-center"
+                      className="w-full bg-[#FFFFFF] dark:bg-zinc-900 border-2 border-[#E5E7EB] dark:border-zinc-800 rounded-xl px-4 py-2.5 cursor-pointer flex justify-between items-center"
                       onClick={() => setModalDepartmentOpen(!modalDepartmentOpen)}
                     >
-                      <span className="text-xs font-bold truncate">
+                      <span className="text-[14px] font-bold truncate">
                         {modalDepartmentFilter.length > 0 ? `${modalDepartmentFilter.length} Selected` : "All Departments"}
                       </span>
-                      <ChevronDownIcon className={`w-4 h-4 text-gray-400 transition-transform ${modalDepartmentOpen ? 'rotate-180' : ''}`} />
+                      <ChevronDownIcon className={`w-4 h-4 text-[#5B6472] transition-transform ${modalDepartmentOpen ? 'rotate-180' : ''}`} />
                     </div>
                     {modalDepartmentOpen && (
-                      <div className="absolute z-[10000] w-full mt-2 bg-white dark:bg-zinc-900 border border-orange-50 dark:border-zinc-800 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2">
-                        <div className="p-2 border-b border-orange-50 dark:border-zinc-800">
+                      <div className="absolute z-[10000] w-full mt-2 bg-white dark:bg-zinc-900 border border-[#E5E7EB] dark:border-zinc-800 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2">
+                        <div className="p-2 border-b border-[#E5E7EB] dark:border-zinc-800">
                           <input 
                             type="text" placeholder="Search departments..." value={modalDepartmentSearch}
                             onChange={(e) => setModalDepartmentSearch(e.target.value)}
-                            className="w-full bg-[#FFFBF0] dark:bg-zinc-950 px-3 py-1.5 rounded-lg border-none outline-none text-xs font-bold"
+                            className="w-full bg-[#FFFFFF] dark:bg-zinc-950 px-3 py-1.5 rounded-lg border-none outline-none text-[14px] font-bold"
                           />
                         </div>
                         <div className="max-h-48 overflow-y-auto p-1">
@@ -2576,18 +2576,18 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                               const isSelected = modalDepartmentFilter.includes(d);
                               return (
                                 <div key={d} 
-                                  className={`px-3 py-2 rounded-lg text-xs font-bold cursor-pointer flex items-center justify-between group transition-colors ${
-                                    isSelected ? 'bg-[#003875]/5 dark:bg-[#FFD500]/10 text-[#003875] dark:text-[#FFD500]' : 'hover:bg-[#003875]/5 dark:hover:bg-[#FFD500]/10 text-gray-700 dark:text-zinc-300'
+                                  className={`px-3 py-2 rounded-lg text-[14px] font-bold cursor-pointer flex items-center justify-between group transition-colors ${
+                                    isSelected ? 'bg-[#2563EB]/5 dark:bg-[#60A5FA]/10 text-white dark:text-[#60A5FA]' : 'hover:bg-[#2563EB]/5 dark:hover:bg-[#60A5FA]/10 text-gray-700 dark:text-zinc-300'
                                   }`}
                                   onClick={() => setModalDepartmentFilter(prev => isSelected ? prev.filter(x => x !== d) : [...prev, d])}
                                 >
                                   <div className="flex items-center gap-2">
-                                    <div className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-all ${isSelected ? 'bg-[#003875] border-[#003875]' : 'border-gray-300 dark:border-zinc-600'}`}>
+                                    <div className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-all ${isSelected ? 'bg-[#2563EB] border-[#2563EB]' : 'border-gray-300 dark:border-zinc-600'}`}>
                                       {isSelected && <CheckCircleIcon className="w-3 h-3 text-white" />}
                                     </div>
                                     <span>{d}</span>
                                   </div>
-                                  <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${isSelected ? 'bg-[#003875] text-white' : 'bg-gray-100 dark:bg-zinc-800 text-gray-500'}`}>
+                                  <span className={`text-[13px] px-1.5 py-0.5 rounded-full ${isSelected ? 'bg-[#2563EB] text-white' : 'bg-gray-100 dark:bg-zinc-800 text-gray-500'}`}>
                                     {count}
                                   </span>
                                 </div>
@@ -2601,7 +2601,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
               </div>
 
               {/* Footer */}
-              <div className="p-6 bg-[#FFD500]/5 dark:bg-zinc-900/50 border-t border-orange-100 dark:border-zinc-800 flex items-center justify-between gap-4">
+              <div className="p-6 bg-[#2563EB]/5 dark:bg-zinc-900/50 border-t border-[#E5E7EB] dark:border-zinc-800 flex items-center justify-between gap-4">
                 <button
                   onClick={() => {
                     setFilterStartDate("");
@@ -2612,13 +2612,13 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                     setModalDepartmentFilter([]);
                     setModalPriorityFilter([]);
                   }}
-                  className="px-6 py-3 text-[11px] font-black uppercase tracking-widest text-[#CE2029] hover:bg-red-50 dark:hover:bg-red-900/10 rounded-2xl transition-all"
+                  className="px-6 py-3 text-[14px] font-semibold text-[#DC2626] hover:bg-red-50 dark:hover:bg-red-900/10 rounded-2xl transition-all"
                 >
                   Clear All Filters
                 </button>
                 <button
                   onClick={setIsFilterModalOpen.bind(null, false)}
-                  className="px-8 py-3 bg-[#003875] text-white rounded-2xl text-[11px] font-black uppercase tracking-widest shadow-lg shadow-blue-900/20 hover:scale-105 active:scale-95 transition-all"
+                  className="px-8 py-3 bg-[#2563EB] text-white rounded-2xl text-[14px] font-semibold shadow-lg shadow-blue-900/20 hover:scale-105 active:scale-95 transition-all"
                 >
                   Apply Filters
                 </button>

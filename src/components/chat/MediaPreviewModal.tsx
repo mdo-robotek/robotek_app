@@ -134,7 +134,7 @@ export default function MediaPreviewModal({
       >
         <div className="min-w-0 flex-1 pr-3">
           <p className="text-gray-900 text-sm font-medium truncate">{formatSenderName(active.senderId)}</p>
-          <p className="text-gray-500 text-xs truncate">{formatPreviewDateTime(active.createdAt)}</p>
+          <p className="text-gray-500 text-[14px] truncate">{formatPreviewDateTime(active.createdAt)}</p>
         </div>
 
         <div className="flex items-center gap-0.5 shrink-0">
@@ -268,7 +268,7 @@ export default function MediaPreviewModal({
       {/* Bottom media strip */}
       {items.length > 0 && (
         <div className="shrink-0 bg-white border-t border-gray-200 px-3 py-3 shadow-[0_-2px_8px_rgba(0,0,0,0.06)]" onClick={(e) => e.stopPropagation()}>
-          <p className="text-xs text-gray-500 mb-2 px-1">
+          <p className="text-[14px] text-gray-500 mb-2 px-1">
             {activeIndex + 1} of {items.length} — scroll to browse
           </p>
           <div className="flex gap-2 overflow-x-auto custom-scrollbar pb-1">
@@ -291,7 +291,7 @@ export default function MediaPreviewModal({
                   ) : (
                     <div className="w-full h-full bg-gray-100 flex flex-col items-center justify-center p-1">
                       <DocumentIcon className="w-6 h-6 text-gray-600" />
-                      <span className="text-[8px] text-gray-500 truncate w-full text-center mt-0.5">
+                      <span className="text-[12px] text-gray-500 truncate w-full text-center mt-0.5">
                         {item.label.split(".").pop()?.toUpperCase() || "DOC"}
                       </span>
                     </div>

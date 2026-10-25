@@ -481,7 +481,7 @@ export default function TicketsPage() {
 
   const getPriorityColor = (p: string) => {
     if (p === 'Critical') return 'bg-red-600 text-white border-red-700 shadow-sm';
-    if (p === 'High') return 'bg-orange-500 text-white border-orange-600 shadow-sm';
+    if (p === 'High') return 'bg-[#D97706] text-white border-[#E5E7EB] shadow-sm';
     if (p === 'Medium') return 'bg-amber-500 text-white border-amber-600 shadow-sm';
     return 'bg-blue-500 text-white border-blue-600 shadow-sm';
   };
@@ -498,7 +498,7 @@ export default function TicketsPage() {
   const renderUserAvatar = (username: string) => {
     if (!username || username === "System" || username === "Unassigned") {
       return (
-        <div className="w-7 h-7 rounded-full shrink-0 bg-gray-100 dark:bg-navy-800 text-gray-400 flex items-center justify-center shadow-sm border border-gray-200 dark:border-navy-700">
+        <div className="w-7 h-7 rounded-full shrink-0 bg-gray-100 dark:bg-navy-800 text-[#5B6472] flex items-center justify-center shadow-sm border border-gray-200 dark:border-navy-700">
           <UserIcon className="w-3.5 h-3.5" />
         </div>
       );
@@ -510,7 +510,7 @@ export default function TicketsPage() {
       );
     }
     return (
-      <div className="w-7 h-7 rounded-full shrink-0 bg-gradient-to-br from-[#003875] to-[#002855] text-white flex items-center justify-center text-[10px] font-bold shadow-sm">
+      <div className="w-7 h-7 rounded-full shrink-0 bg-gradient-to-br from-[#2563EB] to-[#1D4ED8] text-white flex items-center justify-center text-[13px] font-bold shadow-sm">
         {username.charAt(0).toUpperCase()}
       </div>
     );
@@ -523,15 +523,15 @@ export default function TicketsPage() {
         {/* Header Section */}
         <div className="flex flex-col lg:flex-row items-center gap-4 px-1">
           <div className="w-full lg:w-1/3 text-center lg:text-left min-w-0">
-            <h1 className="text-xl md:text-2xl font-black text-gray-900 dark:text-white tracking-tight truncate">Help Tickets</h1>
-            <p className="text-gray-500 dark:text-slate-300 font-bold text-[8px] md:text-[10px] uppercase tracking-wider">Support Ticketing System</p>
+            <h1 className="text-xl md:text-2xl font-semibold text-gray-900 dark:text-white tracking-tight truncate">Help Tickets</h1>
+            <p className="text-gray-500 dark:text-slate-300 font-bold text-[12px] md:text-[10px] tracking-wider">Support Ticketing System</p>
           </div>
 
           <div className="w-full lg:w-1/3 flex justify-center flex-shrink-0 min-w-0">
-            <div className="flex items-center gap-1.5 rounded-full border-2 border-b-4 border-[#003875] dark:border-[#FFD500] bg-white dark:bg-navy-800 shadow-sm transition-all active:translate-y-[2px] active:border-b-2 p-1 overflow-x-auto no-scrollbar max-w-full">
+            <div className="flex items-center gap-1.5 rounded-full border-2 border-b-4 border-[#2563EB] dark:border-[#60A5FA] bg-white dark:bg-navy-800 shadow-sm transition-all active:translate-y-[2px] active:border-b-2 p-1 overflow-x-auto no-scrollbar max-w-full">
               <button
                 onClick={() => setIsNewModalOpen(true)}
-                className="flex items-center gap-2 px-3 md:px-5 py-1.5 font-black uppercase tracking-widest text-[9px] md:text-[10px] transition-all rounded-full whitespace-nowrap bg-[#003875] text-white hover:bg-[#002a5a] shadow-sm"
+                className="flex items-center gap-2 px-3 md:px-5 py-1.5 font-semibold text-[13px] md:text-[10px] transition-all rounded-full whitespace-nowrap bg-[#2563EB] text-white hover:bg-[#002a5a] shadow-sm"
               >
                 <PlusIcon className="w-4 h-4 ml-[-4px]" />
                 New Ticket
@@ -569,11 +569,11 @@ export default function TicketsPage() {
 
               return (
                 <button key={tile.label} onClick={handleToggle}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-[10px] font-black uppercase tracking-widest transition-all ${isActive ? 'bg-[#003875] dark:bg-[#FFD500] text-white dark:text-black border-[#003875] dark:border-[#FFD500] shadow-md scale-105' : `${tile.color} hover:scale-[1.02] hover:shadow-sm`
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-[13px] font-semibold   transition-all ${isActive ? 'bg-[#2563EB] dark:bg-[#60A5FA] text-white dark:text-black border-[#2563EB] dark:border-[#60A5FA] shadow-md scale-105' : `${tile.color} hover:scale-[1.02] hover:shadow-sm`
                     }`}
                 >
                   {tile.icon} {tile.label}
-                  <span className={`ml-1 px-1.5 py-0.5 rounded-full text-[9px] ${isActive ? 'bg-white/20 dark:bg-black/20' : 'bg-black/5 dark:bg-white/10'}`}>{count}</span>
+                  <span className={`ml-1 px-1.5 py-0.5 rounded-full text-[13px] ${isActive ? 'bg-white/20 dark:bg-black/20' : 'bg-black/5 dark:bg-white/10'}`}>{count}</span>
                 </button>
               );
             })}
@@ -584,9 +584,9 @@ export default function TicketsPage() {
           >
             <div className="flex items-center gap-2 w-full">
               <div className="relative group flex-1 min-w-0">
-                <MagnifyingGlassIcon className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 group-focus-within:text-[#FFD500] transition-colors" />
+                <MagnifyingGlassIcon className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#5B6472] group-focus-within:text-[#2563EB] transition-colors" />
                 <input type="text" placeholder="Search database..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-8 pr-2 py-1.5 bg-gray-50 dark:bg-navy-900 border-2 border-gray-100 dark:border-navy-700/50 rounded-xl focus:border-[#FFD500] outline-none font-bold text-[10px] text-gray-700 dark:text-white transition-all shadow-sm"
+                  className="w-full pl-8 pr-2 py-1.5 bg-gray-50 dark:bg-navy-900 border-2 border-gray-100 dark:border-navy-700/50 rounded-xl focus:border-[#2563EB] outline-none font-bold text-[13px] text-gray-700 dark:text-white transition-all shadow-sm"
                 />
               </div>
 
@@ -601,13 +601,13 @@ export default function TicketsPage() {
                       onClick={() => setAssignmentFilters(prev =>
                         prev.includes(btn.value) ? prev.filter(v => v !== btn.value) : [...prev, btn.value]
                       )}
-                      className={`px-2.5 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all flex items-center gap-1 ${isActive ? 'bg-[#003875] text-white shadow-sm' : 'text-gray-500 hover:bg-gray-100 dark:hover:bg-white/5'
+                      className={`px-2.5 py-1.5 rounded-lg text-[13px] font-semibold   transition-all flex items-center gap-1 ${isActive ? 'bg-[#2563EB] text-white shadow-sm' : 'text-gray-500 hover:bg-gray-100 dark:hover:bg-white/5'
                         }`}
                       title={btn.full}
                     >
                       <span className="hidden sm:inline">{btn.full}</span>
                       <span className="sm:hidden">{btn.label}</span>
-                      <span className={`px-1 rounded-md text-[8px] ${isActive ? 'bg-white/20' : 'bg-black/5 dark:bg-white/10'}`}>
+                      <span className={`px-1 rounded-md text-[12px] ${isActive ? 'bg-white/20' : 'bg-black/5 dark:bg-white/10'}`}>
                         {btn.count}
                       </span>
                     </button>
@@ -622,12 +622,12 @@ export default function TicketsPage() {
       {/* Data Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {loading ? (
-          <div className="col-span-full py-12 flex justify-center"><ArrowPathIcon className="w-8 h-8 text-[#003875] dark:text-[#FFD500] animate-spin" /></div>
+          <div className="col-span-full py-12 flex justify-center"><ArrowPathIcon className="w-8 h-8 text-[#2563EB] dark:text-[#60A5FA] animate-spin" /></div>
         ) : filteredTickets.length === 0 ? (
           <div className="col-span-full py-20 text-center flex flex-col items-center">
-            <TicketIcon className="w-16 h-16 text-gray-300 dark:text-navy-700 mb-4" />
-            <h3 className="text-xl font-black text-gray-900 dark:text-white">No tickets found</h3>
-            <p className="text-sm font-bold text-gray-500 mt-2 tracking-widest uppercase">Try adjusting your filters</p>
+            <TicketIcon className="w-16 h-16 text-[#5B6472] dark:text-navy-700 mb-4" />
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white">No tickets found</h3>
+            <p className="text-sm font-bold text-gray-500 mt-2">Try adjusting your filters</p>
           </div>
         ) : (
           filteredTickets.map(ticket => {
@@ -650,14 +650,14 @@ export default function TicketsPage() {
                 {/* Card Header: Slim with Top Right Actions */}
                 <div className="px-3 py-1.5 border-b border-gray-100 dark:border-white/5 flex items-center justify-between gap-2 bg-gray-50/30 dark:bg-white/5">
                   <div className="flex items-center gap-1.5 overflow-hidden">
-                    <span className="font-mono text-[9px] font-black text-white bg-[#003875] dark:bg-[#FFD500] dark:text-black px-1.5 py-0.5 rounded shrink-0 shadow-sm">
+                    <span className="font-mono text-[13px] font-semibold text-white bg-[#2563EB] dark:bg-[#60A5FA] dark:text-black px-1.5 py-0.5 rounded shrink-0 shadow-sm">
                       TKT-{ticket.id.split('-').pop()}
                     </span>
                     <div className="flex items-center gap-1 shrink-0">
-                      <span className={`px-2 py-0.5 rounded-lg text-[9px] font-black uppercase tracking-widest border-2 ${getPriorityColor(ticket.priority)}`}>
+                      <span className={`px-2 py-0.5 rounded-lg text-[13px] font-semibold   border-2 ${getPriorityColor(ticket.priority)}`}>
                         {ticket.priority}
                       </span>
-                      <span className={`px-2 py-0.5 rounded-lg text-[9px] font-black uppercase tracking-widest border-2 shadow-sm ${getStatusColor(displayStatus)}`}>
+                      <span className={`px-2 py-0.5 rounded-lg text-[13px] font-semibold   border-2 shadow-sm ${getStatusColor(displayStatus)}`}>
                         {displayStatus}
                       </span>
                     </div>
@@ -677,14 +677,14 @@ export default function TicketsPage() {
                       <>
                         <button
                           onClick={() => setEditingTicket(ticket)}
-                          className="p-1.5 bg-[#003875]/10 text-[#003875] dark:bg-[#FFD500]/10 dark:text-[#FFD500] hover:bg-[#003875] hover:text-white dark:hover:bg-[#FFD500] dark:hover:text-black rounded-lg transition-all border border-[#003875]/20 dark:border-[#FFD500]/20"
+                          className="p-1.5 bg-[#2563EB]/10 text-white dark:bg-[#60A5FA]/10 dark:text-[#60A5FA] hover:bg-[#2563EB] hover:text-white dark:hover:bg-[#60A5FA] dark:hover:text-black rounded-lg transition-all border border-[#2563EB]/20 dark:border-[#60A5FA]/20"
                           title="Edit"
                         >
                           <PencilSquareIcon className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => handleDeleteClick(ticket.id)}
-                          className="p-1.5 bg-[#CE2029]/10 text-[#CE2029] hover:bg-[#CE2029] hover:text-white rounded-lg transition-all border border-[#CE2029]/20"
+                          className="p-1.5 bg-[#DC2626]/10 text-[#DC2626] hover:bg-[#DC2626] hover:text-white rounded-lg transition-all border border-[#DC2626]/20"
                           title="Delete"
                         >
                           <TrashIcon className="w-4 h-4" />
@@ -697,11 +697,11 @@ export default function TicketsPage() {
                 {/* Card Body: Split and Compact */}
                 <div className="p-3.5 flex flex-col gap-3">
                   <div className="flex flex-col gap-1.5">
-                    <h3 className="font-black text-[14px] text-gray-900 dark:text-white leading-tight line-clamp-1 uppercase tracking-tight group-hover:text-[#003875] dark:group-hover:text-[#FFD500] transition-colors">
+                    <h3 className="font-semibold text-[14px] text-gray-900 dark:text-white leading-tight line-clamp-1 tracking-tight group-hover:text-[#2563EB] dark:group-hover:text-[#60A5FA] transition-colors">
                       {ticket.title}
                     </h3>
                     {/* Description: Clamped 2 lines */}
-                    <p className="text-[11px] text-gray-500 dark:text-gray-400 line-clamp-2 leading-snug italic border-l-2 border-gray-100 dark:border-navy-700 pl-2">
+                    <p className="text-[14px] text-gray-500 dark:text-gray-400 line-clamp-2 leading-snug italic border-l-2 border-gray-100 dark:border-navy-700 pl-2">
                       {ticket.description}
                     </p>
                   </div>
@@ -710,16 +710,16 @@ export default function TicketsPage() {
                     <div className="flex items-center gap-2 min-w-0">
                       {renderUserAvatar(ticket.raised_by || "System")}
                       <div className="min-w-0">
-                        <p className="text-[8px] font-black text-blue-400 dark:text-blue-500 uppercase tracking-widest leading-none mb-0.5">Raised By</p>
-                        <p className="text-[11px] font-bold text-gray-900 dark:text-gray-100 truncate">{ticket.raised_by || "System"}</p>
+                        <p className="text-[12px] font-semibold text-blue-400 dark:text-blue-500 leading-none mb-0.5">Raised By</p>
+                        <p className="text-[14px] font-bold text-gray-900 dark:text-gray-100 truncate">{ticket.raised_by || "System"}</p>
                       </div>
                     </div>
 
                     <div className="flex items-center gap-2 min-w-0">
                       {renderUserAvatar(ticket.solver_person || "Unassigned")}
                       <div className="min-w-0">
-                        <p className="text-[8px] font-black text-emerald-400 dark:text-emerald-500 uppercase tracking-widest leading-none mb-0.5">Assignee</p>
-                        <p className="text-[11px] font-bold text-gray-900 dark:text-gray-100 truncate">{ticket.solver_person || "Unassigned"}</p>
+                        <p className="text-[12px] font-semibold text-emerald-400 dark:text-emerald-500 leading-none mb-0.5">Assignee</p>
+                        <p className="text-[14px] font-bold text-gray-900 dark:text-gray-100 truncate">{ticket.solver_person || "Unassigned"}</p>
                       </div>
                     </div>
 
@@ -728,8 +728,8 @@ export default function TicketsPage() {
                         <CalendarIcon className="w-4 h-4" />
                       </div>
                       <div className="min-w-0">
-                        <p className="text-[8px] font-black text-amber-400 dark:text-amber-500 uppercase tracking-widest leading-none mb-0.5">Due Date</p>
-                        <p className="text-[11px] font-bold text-gray-800 dark:text-slate-200 truncate">
+                        <p className="text-[12px] font-semibold text-amber-400 dark:text-amber-500 leading-none mb-0.5">Due Date</p>
+                        <p className="text-[14px] font-bold text-gray-800 dark:text-slate-200 truncate">
                           {ticket.planned_resolution ? new Date(ticket.planned_resolution).toLocaleDateString() : "—"}
                         </p>
                       </div>
@@ -740,8 +740,8 @@ export default function TicketsPage() {
                         <TagIcon className="w-4 h-4" />
                       </div>
                       <div className="min-w-0">
-                        <p className="text-[8px] font-black text-purple-400 dark:text-purple-500 uppercase tracking-widest leading-none mb-0.5">Category</p>
-                        <p className="text-[11px] font-black text-[#003875] dark:text-[#FFD500] truncate">{ticket.category}</p>
+                        <p className="text-[12px] font-semibold text-purple-400 dark:text-purple-500 leading-none mb-0.5">Category</p>
+                        <p className="text-[14px] font-semibold text-[#2563EB] dark:text-[#60A5FA] truncate">{ticket.category}</p>
                       </div>
                     </div>
                   </div>
@@ -750,14 +750,14 @@ export default function TicketsPage() {
                   {ticket.latest_comment && (
                     <div className="mt-1 pt-3 border-t border-gray-100 dark:border-navy-700/50 flex flex-col gap-1.5">
                       <div className="flex items-center gap-1.5">
-                        <ChatBubbleLeftRightIcon className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500 shrink-0" />
-                        <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest truncate flex gap-1.5 items-center">
+                        <ChatBubbleLeftRightIcon className="w-3.5 h-3.5 text-[#5B6472] dark:text-gray-500 shrink-0" />
+                        <span className="text-[13px] font-semibold text-[#5B6472] truncate flex gap-1.5 items-center">
                           <span>Latest Comment By {ticket.latest_comment.actor}</span>
                           <span className="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-600"></span>
                           <span>{new Date(ticket.latest_comment.created_at).toLocaleDateString([], { day: '2-digit', month: 'short' })}</span>
                         </span>
                       </div>
-                      <p className="text-[11px] text-gray-600 dark:text-gray-300 line-clamp-2 leading-relaxed bg-gray-50/50 dark:bg-navy-900 px-2 py-1.5 rounded-lg border border-gray-100 dark:border-navy-800 italic">
+                      <p className="text-[14px] text-gray-600 dark:text-gray-300 line-clamp-2 leading-relaxed bg-gray-50/50 dark:bg-navy-900 px-2 py-1.5 rounded-lg border border-gray-100 dark:border-navy-800 italic">
                         "{ticket.latest_comment.text}"
                       </p>
                     </div>
@@ -775,17 +775,17 @@ export default function TicketsPage() {
         <Portal>
         <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => { setIsNewModalOpen(false); setEditingTicket(null); }} />
-          <div className="relative bg-[#FFFBF0] dark:bg-navy-900 w-full max-w-2xl rounded-3xl shadow-2xl flex flex-col max-h-[90vh] animate-in fade-in zoom-in-95 duration-300 border border-orange-100/50 dark:border-navy-700 overflow-hidden">
+          <div className="relative bg-[#FFFFFF] dark:bg-navy-900 w-full max-w-2xl rounded-3xl shadow-2xl flex flex-col max-h-[90vh] animate-in fade-in zoom-in-95 duration-300 border border-[#E5E7EB] dark:border-navy-700 overflow-hidden">
             {/* Header */}
-            <div className="p-5 border-b border-orange-100/50 dark:border-navy-800 flex justify-between items-center bg-[#003875] dark:bg-navy-900 text-white">
+            <div className="p-5 border-b border-[#E5E7EB] dark:border-navy-800 flex justify-between items-center bg-[#2563EB] dark:bg-navy-900 text-white">
               <div>
-                <h2 className="text-lg font-black tracking-tight flex items-center gap-2 uppercase">
-                  <TicketIcon className="w-5 h-5 text-[#FFD500]" /> {editingTicket ? "Edit Ticket" : "New Ticket"}
+                <h2 className="text-lg font-semibold tracking-tight flex items-center gap-2">
+                  <TicketIcon className="w-5 h-5 text-[#2563EB]" /> {editingTicket ? "Edit Ticket" : "New Ticket"}
                 </h2>
                 <div className="flex items-center gap-2 mt-0.5">
-                  <p className="text-[#FFD500] dark:text-slate-400 font-bold text-[8px] uppercase tracking-widest">Support Configuration</p>
+                  <p className="text-[#2563EB] dark:text-slate-400 font-bold text-[12px]">Support Configuration</p>
                   {editingTicket && (
-                    <span className="px-2 py-0.5 bg-white/10 text-[8px] font-black text-[#FFD500] rounded border border-white/20">
+                    <span className="px-2 py-0.5 bg-white/10 text-[12px] font-semibold text-[#2563EB] rounded border border-white/20">
                       ID: {editingTicket.id}
                     </span>
                   )}
@@ -799,21 +799,21 @@ export default function TicketsPage() {
             <form onSubmit={editingTicket ? handleUpdateTicket : handleCreateTicket} className="p-6 overflow-y-auto space-y-6 custom-scrollbar bg-white dark:bg-navy-800/50">
               <div className="space-y-4">
                 <div>
-                  <label className="block text-[10px] font-black text-[#FFD500] uppercase tracking-widest mb-1.5 px-1">
+                  <label className="block text-[13px] font-semibold text-[#2563EB] mb-1.5 px-1">
                     Title <span className="text-red-500 ml-1" aria-hidden="true">*</span>
                   </label>
-                  <input required aria-required="true" type="text" value={editingTicket ? editingTicket.title : newTicket.title} onChange={e => editingTicket ? setEditingTicket({ ...editingTicket, title: e.target.value }) : setNewTicket({ ...newTicket, title: e.target.value })} className="w-full bg-[#FFFBF0] dark:bg-navy-900 px-3 py-2.5 rounded-xl border border-orange-100 dark:border-navy-700 focus:border-[#FFD500] focus:bg-white dark:focus:bg-navy-900 outline-none font-black text-xs text-gray-900 dark:text-white transition-all shadow-sm" placeholder="Issue summary" />
+                  <input required aria-required="true" type="text" value={editingTicket ? editingTicket.title : newTicket.title} onChange={e => editingTicket ? setEditingTicket({ ...editingTicket, title: e.target.value }) : setNewTicket({ ...newTicket, title: e.target.value })} className="w-full bg-[#FFFFFF] dark:bg-navy-900 px-3 py-2.5 rounded-xl border border-[#E5E7EB] dark:border-navy-700 focus:border-[#2563EB] focus:bg-white dark:focus:bg-navy-900 outline-none font-semibold text-[14px] text-gray-900 dark:text-white transition-all shadow-sm" placeholder="Issue summary" />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5 px-1">
+                  <label className="block text-[13px] font-semibold text-[#5B6472] mb-1.5 px-1">
                     Description <span className="text-red-500 ml-1" aria-hidden="true">*</span>
                   </label>
-                  <textarea required aria-required="true" rows={3} value={editingTicket ? editingTicket.description : newTicket.description} onChange={e => editingTicket ? setEditingTicket({ ...editingTicket, description: e.target.value }) : setNewTicket({ ...newTicket, description: e.target.value })} className="w-full bg-[#FFFBF0] dark:bg-navy-900 px-3 py-2.5 rounded-xl border border-orange-100 dark:border-navy-700 focus:border-[#FFD500] focus:bg-white dark:focus:bg-navy-900 outline-none font-bold text-xs text-gray-800 dark:text-zinc-100 transition-all shadow-sm resize-none min-h-[80px]" placeholder="Provide details..." />
+                  <textarea required aria-required="true" rows={3} value={editingTicket ? editingTicket.description : newTicket.description} onChange={e => editingTicket ? setEditingTicket({ ...editingTicket, description: e.target.value }) : setNewTicket({ ...newTicket, description: e.target.value })} className="w-full bg-[#FFFFFF] dark:bg-navy-900 px-3 py-2.5 rounded-xl border border-[#E5E7EB] dark:border-navy-700 focus:border-[#2563EB] focus:bg-white dark:focus:bg-navy-900 outline-none font-bold text-[14px] text-gray-800 dark:text-zinc-100 transition-all shadow-sm resize-none min-h-[80px]" placeholder="Provide details..." />
                 </div>
                 {/* Suggestions (optional, max 3) — raiser's own ideas to solve the issue */}
                 <div>
-                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5 px-1">
-                    Your Suggestions <span className="text-red-500" aria-hidden="true">*</span> <span className="normal-case font-bold text-gray-400/70">(Suggestion 1 required · 2 &amp; 3 optional)</span>
+                  <label className="block text-[13px] font-semibold text-[#5B6472] mb-1.5 px-1">
+                    Your Suggestions <span className="text-red-500" aria-hidden="true">*</span> <span className="normal-case font-bold text-[#5B6472]/70">(Suggestion 1 required · 2 &amp; 3 optional)</span>
                   </label>
                   {(() => {
                     const t: any = editingTicket || newTicket;
@@ -834,7 +834,7 @@ export default function TicketsPage() {
                             aria-required={n === 1 && !editingTicket}
                             value={(t as any)[`suggestion_${n}`] || ""}
                             onChange={(e) => setSugg(n, e.target.value)}
-                            className="w-full bg-[#FFFBF0] dark:bg-navy-900 px-3 py-2.5 rounded-xl border border-orange-100 dark:border-navy-700 focus:border-[#FFD500] focus:bg-white dark:focus:bg-navy-900 outline-none font-bold text-xs text-gray-800 dark:text-zinc-100 transition-all shadow-sm"
+                            className="w-full bg-[#FFFFFF] dark:bg-navy-900 px-3 py-2.5 rounded-xl border border-[#E5E7EB] dark:border-navy-700 focus:border-[#2563EB] focus:bg-white dark:focus:bg-navy-900 outline-none font-bold text-[14px] text-gray-800 dark:text-zinc-100 transition-all shadow-sm"
                             placeholder={n === 1 ? "Suggestion 1 (required)..." : `Suggestion ${n}...`}
                           />
                         ))}
@@ -842,7 +842,7 @@ export default function TicketsPage() {
                           <button
                             type="button"
                             onClick={() => setSuggestionCount(showN + 1)}
-                            className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-[#003875] dark:text-[#FFD500] hover:opacity-70 transition-opacity px-1"
+                            className="flex items-center gap-1.5 text-[13px] font-semibold text-[#2563EB] dark:text-[#60A5FA] hover:opacity-70 transition-opacity px-1"
                           >
                             + Add Suggestion {showN + 1}
                           </button>
@@ -853,11 +853,11 @@ export default function TicketsPage() {
                 </div>
               </div>
 
-              <div className="space-y-4 pt-4 border-t border-orange-50 dark:border-navy-800/50">
+              <div className="space-y-4 pt-4 border-t border-[#E5E7EB] dark:border-navy-800/50">
                 <div className="flex items-center justify-between px-1">
-                  <p className="text-[10px] font-black text-[#FFD500] uppercase tracking-[0.2em]">Attachments</p>
+                  <p className="text-[13px] font-semibold text-[#2563EB]">Attachments</p>
                   {editingTicket && (editingTicket.attachment_url || editingTicket.voice_note) && (
-                    <span className="text-[8px] font-bold text-green-500 uppercase tracking-widest bg-green-500/10 px-2 py-0.5 rounded">Existing Files Preserved</span>
+                    <span className="text-[12px] font-bold text-green-500 bg-green-500/10 px-2 py-0.5 rounded">Existing Files Preserved</span>
                   )}
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -881,8 +881,8 @@ export default function TicketsPage() {
                           <button type="button" onClick={stopRecording} className="p-4 bg-red-500 rounded-full text-white shadow-lg shadow-red-500/30 hover:bg-red-600 transition-all hover:scale-105 active:scale-95 animate-pulse">
                             <StopCircleIcon className="w-8 h-8" />
                           </button>
-                          <p className="mt-3 font-black text-red-600 dark:text-red-400 font-mono text-lg tracking-widest">{formatDuration(recordingDuration)}</p>
-                          <p className="text-[10px] font-bold text-red-500/70 uppercase tracking-widest mt-1 animate-pulse">Recording Live...</p>
+                          <p className="mt-3 font-semibold text-red-600 dark:text-red-400 font-mono text-lg">{formatDuration(recordingDuration)}</p>
+                          <p className="text-[13px] font-bold text-red-500/70 mt-1 animate-pulse">Recording Live...</p>
                         </>
                       ) : (
                         <div className="flex w-full items-center gap-3">
@@ -894,13 +894,13 @@ export default function TicketsPage() {
                           </div>
 
                           <div className="flex-1 text-left border-l-2 border-gray-200 dark:border-navy-700 pl-3 h-full flex flex-col justify-center min-w-0">
-                            <p className="text-sm font-black text-gray-800 dark:text-zinc-200 truncate">{voiceNoteFile ? "New Voice Note" : editingTicket?.voice_note ? "Keep Existing" : "Record Live"}</p>
-                            <p className="text-[10px] font-bold text-gray-500 mt-0.5 truncate">{voiceNoteFile ? voiceNoteFile.name : editingTicket?.voice_note ? "Original file preserved" : "Click mic to start"}</p>
+                            <p className="text-sm font-semibold text-gray-800 dark:text-zinc-200 truncate">{voiceNoteFile ? "New Voice Note" : editingTicket?.voice_note ? "Keep Existing" : "Record Live"}</p>
+                            <p className="text-[13px] font-bold text-gray-500 mt-0.5 truncate">{voiceNoteFile ? voiceNoteFile.name : editingTicket?.voice_note ? "Original file preserved" : "Click mic to start"}</p>
                           </div>
 
                           <label className="flex items-center gap-1.5 cursor-pointer bg-white dark:bg-navy-800 px-2.5 py-1.5 rounded border border-gray-200 dark:border-navy-700 shadow-sm hover:bg-gray-50 dark:hover:bg-navy-700 transition-colors flex-shrink-0">
                             <PaperClipIcon className="w-4 h-4 text-gray-500" />
-                            <span className="text-[9px] font-black uppercase tracking-widest text-gray-500">Upload</span>
+                            <span className="text-[13px] font-semibold text-gray-500">Upload</span>
                             <input type="file" accept="audio/*" className="hidden" onChange={(e) => { if (e.target.files?.[0]) setVoiceNoteFile(e.target.files[0]); }} />
                           </label>
                         </div>
@@ -912,12 +912,12 @@ export default function TicketsPage() {
                   <div className="p-4 bg-gray-50 dark:bg-navy-900/50 rounded-xl border border-dashed border-gray-300 dark:border-navy-700 flex flex-col justify-center">
                     <label className="flex items-center gap-3 cursor-pointer group">
                       <div className="relative p-3 bg-white dark:bg-navy-800 rounded-lg shadow-sm group-hover:scale-105 transition-transform">
-                        <PaperClipIcon className="w-5 h-5 text-gray-400 group-hover:text-[#003875] dark:group-hover:text-[#FFD500] transition-colors" />
+                        <PaperClipIcon className="w-5 h-5 text-[#5B6472] group-hover:text-[#2563EB] dark:group-hover:text-[#60A5FA] transition-colors" />
                         {editingTicket?.attachment_url && !refDocFile && <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-white dark:border-navy-950" title="Existing document" />}
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="text-xs font-black text-gray-800 dark:text-zinc-200">{refDocFile ? "New Document" : editingTicket?.attachment_url ? "Keep Existing" : "Reference Doc"}</p>
-                        <p className="text-[10px] font-bold text-gray-400 mt-0.5 truncate">{refDocFile ? refDocFile.name : editingTicket?.attachment_url ? "Original file preserved" : "Click to upload document"}</p>
+                        <p className="text-[14px] font-semibold text-gray-800 dark:text-zinc-200">{refDocFile ? "New Document" : editingTicket?.attachment_url ? "Keep Existing" : "Reference Doc"}</p>
+                        <p className="text-[13px] font-bold text-[#5B6472] mt-0.5 truncate">{refDocFile ? refDocFile.name : editingTicket?.attachment_url ? "Original file preserved" : "Click to upload document"}</p>
                       </div>
                       <input type="file" className="hidden" onChange={(e) => setRefDocFile(e.target.files?.[0] || null)} />
                     </label>
@@ -928,24 +928,24 @@ export default function TicketsPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Searchable Category Dropdown */}
                 <div className="relative">
-                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-1.5 px-1">Category</label>
-                  <div className="w-full bg-[#FFFBF0] dark:bg-navy-900 border border-orange-100 dark:border-navy-700 rounded-xl shadow-sm cursor-pointer" onClick={() => { setCategoryOpen(!categoryOpen); setAssignedToOpen(false); }}>
-                    <div className="px-3 py-2.5 font-bold text-xs text-gray-800 dark:text-zinc-100 flex justify-between items-center transition-colors">
+                  <label className="text-[13px] font-semibold text-[#5B6472] block mb-1.5 px-1">Category</label>
+                  <div className="w-full bg-[#FFFFFF] dark:bg-navy-900 border border-[#E5E7EB] dark:border-navy-700 rounded-xl shadow-sm cursor-pointer" onClick={() => { setCategoryOpen(!categoryOpen); setAssignedToOpen(false); }}>
+                    <div className="px-3 py-2.5 font-bold text-[14px] text-gray-800 dark:text-zinc-100 flex justify-between items-center transition-colors">
                       <div className="flex items-center gap-2">
-                        <TagIcon className="w-3.5 h-3.5 text-gray-400" />
+                        <TagIcon className="w-3.5 h-3.5 text-[#5B6472]" />
                         <span>{(editingTicket ? editingTicket.category : newTicket.category) || "Select Category..."}</span>
                       </div>
-                      <ChevronDownIcon className="w-3.5 h-3.5 text-gray-400" />
+                      <ChevronDownIcon className="w-3.5 h-3.5 text-[#5B6472]" />
                     </div>
                   </div>
                   {categoryOpen && (
-                    <div className="absolute z-[10000] w-full mt-1 bg-white dark:bg-navy-900 border border-orange-100 dark:border-navy-700 rounded-xl shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-                      <div className="p-2 border-b border-orange-50 dark:border-navy-800">
-                        <input type="text" placeholder="Search categories..." value={categorySearch} onChange={(e) => setCategorySearch(e.target.value)} onClick={(e) => e.stopPropagation()} className="w-full bg-gray-50 dark:bg-navy-900 px-2 py-1.5 rounded-lg border border-gray-100 dark:border-navy-800 outline-none text-[10px] font-bold text-gray-700 dark:text-gray-300" />
+                    <div className="absolute z-[10000] w-full mt-1 bg-white dark:bg-navy-900 border border-[#E5E7EB] dark:border-navy-700 rounded-xl shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                      <div className="p-2 border-b border-[#E5E7EB] dark:border-navy-800">
+                        <input type="text" placeholder="Search categories..." value={categorySearch} onChange={(e) => setCategorySearch(e.target.value)} onClick={(e) => e.stopPropagation()} className="w-full bg-gray-50 dark:bg-navy-900 px-2 py-1.5 rounded-lg border border-gray-100 dark:border-navy-800 outline-none text-[13px] font-bold text-gray-700 dark:text-gray-300" />
                       </div>
                       <div className="max-h-40 overflow-y-auto">
                         {categories.filter(c => c.toLowerCase().includes(categorySearch.toLowerCase())).map(c => (
-                          <div key={c} className="px-3 py-2 text-xs font-bold text-gray-700 dark:text-gray-300 hover:bg-[#003875]/5 dark:hover:bg-[#FFD500]/10 cursor-pointer" onClick={() => { editingTicket ? setEditingTicket({ ...editingTicket, category: c }) : setNewTicket({ ...newTicket, category: c }); setCategoryOpen(false); setCategorySearch(""); }}>{c}</div>
+                          <div key={c} className="px-3 py-2 text-[14px] font-bold text-gray-700 dark:text-gray-300 hover:bg-[#2563EB]/5 dark:hover:bg-[#60A5FA]/10 cursor-pointer" onClick={() => { editingTicket ? setEditingTicket({ ...editingTicket, category: c }) : setNewTicket({ ...newTicket, category: c }); setCategoryOpen(false); setCategorySearch(""); }}>{c}</div>
                         ))}
                       </div>
                     </div>
@@ -954,13 +954,13 @@ export default function TicketsPage() {
 
                 {/* Priority Buttons */}
                 <div>
-                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-1.5 px-1">Priority</label>
+                  <label className="text-[13px] font-semibold text-[#5B6472] block mb-1.5 px-1">Priority</label>
                   <div className="flex bg-gray-100 dark:bg-navy-900/50 p-1 rounded-xl gap-1">
                     {(['Low', 'Medium', 'High', 'Critical'] as const).map((pri) => (
-                      <button key={pri} type="button" onClick={() => editingTicket ? setEditingTicket({ ...editingTicket, priority: pri }) : setNewTicket({ ...newTicket, priority: pri })} className={`flex-1 py-2 text-[8px] sm:text-[9px] font-black uppercase tracking-widest rounded-lg transition-all ${(editingTicket ? editingTicket.priority : newTicket.priority) === pri
+                      <button key={pri} type="button" onClick={() => editingTicket ? setEditingTicket({ ...editingTicket, priority: pri }) : setNewTicket({ ...newTicket, priority: pri })} className={`flex-1 py-2 text-[12px] sm:text-[9px] font-semibold   rounded-lg transition-all ${(editingTicket ? editingTicket.priority : newTicket.priority) === pri
                           ? pri === 'Low' ? 'bg-green-500 text-white shadow-md'
                             : pri === 'Medium' ? 'bg-yellow-500 text-white shadow-md'
-                              : pri === 'High' ? 'bg-orange-500 text-white shadow-md'
+                              : pri === 'High' ? 'bg-[#D97706] text-white shadow-md'
                                 : 'bg-red-600 text-white shadow-md'
                           : 'text-gray-500 dark:text-gray-400 hover:bg-white dark:hover:bg-navy-800 hover:text-gray-900 dark:hover:text-white'
                         }`}>{pri}</button>
@@ -970,24 +970,24 @@ export default function TicketsPage() {
 
                 {/* Searchable Assign To Dropdown */}
                 <div className="relative">
-                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-1.5 px-1">Assign To</label>
-                  <div className="w-full bg-[#FFFBF0] dark:bg-navy-900 border border-orange-100 dark:border-navy-700 rounded-xl shadow-sm cursor-pointer" onClick={() => { setAssignedToOpen(!assignedToOpen); setCategoryOpen(false); }}>
-                    <div className="px-3 py-2.5 font-bold text-xs text-gray-800 dark:text-zinc-100 flex justify-between items-center transition-colors">
+                  <label className="text-[13px] font-semibold text-[#5B6472] block mb-1.5 px-1">Assign To</label>
+                  <div className="w-full bg-[#FFFFFF] dark:bg-navy-900 border border-[#E5E7EB] dark:border-navy-700 rounded-xl shadow-sm cursor-pointer" onClick={() => { setAssignedToOpen(!assignedToOpen); setCategoryOpen(false); }}>
+                    <div className="px-3 py-2.5 font-bold text-[14px] text-gray-800 dark:text-zinc-100 flex justify-between items-center transition-colors">
                       <div className="flex items-center gap-2">
-                        <UserIcon className="w-3.5 h-3.5 text-gray-400" />
+                        <UserIcon className="w-3.5 h-3.5 text-[#5B6472]" />
                         <span>{(editingTicket ? editingTicket.solver_person : newTicket.solver_person) || "Select Staff..."}</span>
                       </div>
-                      <ChevronDownIcon className="w-3.5 h-3.5 text-gray-400" />
+                      <ChevronDownIcon className="w-3.5 h-3.5 text-[#5B6472]" />
                     </div>
                   </div>
                   {assignedToOpen && (
-                    <div className="absolute z-[10000] w-full mt-1 bg-white dark:bg-navy-900 border border-orange-100 dark:border-navy-700 rounded-xl shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-                      <div className="p-2 border-b border-orange-50 dark:border-navy-800">
-                        <input type="text" placeholder="Search staff..." value={assignedToSearch} onChange={(e) => setAssignedToSearch(e.target.value)} onClick={(e) => e.stopPropagation()} className="w-full bg-gray-50 dark:bg-navy-900 px-2 py-1.5 rounded-lg border border-gray-100 dark:border-navy-800 outline-none text-[10px] font-bold text-gray-700 dark:text-gray-300" />
+                    <div className="absolute z-[10000] w-full mt-1 bg-white dark:bg-navy-900 border border-[#E5E7EB] dark:border-navy-700 rounded-xl shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                      <div className="p-2 border-b border-[#E5E7EB] dark:border-navy-800">
+                        <input type="text" placeholder="Search staff..." value={assignedToSearch} onChange={(e) => setAssignedToSearch(e.target.value)} onClick={(e) => e.stopPropagation()} className="w-full bg-gray-50 dark:bg-navy-900 px-2 py-1.5 rounded-lg border border-gray-100 dark:border-navy-800 outline-none text-[13px] font-bold text-gray-700 dark:text-gray-300" />
                       </div>
                       <div className="max-h-40 overflow-y-auto">
                         {usersList.filter(u => u.username.toLowerCase().includes(assignedToSearch.toLowerCase())).map(u => (
-                          <div key={u.username} className="px-3 py-2 text-xs font-bold text-gray-700 dark:text-gray-300 hover:bg-[#003875]/5 dark:hover:bg-[#FFD500]/10 cursor-pointer" onClick={() => { editingTicket ? setEditingTicket({ ...editingTicket, solver_person: u.username }) : setNewTicket({ ...newTicket, solver_person: u.username }); setAssignedToOpen(false); setAssignedToSearch(""); }}>{u.username}</div>
+                          <div key={u.username} className="px-3 py-2 text-[14px] font-bold text-gray-700 dark:text-gray-300 hover:bg-[#2563EB]/5 dark:hover:bg-[#60A5FA]/10 cursor-pointer" onClick={() => { editingTicket ? setEditingTicket({ ...editingTicket, solver_person: u.username }) : setNewTicket({ ...newTicket, solver_person: u.username }); setAssignedToOpen(false); setAssignedToSearch(""); }}>{u.username}</div>
                         ))}
                       </div>
                     </div>
@@ -1008,9 +1008,9 @@ export default function TicketsPage() {
                 </div>
               </div>
 
-              <div className="pt-4 mt-6 border-t border-orange-100/50 dark:border-navy-800 flex gap-3">
-                <button type="button" onClick={() => { setIsNewModalOpen(false); setEditingTicket(null); }} className="flex-1 px-4 py-2.5 rounded-xl font-black text-gray-400 hover:text-gray-600 hover:bg-gray-50 dark:hover:bg-navy-800 transition-all uppercase tracking-widest text-xs">Cancel</button>
-                <button type="submit" disabled={submitting} className="flex-1 bg-[#CE2029] hover:bg-[#8E161D] text-white px-4 py-2.5 rounded-xl font-black transition-all shadow-lg active:scale-95 uppercase tracking-widest text-xs flex items-center justify-center gap-2 disabled:opacity-50">
+              <div className="pt-4 mt-6 border-t border-[#E5E7EB] dark:border-navy-800 flex gap-3">
+                <button type="button" onClick={() => { setIsNewModalOpen(false); setEditingTicket(null); }} className="flex-1 px-4 py-2.5 rounded-xl font-semibold text-[#5B6472] hover:text-gray-600 hover:bg-gray-50 dark:hover:bg-navy-800 transition-all text-[14px]">Cancel</button>
+                <button type="submit" disabled={submitting} className="flex-1 bg-[#DC2626] hover:bg-[#8E161D] text-white px-4 py-2.5 rounded-xl font-semibold transition-all shadow-lg active:scale-95 text-[14px] flex items-center justify-center gap-2 disabled:opacity-50">
                   {submitting ? <ArrowPathIcon className="w-4 h-4 animate-spin" /> : editingTicket ? <ShieldCheckIcon className="w-4 h-4" /> : <FireIcon className="w-4 h-4" />} {editingTicket ? "Save Changes" : "Create Ticket"}
                 </button>
               </div>
@@ -1027,17 +1027,17 @@ export default function TicketsPage() {
           <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm animate-in fade-in" onClick={() => setSelectedTicket(null)} />
           <div className="relative w-full max-w-md bg-white dark:bg-navy-900 shadow-[-20px_0_50px_-12px_rgba(0,0,0,0.3)] flex flex-col animate-in slide-in-from-right duration-500 border-l border-gray-200 dark:border-navy-700">
             {/* Header */}
-            <div className="bg-[#CE2029] py-3 px-5 flex items-start justify-between text-white shrink-0 shadow-md">
+            <div className="bg-[#DC2626] py-3 px-5 flex items-start justify-between text-white shrink-0 shadow-md">
               <div className="flex items-start gap-3 flex-1 min-w-0">
                 <div className="p-2 bg-white/10 rounded-xl backdrop-blur-md border border-white/20 shrink-0 mt-0.5">
                   <TicketIcon className="w-5 h-5" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="flex gap-2 text-[9px] font-black uppercase tracking-widest mb-1 opacity-90">
+                  <div className="flex gap-2 text-[13px] font-semibold mb-1 opacity-90">
                     <span className="bg-white/20 px-1.5 py-0.5 rounded border border-white/10 shrink-0">#{selectedTicket.id.split('-').pop()}</span>
                     <span>{selectedTicket.priority}</span>
                   </div>
-                  <h2 className="text-sm font-black tracking-tight leading-snug break-words">{selectedTicket.title}</h2>
+                  <h2 className="text-sm font-semibold tracking-tight leading-snug break-words">{selectedTicket.title}</h2>
                 </div>
               </div>
               <button
@@ -1051,13 +1051,13 @@ export default function TicketsPage() {
             <div className="flex-1 overflow-y-auto px-5 pt-3 pb-6 custom-scrollbar space-y-4">
               {/* Description Block */}
               <div className="bg-red-50/50 dark:bg-red-900/10 rounded-xl p-3 border border-red-100 dark:border-red-900/30">
-                <p className="text-xs font-bold text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{selectedTicket.description}</p>
+                <p className="text-[14px] font-bold text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{selectedTicket.description}</p>
                 {[selectedTicket.suggestion_1, selectedTicket.suggestion_2, selectedTicket.suggestion_3].filter(Boolean).length > 0 && (
                   <div className="mt-3 pt-2 border-t border-red-200/50">
-                    <p className="text-[9px] font-black uppercase tracking-widest text-gray-400 mb-1.5">💡 Suggestions by {selectedTicket.raised_by}</p>
+                    <p className="text-[13px] font-semibold text-[#5B6472] mb-1.5">💡 Suggestions by {selectedTicket.raised_by}</p>
                     <ul className="space-y-1">
                       {[selectedTicket.suggestion_1, selectedTicket.suggestion_2, selectedTicket.suggestion_3].filter(Boolean).map((s, i) => (
-                        <li key={i} className="text-xs font-bold text-gray-700 dark:text-gray-300 flex gap-1.5"><span className="text-[#003875] dark:text-[#FFD500] font-black">{i + 1}.</span><span className="whitespace-pre-wrap">{s}</span></li>
+                        <li key={i} className="text-[14px] font-bold text-gray-700 dark:text-gray-300 flex gap-1.5"><span className="text-[#2563EB] dark:text-[#60A5FA] font-semibold">{i + 1}.</span><span className="whitespace-pre-wrap">{s}</span></li>
                       ))}
                     </ul>
                   </div>
@@ -1065,7 +1065,7 @@ export default function TicketsPage() {
                 {(selectedTicket.voice_note || selectedTicket.attachment_url) && (
                   <div className="mt-3 flex flex-wrap gap-2 pt-2 border-t border-red-200/50">
                     {selectedTicket.voice_note && (
-                      <button onClick={() => toggleAudio(selectedTicket.voice_note, `main-${selectedTicket.id}`)} className="flex items-center gap-2 bg-white dark:bg-navy-800 text-[#CE2029] dark:text-red-400 px-3 py-1.5 rounded-lg border border-red-200 dark:border-red-800/50 shadow-sm transition-all hover:bg-red-50 dark:hover:bg-navy-700 text-[9px] font-black uppercase tracking-widest">
+                      <button onClick={() => toggleAudio(selectedTicket.voice_note, `main-${selectedTicket.id}`)} className="flex items-center gap-2 bg-white dark:bg-navy-800 text-[#DC2626] dark:text-red-400 px-3 py-1.5 rounded-lg border border-red-200 dark:border-red-800/50 shadow-sm transition-all hover:bg-red-50 dark:hover:bg-navy-700 text-[13px] font-semibold">
                         {playingAudioId === `main-${selectedTicket.id}` ? <PauseIcon className="w-3.5 h-3.5" /> : <PlayIcon className="w-3.5 h-3.5" />} Voice Note
                       </button>
                     )}
@@ -1073,7 +1073,7 @@ export default function TicketsPage() {
                       <a 
                         href={selectedTicket.attachment_url.startsWith("http") ? selectedTicket.attachment_url : `https://drive.google.com/file/d/${selectedTicket.attachment_url}/view?usp=sharing`} 
                         target="_blank" 
-                        className="flex items-center gap-2 bg-white dark:bg-navy-800 text-blue-600 dark:text-blue-400 px-3 py-1.5 rounded-lg border border-blue-200 dark:border-blue-800/50 shadow-sm transition-all hover:bg-blue-50 dark:hover:bg-navy-700 text-[9px] font-black uppercase tracking-widest no-underline"
+                        className="flex items-center gap-2 bg-white dark:bg-navy-800 text-blue-600 dark:text-blue-400 px-3 py-1.5 rounded-lg border border-blue-200 dark:border-blue-800/50 shadow-sm transition-all hover:bg-blue-50 dark:hover:bg-navy-700 text-[13px] font-semibold no-underline"
                       >
                         <PaperClipIcon className="w-3.5 h-3.5" /> Document
                       </a>
@@ -1085,33 +1085,33 @@ export default function TicketsPage() {
               {/* Ticket Details Metadata */}
               <div className="grid grid-cols-2 gap-3 px-1">
                 <div className="space-y-1">
-                  <span className="text-[8px] font-black text-gray-400 uppercase tracking-widest block px-0.5">Raised By</span>
+                  <span className="text-[12px] font-semibold text-[#5B6472] block px-0.5">Raised By</span>
                   <div className="flex items-center gap-1.5 bg-blue-50/50 dark:bg-blue-900/10 px-2 py-1 rounded-lg border border-blue-100/50 dark:border-blue-800/20">
                     <UserIcon className="w-3 h-3 text-blue-500" />
-                    <span className="text-[10px] font-black text-blue-700 dark:text-blue-400 truncate">{selectedTicket.raised_by}</span>
+                    <span className="text-[13px] font-semibold text-blue-700 dark:text-blue-400 truncate">{selectedTicket.raised_by}</span>
                   </div>
                 </div>
                 <div className="space-y-1">
-                  <span className="text-[8px] font-black text-gray-400 uppercase tracking-widest block px-0.5">Assigned To</span>
+                  <span className="text-[12px] font-semibold text-[#5B6472] block px-0.5">Assigned To</span>
                   <div className="flex items-center gap-1.5 bg-purple-50/50 dark:bg-purple-900/10 px-2 py-1 rounded-lg border border-purple-100/50 dark:border-purple-800/20">
                     <UserGroupIcon className="w-3 h-3 text-purple-500" />
-                    <span className="text-[10px] font-black text-purple-700 dark:text-purple-400 truncate">{selectedTicket.solver_person || 'Unassigned'}</span>
+                    <span className="text-[13px] font-semibold text-purple-700 dark:text-purple-400 truncate">{selectedTicket.solver_person || 'Unassigned'}</span>
                   </div>
                 </div>
                 <div className="space-y-1">
-                  <span className="text-[8px] font-black text-gray-400 uppercase tracking-widest block px-0.5">Due Date</span>
+                  <span className="text-[12px] font-semibold text-[#5B6472] block px-0.5">Due Date</span>
                   <div className="flex items-center gap-1.5 bg-amber-50/50 dark:bg-amber-900/10 px-2 py-1 rounded-lg border border-amber-100/50 dark:border-amber-800/20">
                     <CalendarIcon className="w-3 h-3 text-amber-500" />
-                    <span className="text-[10px] font-black text-amber-700 dark:text-amber-400 truncate">
+                    <span className="text-[13px] font-semibold text-amber-700 dark:text-amber-400 truncate">
                       {selectedTicket.planned_resolution ? new Date(selectedTicket.planned_resolution).toLocaleDateString([], { day: '2-digit', month: 'short' }) : 'No Date'}
                     </span>
                   </div>
                 </div>
                 <div className="space-y-1">
-                  <span className="text-[8px] font-black text-gray-400 uppercase tracking-widest block px-0.5">Category</span>
+                  <span className="text-[12px] font-semibold text-[#5B6472] block px-0.5">Category</span>
                   <div className="flex items-center gap-1.5 bg-emerald-50/50 dark:bg-emerald-900/10 px-2 py-1 rounded-lg border border-emerald-100/50 dark:border-emerald-800/20">
                     <TagIcon className="w-3 h-3 text-emerald-500" />
-                    <span className="text-[10px] font-black text-emerald-700 dark:text-emerald-400 truncate">{selectedTicket.category}</span>
+                    <span className="text-[13px] font-semibold text-emerald-700 dark:text-emerald-400 truncate">{selectedTicket.category}</span>
                   </div>
                 </div>
               </div>
@@ -1119,8 +1119,8 @@ export default function TicketsPage() {
               {/* Status Update */}
               <div className="bg-white dark:bg-navy-800 rounded-xl p-3 border border-gray-100 dark:border-navy-700 shadow-sm flex flex-col gap-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Update State</span>
-                  {submitting && <ArrowPathIcon className="w-3 h-3 animate-spin text-[#003875]" />}
+                  <span className="text-[13px] font-semibold text-gray-500">Update State</span>
+                  {submitting && <ArrowPathIcon className="w-3 h-3 animate-spin text-[#2563EB]" />}
                 </div>
                 <div className="grid grid-cols-2 lg:grid-cols-3 gap-1.5">
                   {['Open', 'In Progress', 'Pending Info', 'Resolved'].map(s => (
@@ -1128,7 +1128,7 @@ export default function TicketsPage() {
                       key={s}
                       disabled={submitting}
                       onClick={() => setPendingStatus(s)}
-                      className={`px-2 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all border-2 ${pendingStatus === s
+                      className={`px-2 py-1.5 rounded-lg text-[13px] font-semibold   transition-all border-2 ${pendingStatus === s
                           ? `${getStatusColor(s)} scale-105 shadow-lg z-10`
                           : 'bg-gray-50 dark:bg-navy-900 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-navy-700 hover:border-gray-400'
                         }`}
@@ -1141,39 +1141,39 @@ export default function TicketsPage() {
 
               {/* Thread History */}
               <div>
-                <h3 className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-3 flex items-center gap-1.5 pb-2 border-b border-gray-100 dark:border-navy-700">
+                <h3 className="text-[13px] font-semibold text-gray-500 mb-3 flex items-center gap-1.5 pb-2 border-b border-gray-100 dark:border-navy-700">
                   <ClockIcon className="w-3.5 h-3.5" /> Action Log
                 </h3>
 
                 {historyLoading ? (
-                  <div className="flex justify-center p-6"><ArrowPathIcon className="w-5 h-5 text-[#003875] animate-spin" /></div>
+                  <div className="flex justify-center p-6"><ArrowPathIcon className="w-5 h-5 text-[#2563EB] animate-spin" /></div>
                 ) : ticketHistory.length === 0 ? (
-                  <p className="text-center text-[10px] uppercase font-black tracking-widest text-gray-400 py-4">No activity yet</p>
+                  <p className="text-center text-[13px] font-semibold text-[#5B6472] py-4">No activity yet</p>
                 ) : (
                   <div className="space-y-3 relative before:absolute before:inset-0 before:ml-[17px] before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-gray-200 dark:before:via-navy-700 before:to-transparent">
                     {ticketHistory.filter(Boolean).map((log) => (
                       <div key={log.id} className="relative flex items-start gap-3">
-                        <div className="flex items-center justify-center w-[34px] h-[34px] rounded-full border-[3px] border-white dark:border-navy-900 bg-[#003875] text-white shadow-sm shrink-0 z-10">
+                        <div className="flex items-center justify-center w-[34px] h-[34px] rounded-full border-[3px] border-white dark:border-navy-900 bg-[#2563EB] text-white shadow-sm shrink-0 z-10">
                           {log.action_type === 'STATUS_CHANGE' ? <ArrowPathIcon className="w-3 h-3" /> : <ChatBubbleLeftRightIcon className="w-3 h-3" />}
                         </div>
                         <div className="flex-1 p-2.5 rounded-xl bg-gray-50 dark:bg-navy-800 border border-gray-100 dark:border-navy-700 shadow-sm z-10">
                           <div className="flex justify-between items-start mb-1">
-                            <span className="text-[9px] font-black text-[#003875] dark:text-[#FFD500] uppercase">{log.actor_username}</span>
-                            <span className="text-[8px] font-bold text-gray-400">{new Date(log.created_at).toLocaleString([], { hour: '2-digit', minute: '2-digit', day: '2-digit', month: 'short' })}</span>
+                            <span className="text-[13px] font-semibold text-[#2563EB] dark:text-[#60A5FA]">{log.actor_username}</span>
+                            <span className="text-[12px] font-bold text-[#5B6472]">{new Date(log.created_at).toLocaleString([], { hour: '2-digit', minute: '2-digit', day: '2-digit', month: 'short' })}</span>
                           </div>
                           {log.action_type === 'STATUS_CHANGE' && (
-                            <p className="text-[11px] font-bold text-gray-600 dark:text-gray-300 mb-1.5 flex items-center gap-2">
+                            <p className="text-[14px] font-bold text-gray-600 dark:text-gray-300 mb-1.5 flex items-center gap-2">
                               <span className="opacity-60">Status:</span>
                               <span className="line-through opacity-40">{log.old_status}</span>
-                              <span className="text-[#CE2029] dark:text-red-400">➡️ {log.new_status}</span>
+                              <span className="text-[#DC2626] dark:text-red-400">➡️ {log.new_status}</span>
                             </p>
                           )}
 
                           {(log.comment_text || log.voice_note || log.attachment_url) && (
                             <div className="space-y-2 pt-1 border-t border-gray-100/50 dark:border-navy-700/50">
-                              {log.comment_text && <p className="text-[11px] font-bold text-gray-800 dark:text-gray-200 whitespace-pre-wrap">{log.comment_text}</p>}
+                              {log.comment_text && <p className="text-[14px] font-bold text-gray-800 dark:text-gray-200 whitespace-pre-wrap">{log.comment_text}</p>}
                               {log.voice_note && (
-                                <button onClick={() => toggleAudio(log.voice_note, log.id)} className="flex items-center gap-1.5 bg-white dark:bg-navy-900 border border-gray-200 dark:border-navy-600 px-2 py-1 rounded text-[#003875] dark:text-[#FFD500] text-[9px] font-black uppercase tracking-widest shadow-sm">
+                                <button onClick={() => toggleAudio(log.voice_note, log.id)} className="flex items-center gap-1.5 bg-white dark:bg-navy-900 border border-gray-200 dark:border-navy-600 px-2 py-1 rounded text-[#2563EB] dark:text-[#60A5FA] text-[13px] font-semibold shadow-sm">
                                   {playingAudioId === log.id ? <PauseIcon className="w-3 h-3" /> : <PlayIcon className="w-3 h-3" />} Play Voice
                                 </button>
                               )}
@@ -1181,7 +1181,7 @@ export default function TicketsPage() {
                                 <a 
                                   href={log.attachment_url.startsWith("http") ? log.attachment_url : `https://drive.google.com/file/d/${log.attachment_url}/view?usp=sharing`} 
                                   target="_blank" 
-                                  className="flex items-center gap-1 text-blue-600 text-[9px] font-black uppercase tracking-widest hover:underline"
+                                  className="flex items-center gap-1 text-blue-600 text-[13px] font-semibold hover:underline"
                                 >
                                   <PaperClipIcon className="w-3 h-3" /> View Attachment
                                 </a>
@@ -1201,33 +1201,33 @@ export default function TicketsPage() {
               {/* Reply Mini voice recorder */}
               {!isRecording && !voiceNoteFile && !refDocFile && (
                 <div className="flex gap-2 mb-2">
-                  <button type="button" onClick={startRecording} className="flex-1 flex justify-center items-center gap-1.5 bg-gray-50 dark:bg-navy-900 text-gray-600 dark:text-gray-300 hover:bg-gray-100 py-1.5 rounded-lg border border-gray-200 dark:border-navy-700 text-[9px] font-black uppercase tracking-widest transition-colors"><MicrophoneIcon className="w-3.5 h-3.5" /> Mic</button>
+                  <button type="button" onClick={startRecording} className="flex-1 flex justify-center items-center gap-1.5 bg-gray-50 dark:bg-navy-900 text-gray-600 dark:text-gray-300 hover:bg-gray-100 py-1.5 rounded-lg border border-gray-200 dark:border-navy-700 text-[13px] font-semibold transition-colors"><MicrophoneIcon className="w-3.5 h-3.5" /> Mic</button>
                   <input type="file" id="commentDoc" className="hidden" onChange={e => setRefDocFile(e.target.files?.[0] || null)} />
-                  <label htmlFor="commentDoc" className="flex-1 flex justify-center items-center gap-1.5 bg-gray-50 dark:bg-navy-900 text-gray-600 dark:text-gray-300 hover:bg-gray-100 py-1.5 rounded-lg border border-gray-200 dark:border-navy-700 text-[9px] font-black uppercase tracking-widest transition-colors cursor-pointer"><PaperClipIcon className="w-3.5 h-3.5" /> Doc</label>
+                  <label htmlFor="commentDoc" className="flex-1 flex justify-center items-center gap-1.5 bg-gray-50 dark:bg-navy-900 text-gray-600 dark:text-gray-300 hover:bg-gray-100 py-1.5 rounded-lg border border-gray-200 dark:border-navy-700 text-[13px] font-semibold transition-colors cursor-pointer"><PaperClipIcon className="w-3.5 h-3.5" /> Doc</label>
                 </div>
               )}
               {isRecording && (
                 <div className="flex items-center justify-between bg-red-50 dark:bg-red-900/20 px-3 py-1.5 rounded-lg border border-red-200 dark:border-red-900/50 mb-2">
-                  <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" /><span className="text-red-600 text-[10px] font-bold">{formatDuration(recordingDuration)}</span></div>
+                  <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" /><span className="text-red-600 text-[13px] font-bold">{formatDuration(recordingDuration)}</span></div>
                   <button onClick={stopRecording} className="text-red-600"><StopCircleIcon className="w-4 h-4" /></button>
                 </div>
               )}
               {voiceNoteFile && !isRecording && (
                 <div className="flex items-center justify-between bg-green-50 dark:bg-emerald-900/20 px-3 py-1.5 rounded-lg border border-green-200 dark:border-emerald-900/50 mb-2">
-                  <span className="text-green-700 dark:text-emerald-400 text-[10px] font-bold flex items-center gap-1"><CheckCircleIcon className="w-3 h-3" /> Audio attached</span>
+                  <span className="text-green-700 dark:text-emerald-400 text-[13px] font-bold flex items-center gap-1"><CheckCircleIcon className="w-3 h-3" /> Audio attached</span>
                   <button onClick={() => setVoiceNoteFile(null)} className="text-green-700"><XMarkIcon className="w-3.5 h-3.5" /></button>
                 </div>
               )}
               {refDocFile && (
                 <div className="flex items-center justify-between bg-blue-50 dark:bg-blue-900/20 px-3 py-1.5 rounded-lg border border-blue-200 dark:border-blue-900/50 mb-2">
-                  <span className="text-blue-700 dark:text-blue-400 text-[10px] font-bold flex items-center gap-1 truncate max-w-[200px]"><PaperClipIcon className="w-3 h-3 shrink-0" /> {refDocFile.name}</span>
+                  <span className="text-blue-700 dark:text-blue-400 text-[13px] font-bold flex items-center gap-1 truncate max-w-[200px]"><PaperClipIcon className="w-3 h-3 shrink-0" /> {refDocFile.name}</span>
                   <button onClick={() => setRefDocFile(null)} className="text-blue-700"><XMarkIcon className="w-3.5 h-3.5" /></button>
                 </div>
               )}
 
               <form onSubmit={handleAddComment} className="flex gap-2 relative">
-                <input required={!(voiceNoteFile || refDocFile || (pendingStatus && pendingStatus !== selectedTicket?.status))} type="text" placeholder="Type a remark..." value={newComment} onChange={e => setNewComment(e.target.value)} className="flex-1 bg-gray-50 dark:bg-navy-900 border border-gray-200 dark:border-navy-700 rounded-xl px-3 py-2 outline-none focus:border-[#003875] font-bold text-xs shadow-inner" />
-                <button type="submit" disabled={submitting || (!newComment.trim() && !voiceNoteFile && !refDocFile && pendingStatus === selectedTicket?.status)} className="bg-[#003875] hover:bg-[#002a5a] text-white px-3 py-2 rounded-xl font-black text-[10px] uppercase tracking-widest disabled:opacity-50 transition-all shadow-md">
+                <input required={!(voiceNoteFile || refDocFile || (pendingStatus && pendingStatus !== selectedTicket?.status))} type="text" placeholder="Type a remark..." value={newComment} onChange={e => setNewComment(e.target.value)} className="flex-1 bg-gray-50 dark:bg-navy-900 border border-gray-200 dark:border-navy-700 rounded-xl px-3 py-2 outline-none focus:border-[#2563EB] font-bold text-[14px] shadow-inner" />
+                <button type="submit" disabled={submitting || (!newComment.trim() && !voiceNoteFile && !refDocFile && pendingStatus === selectedTicket?.status)} className="bg-[#2563EB] hover:bg-[#002a5a] text-white px-3 py-2 rounded-xl font-semibold text-[13px] disabled:opacity-50 transition-all shadow-md">
                   {submitting ? <ArrowPathIcon className="w-4 h-4 animate-spin" /> : "Post"}
                 </button>
               </form>
@@ -1244,10 +1244,10 @@ export default function TicketsPage() {
           <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" />
           <div className="bg-white dark:bg-navy-900 p-6 rounded-2xl shadow-2xl relative z-10 max-w-xs w-full flex flex-col items-center text-center animate-in zoom-in-95 border border-gray-100 dark:border-navy-700">
             <div className="w-14 h-14 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center mb-3 border border-blue-100 dark:border-blue-800/50">
-              <ArrowPathIcon className="w-6 h-6 text-[#003875] dark:text-[#FFD500] animate-spin" />
+              <ArrowPathIcon className="w-6 h-6 text-[#2563EB] dark:text-[#60A5FA] animate-spin" />
             </div>
-            <h3 className="text-base font-black text-gray-900 dark:text-white mb-1">Processing</h3>
-            <p className="text-xs text-gray-500 font-bold">{statusMessage}</p>
+            <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-1">Processing</h3>
+            <p className="text-[14px] text-gray-500 font-bold">{statusMessage}</p>
           </div>
         </div>
         </Portal>

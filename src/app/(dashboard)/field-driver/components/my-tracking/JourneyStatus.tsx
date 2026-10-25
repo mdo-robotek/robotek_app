@@ -37,17 +37,17 @@ function InfoBox({
         {icon}
       </div>
       <div className="min-w-0 flex-1">
-        <p className="text-[9px] font-bold uppercase tracking-wide text-gray-400">{label}</p>
+        <p className="text-[13px] font-bold tracking-wide text-[#5B6472]">{label}</p>
         {valueLine2 ? (
           <div className="mt-0.5">
-            <p className="text-[11px] font-black text-[#062B6F] dark:text-white leading-snug">{value}</p>
-            <p className="text-[11px] font-black text-[#062B6F] dark:text-white leading-snug">{valueLine2}</p>
+            <p className="text-[14px] font-semibold text-[#1D4ED8] dark:text-white leading-snug">{value}</p>
+            <p className="text-[14px] font-semibold text-[#1D4ED8] dark:text-white leading-snug">{valueLine2}</p>
           </div>
         ) : (
           <p
             className={`${
-              compact || multiline ? 'text-[11px]' : 'text-sm'
-            } font-black text-[#062B6F] dark:text-white mt-0.5 leading-snug ${
+              compact || multiline ? 'text-[14px]' : 'text-sm'
+            } font-semibold text-[#1D4ED8] dark:text-white mt-0.5 leading-snug ${
               multiline ? 'line-clamp-2' : ''
             }`}
           >
@@ -132,27 +132,27 @@ export default function JourneyStatus({
             <>
               <div className="flex items-center gap-2 p-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-800/40 min-w-0">
                 <div className="shrink-0 w-12 h-12 flex items-center justify-center">
-                  <ScooterIcon className="w-11 h-11" color="#062B6F" />
+                  <ScooterIcon className="w-11 h-11" color="#1D4ED8" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-1.5">
                     <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse shrink-0" />
-                    <span className="text-[11px] font-black uppercase text-[#062B6F] dark:text-white whitespace-nowrap">
+                    <span className="text-[14px] font-semibold text-[#1D4ED8] dark:text-white whitespace-nowrap">
                       Checked In
                     </span>
                   </div>
-                  <p className="text-[10px] text-gray-500">Field journey in progress</p>
+                  <p className="text-[13px] text-gray-500">Field journey in progress</p>
                 </div>
                 <div className="shrink-0 text-center px-2 py-1 rounded-lg bg-sky-100 dark:bg-sky-900/40 border border-sky-200">
-                  <p className="font-mono font-black text-sm text-[#062B6F] dark:text-white leading-none">
+                  <p className="font-mono font-semibold text-sm text-[#1D4ED8] dark:text-white leading-none">
                     {elapsedTime.slice(0, 5)}
                   </p>
-                  <p className="text-[7px] font-bold text-gray-400 uppercase mt-0.5">HH:MM</p>
+                  <p className="text-[12px] font-bold text-[#5B6472] mt-0.5">HH:MM</p>
                 </div>
               </div>
               <div className="flex items-center justify-center gap-1.5 py-1 px-2 bg-[#FEF9C3] border border-[#FDE047] rounded-full">
-                <span className="w-1.5 h-1.5 rounded-full bg-orange-500" />
-                <span className="text-[9px] font-black uppercase text-gray-800">Field Check-in Active</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-[#D97706]" />
+                <span className="text-[13px] font-semibold text-gray-800">Field Check-in Active</span>
               </div>
             </>
           )}
@@ -163,9 +163,9 @@ export default function JourneyStatus({
               <div>
                 <div className="flex items-center gap-2">
                   <span className="w-2.5 h-2.5 rounded-full bg-[#2563EB]" />
-                  <span className="text-xs font-black uppercase text-[#2563EB]">Idle</span>
+                  <span className="text-[14px] font-semibold text-[#2563EB]">Idle</span>
                 </div>
-                <p className="text-[11px] text-gray-500 mt-0.5">Ready for your field journey</p>
+                <p className="text-[14px] text-gray-500 mt-0.5">Ready for your field journey</p>
               </div>
             </div>
           )}
@@ -174,8 +174,8 @@ export default function JourneyStatus({
             <div className="flex items-center gap-2 p-2 rounded-xl bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-white/10">
               <CheckCircleIcon className="w-5 h-5 text-green-600 shrink-0" />
               <div>
-                <p className="text-xs font-black uppercase text-gray-600">Completed</p>
-                <p className="text-[10px] text-gray-500">Journey completed for today</p>
+                <p className="text-[14px] font-semibold text-gray-600">Completed</p>
+                <p className="text-[13px] text-gray-500">Journey completed for today</p>
               </div>
             </div>
           )}
@@ -206,7 +206,7 @@ export default function JourneyStatus({
                   <InfoBox
                     compact
                     className="flex-1 min-w-0"
-                    icon={<span className="text-xs">⏱</span>}
+                    icon={<span className="text-[14px]">⏱</span>}
                     label="Odometer In"
                     value={`${odometerText} KM`}
                   />
@@ -220,7 +220,7 @@ export default function JourneyStatus({
               type="button"
               onClick={onStartCheckIn}
               disabled={!liveLocationReady}
-              className="w-full py-2.5 rounded-lg bg-[#062B6F] hover:bg-[#051d4d] text-white font-black text-[10px] uppercase tracking-widest disabled:opacity-50"
+              className="w-full py-2.5 rounded-lg bg-[#1D4ED8] hover:bg-[#051d4d] text-white font-semibold text-[13px] disabled:opacity-50"
             >
               Start Field Check-in
             </button>
@@ -230,7 +230,7 @@ export default function JourneyStatus({
             <button
               type="button"
               onClick={onEndJourney}
-              className="w-full py-2.5 rounded-lg bg-[#DC2626] hover:bg-red-700 text-white font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-1.5"
+              className="w-full py-2.5 rounded-lg bg-[#DC2626] hover:bg-red-700 text-white font-semibold text-[13px] flex items-center justify-center gap-1.5"
             >
               <span>🏁</span>
               End Journey

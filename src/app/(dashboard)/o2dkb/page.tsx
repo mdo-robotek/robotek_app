@@ -196,8 +196,8 @@ function SearchableDropdown({
   return (
     <div className="relative" ref={dropdownRef}>
       {!hideLabel && (
-        <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-1.5 mb-1.5 group">
-          <Icon className="w-3 h-3 transition-colors group-hover:text-[#FFD500]" />
+        <label className="text-[13px] font-semibold text-[#5B6472] flex items-center gap-1.5 mb-1.5 group">
+          <Icon className="w-3 h-3 transition-colors group-hover:text-[#2563EB]" />
           {label}
         </label>
       )}
@@ -211,14 +211,14 @@ function SearchableDropdown({
         }}
         onFocus={handleFocus}
         onKeyDown={handleTriggerKeyDown}
-        className={`w-full ${isMulti ? "min-h-[34px] py-1" : "h-[34px]"} ${error ? "bg-red-50 dark:bg-red-900/20 border-red-500 ring-1 ring-red-500 text-red-700 dark:text-red-400" : "bg-[#FEF6DB] dark:bg-black border-orange-100 dark:border-navy-700 focus:border-[#FFD500] focus:ring-1 focus:ring-[#FFD500]"} px-3 rounded-lg border outline-none cursor-pointer flex items-center justify-between shadow-sm transition-all`}
+        className={`w-full ${isMulti ? "min-h-[34px] py-1" : "h-[34px]"} ${error ? "bg-red-50 dark:bg-red-900/20 border-red-500 ring-1 ring-red-500 text-red-700 dark:text-red-400" : "bg-[#EFF4FF] dark:bg-black border-[#E5E7EB] dark:border-navy-700 focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB]"} px-3 rounded-lg border outline-none cursor-pointer flex items-center justify-between shadow-sm transition-all`}
       >
         <div className="flex flex-wrap gap-1 items-center min-w-0 flex-1">
           {isMulti && selectedValues.length > 0 ? (
             selectedValues.map((v, i) => (
               <span
                 key={i}
-                className="inline-flex items-center gap-1 px-2 py-0.5 bg-[#003875] text-[#FFD500] rounded-md text-[9px] font-black group/chip transition-all hover:pr-1.5"
+                className="inline-flex items-center gap-1 px-2 py-0.5 bg-[#2563EB] text-white rounded-md text-[13px] font-semibold group/chip transition-all hover:pr-1.5"
                 onClick={(e) => {
                   e.stopPropagation();
                   toggleValue(v);
@@ -230,24 +230,24 @@ function SearchableDropdown({
             ))
           ) : (
             <span
-              className={`text-[11px] font-bold truncate pr-2 ${error ? "text-red-700 dark:text-red-400" : value ? "text-gray-800 dark:text-zinc-100" : "text-gray-400"}`}
+              className={`text-[14px] font-bold truncate pr-2 ${error ? "text-red-700 dark:text-red-400" : value ? "text-gray-800 dark:text-zinc-100" : "text-[#5B6472]"}`}
             >
               {value || placeholder || `Select...`}
             </span>
           )}
         </div>
         <ChevronDownIcon
-          className={`w-3.5 h-3.5 text-gray-400 transition-transform shrink-0 ${isOpen ? "rotate-180" : ""}`}
+          className={`w-3.5 h-3.5 text-[#5B6472] transition-transform shrink-0 ${isOpen ? "rotate-180" : ""}`}
         />
       </div>
 
       {isOpen && (
         <div
-          className={`${listPosition} z-[10000] w-full mt-1 bg-white dark:bg-navy-800 border border-orange-100 dark:border-navy-700 rounded-lg shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200`}
+          className={`${listPosition} z-[10000] w-full mt-1 bg-white dark:bg-navy-800 border border-[#E5E7EB] dark:border-navy-700 rounded-lg shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200`}
         >
           <div className="p-2 border-b border-gray-100 dark:border-navy-700">
             <div className="relative">
-              <MagnifyingGlassIcon className="absolute left-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
+              <MagnifyingGlassIcon className="absolute left-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#5B6472]" />
               <input
                 type="text"
                 autoFocus
@@ -256,7 +256,7 @@ function SearchableDropdown({
                 onChange={(e) => setSearch(e.target.value)}
                 onFocus={onFocus}
                 onKeyDown={handleKeyDown}
-                className="w-full pl-7 pr-3 py-1.5 bg-gray-50 dark:bg-navy-950 border-none outline-none text-[11px] font-bold text-gray-700 dark:text-white rounded-md"
+                className="w-full pl-7 pr-3 py-1.5 bg-gray-50 dark:bg-navy-950 border-none outline-none text-[14px] font-bold text-gray-700 dark:text-white rounded-md"
               />
             </div>
           </div>
@@ -279,11 +279,11 @@ function SearchableDropdown({
                       }
                     }}
                     onMouseEnter={() => setActiveIndex(i)}
-                    className={`px-4 py-2 text-[11px] font-bold cursor-pointer transition-colors flex items-center justify-between ${i === activeIndex
-                        ? "bg-[#003875] text-white dark:bg-[#FFD500] dark:text-black"
+                    className={`px-4 py-2 text-[14px] font-bold cursor-pointer transition-colors flex items-center justify-between ${i === activeIndex
+                        ? "bg-[#2563EB] text-white dark:bg-[#60A5FA] dark:text-black"
                         : isSelected
-                          ? "bg-orange-50 text-[#003875] dark:bg-white/10 dark:text-[#FFD500]"
-                          : "text-gray-600 dark:text-gray-300 hover:bg-orange-50 dark:hover:bg-white/5"
+                          ? "bg-[#F7F8FA] text-white dark:bg-white/10 dark:text-[#60A5FA]"
+                          : "text-gray-600 dark:text-gray-300 hover:bg-[#F7F8FA] dark:hover:bg-white/5"
                       }`}
                   >
                     <span>{opt}</span>
@@ -292,7 +292,7 @@ function SearchableDropdown({
                 );
               })
             ) : (
-              <div className="px-4 py-3 text-[10px] text-gray-400 font-bold text-center italic">
+              <div className="px-4 py-3 text-[13px] text-[#5B6472] font-bold text-center italic">
                 No matches
               </div>
             )}
@@ -2108,35 +2108,35 @@ export default function O2DPage() {
       {/* Header Row */}
       <div className="flex flex-col lg:flex-row items-center justify-between gap-4 px-2 shrink-0">
         <div className="text-center lg:text-left min-w-0">
-          <h1 className="text-xl md:text-2xl font-black text-gray-900 dark:text-white tracking-tight italic">
+          <h1 className="text-xl md:text-2xl font-semibold text-gray-900 dark:text-white tracking-tight italic">
             O2DKB SYSTEM
           </h1>
-          <p className="text-[#003875] dark:text-[#FFD500] font-black text-[9px] md:text-[10px] uppercase tracking-[0.2em] opacity-80 -mt-1">
+          <p className="text-[#2563EB] dark:text-[#60A5FA] font-semibold text-[13px] md:text-[10px] opacity-80 -mt-1">
             Syncing Intelligence
           </p>
         </div>
         <div className="flex justify-end flex-shrink-0 min-w-0 lg:ml-auto">
-          <div className="flex items-center gap-1 rounded-full border-2 border-[#003875] dark:border-[#FFD500] bg-white dark:bg-navy-800 shadow-lg p-0.5 overflow-x-auto no-scrollbar max-w-full">
+          <div className="flex items-center gap-1 rounded-full border-2 border-[#2563EB] dark:border-[#60A5FA] bg-white dark:bg-navy-800 shadow-lg p-0.5 overflow-x-auto no-scrollbar max-w-full">
             <button
               onClick={() => {
                 resetForm();
                 setIsModalOpen(true);
               }}
-              className="flex items-center gap-2 text-[#003875] dark:text-[#FFD500] px-2 sm:px-4 py-1.5 font-black text-[11px] uppercase tracking-widest rounded-full hover:bg-[#003875]/5 dark:hover:bg-navy-700 transition-all"
+              className="flex items-center gap-2 text-white dark:text-[#60A5FA] px-2 sm:px-4 py-1.5 font-semibold text-[14px] rounded-full hover:bg-[#2563EB]/5 dark:hover:bg-navy-700 transition-all"
             >
               <PlusIcon className="w-4 h-4 stroke-[3]" />
               <span className="hidden sm:inline">New Order</span>
             </button>
-            <div className="h-4 w-[1px] bg-[#003875]/10 dark:bg-[#FFD500]/10 mx-0.5" />
+            <div className="h-4 w-[1px] bg-[#2563EB]/10 dark:bg-[#60A5FA]/10 mx-0.5" />
 
             {/* View Mode Switcher - Prominent in pill as requested */}
             <button
               onClick={() =>
                 setPageViewMode(pageViewMode === "panels" ? "table" : "panels")
               }
-              className={`flex items-center gap-2 px-2 sm:px-3 py-1.5 font-black text-[11px] uppercase tracking-widest rounded-full transition-all border-2 ${pageViewMode === "table"
-                  ? "bg-[#003875] text-[#FFD500] border-[#003875]"
-                  : "text-[#003875] dark:text-[#FFD500] border-transparent hover:bg-[#003875]/5 dark:hover:bg-navy-700"
+              className={`flex items-center gap-2 px-2 sm:px-3 py-1.5 font-semibold text-[14px]   rounded-full transition-all border-2 ${pageViewMode === "table"
+                  ? "bg-[#2563EB] text-white border-[#2563EB]"
+                  : "text-white dark:text-[#60A5FA] border-transparent hover:bg-[#2563EB]/5 dark:hover:bg-navy-700"
                 }`}
             >
               {pageViewMode === "panels" ? (
@@ -2148,19 +2148,19 @@ export default function O2DPage() {
                 {pageViewMode === "panels" ? "Table View" : "Panel View"}
               </span>
             </button>
-            <div className="h-4 w-[1px] bg-[#003875]/10 dark:bg-[#FFD500]/10 mx-0.5" />
+            <div className="h-4 w-[1px] bg-[#2563EB]/10 dark:bg-[#60A5FA]/10 mx-0.5" />
 
             <button
               onClick={() => setIsExportModalOpen(true)}
-              className="flex items-center gap-2 text-[#003875] dark:text-[#FFD500] px-2 sm:px-3 py-1.5 font-black text-[11px] uppercase tracking-widest rounded-full hover:bg-[#003875]/5 dark:hover:bg-navy-700 transition-all"
+              className="flex items-center gap-2 text-white dark:text-[#60A5FA] px-2 sm:px-3 py-1.5 font-semibold text-[14px] rounded-full hover:bg-[#2563EB]/5 dark:hover:bg-navy-700 transition-all"
             >
               <ArrowDownTrayIcon className="w-4 h-4 stroke-[3]" />
               <span className="hidden sm:inline">Export</span>
             </button>
-            <div className="h-4 w-[1px] bg-[#003875]/10 dark:bg-[#FFD500]/10 mx-0.5" />
+            <div className="h-4 w-[1px] bg-[#2563EB]/10 dark:bg-[#60A5FA]/10 mx-0.5" />
             <button
               onClick={handleOpenSetup}
-              className="flex items-center gap-2 text-[#003875] dark:text-[#FFD500] px-2 sm:px-3 py-1.5 font-black text-[11px] uppercase tracking-widest rounded-full hover:bg-[#003875]/5 dark:hover:bg-navy-700 transition-all"
+              className="flex items-center gap-2 text-white dark:text-[#60A5FA] px-2 sm:px-3 py-1.5 font-semibold text-[14px] rounded-full hover:bg-[#2563EB]/5 dark:hover:bg-navy-700 transition-all"
             >
               <Cog6ToothIcon className="w-4 h-4 stroke-[3]" />
               <span className="hidden sm:inline">Setup</span>
@@ -2176,12 +2176,12 @@ export default function O2DPage() {
         <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[50]">
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className="flex items-center gap-1.5 px-3 py-1 bg-white dark:bg-navy-800 border border-gray-100 dark:border-navy-700 rounded-full shadow-md hover:shadow-lg transition-all text-[#003875] dark:text-[#FFD500] group"
+            className="flex items-center gap-1.5 px-3 py-1 bg-white dark:bg-navy-800 border border-gray-100 dark:border-navy-700 rounded-full shadow-md hover:shadow-lg transition-all text-[#2563EB] dark:text-[#60A5FA] group"
           >
             <FunnelIcon
               className={`w-3 h-3 transition-transform duration-300 ${showFilters ? "rotate-180" : ""}`}
             />
-            <span className="text-[9px] font-black uppercase tracking-widest">
+            <span className="text-[13px] font-semibold">
               {showFilters ? "Hide Filters" : "Show Filters"}
             </span>
             {showFilters ? (
@@ -2205,17 +2205,17 @@ export default function O2DPage() {
                       key={stepIdx}
                       onClick={() => toggleStepFilter(stepIdx)}
                       className={`flex items-center gap-2 px-3 py-1.5 rounded-full border transition-all whitespace-nowrap ${isActive
-                          ? "bg-[#CE2029] border-[#CE2029] text-white shadow-lg scale-105"
-                          : "bg-white dark:bg-navy-800 border-gray-100 dark:border-navy-700 text-gray-500 hover:border-[#CE2029]/30"
+                          ? "bg-[#DC2626] border-[#DC2626] text-white shadow-lg scale-105"
+                          : "bg-white dark:bg-navy-800 border-gray-100 dark:border-navy-700 text-gray-500 hover:border-[#DC2626]/30"
                         }`}
                     >
                       <span
-                        className={`text-[10px] font-black uppercase tracking-widest ${isActive ? "text-white" : "text-gray-600 dark:text-gray-300"}`}
+                        className={`text-[13px] font-semibold   ${isActive ? "text-white" : "text-gray-600 dark:text-gray-300"}`}
                       >
                         {stepName}
                       </span>
                       <span
-                        className={`px-1.5 py-0.5 rounded-md text-[9px] font-black ${isActive ? "bg-white/20 text-white" : "bg-gray-100 dark:bg-navy-700 text-gray-400"}`}
+                        className={`px-1.5 py-0.5 rounded-md text-[13px] font-semibold ${isActive ? "bg-white/20 text-white" : "bg-gray-100 dark:bg-navy-700 text-[#5B6472]"}`}
                       >
                         {count}
                       </span>
@@ -2227,32 +2227,32 @@ export default function O2DPage() {
               {/* Advanced Filter Sub-Row */}
               <div className="flex flex-wrap items-center gap-4 px-4 py-2 bg-gray-50/50 dark:bg-navy-800/20 border-t border-gray-100 dark:border-navy-800">
                 <div className="flex items-center gap-2">
-                  <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">
+                  <span className="text-[13px] font-semibold text-[#5B6472]">
                     Date Range:
                   </span>
-                  <div className="relative group/date flex items-center bg-white dark:bg-black border border-gray-200 dark:border-navy-700 rounded-lg px-2 h-[34px] focus-within:border-[#FFD500] transition-all shadow-sm">
-                    <CalendarDaysIcon className="w-3.5 h-3.5 text-gray-400 group-focus-within/date:text-[#FFD500] shrink-0" />
+                  <div className="relative group/date flex items-center bg-white dark:bg-black border border-gray-200 dark:border-navy-700 rounded-lg px-2 h-[34px] focus-within:border-[#2563EB] transition-all shadow-sm">
+                    <CalendarDaysIcon className="w-3.5 h-3.5 text-[#5B6472] group-focus-within/date:text-[#2563EB] shrink-0" />
                     <input
                       type="date"
                       value={filterStartDate}
                       onChange={(e) => setFilterStartDate(e.target.value)}
-                      className="bg-transparent border-none outline-none pl-1.5 text-[10px] font-bold text-gray-700 dark:text-zinc-100 min-w-[100px]"
+                      className="bg-transparent border-none outline-none pl-1.5 text-[13px] font-bold text-gray-700 dark:text-zinc-100 min-w-[100px]"
                     />
                   </div>
-                  <span className="text-gray-300 font-bold">-</span>
-                  <div className="relative group/date flex items-center bg-white dark:bg-black border border-gray-200 dark:border-navy-700 rounded-lg px-2 h-[34px] focus-within:border-[#FFD500] transition-all shadow-sm">
-                    <CalendarDaysIcon className="w-3.5 h-3.5 text-gray-400 group-focus-within/date:text-[#FFD500] shrink-0" />
+                  <span className="text-[#5B6472] font-bold">-</span>
+                  <div className="relative group/date flex items-center bg-white dark:bg-black border border-gray-200 dark:border-navy-700 rounded-lg px-2 h-[34px] focus-within:border-[#2563EB] transition-all shadow-sm">
+                    <CalendarDaysIcon className="w-3.5 h-3.5 text-[#5B6472] group-focus-within/date:text-[#2563EB] shrink-0" />
                     <input
                       type="date"
                       value={filterEndDate}
                       onChange={(e) => setFilterEndDate(e.target.value)}
-                      className="bg-transparent border-none outline-none pl-1.5 text-[10px] font-bold text-gray-700 dark:text-zinc-100 min-w-[100px]"
+                      className="bg-transparent border-none outline-none pl-1.5 text-[13px] font-bold text-gray-700 dark:text-zinc-100 min-w-[100px]"
                     />
                   </div>
                 </div>
                 <div className="h-4 w-[1px] bg-gray-200 dark:bg-navy-700" />
                 <div className="flex items-center gap-2">
-                  <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">
+                  <span className="text-[13px] font-semibold text-[#5B6472]">
                     Party:
                   </span>
                   <div className="w-44">
@@ -2270,7 +2270,7 @@ export default function O2DPage() {
 
                 <div className="h-4 w-[1px] bg-gray-200 dark:bg-navy-700" />
                 <div className="flex items-center gap-2">
-                  <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">
+                  <span className="text-[13px] font-semibold text-[#5B6472]">
                     Order ID:
                   </span>
                   <div className="w-32">
@@ -2288,7 +2288,7 @@ export default function O2DPage() {
 
                 <div className="h-4 w-[1px] bg-gray-200 dark:bg-navy-700" />
                 <div className="flex items-center gap-2">
-                  <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">
+                  <span className="text-[13px] font-semibold text-[#5B6472]">
                     Item Name:
                   </span>
                   <div className="w-44">
@@ -2306,13 +2306,13 @@ export default function O2DPage() {
                 <div className="h-4 w-[1px] bg-gray-200 dark:bg-navy-700" />
                 <button
                   onClick={() => setTableFilterPending(!tableFilterPending)}
-                  className={`px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all flex items-center gap-1.5 border ${tableFilterPending
-                      ? "bg-[#003875] text-[#FFD500] border-[#003875] shadow-md"
-                      : "bg-white dark:bg-navy-800 text-gray-400 border-gray-200 dark:border-navy-700 hover:border-[#003875]"
+                  className={`px-3 py-1.5 rounded-lg text-[13px] font-semibold   transition-all flex items-center gap-1.5 border ${tableFilterPending
+                      ? "bg-[#2563EB] text-white border-[#2563EB] shadow-md"
+                      : "bg-white dark:bg-navy-800 text-[#5B6472] border-gray-200 dark:border-navy-700 hover:border-[#2563EB]"
                     }`}
                 >
                   <ClockIcon
-                    className={`w-3.5 h-3.5 ${tableFilterPending ? "text-[#FFD500]" : "text-gray-400"}`}
+                    className={`w-3.5 h-3.5 ${tableFilterPending ? "text-[#2563EB]" : "text-[#5B6472]"}`}
                   />
                   Pending
                 </button>
@@ -2326,7 +2326,7 @@ export default function O2DPage() {
                     setTableFilterPending(false);
                     setSearchTerm("");
                   }}
-                  className="ml-auto px-3 py-1.5 text-[9px] font-black uppercase text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all"
+                  className="ml-auto px-3 py-1.5 text-[13px] font-semibold text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all"
                 >
                   Reset Filters
                 </button>
@@ -2336,7 +2336,7 @@ export default function O2DPage() {
 
           {/* Loading Bar Indicator */}
           {(isAllLoading || isTransitioning) && (
-            <div className="h-1 bg-gradient-to-r from-[#003875] via-[#FFD500] to-[#003875] animate-pulse shrink-0" />
+            <div className="h-1 bg-gradient-to-r from-[#2563EB] via-[#2563EB] to-[#2563EB] animate-pulse shrink-0" />
           )}
 
           {/* Simple Table vs Master-Detail Panels Row */}
@@ -2346,7 +2346,7 @@ export default function O2DPage() {
                 <div className="flex-1 overflow-auto no-scrollbar pb-10">
                   <table className="w-full text-left border-collapse min-w-[1000px]">
                     <thead className="sticky top-0 z-20 shadow-sm">
-                      <tr className="bg-gray-50 dark:bg-navy-950 text-[10px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest border-b border-gray-100 dark:border-navy-800">
+                      <tr className="bg-gray-50 dark:bg-navy-950 text-[13px] font-semibold text-gray-500 dark:text-gray-400 border-b border-gray-100 dark:border-navy-800">
                         <th className="px-6 py-4">Order ID</th>
                         <th className="px-6 py-4">Party Name</th>
                         <th className="px-6 py-4">Item Name</th>
@@ -2372,47 +2372,47 @@ export default function O2DPage() {
                           return parsedItems.map((subItem: any, subIdx: number) => (
                             <tr
                               key={`${orderIdx}-${subIdx}`}
-                              className="group hover:bg-[#003875]/[0.02] dark:hover:bg-white/5 transition-colors"
+                              className="group hover:bg-[#2563EB]/[0.02] dark:hover:bg-white/5 transition-colors"
                             >
                               <td className="px-6 py-4">
                                 <div className="flex flex-col">
-                                  <span className="text-[13px] font-black text-[#003875] dark:text-[#FFD500]">
+                                  <span className="text-[13px] font-semibold text-[#2563EB] dark:text-[#60A5FA]">
                                     {item.order_no}
                                   </span>
                                   {item.hold && (
-                                    <span className="text-[7px] text-orange-500 font-black uppercase tracking-tighter">
+                                    <span className="text-[12px] text-[#D97706] font-semibold tracking-tighter">
                                       On Hold
                                     </span>
                                   )}
                                   {item.cancelled && (
-                                    <span className="text-[7px] text-red-500 font-black uppercase tracking-tighter">
+                                    <span className="text-[12px] text-red-500 font-semibold tracking-tighter">
                                       Cancelled
                                     </span>
                                   )}
                                 </div>
                               </td>
                               <td
-                                className="px-6 py-4 text-[12px] font-black text-gray-700 dark:text-gray-200 uppercase max-w-[200px] truncate"
+                                className="px-6 py-4 text-[14px] font-semibold text-gray-700 dark:text-gray-200 max-w-[200px] truncate"
                                 title={item.party_name}
                               >
                                 {item.party_name}
                               </td>
                               <td
-                                className="px-6 py-4 text-[12px] font-bold text-gray-600 dark:text-gray-300 uppercase max-w-[250px] truncate"
+                                className="px-6 py-4 text-[14px] font-bold text-gray-600 dark:text-gray-300 max-w-[250px] truncate"
                                 title={subItem.item_name}
                               >
                                 {subItem.item_name || "-"}
                               </td>
                               <td
-                                className="px-6 py-4 text-[12px] font-bold text-gray-500 dark:text-gray-400 uppercase max-w-[200px] truncate"
+                                className="px-6 py-4 text-[14px] font-bold text-gray-500 dark:text-gray-400 max-w-[200px] truncate"
                                 title={subItem.item_specification}
                               >
                                 {subItem.item_specification || "-"}
                               </td>
-                              <td className="px-6 py-4 text-center font-black text-[#003875] dark:text-[#FFD500] text-[13px]">
+                              <td className="px-6 py-4 text-center font-semibold text-[#2563EB] dark:text-[#60A5FA] text-[13px]">
                                 {subItem.item_qty || 0}
                               </td>
-                              <td className="px-6 py-4 text-[11px] font-bold text-gray-400 tracking-tight">
+                              <td className="px-6 py-4 text-[14px] font-bold text-[#5B6472] tracking-tight">
                                 {item.created_at ? (
                                   <div className="flex flex-col">
                                     <span className="text-gray-700 dark:text-gray-200">
@@ -2420,7 +2420,7 @@ export default function O2DPage() {
                                         item.created_at,
                                       ).toLocaleDateString("en-GB")}
                                     </span>
-                                    <span className="text-[9px] text-[#003875] dark:text-[#FFD500] font-black opacity-70 uppercase">
+                                    <span className="text-[13px] text-[#2563EB] dark:text-[#60A5FA] font-semibold opacity-70">
                                       {new Date(
                                         item.created_at,
                                       ).toLocaleTimeString([], {
@@ -2435,7 +2435,7 @@ export default function O2DPage() {
                                   "-"
                                 )}
                               </td>
-                              <td className="px-6 py-4 text-[11px] font-black text-gray-500 uppercase tracking-tighter">
+                              <td className="px-6 py-4 text-[14px] font-semibold text-gray-500 tracking-tighter">
                                 {item.filled_by || "-"}
                               </td>
                               <td className="px-6 py-4">
@@ -2445,7 +2445,7 @@ export default function O2DPage() {
                                       setSelectedOrderNo(item.order_no);
                                       setPageViewMode("panels");
                                     }}
-                                    className="p-1.5 bg-[#003875]/5 text-[#003875] rounded-lg hover:bg-[#003875] hover:text-white transition-all"
+                                    className="p-1.5 bg-[#2563EB]/5 text-white rounded-lg hover:bg-[#2563EB] hover:text-white transition-all"
                                   >
                                     <EyeIcon className="w-3.5 h-3.5" />
                                   </button>
@@ -2464,7 +2464,7 @@ export default function O2DPage() {
                         <tr>
                           <td colSpan={7} className="px-6 py-20 text-center">
                             <ArchiveBoxIcon className="w-12 h-12 text-gray-200 mx-auto mb-4" />
-                            <p className="text-[11px] font-black text-gray-400 uppercase tracking-[0.3em]">
+                            <p className="text-[14px] font-semibold text-[#5B6472]">
                               No data matches your intelligence criteria
                             </p>
                           </td>
@@ -2475,15 +2475,15 @@ export default function O2DPage() {
                 </div>
                 {/* Table Pagination Footer */}
                 <div className="p-4 bg-gray-50 dark:bg-navy-950 border-t border-gray-100 dark:border-navy-800 flex items-center justify-between shrink-0">
-                  <div className="text-[11px] font-black text-gray-400 uppercase tracking-widest">
-                    Showing <span className="text-[#003875] dark:text-[#FFD500]">{(tableCurrentPage - 1) * tableItemsPerPage + 1}</span> to <span className="text-[#003875] dark:text-[#FFD500]">{Math.min(tableCurrentPage * tableItemsPerPage, totalOrdersServer)}</span> of <span className="text-[#003875] dark:text-[#FFD500]">{totalOrdersServer}</span> entries
+                  <div className="text-[14px] font-semibold text-[#5B6472]">
+                    Showing <span className="text-[#2563EB] dark:text-[#60A5FA]">{(tableCurrentPage - 1) * tableItemsPerPage + 1}</span> to <span className="text-[#2563EB] dark:text-[#60A5FA]">{Math.min(tableCurrentPage * tableItemsPerPage, totalOrdersServer)}</span> of <span className="text-[#2563EB] dark:text-[#60A5FA]">{totalOrdersServer}</span> entries
                   </div>
 
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => setTableCurrentPage(p => Math.max(1, p - 1))}
                       disabled={tableCurrentPage === 1}
-                      className="flex items-center gap-1.5 px-4 py-2 bg-white dark:bg-black border border-gray-100 dark:border-navy-700 rounded-xl text-[10px] font-black uppercase tracking-widest hover:border-[#FFD500] disabled:opacity-30 transition-all shadow-sm group"
+                      className="flex items-center gap-1.5 px-4 py-2 bg-white dark:bg-black border border-gray-100 dark:border-navy-700 rounded-xl text-[13px] font-semibold hover:border-[#2563EB] disabled:opacity-30 transition-all shadow-sm group"
                     >
                       <ChevronLeftIcon className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" />
                       Prev
@@ -2496,7 +2496,7 @@ export default function O2DPage() {
                         if (totalPages <= 1) return null;
 
                         return (
-                          <span className="px-4 py-2 bg-[#003875]/5 dark:bg-[#FFD500]/5 rounded-xl border border-[#003875]/10 dark:border-[#FFD500]/10 text-[11px] font-black text-[#003875] dark:text-[#FFD500]">
+                          <span className="px-4 py-2 bg-[#2563EB]/5 dark:bg-[#60A5FA]/5 rounded-xl border border-[#2563EB]/10 dark:border-[#60A5FA]/10 text-[14px] font-semibold text-white dark:text-[#60A5FA]">
                             Page {tableCurrentPage} of {totalPages}
                           </span>
                         );
@@ -2506,7 +2506,7 @@ export default function O2DPage() {
                     <button
                       onClick={() => setTableCurrentPage(p => Math.min(Math.ceil(totalOrdersServer / tableItemsPerPage), p + 1))}
                       disabled={tableCurrentPage >= Math.ceil(totalOrdersServer / tableItemsPerPage)}
-                      className="flex items-center gap-1.5 px-4 py-2 bg-white dark:bg-black border border-gray-100 dark:border-navy-700 rounded-xl text-[10px] font-black uppercase tracking-widest hover:border-[#FFD500] disabled:opacity-30 transition-all shadow-sm group"
+                      className="flex items-center gap-1.5 px-4 py-2 bg-white dark:bg-black border border-gray-100 dark:border-navy-700 rounded-xl text-[13px] font-semibold hover:border-[#2563EB] disabled:opacity-30 transition-all shadow-sm group"
                     >
                       Next
                       <ChevronRightIcon className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
@@ -2518,17 +2518,17 @@ export default function O2DPage() {
               <>
                 {/* Master Pane: Order List */}
                 <div
-                  className={`w-full lg:w-80 flex flex-col border-r border-[#003875]/5 dark:border-navy-800 ${selectedOrderNo ? "hidden lg:flex" : "flex"}`}
+                  className={`w-full lg:w-80 flex flex-col border-r border-[#2563EB]/5 dark:border-navy-800 ${selectedOrderNo ? "hidden lg:flex" : "flex"}`}
                 >
                   <div className="p-2 border-b border-gray-50 dark:border-navy-800 bg-gray-50/30 dark:bg-navy-900/40">
                     <div className="relative group mb-2">
-                      <MagnifyingGlassIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-[#FFD500] transition-colors" />
+                      <MagnifyingGlassIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5B6472] group-focus-within:text-[#2563EB] transition-colors" />
                       <input
                         type="text"
                         placeholder="Search resources..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full pl-10 pr-4 h-[34px] bg-white dark:bg-black border border-gray-100 dark:border-navy-700 focus:border-[#FFD500] outline-none font-bold text-[11px] rounded-xl transition-all shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] focus:shadow-md"
+                        className="w-full pl-10 pr-4 h-[34px] bg-white dark:bg-black border border-gray-100 dark:border-navy-700 focus:border-[#2563EB] outline-none font-bold text-[14px] rounded-xl transition-all shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] focus:shadow-md"
                       />
                     </div>
 
@@ -2536,9 +2536,9 @@ export default function O2DPage() {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-1">
                         {isSidebarLoading && (
-                          <div className="w-2.5 h-2.5 border-2 border-[#003875]/20 border-t-[#003875] dark:border-[#FFD500]/20 dark:border-t-[#FFD500] rounded-full animate-spin shrink-0" />
+                          <div className="w-2.5 h-2.5 border-2 border-[#2563EB]/20 border-t-[#2563EB] dark:border-[#60A5FA]/20 dark:border-t-[#60A5FA] rounded-full animate-spin shrink-0" />
                         )}
-                        <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">
+                        <span className="text-[13px] font-semibold text-[#5B6472]">
                           {sidebarCurrentPage} / {sidebarTotalPages}
                         </span>
                       </div>
@@ -2546,14 +2546,14 @@ export default function O2DPage() {
                         <button
                           onClick={() => setSidebarCurrentPage(p => Math.max(1, p - 1))}
                           disabled={sidebarCurrentPage === 1 || isSidebarLoading}
-                          className="p-1 bg-white dark:bg-black border border-gray-100 dark:border-navy-700 rounded-lg hover:border-[#FFD500] disabled:opacity-30 transition-all shadow-sm"
+                          className="p-1 bg-white dark:bg-black border border-gray-100 dark:border-navy-700 rounded-lg hover:border-[#2563EB] disabled:opacity-30 transition-all shadow-sm"
                         >
                           <ChevronLeftIcon className="w-3 h-3" />
                         </button>
                         <button
                           onClick={() => setSidebarCurrentPage(p => Math.min(sidebarTotalPages, p + 1))}
                           disabled={sidebarCurrentPage >= sidebarTotalPages || isSidebarLoading}
-                          className="p-1 bg-white dark:bg-black border border-gray-100 dark:border-navy-700 rounded-lg hover:border-[#FFD500] disabled:opacity-30 transition-all shadow-sm"
+                          className="p-1 bg-white dark:bg-black border border-gray-100 dark:border-navy-700 rounded-lg hover:border-[#2563EB] disabled:opacity-30 transition-all shadow-sm"
                         >
                           <ChevronRightIcon className="w-3 h-3" />
                         </button>
@@ -2564,15 +2564,15 @@ export default function O2DPage() {
                     {/* Only show full spinner on true first load; keepPreviousData shows stale content while fetching */}
                     {isSidebarLoading && filteredOrderNumbers.length === 0 ? (
                       <div className="flex flex-col items-center justify-center h-40 space-y-3">
-                        <div className="w-8 h-8 border-3 border-[#FFD500]/20 border-t-[#FFD500] rounded-full animate-spin" />
-                        <p className="text-[10px] font-black text-gray-400 tracking-widest uppercase">
+                        <div className="w-8 h-8 border-3 border-[#2563EB]/20 border-t-[#2563EB] rounded-full animate-spin" />
+                        <p className="text-[13px] font-semibold text-[#5B6472]">
                           Loading Orders...
                         </p>
                       </div>
                     ) : filteredOrderNumbers.length === 0 ? (
                       <div className="text-center py-20 opacity-50">
                         <ShoppingBagIcon className="w-10 h-10 text-gray-100 mx-auto mb-2" />
-                        <p className="text-[11px] font-black uppercase tracking-widest italic text-gray-400">
+                        <p className="text-[14px] font-semibold italic text-[#5B6472]">
                           No records
                         </p>
                       </div>
@@ -2638,39 +2638,39 @@ export default function O2DPage() {
                                 }
                               }}
                               className={`group relative p-2 rounded-xl border transition-all cursor-pointer ${isSelected
-                                  ? "border-[#003875] dark:border-[#FFD500] bg-[#003875]/5 dark:bg-[#FFD500]/5 shadow-xl scale-[1.02] z-10"
+                                  ? "border-[#2563EB] dark:border-[#60A5FA] bg-[#2563EB]/5 dark:bg-[#60A5FA]/5 shadow-xl scale-[1.02] z-10"
                                   : isCancelled
                                     ? "border-red-200 dark:border-red-800/40 bg-gradient-to-br from-red-100 via-red-50 to-white dark:from-red-900/30 dark:via-red-900/10 dark:to-navy-800/50 shadow-md hover:shadow-lg hover:scale-[1.01]"
                                     : isHold
-                                      ? "border-orange-200 dark:border-orange-800/40 bg-gradient-to-br from-orange-100 via-orange-50 to-white dark:from-orange-900/30 dark:via-orange-900/10 dark:to-navy-800/50 shadow-md hover:shadow-lg hover:scale-[1.01]"
+                                      ? "border-[#E5E7EB] dark:border-[#E5E7EB] bg-gradient-to-br from-[#F7F8FA] via-[#F7F8FA] to-white dark:from-[#F7F8FA] dark:via-[#F7F8FA] dark:to-navy-800/50 shadow-md hover:shadow-lg hover:scale-[1.01]"
                                       : "border-gray-100 dark:border-navy-700 bg-white dark:bg-navy-800/50 shadow-md hover:shadow-lg dark:hover:border-navy-600 hover:scale-[1.01]"
                                 }`}
                             >
                               <div
                                 className={`absolute left-0 top-1 bottom-1 w-0.5 rounded-full transition-all ${isSelected
-                                    ? "bg-[#FFD500]"
+                                    ? "bg-[#2563EB]"
                                     : isCancelled
                                       ? "bg-red-500"
                                       : isHold
-                                        ? "bg-orange-500"
-                                        : "bg-[#003875]/10 group-hover:bg-[#003875]/20"
+                                        ? "bg-[#D97706]"
+                                        : "bg-[#2563EB]/10 group-hover:bg-[#2563EB]/20"
                                   }`}
                               />
 
                               {/* Line 1: Order No & Status Labels */}
                               <div className="flex justify-between items-start mb-0.5 pl-1.5">
                                 <div className="flex flex-wrap items-center gap-2 min-w-0">
-                                  <span className="text-[13px] font-black text-gray-900 dark:text-white truncate tracking-tight flex items-center gap-2">
+                                  <span className="text-[13px] font-semibold text-gray-900 dark:text-white truncate tracking-tight flex items-center gap-2">
 
                                     {no}
                                   </span>
                                   {first?.cancelled ? (
-                                    <span className="px-1.5 py-0.5 rounded-sm bg-red-100 text-red-600 dark:bg-red-900/40 dark:text-red-400 text-[7px] uppercase tracking-widest leading-none font-bold">
+                                    <span className="px-1.5 py-0.5 rounded-sm bg-red-100 text-red-600 dark:bg-red-900/40 dark:text-red-400 text-[12px] leading-none font-bold">
                                       Cancelled
                                     </span>
                                   ) : null}
                                   {first?.hold && !first?.cancelled ? (
-                                    <span className="px-1.5 py-0.5 rounded-sm bg-orange-100 text-orange-600 dark:bg-orange-900/40 dark:text-orange-400 text-[7px] uppercase tracking-widest leading-none font-bold">
+                                    <span className="px-1.5 py-0.5 rounded-sm bg-[#F7F8FA] text-[#D97706] dark:bg-[#FEF3C7] dark:text-[#D97706] text-[12px] leading-none font-bold">
                                       Hold
                                     </span>
                                   ) : null}
@@ -2681,7 +2681,7 @@ export default function O2DPage() {
                                       e.stopPropagation();
                                       handleEdit(no);
                                     }}
-                                    className="p-1 px-1.5 bg-[#003875]/5 text-[#003875] dark:bg-[#FFD500]/10 dark:text-[#FFD500] hover:bg-[#003875] hover:text-white dark:hover:bg-[#FFD500] dark:hover:text-black rounded-lg transition-all"
+                                    className="p-1 px-1.5 bg-[#2563EB]/5 text-white dark:bg-[#60A5FA]/10 dark:text-[#60A5FA] hover:bg-[#2563EB] hover:text-white dark:hover:bg-[#60A5FA] dark:hover:text-black rounded-lg transition-all"
                                   >
                                     <PencilSquareIcon className="w-3 h-3" />
                                   </button>
@@ -2690,7 +2690,7 @@ export default function O2DPage() {
                                       e.stopPropagation();
                                       handleDeleteClick(no);
                                     }}
-                                    className="p-1 px-1.5 bg-[#CE2029]/5 text-[#CE2029] hover:bg-[#CE2029] hover:text-white rounded-lg transition-all"
+                                    className="p-1 px-1.5 bg-[#DC2626]/5 text-[#DC2626] hover:bg-[#DC2626] hover:text-white rounded-lg transition-all"
                                   >
                                     <TrashIcon className="w-3 h-3" />
                                   </button>
@@ -2698,7 +2698,7 @@ export default function O2DPage() {
                               </div>
 
                               {/* Line 2: Party Name */}
-                              <div className="pl-1.5 mb-1 text-[10px] font-bold text-gray-400 uppercase tracking-wide truncate">
+                              <div className="pl-1.5 mb-1 text-[13px] font-bold text-[#5B6472] tracking-wide truncate">
                                 {first?.party_name}
                               </div>
 
@@ -2706,12 +2706,12 @@ export default function O2DPage() {
                               <div className="flex items-end justify-between pl-1.5 min-w-0">
                                 <div className="min-w-0 mr-2">
                                   {allDone ? (
-                                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[9.5px] font-black uppercase tracking-widest bg-emerald-50 text-emerald-600 border border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800 truncate">
+                                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[9.5px] font-semibold bg-emerald-50 text-emerald-600 border border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800 truncate">
                                       <span className="w-1 h-1 rounded-full bg-emerald-500 inline-block" />
                                       Completed
                                     </span>
                                   ) : (
-                                    <span className="inline-flex flex-col items-start px-1.5 py-0.5 rounded-md text-[9.5px] font-black uppercase tracking-widest bg-amber-100 text-amber-700 border border-amber-200 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800 leading-none">
+                                    <span className="inline-flex flex-col items-start px-1.5 py-0.5 rounded-md text-[9.5px] font-semibold bg-amber-100 text-amber-700 border border-amber-200 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800 leading-none">
                                       <span className="flex items-center gap-1 min-w-0">
                                         <span className="w-1 h-1 rounded-full bg-amber-400 animate-pulse shrink-0 block" />
                                         <span className="truncate">
@@ -2720,7 +2720,7 @@ export default function O2DPage() {
                                         </span>
                                       </span>
                                       {plannedTimeStr && (
-                                        <span className="text-[8px] opacity-75 font-semibold pl-2 mt-0.5 flex items-center gap-1 tracking-wider normal-case">
+                                        <span className="text-[12px] opacity-75 font-semibold pl-2 mt-0.5 flex items-center gap-1 tracking-wider normal-case">
                                           <ClockIcon className="w-2 h-2" />
                                           {plannedTimeStr}
                                         </span>
@@ -2729,10 +2729,10 @@ export default function O2DPage() {
                                   )}
                                 </div>
                                 <div className="flex flex-col items-end shrink-0 leading-[1.1]">
-                                  <span className="text-[10px] font-black text-gray-400 uppercase tracking-tighter mb-0.5">
+                                  <span className="text-[13px] font-semibold text-[#5B6472] tracking-tighter mb-0.5">
                                     {itemsCount} ITEMS
                                   </span>
-                                  <span className="text-[12px] font-black text-[#003875] dark:text-[#FFD500]">
+                                  <span className="text-[14px] font-semibold text-[#2563EB] dark:text-[#60A5FA]">
                                     ₹
                                     {(totalAmt || 0).toLocaleString(undefined, {
                                       minimumFractionDigits: 1,
@@ -2750,7 +2750,7 @@ export default function O2DPage() {
                 </div>
 
                 {/* Thick Dark Blue Divider Line */}
-                <div className="w-[3px] bg-[#003875] h-full hidden lg:block opacity-80" />
+                <div className="w-[3px] bg-[#2563EB] h-full hidden lg:block opacity-80" />
 
                 {/* Detail Pane: Order Details - Modularized */}
                 <O2DDetailPanel
@@ -2791,16 +2791,16 @@ export default function O2DPage() {
           <div className="relative bg-white dark:bg-navy-900 w-full max-w-md rounded-3xl shadow-2xl border border-gray-100 dark:border-navy-700 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
             <div className="p-6 border-b border-gray-50 dark:border-navy-800 flex items-center justify-between">
               <div>
-                <h2 className="text-xl font-black text-[#003875] dark:text-[#FFD500] italic uppercase">
+                <h2 className="text-xl font-semibold text-[#2563EB] dark:text-[#60A5FA] italic">
                   EXPORT SELECTION
                 </h2>
-                <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mt-1">
+                <p className="text-[13px] font-semibold text-[#5B6472] mt-1">
                   Configure your data payload
                 </p>
               </div>
               <button
                 onClick={() => setIsExportModalOpen(false)}
-                className="p-2 text-gray-400 hover:text-red-500 transition-colors"
+                className="p-2 text-[#5B6472] hover:text-red-500 transition-colors"
               >
                 <XMarkIcon className="w-6 h-6" />
               </button>
@@ -2808,18 +2808,18 @@ export default function O2DPage() {
 
             <div className="p-6 space-y-6 max-h-[60vh] overflow-y-auto no-scrollbar">
               <div className="space-y-3">
-                <label className="flex items-center gap-3 p-4 bg-gray-50 dark:bg-black/20 rounded-2xl border border-gray-100 dark:border-navy-800 cursor-pointer hover:border-[#FFD500] transition-all group">
+                <label className="flex items-center gap-3 p-4 bg-gray-50 dark:bg-black/20 rounded-2xl border border-gray-100 dark:border-navy-800 cursor-pointer hover:border-[#2563EB] transition-all group">
                   <input
                     type="checkbox"
                     checked={exportIncludeDetails}
                     onChange={(e) => setExportIncludeDetails(e.target.checked)}
-                    className="w-5 h-5 rounded border-gray-300 text-[#003875] focus:ring-[#003875]"
+                    className="w-5 h-5 rounded border-gray-300 text-[#2563EB] focus:ring-[#2563EB]"
                   />
                   <div className="flex flex-col">
-                    <span className="text-[11px] font-black text-gray-700 dark:text-gray-200 uppercase tracking-widest">
+                    <span className="text-[14px] font-semibold text-gray-700 dark:text-gray-200">
                       Order Details
                     </span>
-                    <span className="text-[9px] font-bold text-gray-400 uppercase tracking-wider">
+                    <span className="text-[13px] font-bold text-[#5B6472] tracking-wider">
                       No, Party, Item, Qty, Amount, etc.
                     </span>
                   </div>
@@ -2828,7 +2828,7 @@ export default function O2DPage() {
 
               <div className="space-y-3">
                 <div className="flex items-center justify-between px-1">
-                  <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                  <h3 className="text-[13px] font-semibold text-[#5B6472]">
                     Workflow Steps
                   </h3>
                   <div className="flex gap-3">
@@ -2838,13 +2838,13 @@ export default function O2DPage() {
                           Array.from({ length: 11 }, (_, i) => i + 1),
                         )
                       }
-                      className="text-[9px] font-black text-[#003875] dark:text-[#FFD500] uppercase hover:underline"
+                      className="text-[13px] font-semibold text-[#2563EB] dark:text-[#60A5FA] hover:underline"
                     >
                       Select All
                     </button>
                     <button
                       onClick={() => setExportSelectedSteps([])}
-                      className="text-[9px] font-black text-red-500 uppercase hover:underline"
+                      className="text-[13px] font-semibold text-red-500 hover:underline"
                     >
                       Clear
                     </button>
@@ -2870,18 +2870,18 @@ export default function O2DPage() {
                             ]);
                         }}
                         className={`flex items-center gap-2 p-3 rounded-xl border-2 transition-all ${isSelected
-                            ? "bg-[#003875] border-[#003875] text-[#FFD500] shadow-md"
-                            : "bg-white dark:bg-black/20 border-gray-100 dark:border-navy-800 text-gray-400 hover:border-gray-200"
+                            ? "bg-[#2563EB] border-[#2563EB] text-white shadow-md"
+                            : "bg-white dark:bg-black/20 border-gray-100 dark:border-navy-800 text-[#5B6472] hover:border-gray-200"
                           }`}
                       >
                         <div
-                          className={`w-4 h-4 rounded border flex items-center justify-center ${isSelected ? "bg-[#FFD500] border-[#FFD500]" : "border-gray-300"}`}
+                          className={`w-4 h-4 rounded border flex items-center justify-center ${isSelected ? "bg-[#2563EB] border-[#2563EB]" : "border-gray-300"}`}
                         >
                           {isSelected && (
-                            <div className="w-2 h-2 bg-[#003875] rounded-sm" />
+                            <div className="w-2 h-2 bg-[#2563EB] rounded-sm" />
                           )}
                         </div>
-                        <span className="text-[10px] font-black uppercase tracking-widest truncate">
+                        <span className="text-[13px] font-semibold truncate">
                           {step}
                         </span>
                       </button>
@@ -2897,7 +2897,7 @@ export default function O2DPage() {
                 disabled={
                   !exportIncludeDetails && exportSelectedSteps.length === 0
                 }
-                className="w-full h-14 bg-[#003875] dark:bg-[#FFD500] text-white dark:text-black rounded-2xl font-black uppercase tracking-[0.2em] text-[12px] shadow-lg shadow-[#003875]/20 dark:shadow-[#FFD500]/10 disabled:opacity-50 transition-all active:scale-[0.98] flex items-center justify-center gap-3"
+                className="w-full h-14 bg-[#2563EB] dark:bg-[#60A5FA] text-white dark:text-black rounded-2xl font-semibold text-[14px] shadow-lg shadow-[#2563EB]/20 dark:shadow-[#60A5FA]/10 disabled:opacity-50 transition-all active:scale-[0.98] flex items-center justify-center gap-3"
               >
                 <ArrowDownTrayIcon className="w-5 h-5" />
                 Initialize Export
@@ -2933,20 +2933,20 @@ export default function O2DPage() {
             onClick={() => setIsModalOpen(false)}
           />
           <div className="relative bg-white dark:bg-navy-900 w-full max-w-2xl rounded-3xl shadow-[0_32px_64px_-12px_rgba(0,0,0,0.4)] border border-gray-100 dark:border-navy-700 overflow-hidden animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[92vh]">
-            <div className="p-5 border-b border-orange-100/30 dark:border-navy-700 flex items-center justify-between shrink-0 bg-[#FEF6DB] dark:bg-navy-800">
+            <div className="p-5 border-b border-[#E5E7EB] dark:border-navy-700 flex items-center justify-between shrink-0 bg-[#EFF4FF] dark:bg-navy-800">
               <div>
-                <h2 className="text-xl font-black text-[#003875] dark:text-[#FFD500] italic">
+                <h2 className="text-xl font-semibold text-[#2563EB] dark:text-[#60A5FA] italic">
                   {editingOrderNo
                     ? `EDIT ORDER: ${editingOrderNo}`
                     : "CREATE NEW ORDER"}
                 </h2>
-                <p className="text-[9px] font-black text-gray-400 uppercase tracking-[0.3em] mt-0.5">
+                <p className="text-[13px] font-semibold text-[#5B6472] mt-0.5">
                   Automated Intelligence Protocol
                 </p>
               </div>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="p-2.5 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-white/5 rounded-2xl transition-all"
+                className="p-2.5 text-[#5B6472] hover:text-red-500 hover:bg-red-50 dark:hover:bg-white/5 rounded-2xl transition-all"
               >
                 <XMarkIcon className="w-6 h-6 shrink-0" />
               </button>
@@ -2960,8 +2960,8 @@ export default function O2DPage() {
                 {/* Common Information */}
                 <div className="bg-white dark:bg-navy-800/60 p-5 rounded-3xl border border-gray-100 dark:border-navy-700 shadow-sm space-y-5">
                   <div className="flex items-center gap-2 -ml-1">
-                    <div className="w-1 h-5 bg-[#003875] dark:bg-[#FFD500] rounded-full" />
-                    <h3 className="text-[10px] font-black uppercase tracking-widest text-gray-600 dark:text-gray-200">
+                    <div className="w-1 h-5 bg-[#2563EB] dark:bg-[#60A5FA] rounded-full" />
+                    <h3 className="text-[13px] font-semibold text-gray-600 dark:text-gray-200">
                       MASTER CLASSIFICATION
                     </h3>
                   </div>
@@ -2969,7 +2969,7 @@ export default function O2DPage() {
                   <div className="flex flex-wrap items-end gap-5">
                     <div className="flex-1 flex flex-col gap-4">
                       <div className={!editingOrderNo ? "hidden" : ""}>
-                        <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-1.5 mb-2">
+                        <label className="text-[13px] font-semibold text-[#5B6472] flex items-center gap-1.5 mb-2">
                           <IdentificationIcon className="w-3 h-3" />
                           Order ID
                         </label>
@@ -2977,7 +2977,7 @@ export default function O2DPage() {
                           type="text"
                           value={commonData.order_no}
                           readOnly
-                          className="w-full h-[36px] bg-gray-50 dark:bg-black border border-transparent dark:border-navy-700 px-3 rounded-xl font-bold text-[11px] text-gray-400 dark:text-gray-500 cursor-not-allowed shadow-inner"
+                          className="w-full h-[36px] bg-gray-50 dark:bg-black border border-transparent dark:border-navy-700 px-3 rounded-xl font-bold text-[14px] text-[#5B6472] dark:text-gray-500 cursor-not-allowed shadow-inner"
                         />
                       </div>
                       <div className="flex gap-2 items-end">
@@ -2997,7 +2997,7 @@ export default function O2DPage() {
                           <button
                             type="button"
                             onClick={() => setIsPartyModalOpen(true)}
-                            className="w-[36px] h-[36px] shrink-0 bg-[#003875] dark:bg-[#FFD500] text-white dark:text-black rounded-xl flex items-center justify-center shadow-sm hover:scale-105 transition-all mt-[auto] border border-[#003875]/20 dark:border-[#FFD500]/20"
+                            className="w-[36px] h-[36px] shrink-0 bg-[#2563EB] dark:bg-[#60A5FA] text-white dark:text-black rounded-xl flex items-center justify-center shadow-sm hover:scale-105 transition-all mt-[auto] border border-[#2563EB]/20 dark:border-[#60A5FA]/20"
                             title="Create New Party"
                           >
                             <PlusIcon className="w-4 h-4" />
@@ -3007,7 +3007,7 @@ export default function O2DPage() {
                   </div>
 
                   <div className="mt-2">
-                    <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-1.5 mb-2">
+                    <label className="text-[13px] font-semibold text-[#5B6472] flex items-center gap-1.5 mb-2">
                       <ChatBubbleBottomCenterTextIcon className="w-3 h-3" />
                       Remarks
                     </label>
@@ -3017,7 +3017,7 @@ export default function O2DPage() {
                       onChange={(e) =>
                         setCommonData({ ...commonData, remark: e.target.value })
                       }
-                      className="w-full bg-[#FEF6DB] dark:bg-black p-3 rounded-2xl border border-orange-100 dark:border-navy-700 focus:border-[#FFD500] outline-none font-bold text-[11px] text-gray-800 dark:text-gray-100 shadow-sm min-h-[60px] no-scrollbar"
+                      className="w-full bg-[#EFF4FF] dark:bg-black p-3 rounded-2xl border border-[#E5E7EB] dark:border-navy-700 focus:border-[#2563EB] outline-none font-bold text-[14px] text-gray-800 dark:text-gray-100 shadow-sm min-h-[60px] no-scrollbar"
                       placeholder="Order notes..."
                     />
                   </div>
@@ -3028,8 +3028,8 @@ export default function O2DPage() {
                 <div className="space-y-3">
                   <div className="flex items-center px-1">
                     <div className="flex items-center gap-2">
-                      <div className="w-1 h-5 bg-[#CE2029] rounded-full" />
-                      <h3 className="text-[10px] font-black uppercase tracking-widest text-gray-600 dark:text-gray-200">
+                      <div className="w-1 h-5 bg-[#DC2626] rounded-full" />
+                      <h3 className="text-[13px] font-semibold text-gray-600 dark:text-gray-200">
                         ITEMIZED LOGISTICS
                       </h3>
                     </div>
@@ -3038,20 +3038,20 @@ export default function O2DPage() {
                   <div className="space-y-1.5">
                     {/* Add Line Item - top (Controls-First) */}
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-3 py-2 px-1">
-                      <div className="flex items-center bg-[#003875]/5 dark:bg-[#FFD500]/5 px-4 py-2 rounded-2xl border border-[#003875]/10 dark:border-[#FFD500]/10 shadow-sm">
-                          <label className="text-[9px] font-black uppercase text-gray-400 tracking-tighter mr-2 whitespace-nowrap">Bulk Rows:</label>
+                      <div className="flex items-center bg-[#2563EB]/5 dark:bg-[#60A5FA]/5 px-4 py-2 rounded-2xl border border-[#2563EB]/10 dark:border-[#60A5FA]/10 shadow-sm">
+                          <label className="text-[13px] font-semibold text-[#5B6472] tracking-tighter mr-2 whitespace-nowrap">Bulk Rows:</label>
                           <input 
                               type="number" 
                               min="1" 
                               max="50"
                               value={multiRowQty}
                               onChange={(e) => setMultiRowQty(parseInt(e.target.value) || 1)}
-                              className="w-12 bg-transparent text-center font-black text-[#003875] dark:text-[#FFD500] text-[12px] outline-none"
+                              className="w-12 bg-transparent text-center font-semibold text-[#2563EB] dark:text-[#60A5FA] text-[14px] outline-none"
                           />
                           <button
                             type="button"
                             onClick={() => addItemRow(multiRowQty)}
-                            className="ml-2 flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest bg-[#003875] dark:bg-[#FFD500] text-white dark:text-black px-3 py-1.5 rounded-xl hover:scale-105 transition-all shadow-sm"
+                            className="ml-2 flex items-center gap-1.5 text-[13px] font-semibold bg-[#2563EB] dark:bg-[#60A5FA] text-white dark:text-black px-3 py-1.5 rounded-xl hover:scale-105 transition-all shadow-sm"
                           >
                             <PlusIcon className="w-3.5 h-3.5 stroke-[3]" /> Generate
                           </button>
@@ -3060,7 +3060,7 @@ export default function O2DPage() {
                       <button
                         type="button"
                         onClick={() => addItemRow(1)}
-                        className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-[#003875] dark:text-[#FFD500] hover:scale-105 transition-all bg-[#003875]/10 dark:bg-[#FFD500]/15 px-6 py-2.5 rounded-2xl shadow-sm border-2 border-transparent hover:border-[#003875]/20"
+                        className="flex items-center gap-2 text-[13px] font-semibold text-white dark:text-[#60A5FA] hover:scale-105 transition-all bg-[#2563EB]/10 dark:bg-[#60A5FA]/15 px-6 py-2.5 rounded-2xl shadow-sm border-2 border-transparent hover:border-[#2563EB]/20"
                       >
                         <PlusIcon className="w-4 h-4 stroke-[3]" /> Add Single Line
                       </button>
@@ -3068,7 +3068,7 @@ export default function O2DPage() {
                       <button
                         type="button"
                         onClick={() => setIsPasteModalOpen(true)}
-                        className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-[#003875] dark:text-[#FFD500] hover:scale-105 transition-all bg-[#003875]/10 dark:bg-[#FFD500]/15 px-6 py-2.5 rounded-2xl shadow-sm border-2 border-transparent hover:border-[#003875]/20"
+                        className="flex items-center gap-2 text-[13px] font-semibold text-white dark:text-[#60A5FA] hover:scale-105 transition-all bg-[#2563EB]/10 dark:bg-[#60A5FA]/15 px-6 py-2.5 rounded-2xl shadow-sm border-2 border-transparent hover:border-[#2563EB]/20"
                       >
                         <ClipboardDocumentCheckIcon className="w-4 h-4 stroke-[3]" /> Paste Data
                       </button>
@@ -3084,7 +3084,7 @@ export default function O2DPage() {
                             type="button"
                             tabIndex={-1}
                             onClick={() => removeItemRow(index)}
-                            className="absolute top-2.5 right-2.5 p-1.5 text-gray-300 hover:text-[#CE2029] hover:bg-red-50 dark:hover:bg-red-950/20 rounded-lg transition-all z-10"
+                            className="absolute top-2.5 right-2.5 p-1.5 text-[#5B6472] hover:text-[#DC2626] hover:bg-red-50 dark:hover:bg-red-950/20 rounded-lg transition-all z-10"
                             title="Remove Line Item"
                           >
                             <TrashIcon className="w-4 h-4" />
@@ -3125,7 +3125,7 @@ export default function O2DPage() {
                                   setActiveItemIndex(index);
                                   setIsItemModalOpen(true);
                                 }}
-                                className="w-[34px] h-[34px] shrink-0 bg-[#003875] dark:bg-[#FFD500] text-white dark:text-black rounded-lg flex items-center justify-center shadow-sm hover:scale-105 transition-all mb-0.5 border border-[#003875]/20 dark:border-[#FFD500]/20"
+                                className="w-[34px] h-[34px] shrink-0 bg-[#2563EB] dark:bg-[#60A5FA] text-white dark:text-black rounded-lg flex items-center justify-center shadow-sm hover:scale-105 transition-all mb-0.5 border border-[#2563EB]/20 dark:border-[#60A5FA]/20"
                                 title="Add New Item"
                               >
                                 <PlusIcon className="w-4 h-4" />
@@ -3133,7 +3133,7 @@ export default function O2DPage() {
                             </div>
                           </div>
                           <div className="md:col-span-2">
-                            <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-1 mb-1.5">
+                            <label className="text-[13px] font-semibold text-[#5B6472] flex items-center gap-1 mb-1.5">
                               <HashtagIcon className="w-2.5 h-2.5" />
                               Qty <span className="text-red-500 ml-0.5">*</span>
                             </label>
@@ -3148,12 +3148,12 @@ export default function O2DPage() {
                                   e.target.value,
                                 )
                               }
-                              className="w-full h-[34px] bg-[#FEF6DB] dark:bg-black px-3 rounded-lg border border-orange-100 dark:border-navy-700 focus:border-[#FFD500] outline-none font-bold text-[11px] text-gray-800 dark:text-gray-100 shadow-sm transition-all"
+                              className="w-full h-[34px] bg-[#EFF4FF] dark:bg-black px-3 rounded-lg border border-[#E5E7EB] dark:border-navy-700 focus:border-[#2563EB] outline-none font-bold text-[14px] text-gray-800 dark:text-gray-100 shadow-sm transition-all"
                               required
                             />
                           </div>
                           <div className="md:col-span-3">
-                            <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-1 mb-1.5">
+                            <label className="text-[13px] font-semibold text-[#5B6472] flex items-center gap-1 mb-1.5">
                               <CurrencyRupeeIcon className="w-2.5 h-2.5" />
                               Total
                             </label>
@@ -3170,9 +3170,9 @@ export default function O2DPage() {
                               onFocus={centerOnFocus}
                               tabIndex={!!dropdownItems.find(di => di.name === item.item_name) ? -1 : 0}
                               readOnly={!!dropdownItems.find(di => di.name === item.item_name)}
-                              className={`w-full h-[34px] px-3 rounded-lg border focus:border-[#FFD500] outline-none font-bold text-[11px] shadow-sm transition-all ${dropdownItems.find(di => di.name === item.item_name)
+                              className={`w-full h-[34px] px-3 rounded-lg border focus:border-[#2563EB] outline-none font-bold text-[14px] shadow-sm transition-all ${dropdownItems.find(di => di.name === item.item_name)
                                   ? "bg-gray-100 dark:bg-navy-950 text-gray-500 cursor-not-allowed border-gray-200 dark:border-navy-700"
-                                  : "bg-[#FEF6DB] dark:bg-black text-[#003875] dark:text-[#FFD500] border-orange-100 dark:border-navy-700"
+                                  : "bg-[#EFF4FF] dark:bg-black text-[#2563EB] dark:text-[#60A5FA] border-[#E5E7EB] dark:border-navy-700"
                                 }`}
                             />
                           </div>
@@ -3195,7 +3195,7 @@ export default function O2DPage() {
                                     addItemRow(1);
                                 }
                             }}
-                            className="w-full h-[34px] bg-[#FEF6DB] dark:bg-black px-3 rounded-lg border border-orange-100 dark:border-navy-700 focus:border-[#FFD500] outline-none font-bold text-[11px] text-gray-800 dark:text-gray-100 shadow-sm transition-all"
+                            className="w-full h-[34px] bg-[#EFF4FF] dark:bg-black px-3 rounded-lg border border-[#E5E7EB] dark:border-navy-700 focus:border-[#2563EB] outline-none font-bold text-[14px] text-gray-800 dark:text-gray-100 shadow-sm transition-all"
                             placeholder="Item Specification..."
                           />
                         </div>
@@ -3207,17 +3207,17 @@ export default function O2DPage() {
                 </div>
               </div>
 
-              <div className="pt-5 border-t border-orange-100/30 dark:border-navy-700 flex gap-3 shrink-0">
+              <div className="pt-5 border-t border-[#E5E7EB] dark:border-navy-700 flex gap-3 shrink-0">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="flex-1 h-[48px] rounded-2xl font-black text-gray-400 hover:text-gray-600 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5 transition-all uppercase tracking-widest text-[10px]"
+                  className="flex-1 h-[48px] rounded-2xl font-semibold text-[#5B6472] hover:text-gray-600 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5 transition-all text-[13px]"
                 >
                   Abandon
                 </button>
                 <button
                   type="submit"
-                  className="flex-[2] h-[48px] bg-[#CE2029] hover:bg-[#8E161D] text-white rounded-2xl font-black transition-all shadow-[0_8px_20px_-6px_rgba(206,32,41,0.5)] active:scale-95 uppercase tracking-[0.2em] text-[11px] flex items-center justify-center gap-2 group"
+                  className="flex-[2] h-[48px] bg-[#DC2626] hover:bg-[#8E161D] text-white rounded-2xl font-semibold transition-all shadow-[0_8px_20px_-6px_rgba(206,32,41,0.5)] active:scale-95 text-[14px] flex items-center justify-center gap-2 group"
                 >
                   <PlusIcon className="w-5 h-5 stroke-[2.5] group-hover:rotate-90 transition-transform duration-300" />{" "}
                   {editingOrderNo ? "PROTOCOL UPDATE" : "EXECUTE ORDER"}
@@ -3234,20 +3234,20 @@ export default function O2DPage() {
             className="absolute inset-0 bg-navy-950/60 backdrop-blur-md"
             onClick={() => setIsSetupModalOpen(false)}
           />
-          <div className="relative bg-[#FEF6DB] dark:bg-navy-900 w-full max-w-4xl rounded-3xl shadow-[0_32px_64px_-12px_rgba(0,0,0,0.3)] border border-orange-100 dark:border-navy-700 overflow-hidden animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[92vh]">
-            <div className="p-5 border-b border-orange-100/50 dark:border-white/5 flex items-center justify-between shrink-0">
+          <div className="relative bg-[#EFF4FF] dark:bg-navy-900 w-full max-w-4xl rounded-3xl shadow-[0_32px_64px_-12px_rgba(0,0,0,0.3)] border border-[#E5E7EB] dark:border-navy-700 overflow-hidden animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[92vh]">
+            <div className="p-5 border-b border-[#E5E7EB] dark:border-white/5 flex items-center justify-between shrink-0">
               <div>
-                <h2 className="text-xl font-black text-[#003875] dark:text-[#FFD500] italic">
+                <h2 className="text-xl font-semibold text-[#2563EB] dark:text-[#60A5FA] italic">
                   SYSTEM CONFIGURATION
                 </h2>
-                <p className="text-[9px] font-black text-gray-400 uppercase tracking-[0.3em] mt-0.5">
+                <p className="text-[13px] font-semibold text-[#5B6472] mt-0.5">
                   Define TAT and Operators
                 </p>
               </div>
               <button
                 type="button"
                 onClick={() => setIsSetupModalOpen(false)}
-                className="p-2.5 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-white/5 rounded-2xl transition-all"
+                className="p-2.5 text-[#5B6472] hover:text-red-500 hover:bg-red-50 dark:hover:bg-white/5 rounded-2xl transition-all"
               >
                 <XMarkIcon className="w-6 h-6 shrink-0" />
               </button>
@@ -3260,21 +3260,21 @@ export default function O2DPage() {
               {stepConfigs.map((config, index) => (
                 <div
                   key={index}
-                  className="grid grid-cols-1 md:grid-cols-12 gap-4 p-4 bg-white dark:bg-navy-800/50 rounded-2xl border border-gray-100 dark:border-navy-700 shadow-sm items-center hover:border-orange-100 dark:hover:border-[#FFD500]/30 transition-colors"
+                  className="grid grid-cols-1 md:grid-cols-12 gap-4 p-4 bg-white dark:bg-navy-800/50 rounded-2xl border border-gray-100 dark:border-navy-700 shadow-sm items-center hover:border-[#E5E7EB] dark:hover:border-[#60A5FA]/30 transition-colors"
                 >
                   <div className="md:col-span-5 flex flex-col">
-                    <span className="text-[9px] font-black text-[#003875]/50 dark:text-[#FFD500]/50 uppercase tracking-widest mb-1">
+                    <span className="text-[13px] font-semibold text-[#2563EB]/50 dark:text-[#60A5FA]/50 mb-1">
                       Step {index + 1}
                     </span>
-                    <span className="text-[12px] font-bold text-gray-800 dark:text-gray-100 leading-tight">
+                    <span className="text-[14px] font-bold text-gray-800 dark:text-gray-100 leading-tight">
                       {config.step_name}
                     </span>
                   </div>
                   <div className="md:col-span-3">
-                    <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-1.5 mb-1.5">
-                      <ClockIcon className="w-3 h-3 text-[#FFD500]" /> TAT
+                    <label className="text-[13px] font-semibold text-[#5B6472] flex items-center gap-1.5 mb-1.5">
+                      <ClockIcon className="w-3 h-3 text-[#2563EB]" /> TAT
                     </label>
-                    <div className="flex h-[38px] bg-[#FEF6DB] dark:bg-navy-950/50 border border-orange-100 dark:border-navy-700 focus-within:border-[#FFD500] rounded-2xl shadow-sm transition-all overflow-hidden items-center p-1">
+                    <div className="flex h-[38px] bg-[#EFF4FF] dark:bg-navy-950/50 border border-[#E5E7EB] dark:border-navy-700 focus-within:border-[#2563EB] rounded-2xl shadow-sm transition-all overflow-hidden items-center p-1">
                       <div className="flex gap-1 bg-white/50 dark:bg-navy-900 p-0.5 rounded-xl border border-gray-100 dark:border-navy-800 shrink-0">
                         <button
                           type="button"
@@ -3284,7 +3284,7 @@ export default function O2DPage() {
                             newConfigs[index].tat = `${val} Hrs`;
                             setStepConfigs(newConfigs);
                           }}
-                          className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all ${config.tat.includes("Hrs") ? "bg-[#FFD500] text-black shadow-sm" : "text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"}`}
+                          className={`px-2.5 py-1 rounded-lg text-[13px] font-semibold  tracking-wider transition-all ${config.tat.includes("Hrs") ? "bg-[#2563EB] text-black shadow-sm" : "text-[#5B6472] hover:text-gray-600 dark:hover:text-gray-200"}`}
                         >
                           Hrs
                         </button>
@@ -3296,7 +3296,7 @@ export default function O2DPage() {
                             newConfigs[index].tat = `${val} Days`;
                             setStepConfigs(newConfigs);
                           }}
-                          className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all ${config.tat.includes("Days") ? "bg-[#FFD500] text-black shadow-sm" : "text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"}`}
+                          className={`px-2.5 py-1 rounded-lg text-[13px] font-semibold  tracking-wider transition-all ${config.tat.includes("Days") ? "bg-[#2563EB] text-black shadow-sm" : "text-[#5B6472] hover:text-gray-600 dark:hover:text-gray-200"}`}
                         >
                           Days
                         </button>
@@ -3312,7 +3312,7 @@ export default function O2DPage() {
                           setStepConfigs(newConfigs);
                         }}
                         placeholder="24"
-                        className="w-full bg-transparent px-3 outline-none text-[12px] font-black text-gray-800 dark:text-gray-100 placeholder:text-gray-400/50 text-right"
+                        className="w-full bg-transparent px-3 outline-none text-[14px] font-semibold text-gray-800 dark:text-gray-100 placeholder:text-gray-400/50 text-right"
                       />
                     </div>
                   </div>
@@ -3335,18 +3335,18 @@ export default function O2DPage() {
               ))}
             </form>
 
-            <div className="p-5 border-t border-orange-100/50 dark:border-navy-700 flex gap-3 shrink-0 bg-white/40 dark:bg-transparent">
+            <div className="p-5 border-t border-[#E5E7EB] dark:border-navy-700 flex gap-3 shrink-0 bg-white/40 dark:bg-transparent">
               <button
                 type="button"
                 onClick={() => setIsSetupModalOpen(false)}
-                className="flex-1 h-[48px] rounded-2xl font-black text-gray-400 hover:text-gray-600 dark:hover:text-white hover:bg-orange-50 dark:hover:bg-white/5 transition-all uppercase tracking-widest text-[10px]"
+                className="flex-1 h-[48px] rounded-2xl font-semibold text-[#5B6472] hover:text-gray-600 dark:hover:text-white hover:bg-[#F7F8FA] dark:hover:bg-white/5 transition-all text-[13px]"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 onClick={handleSaveSetup}
-                className="flex-[2] h-[48px] bg-[#003875] dark:bg-[#FFD500] hover:bg-[#002855] dark:hover:bg-[#E6C000] text-white dark:text-black rounded-2xl font-black transition-all shadow-[0_8px_20px_-6px_rgba(0,56,117,0.5)] dark:shadow-[0_8px_20px_-6px_rgba(255,213,0,0.3)] active:scale-95 uppercase tracking-[0.2em] text-[11px] flex items-center justify-center gap-2"
+                className="flex-[2] h-[48px] bg-[#2563EB] dark:bg-[#60A5FA] hover:bg-[#1D4ED8] dark:hover:bg-[#E6C000] text-white dark:text-black rounded-2xl font-semibold transition-all shadow-[0_8px_20px_-6px_rgba(0,56,117,0.5)] dark:shadow-[0_8px_20px_-6px_rgba(255,213,0,0.3)] active:scale-95 text-[14px] flex items-center justify-center gap-2"
               >
                 <Cog6ToothIcon className="w-5 h-5 stroke-[2.5]" /> SAVE
                 CONFIGURATION
@@ -3363,18 +3363,18 @@ export default function O2DPage() {
             onClick={() => setIsStepUpdateModalOpen(false)}
           />
           <div className="relative bg-white dark:bg-navy-900 w-full max-w-lg rounded-3xl shadow-2xl border border-gray-100 dark:border-navy-700 overflow-hidden animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[92vh]">
-            <div className="p-5 border-b border-orange-100/30 dark:border-navy-700 flex items-center justify-between shrink-0 bg-[#FEF6DB] dark:bg-navy-800">
+            <div className="p-5 border-b border-[#E5E7EB] dark:border-navy-700 flex items-center justify-between shrink-0 bg-[#EFF4FF] dark:bg-navy-800">
               <div>
-                <h2 className="text-lg font-black text-[#CE2029] italic uppercase tracking-tight">
+                <h2 className="text-lg font-semibold text-[#DC2626] italic tracking-tight">
                   Step Update: {O2DKB_STEP_SHORTS[currentStepToUpdate - 1]}
                 </h2>
-                <p className="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em] mt-0.5">
+                <p className="text-[13px] font-semibold text-[#5B6472] mt-0.5">
                   Execution Protocol {selectedOrderNo}
                 </p>
               </div>
               <button
                 onClick={() => setIsStepUpdateModalOpen(false)}
-                className="p-2 text-gray-400 hover:text-red-500 transition-all"
+                className="p-2 text-[#5B6472] hover:text-red-500 transition-all"
               >
                 <XMarkIcon className="w-5 h-5" />
               </button>
@@ -3396,8 +3396,8 @@ export default function O2DPage() {
 
                 {/* Actual Time - Automated */}
                 <div className="hidden">
-                  <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-1.5 mb-1.5">
-                    <ClockIcon className="w-3 h-3 text-[#FFD500]" /> Actual
+                  <label className="text-[13px] font-semibold text-[#5B6472] flex items-center gap-1.5 mb-1.5">
+                    <ClockIcon className="w-3 h-3 text-[#2563EB]" /> Actual
                     Timestamp
                   </label>
                   <input
@@ -3415,7 +3415,7 @@ export default function O2DPage() {
                         actual: new Date(e.target.value).toISOString(),
                       })
                     }
-                    className="w-full h-[38px] bg-[#FEF6DB] dark:bg-black px-4 rounded-xl border border-orange-100 dark:border-navy-700 font-bold text-[11px] outline-none focus:border-[#FFD500]"
+                    className="w-full h-[38px] bg-[#EFF4FF] dark:bg-black px-4 rounded-xl border border-[#E5E7EB] dark:border-navy-700 font-bold text-[14px] outline-none focus:border-[#2563EB]"
                   />
                 </div>
 
@@ -3423,7 +3423,7 @@ export default function O2DPage() {
                 {currentStepToUpdate === 1 && (
                   <div className="space-y-4 pt-2 border-t border-gray-100 dark:border-white/5">
                     <div>
-                      <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1.5 block font-bold">
+                      <label className="text-[13px] font-semibold text-[#5B6472] mb-1.5 block font-bold">
                         Voucher Number <span className="text-red-500">*</span>
                       </label>
                       <input
@@ -3435,16 +3435,16 @@ export default function O2DPage() {
                             voucher_num_1: e.target.value,
                           })
                         }
-                        className="w-full h-[36px] bg-[#FEF6DB] dark:bg-black px-3 rounded-lg border border-orange-100 dark:border-navy-700 font-bold text-[11px] text-gray-800 dark:text-white"
+                        className="w-full h-[36px] bg-[#EFF4FF] dark:bg-black px-3 rounded-lg border border-[#E5E7EB] dark:border-navy-700 font-bold text-[14px] text-gray-800 dark:text-white"
                         placeholder="Voucher#..."
                       />
                     </div>
                     <div>
-                      <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1.5 block flex items-center gap-1.5 font-bold">
+                      <label className="text-[13px] font-semibold text-[#5B6472] mb-1.5 block flex items-center gap-1.5 font-bold">
                         <PhotoIcon className="w-3 h-3" /> Upload Bill (Attachment) <span className="text-red-500">*</span>
                       </label>
                       <label
-                        className="flex items-center justify-center w-full h-24 border-2 border-dashed border-orange-100 rounded-2xl hover:bg-orange-50/30 cursor-pointer overflow-hidden relative"
+                        className="flex items-center justify-center w-full h-24 border-2 border-dashed border-[#E5E7EB] rounded-2xl hover:bg-[#F7F8FA] cursor-pointer overflow-hidden relative"
                         onDragOver={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
@@ -3467,15 +3467,15 @@ export default function O2DPage() {
                           />
                         ) : stepAttachment ? (
                           <div className="flex flex-col items-center gap-1">
-                            <ArchiveBoxIcon className="w-8 h-8 text-[#003875]/40" />
-                            <span className="text-[8px] font-black text-gray-400 max-w-[150px] truncate">
+                            <ArchiveBoxIcon className="w-8 h-8 text-[#2563EB]/40" />
+                            <span className="text-[12px] font-semibold text-[#5B6472] max-w-[150px] truncate">
                               {stepAttachment?.name}
                             </span>
                           </div>
                         ) : (
                           <div className="text-center">
-                            <PlusIcon className="w-5 h-5 text-gray-300 mx-auto" />
-                            <span className="text-[9px] font-black text-gray-300 tracking-widest uppercase">
+                            <PlusIcon className="w-5 h-5 text-[#5B6472] mx-auto" />
+                            <span className="text-[13px] font-semibold text-[#5B6472]">
                               Select Bill File
                             </span>
                           </div>
@@ -3501,11 +3501,11 @@ export default function O2DPage() {
                 {currentStepToUpdate === 7 && (
                   <div className="space-y-4 pt-2 border-t border-gray-100 dark:border-white/5">
                     <div>
-                      <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest block flex items-center gap-1.5 font-bold font-bold">
+                      <label className="text-[13px] font-semibold text-[#5B6472] block flex items-center gap-1.5 font-bold font-bold">
                         <PhotoIcon className="w-3 h-3" /> Upload Billty (Attachment) <span className="text-red-500">*</span>
                       </label>
                       <label
-                        className="flex items-center justify-center w-full h-24 border-2 border-dashed border-orange-100 rounded-2xl hover:bg-orange-50/30 cursor-pointer overflow-hidden relative mt-1.5"
+                        className="flex items-center justify-center w-full h-24 border-2 border-dashed border-[#E5E7EB] rounded-2xl hover:bg-[#F7F8FA] cursor-pointer overflow-hidden relative mt-1.5"
                         onDragOver={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
@@ -3528,15 +3528,15 @@ export default function O2DPage() {
                           />
                         ) : stepAttachment ? (
                           <div className="flex flex-col items-center gap-1">
-                            <ArchiveBoxIcon className="w-8 h-8 text-[#003875]/40" />
-                            <span className="text-[8px] font-black text-gray-400 max-w-[150px] truncate">
+                            <ArchiveBoxIcon className="w-8 h-8 text-[#2563EB]/40" />
+                            <span className="text-[12px] font-semibold text-[#5B6472] max-w-[150px] truncate">
                               {stepAttachment?.name}
                             </span>
                           </div>
                         ) : (
                           <div className="text-center">
-                            <PlusIcon className="w-5 h-5 text-gray-300 mx-auto" />
-                            <span className="text-[9px] font-black text-gray-300 tracking-widest uppercase">
+                            <PlusIcon className="w-5 h-5 text-[#5B6472] mx-auto" />
+                            <span className="text-[13px] font-semibold text-[#5B6472]">
                               Select Billty File
                             </span>
                           </div>
@@ -3564,13 +3564,13 @@ export default function O2DPage() {
                 <button
                   type="button"
                   onClick={() => setIsStepUpdateModalOpen(false)}
-                  className="flex-1 h-[44px] rounded-xl font-black text-gray-400 uppercase tracking-widest text-[9px] hover:bg-gray-50 transition-all"
+                  className="flex-1 h-[44px] rounded-xl font-semibold text-[#5B6472] text-[13px] hover:bg-gray-50 transition-all"
                 >
                   Abort
                 </button>
                 <button
                   type="submit"
-                  className="flex-[2] h-[44px] bg-[#CE2029] text-white rounded-xl font-black uppercase tracking-widest text-[10px] shadow-lg shadow-red-500/20 active:scale-95 transition-all"
+                  className="flex-[2] h-[44px] bg-[#DC2626] text-white rounded-xl font-semibold text-[13px] shadow-lg shadow-red-500/20 active:scale-95 transition-all"
                 >
                   Deploy Update
                 </button>
@@ -3644,15 +3644,15 @@ export default function O2DPage() {
           <div className="relative bg-white dark:bg-navy-900 w-full max-w-lg rounded-3xl shadow-2xl border border-gray-100 dark:border-navy-700 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
             <div className="p-5 border-b border-gray-100 dark:border-navy-700 flex items-center justify-between bg-gray-50/50 dark:bg-navy-800">
               <div>
-                <h2 className="text-lg font-black text-gray-900 dark:text-white italic uppercase tracking-tight flex items-center gap-2">
-                  <ClipboardDocumentCheckIcon className="w-5 h-5 text-[#003875] dark:text-[#FFD500]" />
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white italic tracking-tight flex items-center gap-2">
+                  <ClipboardDocumentCheckIcon className="w-5 h-5 text-[#2563EB] dark:text-[#60A5FA]" />
                   Paste Items Data
                 </h2>
-                <p className="text-[10px] font-bold text-gray-400 mt-1">Paste your Excel data here. Ensure columns are: Name, Quantity, Specification.</p>
+                <p className="text-[13px] font-bold text-[#5B6472] mt-1">Paste your Excel data here. Ensure columns are: Name, Quantity, Specification.</p>
               </div>
               <button
                 onClick={() => setIsPasteModalOpen(false)}
-                className="p-2 text-gray-400 hover:text-red-500 transition-all"
+                className="p-2 text-[#5B6472] hover:text-red-500 transition-all"
               >
                 <XMarkIcon className="w-5 h-5" />
               </button>
@@ -3662,20 +3662,20 @@ export default function O2DPage() {
                 value={pasteText}
                 onChange={(e) => setPasteText(e.target.value)}
                 placeholder={`Item A\t10\tSpec A\nItem B\t5\tSpec B`}
-                className="w-full h-[200px] bg-[#FEF6DB] dark:bg-black p-4 rounded-2xl border border-orange-100 dark:border-navy-700 focus:border-[#FFD500] outline-none font-bold text-[12px] text-gray-800 dark:text-gray-100 shadow-sm whitespace-pre"
+                className="w-full h-[200px] bg-[#EFF4FF] dark:bg-black p-4 rounded-2xl border border-[#E5E7EB] dark:border-navy-700 focus:border-[#2563EB] outline-none font-bold text-[14px] text-gray-800 dark:text-gray-100 shadow-sm whitespace-pre"
               />
               <div className="mt-5 flex gap-3">
                 <button
                   type="button"
                   onClick={() => setIsPasteModalOpen(false)}
-                  className="flex-1 py-3 px-4 bg-gray-100 dark:bg-navy-800 text-gray-600 dark:text-gray-300 rounded-xl font-black text-[11px] uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-navy-700 transition-all"
+                  className="flex-1 py-3 px-4 bg-gray-100 dark:bg-navy-800 text-gray-600 dark:text-gray-300 rounded-xl font-semibold text-[14px] hover:bg-gray-200 dark:hover:bg-navy-700 transition-all"
                 >
                   Cancel
                 </button>
                 <button
                   type="button"
                   onClick={handlePasteData}
-                  className="flex-1 py-3 px-4 bg-[#003875] dark:bg-[#FFD500] text-white dark:text-black rounded-xl font-black text-[11px] uppercase tracking-widest shadow-sm hover:scale-[1.02] transition-all"
+                  className="flex-1 py-3 px-4 bg-[#2563EB] dark:bg-[#60A5FA] text-white dark:text-black rounded-xl font-semibold text-[14px] shadow-sm hover:scale-[1.02] transition-all"
                 >
                   Import Data
                 </button>
@@ -3712,16 +3712,16 @@ export default function O2DPage() {
           <div className="relative bg-white dark:bg-navy-900 w-full max-w-md rounded-3xl shadow-2xl border border-gray-100 dark:border-navy-700 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
             <div className="p-5 border-b border-gray-100 dark:border-navy-700 flex items-center justify-between bg-gray-50/50 dark:bg-navy-800">
               <div>
-                <h2 className="text-lg font-black text-gray-900 dark:text-white italic uppercase tracking-tight">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white italic tracking-tight">
                   Revision Protocol
                 </h2>
-                <p className="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em] mt-0.5">
+                <p className="text-[13px] font-semibold text-[#5B6472] mt-0.5">
                   Clear Operational Data: {selectedOrderNo}
                 </p>
               </div>
               <button
                 onClick={() => setIsRemoveFollowUpModalOpen(false)}
-                className="p-2 text-gray-400 hover:text-red-500 transition-all"
+                className="p-2 text-[#5B6472] hover:text-red-500 transition-all"
               >
                 <XMarkIcon className="w-5 h-5" />
               </button>
@@ -3729,13 +3729,13 @@ export default function O2DPage() {
 
             <div className="p-6 space-y-6">
               <div>
-                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2.5 block">
+                <label className="text-[13px] font-semibold text-[#5B6472] mb-2.5 block">
                   Target Step to Clear
                 </label>
                 <select
                   value={removeStep}
                   onChange={(e) => setRemoveStep(parseInt(e.target.value))}
-                  className="w-full h-[48px] bg-[#FEF6DB] dark:bg-black px-4 rounded-xl border border-orange-100 dark:border-navy-700 font-bold text-[13px] outline-none appearance-none"
+                  className="w-full h-[48px] bg-[#EFF4FF] dark:bg-black px-4 rounded-xl border border-[#E5E7EB] dark:border-navy-700 font-bold text-[13px] outline-none appearance-none"
                 >
                   {O2DKB_STEPS.map((step, idx) => (
                     <option key={idx} value={idx + 1}>
@@ -3746,29 +3746,29 @@ export default function O2DPage() {
               </div>
 
               <div className="space-y-3">
-                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block">
+                <label className="text-[13px] font-semibold text-[#5B6472] block">
                   Clearance Scope
                 </label>
                 <div className="grid grid-cols-2 gap-3">
                   <button
                     onClick={() => setRemoveOnwards(false)}
-                    className={`py-3 px-4 rounded-xl border-2 transition-all text-center ${!removeOnwards ? "border-[#CE2029] bg-[#CE2029]/5 text-[#CE2029]" : "border-gray-100 dark:border-navy-700 text-gray-400 hover:border-gray-200"}`}
+                    className={`py-3 px-4 rounded-xl border-2 transition-all text-center ${!removeOnwards ? "border-[#DC2626] bg-[#DC2626]/5 text-[#DC2626]" : "border-gray-100 dark:border-navy-700 text-[#5B6472] hover:border-gray-200"}`}
                   >
-                    <p className="text-[11px] font-black uppercase tracking-tighter">
+                    <p className="text-[14px] font-semibold tracking-tighter">
                       Only Step {removeStep}
                     </p>
-                    <p className="text-[8px] font-bold opacity-60">
+                    <p className="text-[12px] font-bold opacity-60">
                       Surgical Clear
                     </p>
                   </button>
                   <button
                     onClick={() => setRemoveOnwards(true)}
-                    className={`py-3 px-4 rounded-xl border-2 transition-all text-center ${removeOnwards ? "border-[#CE2029] bg-[#CE2029]/5 text-[#CE2029]" : "border-gray-100 dark:border-navy-700 text-gray-400 hover:border-gray-200"}`}
+                    className={`py-3 px-4 rounded-xl border-2 transition-all text-center ${removeOnwards ? "border-[#DC2626] bg-[#DC2626]/5 text-[#DC2626]" : "border-gray-100 dark:border-navy-700 text-[#5B6472] hover:border-gray-200"}`}
                   >
-                    <p className="text-[11px] font-black uppercase tracking-tighter">
+                    <p className="text-[14px] font-semibold tracking-tighter">
                       Step {removeStep} Onwards
                     </p>
-                    <p className="text-[8px] font-bold opacity-60">
+                    <p className="text-[12px] font-bold opacity-60">
                       Sequence Reset
                     </p>
                   </button>
@@ -3776,8 +3776,8 @@ export default function O2DPage() {
               </div>
 
               <div className="p-4 bg-amber-100 dark:bg-amber-900/10 rounded-2xl border border-amber-100 dark:border-amber-900/30">
-                <p className="text-[10px] font-medium text-amber-700 dark:text-amber-400 leading-relaxed">
-                  <span className="font-black uppercase tracking-widest block mb-1">
+                <p className="text-[13px] font-medium text-amber-700 dark:text-amber-400 leading-relaxed">
+                  <span className="font-semibold block mb-1">
                     Impact Analysis:
                   </span>
                   This will clear Status, Actual Time, and Step-specific data
@@ -3790,13 +3790,13 @@ export default function O2DPage() {
               <div className="flex gap-3 pt-2">
                 <button
                   onClick={() => setIsRemoveFollowUpModalOpen(false)}
-                  className="flex-1 h-[48px] rounded-xl font-black text-gray-400 uppercase tracking-widest text-[10px] hover:bg-gray-100 transition-all underline decoration-dotted"
+                  className="flex-1 h-[48px] rounded-xl font-semibold text-[#5B6472] text-[13px] hover:bg-gray-100 transition-all underline decoration-dotted"
                 >
                   Abort
                 </button>
                 <button
                   onClick={handleRemoveFollowUp}
-                  className="flex-[2] h-[48px] bg-[#CE2029] text-white rounded-xl font-black uppercase tracking-widest text-[11px] shadow-lg shadow-red-500/30 hover:scale-[1.02] active:scale-95 transition-all"
+                  className="flex-[2] h-[48px] bg-[#DC2626] text-white rounded-xl font-semibold text-[14px] shadow-lg shadow-red-500/30 hover:scale-[1.02] active:scale-95 transition-all"
                 >
                   Confirm Clear
                 </button>
@@ -3965,18 +3965,18 @@ function BusyModal({
         onClick={onClose}
       />
       <div className="relative bg-white dark:bg-navy-900 w-full max-w-lg rounded-3xl shadow-[0_32px_64px_-12px_rgba(0,0,0,0.4)] border border-gray-100 dark:border-navy-700 overflow-hidden flex flex-col max-h-[92vh] animate-in fade-in zoom-in-95 duration-200">
-        <div className="p-5 border-b border-orange-100/30 dark:border-navy-700 flex items-center justify-between shrink-0 bg-[#FEF6DB] dark:bg-navy-800">
+        <div className="p-5 border-b border-[#E5E7EB] dark:border-navy-700 flex items-center justify-between shrink-0 bg-[#EFF4FF] dark:bg-navy-800">
           <div>
-            <h2 className="text-xl font-black text-[#003875] dark:text-[#FFD500] italic uppercase">
+            <h2 className="text-xl font-semibold text-[#2563EB] dark:text-[#60A5FA] italic">
               DATA FOR BUSY
             </h2>
-            <p className="text-[9px] font-black text-gray-400 uppercase tracking-[0.3em] mt-0.5">
+            <p className="text-[13px] font-semibold text-[#5B6472] mt-0.5">
               Simple Item Logistics
             </p>
           </div>
           <button
             onClick={onClose}
-            className="p-2.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-2xl transition-all"
+            className="p-2.5 text-[#5B6472] hover:text-red-500 hover:bg-red-50 rounded-2xl transition-all"
           >
             <XMarkIcon className="w-6 h-6" />
           </button>
@@ -3988,7 +3988,7 @@ function BusyModal({
             <div className="flex flex-wrap items-center gap-2 mb-4">
               <button
                 onClick={() => setSelectedBusyDate("")}
-                className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${!selectedBusyDate ? "bg-[#003875] text-white shadow-md" : "bg-white dark:bg-navy-950 text-gray-400 border border-gray-100 dark:border-navy-800"}`}
+                className={`px-3 py-1.5 rounded-lg text-[13px] font-semibold   transition-all ${!selectedBusyDate ? "bg-[#2563EB] text-white shadow-md" : "bg-white dark:bg-navy-950 text-[#5B6472] border border-gray-100 dark:border-navy-800"}`}
               >
                 Show All
               </button>
@@ -4013,19 +4013,19 @@ function BusyModal({
                   <>
                     <button
                       onClick={() => setSelectedBusyDate(dayBeforeYesterday)}
-                      className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${selectedBusyDate === dayBeforeYesterday ? "bg-[#003875] text-white shadow-md" : "bg-white dark:bg-navy-950 text-gray-400 border border-gray-100 dark:border-navy-800"}`}
+                      className={`px-3 py-1.5 rounded-lg text-[13px] font-semibold   transition-all ${selectedBusyDate === dayBeforeYesterday ? "bg-[#2563EB] text-white shadow-md" : "bg-white dark:bg-navy-950 text-[#5B6472] border border-gray-100 dark:border-navy-800"}`}
                     >
                       D-B Yesterday
                     </button>
                     <button
                       onClick={() => setSelectedBusyDate(yesterday)}
-                      className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${selectedBusyDate === yesterday ? "bg-[#003875] text-white shadow-md" : "bg-white dark:bg-navy-950 text-gray-400 border border-gray-100 dark:border-navy-800"}`}
+                      className={`px-3 py-1.5 rounded-lg text-[13px] font-semibold   transition-all ${selectedBusyDate === yesterday ? "bg-[#2563EB] text-white shadow-md" : "bg-white dark:bg-navy-950 text-[#5B6472] border border-gray-100 dark:border-navy-800"}`}
                     >
                       Yesterday
                     </button>
                     <button
                       onClick={() => setSelectedBusyDate(today)}
-                      className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${selectedBusyDate === today ? "bg-[#003875] text-white shadow-md" : "bg-white dark:bg-navy-950 text-gray-400 border border-gray-100 dark:border-navy-800"}`}
+                      className={`px-3 py-1.5 rounded-lg text-[13px] font-semibold   transition-all ${selectedBusyDate === today ? "bg-[#2563EB] text-white shadow-md" : "bg-white dark:bg-navy-950 text-[#5B6472] border border-gray-100 dark:border-navy-800"}`}
                     >
                       Today
                     </button>
@@ -4036,7 +4036,7 @@ function BusyModal({
               <div className="relative">
                 <button
                   onClick={() => setIsBusyCalendarOpen(!isBusyCalendarOpen)}
-                  className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${selectedBusyDate &&
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-[13px] font-semibold   transition-all ${selectedBusyDate &&
                       ![0, 1, 2].some((d) => {
                         const dt = new Date();
                         const y = dt.getFullYear();
@@ -4044,8 +4044,8 @@ function BusyModal({
                         const day = String(dt.getDate() - d).padStart(2, "0");
                         return `${y}-${m}-${day}` === selectedBusyDate;
                       })
-                      ? "bg-[#003875] text-white shadow-md"
-                      : "bg-white dark:bg-navy-950 text-gray-400 border border-gray-100 dark:border-navy-800"
+                      ? "bg-[#2563EB] text-white shadow-md"
+                      : "bg-white dark:bg-navy-950 text-[#5B6472] border border-gray-100 dark:border-navy-800"
                     }`}
                 >
                   <CalendarDaysIcon className="w-3.5 h-3.5" />
@@ -4092,11 +4092,11 @@ function BusyModal({
                 {selectedNos.map((no) => (
                   <span
                     key={no}
-                    className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#003875] text-[#FFD500] rounded-full text-[10px] font-black shadow-sm"
+                    className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#2563EB] text-white rounded-full text-[13px] font-semibold shadow-sm"
                     title={allGroupedOrders[no]?.[0]?.party_name}
                   >
                     {no}
-                    <span className="opacity-60 font-bold border-l border-[#FFD500]/30 pl-1.5 ml-0.5 truncate max-w-[80px]">
+                    <span className="opacity-60 font-bold border-l border-[#2563EB]/30 pl-1.5 ml-0.5 truncate max-w-[80px]">
                       {allGroupedOrders[no]?.[0]?.party_name}
                     </span>
                     <button
@@ -4109,7 +4109,7 @@ function BusyModal({
                 ))}
                 <button
                   onClick={() => setSelectedNos([])}
-                  className="text-[9px] font-black text-red-500 uppercase tracking-widest hover:underline ml-auto"
+                  className="text-[13px] font-semibold text-red-500 hover:underline ml-auto"
                 >
                   Clear All
                 </button>
@@ -4122,20 +4122,20 @@ function BusyModal({
               results.map((r, idx) => (
                 <div
                   key={idx}
-                  className={`p-4 rounded-2xl border-2 ${r.found ? "bg-white dark:bg-navy-800/50 border-orange-100/30 dark:border-navy-700 shadow-sm" : "bg-red-50 border-red-100 text-red-500 opacity-60"}`}
+                  className={`p-4 rounded-2xl border-2 ${r.found ? "bg-white dark:bg-navy-800/50 border-[#E5E7EB] dark:border-navy-700 shadow-sm" : "bg-red-50 border-red-100 text-red-500 opacity-60"}`}
                 >
                   {!r.found ? (
-                    <p className="text-[10px] font-black italic">
+                    <p className="text-[13px] font-semibold italic">
                       Order {r.orderNo} not found
                     </p>
                   ) : (
                     <div className="space-y-3">
                       <div className="flex flex-col border-b border-gray-50 dark:border-white/5 pb-2">
                         <div className="flex justify-between items-center">
-                          <span className="text-[12px] font-black text-[#003875] dark:text-[#FFD500] italic">
+                          <span className="text-[14px] font-semibold text-[#2563EB] dark:text-[#60A5FA] italic">
                             {r.orderNo}
                           </span>
-                          <span className="text-[10px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest truncate max-w-[200px]">
+                          <span className="text-[13px] font-semibold text-gray-500 dark:text-gray-400 truncate max-w-[200px]">
                             {r.partyName}
                           </span>
                         </div>
@@ -4143,20 +4143,20 @@ function BusyModal({
 
                       <div className="grid grid-cols-12 gap-2">
                         {/* Header */}
-                        <div className="col-span-10 text-[9px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-50 dark:border-white/5 pb-1">
+                        <div className="col-span-10 text-[13px] font-semibold text-[#5B6472] border-b border-gray-50 dark:border-white/5 pb-1">
                           Item Description
                         </div>
-                        <div className="col-span-2 text-[9px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-50 dark:border-white/5 pb-1 text-right">
+                        <div className="col-span-2 text-[13px] font-semibold text-[#5B6472] border-b border-gray-50 dark:border-white/5 pb-1 text-right">
                           Qty
                         </div>
 
                         {/* Items */}
                         {r.items.map((i: any, ii: number) => (
                           <React.Fragment key={ii}>
-                            <div className="col-span-10 text-[11px] font-bold text-gray-700 dark:text-gray-200 uppercase truncate py-0.5">
+                            <div className="col-span-10 text-[14px] font-bold text-gray-700 dark:text-gray-200 truncate py-0.5">
                               {i.name}
                             </div>
-                            <div className="col-span-2 text-[11px] font-black text-[#003875] dark:text-[#FFD500] text-right py-0.5">
+                            <div className="col-span-2 text-[14px] font-semibold text-[#2563EB] dark:text-[#60A5FA] text-right py-0.5">
                               {i.qty}
                             </div>
                           </React.Fragment>
@@ -4167,11 +4167,11 @@ function BusyModal({
                           r.promoItems.length > 0 &&
                           r.promoItems.map((p: any, ii: number) => (
                             <React.Fragment key={`p-${ii}`}>
-                              <div className="col-span-10 text-[11px] font-bold text-rose-500 uppercase truncate py-0.5 flex items-center gap-1.5 mt-1 border-t border-rose-50 dark:border-rose-900/10 pt-1">
+                              <div className="col-span-10 text-[14px] font-bold text-rose-500 truncate py-0.5 flex items-center gap-1.5 mt-1 border-t border-rose-50 dark:border-rose-900/10 pt-1">
                                 <span className="w-1 h-1 rounded-full bg-rose-400" />
                                 {p.name} (X-TRA)
                               </div>
-                              <div className="col-span-2 text-[11px] font-black text-rose-500 text-right py-0.5 mt-1 border-t border-rose-50 dark:border-rose-900/10 pt-1">
+                              <div className="col-span-2 text-[14px] font-semibold text-rose-500 text-right py-0.5 mt-1 border-t border-rose-50 dark:border-rose-900/10 pt-1">
                                 {p.qty}
                               </div>
                             </React.Fragment>
@@ -4183,8 +4183,8 @@ function BusyModal({
               ))
             ) : (
               <div className="text-center py-12 opacity-30">
-                <ArchiveBoxIcon className="w-10 h-10 mx-auto mb-2 text-gray-300" />
-                <p className="text-[10px] font-black uppercase tracking-[0.2em]">
+                <ArchiveBoxIcon className="w-10 h-10 mx-auto mb-2 text-[#5B6472]" />
+                <p className="text-[13px] font-semibold">
                   Ready for extraction
                 </p>
               </div>
@@ -4196,14 +4196,14 @@ function BusyModal({
           <button
             onClick={handleCopy}
             disabled={results.filter((r) => r.found).length === 0}
-            className="w-full h-[52px] bg-[#003875] dark:bg-[#FFD500] text-white dark:text-black rounded-2xl font-black uppercase tracking-[0.2em] text-[11px] shadow-lg disabled:opacity-50 transition-all active:scale-95 flex items-center justify-center gap-2 group"
+            className="w-full h-[52px] bg-[#2563EB] dark:bg-[#60A5FA] text-white dark:text-black rounded-2xl font-semibold text-[14px] shadow-lg disabled:opacity-50 transition-all active:scale-95 flex items-center justify-center gap-2 group"
           >
             <ClipboardDocumentCheckIcon className="w-5 h-5" />
             {copyStatus}
           </button>
           <button
             onClick={onClose}
-            className="w-full h-[40px] rounded-xl font-black text-gray-400 uppercase tracking-widest text-[9px] hover:bg-gray-100 dark:hover:bg-white/5 transition-all"
+            className="w-full h-[40px] rounded-xl font-semibold text-[#5B6472] text-[13px] hover:bg-gray-100 dark:hover:bg-white/5 transition-all"
           >
             Close Modal
           </button>
@@ -4223,29 +4223,29 @@ function YesNoToggle({
   onChange: (val: string) => void;
 }) {
   return (
-    <div className="flex items-center justify-between p-4 bg-gradient-to-r from-[#FEF6DB] to-white dark:from-navy-800 dark:to-navy-900 rounded-2xl border border-orange-100 dark:border-navy-700 shadow-sm relative overflow-hidden group">
-      <div className="absolute top-0 left-0 w-1 h-full bg-[#FFD500]/30" />
-      <span className="text-[10px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-[0.2em]">
+    <div className="flex items-center justify-between p-4 bg-gradient-to-r from-[#EFF4FF] to-white dark:from-navy-800 dark:to-navy-900 rounded-2xl border border-[#E5E7EB] dark:border-navy-700 shadow-sm relative overflow-hidden group">
+      <div className="absolute top-0 left-0 w-1 h-full bg-[#2563EB]/30" />
+      <span className="text-[13px] font-semibold text-gray-500 dark:text-gray-400">
         {label}
       </span>
       <div className="flex bg-gray-100/50 dark:bg-black/40 p-1.5 rounded-full border border-gray-100 dark:border-navy-800 backdrop-blur-sm relative">
         <div
           className={`absolute top-1.5 bottom-1.5 transition-all duration-300 rounded-full shadow-lg ${value === "Yes"
               ? "left-1.5 right-[calc(50%+6px)] bg-emerald-500"
-              : "left-[calc(50%+6px)] right-1.5 bg-[#CE2029]"
+              : "left-[calc(50%+6px)] right-1.5 bg-[#DC2626]"
             }`}
         />
         <button
           type="button"
           onClick={() => onChange("Yes")}
-          className={`relative z-10 w-20 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${value === "Yes" ? "text-white" : "text-gray-400 hover:text-gray-600"}`}
+          className={`relative z-10 w-20 py-2 rounded-full text-[13px] font-semibold   transition-all duration-300 ${value === "Yes" ? "text-white" : "text-[#5B6472] hover:text-gray-600"}`}
         >
           Yes
         </button>
         <button
           type="button"
           onClick={() => onChange("No")}
-          className={`relative z-10 w-20 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${value === "No" ? "text-white" : "text-gray-400 hover:text-gray-600"}`}
+          className={`relative z-10 w-20 py-2 rounded-full text-[13px] font-semibold   transition-all duration-300 ${value === "No" ? "text-white" : "text-[#5B6472] hover:text-gray-600"}`}
         >
           No
         </button>
@@ -4351,8 +4351,8 @@ function O2DDetailPanel({
       {(isAllLoading || isTransitioning) && (!selectedOrder || selectedOrder.length === 0) && (
         <div className="absolute inset-0 bg-white/60 dark:bg-navy-900/60 backdrop-blur-sm flex items-center justify-center z-40 rounded-lg">
           <div className="flex flex-col items-center gap-3">
-            <div className="w-8 h-8 border-3 border-[#003875]/20 dark:border-[#FFD500]/20 border-t-[#003875] dark:border-t-[#FFD500] rounded-full animate-spin" />
-            <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">
+            <div className="w-8 h-8 border-3 border-[#2563EB]/20 dark:border-[#60A5FA]/20 border-t-[#2563EB] dark:border-t-[#60A5FA] rounded-full animate-spin" />
+            <p className="text-[13px] font-semibold text-[#5B6472]">
               Loading...
             </p>
           </div>
@@ -4362,15 +4362,15 @@ function O2DDetailPanel({
         <div className="flex-1 flex flex-col overflow-y-auto no-scrollbar">
           {" "}
           {/* CREAM HEADER - Compact with all Actions */}
-          <div className="px-4 py-2 flex items-center justify-between bg-[#FEF6DB] dark:bg-navy-800 border-b border-orange-100 dark:border-navy-700 text-[#003875] dark:text-[#FFD500]">
+          <div className="px-4 py-2 flex items-center justify-between bg-[#EFF4FF] dark:bg-navy-800 border-b border-[#E5E7EB] dark:border-navy-700 text-[#2563EB] dark:text-[#60A5FA]">
             <div className="flex items-center gap-2.5">
               <button
                 onClick={() => setSelectedOrderNo(null)}
-                className="lg:hidden p-1.5 bg-[#003875]/10 hover:bg-[#003875]/20 rounded-full transition-all"
+                className="lg:hidden p-1.5 bg-[#2563EB]/10 hover:bg-[#2563EB]/20 rounded-full transition-all"
               >
-                <ArrowLeftIcon className="w-4 h-4 text-[#003875] dark:text-[#FFD500]" />
+                <ArrowLeftIcon className="w-4 h-4 text-[#2563EB] dark:text-[#60A5FA]" />
               </button>
-              <h2 className="text-[15px] font-black italic tracking-tight uppercase">
+              <h2 className="text-[15px] font-semibold italic tracking-tight">
                 {selectedOrderNo}
               </h2>
             </div>
@@ -4386,22 +4386,22 @@ function O2DDetailPanel({
                         onClick={() =>
                           setIsRemoveFollowUpModalOpen(true)
                         }
-                        className="flex items-center gap-1.5 p-1.5 sm:px-4 sm:py-1.5 bg-[#003875]/5 hover:bg-[#003875]/10 rounded-full text-[#003875] dark:text-[#FFD500] transition-all transition-transform active:scale-90 border border-[#003875]/10 dark:border-[#FFD500]/10"
+                        className="flex items-center gap-1.5 p-1.5 sm:px-4 sm:py-1.5 bg-[#2563EB]/5 hover:bg-[#2563EB]/10 rounded-full text-white dark:text-[#60A5FA] transition-all transition-transform active:scale-90 border border-[#2563EB]/10 dark:border-[#60A5FA]/10"
                         title="Remove Follow-up"
                       >
                         <MinusCircleIcon className="w-4 h-4" />
-                        <span className="hidden lg:inline text-[10px] font-black uppercase tracking-widest">
+                        <span className="hidden lg:inline text-[13px] font-semibold">
                           Remove Follow-up
                         </span>
                       </button>
                     )}
                     <button
                       onClick={openStepUpdateModal}
-                      className="flex items-center gap-1.5 p-1.5 sm:px-5 sm:py-1.5 bg-[#003875] text-[#FFD500] hover:bg-[#002a5a] rounded-full transition-all transition-transform active:scale-90 shadow-lg shadow-black/10 animate-pulse"
+                      className="flex items-center gap-1.5 p-1.5 sm:px-5 sm:py-1.5 bg-[#2563EB] text-white hover:bg-[#002a5a] rounded-full transition-all transition-transform active:scale-90 shadow-lg shadow-black/10 animate-pulse"
                       title="Update Progress"
                     >
                       <ArrowPathIcon className="w-4 h-4" />
-                      <span className="hidden lg:inline text-[10px] font-black uppercase opacity-90">
+                      <span className="hidden lg:inline text-[13px] font-semibold opacity-90">
                         Update
                       </span>
                     </button>
@@ -4417,7 +4417,7 @@ function O2DDetailPanel({
                   });
                   setIsConfirmOpen(true);
                 }}
-                className={`flex items-center gap-1.5 p-1.5 sm:px-4 sm:py-1.5 rounded-full transition-all transition-transform active:scale-90 border ${selectedOrder[0]?.hold ? "bg-orange-500 text-white border-orange-400 shadow-md" : "bg-[#003875]/5 text-[#003875]/80 border-[#003875]/10 hover:bg-[#003875]/10 hover:text-[#003875] dark:text-[#FFD500]/80 dark:border-[#FFD500]/10 dark:hover:bg-[#FFD500]/10 dark:hover:text-[#FFD500]"}`}
+                className={`flex items-center gap-1.5 p-1.5 sm:px-4 sm:py-1.5 rounded-full transition-all transition-transform active:scale-90 border ${selectedOrder[0]?.hold ? "bg-[#D97706] text-white border-[#E5E7EB] shadow-md" : "bg-[#2563EB]/5 text-white/80 border-[#2563EB]/10 hover:bg-[#2563EB]/10 hover:text-white dark:text-[#60A5FA]/80 dark:border-[#60A5FA]/10 dark:hover:bg-[#60A5FA]/10 dark:hover:text-[#60A5FA]"}`}
                 title={
                   selectedOrder[0]?.hold
                     ? "Resume Order"
@@ -4425,7 +4425,7 @@ function O2DDetailPanel({
                 }
               >
                 <PauseCircleIcon className="w-4 h-4" />
-                <span className="hidden lg:inline text-[10px] font-black uppercase tracking-widest">
+                <span className="hidden lg:inline text-[13px] font-semibold">
                   {selectedOrder[0]?.hold ? "On Hold" : "Hold"}
                 </span>
               </button>
@@ -4438,7 +4438,7 @@ function O2DDetailPanel({
                   });
                   setIsConfirmOpen(true);
                 }}
-                className={`flex items-center gap-1.5 p-1.5 sm:px-4 sm:py-1.5 rounded-full transition-all transition-transform active:scale-90 border ${selectedOrder[0]?.cancelled ? "bg-black text-white border-black shadow-md" : "bg-[#003875]/5 text-[#003875]/80 border-[#003875]/10 hover:bg-[#003875]/10 hover:text-[#003875] dark:text-[#FFD500]/80 dark:border-[#FFD500]/10 dark:hover:bg-[#FFD500]/10 dark:hover:text-[#FFD500]"}`}
+                className={`flex items-center gap-1.5 p-1.5 sm:px-4 sm:py-1.5 rounded-full transition-all transition-transform active:scale-90 border ${selectedOrder[0]?.cancelled ? "bg-black text-white border-black shadow-md" : "bg-[#2563EB]/5 text-white/80 border-[#2563EB]/10 hover:bg-[#2563EB]/10 hover:text-white dark:text-[#60A5FA]/80 dark:border-[#60A5FA]/10 dark:hover:bg-[#60A5FA]/10 dark:hover:text-[#60A5FA]"}`}
                 title={
                   selectedOrder[0]?.cancelled
                     ? "Undo Cancellation"
@@ -4446,23 +4446,23 @@ function O2DDetailPanel({
                 }
               >
                 <NoSymbolIcon className="w-4 h-4" />
-                <span className="hidden lg:inline text-[10px] font-black uppercase tracking-widest">
+                <span className="hidden lg:inline text-[13px] font-semibold">
                   {selectedOrder[0]?.cancelled
                     ? "Cancelled"
                     : "Cancel"}
                 </span>
               </button>
-              <div className="w-px h-5 bg-[#003875]/10 dark:bg-white/20 mx-1 hidden sm:block" />
-              <div className="flex items-center gap-1.5 p-1 bg-[#003875]/5 dark:bg-black/10 rounded-full border border-[#003875]/10 dark:border-white/20 backdrop-blur-sm">
+              <div className="w-px h-5 bg-[#2563EB]/10 dark:bg-white/20 mx-1 hidden sm:block" />
+              <div className="flex items-center gap-1.5 p-1 bg-[#2563EB]/5 dark:bg-black/10 rounded-full border border-[#2563EB]/10 dark:border-white/20 backdrop-blur-sm">
                 <button
                   onClick={() => setDetailViewMode("full")}
-                  className={`p-1.5 rounded-full transition-all ${detailViewMode === "full" ? "bg-[#003875] text-[#FFD500] shadow-md scale-105" : "text-[#003875]/60 hover:text-[#003875] dark:text-white/60 dark:hover:text-white"}`}
+                  className={`p-1.5 rounded-full transition-all ${detailViewMode === "full" ? "bg-[#2563EB] text-white shadow-md scale-105" : "text-white/60 hover:text-white dark:text-white/60 dark:hover:text-white"}`}
                 >
                   <Squares2X2Icon className="w-4 h-4" />
                 </button>
                 <button
                   onClick={() => setDetailViewMode("table")}
-                  className={`p-1.5 rounded-full transition-all ${detailViewMode === "table" ? "bg-[#003875] text-[#FFD500] shadow-md scale-105" : "text-[#003875]/60 hover:text-[#003875] dark:text-white/60 dark:hover:text-white"}`}
+                  className={`p-1.5 rounded-full transition-all ${detailViewMode === "table" ? "bg-[#2563EB] text-white shadow-md scale-105" : "text-white/60 hover:text-white dark:text-white/60 dark:hover:text-white"}`}
                 >
                   <ListBulletIcon className="w-4 h-4" />
                 </button>
@@ -4475,46 +4475,46 @@ function O2DDetailPanel({
               <div className="bg-white dark:bg-navy-800/50 p-6 rounded-2xl border-2 border-gray-100 dark:border-navy-700 shadow-md grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
                 <div className="md:col-span-9">
                   <div className="mb-5">
-                    <p className="text-[9px] font-black text-gray-400 uppercase tracking-[0.3em] mb-1">
+                    <p className="text-[13px] font-semibold text-[#5B6472] mb-1">
                       ESTABLISHED PARTNER
                     </p>
-                    <p className="text-lg font-black text-[#003875] dark:text-[#FFD500] uppercase tracking-wide">
+                    <p className="text-lg font-semibold text-[#2563EB] dark:text-[#60A5FA] tracking-wide">
                       {selectedOrder[0]?.party_name}
                     </p>
                   </div>
                   <div className="flex flex-wrap gap-6">
                     <div className="flex items-center gap-3">
-                      <ArchiveBoxIcon className="w-4.5 h-4.5 text-[#003875]/40" />
+                      <ArchiveBoxIcon className="w-4.5 h-4.5 text-[#2563EB]/40" />
                       <div className="flex flex-col">
-                        <span className="text-[9px] font-black text-gray-400 uppercase">
+                        <span className="text-[13px] font-semibold text-[#5B6472]">
                           Loadout
                         </span>
-                        <span className="text-[13px] font-black text-gray-700 dark:text-gray-100">
+                        <span className="text-[13px] font-semibold text-gray-700 dark:text-gray-100">
                           {detailItemsCount} Items
                         </span>
                       </div>
                     </div>
-                    <div className="w-px h-8 bg-[#003875]/5 mx-1 hidden sm:block" />
+                    <div className="w-px h-8 bg-[#2563EB]/5 mx-1 hidden sm:block" />
                     <div className="flex items-center gap-3">
-                      <UserIcon className="w-4.5 h-4.5 text-[#003875]/40" />
+                      <UserIcon className="w-4.5 h-4.5 text-[#2563EB]/40" />
                       <div className="flex flex-col">
-                        <span className="text-[9px] font-black text-gray-400 uppercase">
+                        <span className="text-[13px] font-semibold text-[#5B6472]">
                           Operator
                         </span>
-                        <span className="text-[13px] font-black text-gray-700 dark:text-gray-100 uppercase truncate max-w-[120px]">
+                        <span className="text-[13px] font-semibold text-gray-700 dark:text-gray-100 truncate max-w-[120px]">
                           {selectedOrder[0]?.filled_by}
                         </span>
                       </div>
                     </div>
-                    <div className="w-px h-8 bg-[#003875]/5 mx-1 hidden sm:block" />
+                    <div className="w-px h-8 bg-[#2563EB]/5 mx-1 hidden sm:block" />
                     <div className="flex items-center gap-3">
-                      <CalendarDaysIcon className="w-4.5 h-4.5 text-[#003875]/40" />
+                      <CalendarDaysIcon className="w-4.5 h-4.5 text-[#2563EB]/40" />
                       <div className="flex flex-col">
-                        <span className="text-[9px] font-black text-gray-400 uppercase">
+                        <span className="text-[13px] font-semibold text-[#5B6472]">
                           Timestamp
                         </span>
                         <div className="flex items-center gap-2">
-                          <span className="text-[13px] font-black text-gray-700 dark:text-gray-100">
+                          <span className="text-[13px] font-semibold text-gray-700 dark:text-gray-100">
                             {(() => {
                               const o = selectedOrder[0];
                               const d = o?.created_at || (o as any)?.actual_1 || (o as any)?.planned_1;
@@ -4535,14 +4535,14 @@ function O2DDetailPanel({
                     {selectedOrder[0]?.hold &&
                       !selectedOrder[0]?.cancelled && (
                         <>
-                          <div className="w-px h-8 bg-orange-500/10 mx-1 hidden sm:block" />
+                          <div className="w-px h-8 bg-[#D97706]/10 mx-1 hidden sm:block" />
                           <div className="flex items-center gap-3">
-                            <PauseCircleIcon className="w-4.5 h-4.5 text-orange-500/60" />
+                            <PauseCircleIcon className="w-4.5 h-4.5 text-[#D97706]" />
                             <div className="flex flex-col">
-                              <span className="text-[9px] font-black text-orange-400 uppercase">
+                              <span className="text-[13px] font-semibold text-[#D97706]">
                                 Held On
                               </span>
-                              <span className="text-[13px] font-black text-orange-500">
+                              <span className="text-[13px] font-semibold text-[#D97706]">
                                 {selectedOrder[0]?.hold &&
                                   new Date(
                                     selectedOrder[0]?.hold,
@@ -4562,10 +4562,10 @@ function O2DDetailPanel({
                         <div className="flex items-center gap-3">
                           <NoSymbolIcon className="w-4.5 h-4.5 text-red-500/60" />
                           <div className="flex flex-col">
-                            <span className="text-[9px] font-black text-red-400 uppercase">
+                            <span className="text-[13px] font-semibold text-red-400">
                               Cancelled On
                             </span>
-                            <span className="text-[13px] font-black text-[#CE2029]">
+                            <span className="text-[13px] font-semibold text-[#DC2626]">
                               {selectedOrder[0]?.cancelled &&
                                 new Date(
                                   selectedOrder[0]?.cancelled,
@@ -4642,15 +4642,15 @@ function O2DDetailPanel({
                         },
                       };
                       return (
-                        <div className="bg-gradient-to-r from-amber-50 to-[#FFFBF0] dark:from-navy-800 dark:to-navy-900 rounded-2xl border-2 border-[#FFD500] shadow-sm overflow-hidden animate-in fade-in slide-in-from-bottom-2 duration-400 relative">
-                          <div className="absolute top-0 left-0 w-1.5 h-full bg-[#FFD500]" />
+                        <div className="bg-gradient-to-r from-amber-50 to-[#FFFFFF] dark:from-navy-800 dark:to-navy-900 rounded-2xl border-2 border-[#2563EB] shadow-sm overflow-hidden animate-in fade-in slide-in-from-bottom-2 duration-400 relative">
+                          <div className="absolute top-0 left-0 w-1.5 h-full bg-[#2563EB]" />
                           <div className="px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                             <div>
-                              <h3 className="text-[11px] font-black text-[#003875] dark:text-[#FFD500] uppercase tracking-widest flex items-center gap-2">
-                                <GiftIcon className="w-5 h-5 text-[#FFD500]" />
+                              <h3 className="text-[14px] font-semibold text-[#2563EB] dark:text-[#60A5FA] flex items-center gap-2">
+                                <GiftIcon className="w-5 h-5 text-[#2563EB]" />
                                 PROMOTIONAL DEPLOYMENT
                               </h3>
-                              <p className="text-[10px] font-bold text-gray-500 mt-0.5 ml-7 uppercase tracking-wider">
+                              <p className="text-[13px] font-bold text-gray-500 mt-0.5 ml-7 tracking-wider">
                                 Required First Order Extras for
                                 Dispatch
                               </p>
@@ -4671,22 +4671,22 @@ function O2DDetailPanel({
                                     name
                                   ] || {
                                     icon: GiftIcon,
-                                    color: "text-orange-500",
+                                    color: "text-[#D97706]",
                                   };
                                   const ItemIcon = promo.icon;
                                   return (
                                     <div
                                       key={idx}
-                                      className="bg-white dark:bg-black px-3 py-1.5 rounded-lg border border-orange-100 dark:border-navy-700 flex items-center gap-2 shadow-sm"
+                                      className="bg-white dark:bg-black px-3 py-1.5 rounded-lg border border-[#E5E7EB] dark:border-navy-700 flex items-center gap-2 shadow-sm"
                                     >
                                       <ItemIcon
                                         className={`w-3.5 h-3.5 shrink-0 ${promo.color}`}
                                       />
-                                      <span className="text-[11px] font-black text-gray-800 dark:text-gray-100">
+                                      <span className="text-[14px] font-semibold text-gray-800 dark:text-gray-100">
                                         {name}
                                       </span>
                                       <div className="w-px h-3 bg-gray-200 dark:bg-navy-700" />
-                                      <span className="text-[11px] font-black text-[#003875] dark:text-[#FFD500]">
+                                      <span className="text-[14px] font-semibold text-[#2563EB] dark:text-[#60A5FA]">
                                         ×{qty}
                                       </span>
                                     </div>
@@ -4706,11 +4706,11 @@ function O2DDetailPanel({
               {/* Tactical Inventory - Reverted to Simple 4-Column Table View */}
               <div className="bg-white dark:bg-navy-800/50 rounded-2xl border-2 border-gray-100 dark:border-navy-700 shadow-md overflow-hidden animate-in fade-in slide-in-from-bottom-2 duration-500">
                 <div className="px-6 py-3 border-b border-gray-100 dark:border-navy-700 flex items-center justify-between bg-white/40 dark:bg-transparent">
-                  <h3 className="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-2 items-center">
-                    <div className="w-1 h-3.5 bg-[#003875] rounded-full" />{" "}
+                  <h3 className="text-[13px] font-semibold text-gray-500 flex items-center gap-2 items-center">
+                    <div className="w-1 h-3.5 bg-[#2563EB] rounded-full" />{" "}
                     Tactical Inventory
                   </h3>
-                  <div className="text-[12px] font-black text-[#003875] dark:text-[#FFD500] uppercase tracking-tighter">
+                  <div className="text-[14px] font-semibold text-[#2563EB] dark:text-[#60A5FA] tracking-tighter">
                     TOTAL Value: ₹
                     {detailTotalAmt.toLocaleString()}
                   </div>
@@ -4718,8 +4718,8 @@ function O2DDetailPanel({
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse">
                     <thead>
-                      <tr className="bg-amber-100 dark:bg-navy-950 text-[10px] font-black text-[#003875] dark:text-[#FFD500] uppercase tracking-widest">
-                        <th className="px-6 py-3">NOMENCLATURE</th>
+                      <tr className="bg-amber-100 dark:bg-navy-950 text-[13px] font-semibold text-[#2563EB] dark:text-[#60A5FA]">
+                        <th className="px-6 py-3">Nomenclature</th>
                         <th className="px-6 py-3">
                           ITEM SPECIFICATION
                         </th>
@@ -4735,18 +4735,18 @@ function O2DDetailPanel({
                       {parsedItems.map((item: any, idx: number) => (
                         <tr
                           key={idx}
-                          className="text-[12px] font-bold text-gray-700 dark:text-gray-300 hover:bg-[#003875]/[0.02] dark:hover:bg-navy-700/10 transition-colors"
+                          className="text-[14px] font-bold text-gray-700 dark:text-gray-300 hover:bg-[#2563EB]/[0.02] dark:hover:bg-navy-700/10 transition-colors"
                         >
-                          <td className="px-6 py-4 font-black text-gray-900 dark:text-white uppercase">
+                          <td className="px-6 py-4 font-semibold text-gray-900 dark:text-white">
                             {item.item_name}
                           </td>
-                          <td className="px-6 py-4 text-[11px] font-medium text-gray-500 dark:text-gray-400 italic italic">
+                          <td className="px-6 py-4 text-[14px] font-medium text-gray-500 dark:text-gray-400 italic italic">
                             {item.item_specification || "-"}
                           </td>
-                          <td className="px-6 py-4 text-center font-black text-[#003875] dark:text-[#FFD500]">
+                          <td className="px-6 py-4 text-center font-semibold text-[#2563EB] dark:text-[#60A5FA]">
                             {item.item_qty}
                           </td>
-                          <td className="px-6 py-4 text-right font-black text-[#CE2029]">
+                          <td className="px-6 py-4 text-right font-semibold text-[#DC2626]">
                             ₹
                             {(parseFloat(item.est_amount) || 0).toLocaleString()}
                           </td>
@@ -4754,17 +4754,17 @@ function O2DDetailPanel({
                       ))}
                     </tbody>
                     <tfoot>
-                      <tr className="bg-amber-100/50 dark:bg-black/20 text-[11px] font-black uppercase tracking-widest text-[#003875] dark:text-[#FFD500]">
+                      <tr className="bg-amber-100/50 dark:bg-black/20 text-[14px] font-semibold text-[#2563EB] dark:text-[#60A5FA]">
                         <td
                           colSpan={2}
                           className="px-6 py-4 italic"
                         >
                           Aggregate Order Sum
                         </td>
-                        <td className="px-6 py-4 text-center bg-[#003875]/5 dark:bg-[#003875]/10 text-gray-700 dark:text-gray-300">
+                        <td className="px-6 py-4 text-center bg-[#2563EB]/5 dark:bg-[#60A5FA]/10 text-gray-700 dark:text-gray-300">
                           {detailItemsCount} Items
                         </td>
-                        <td className="px-6 py-4 text-right bg-[#003875] text-white">
+                        <td className="px-6 py-4 text-right bg-[#2563EB] text-white">
                           ₹
                           {detailTotalAmt.toLocaleString()}
                         </td>
@@ -4776,23 +4776,23 @@ function O2DDetailPanel({
               {/* Operational Manifest - Step Specific Details */}
               <div className="bg-white dark:bg-navy-800/50 rounded-2xl border-2 border-gray-100 dark:border-navy-700 shadow-md overflow-hidden mb-6">
                 <div className="px-6 py-3 border-b border-gray-100 dark:border-navy-700 bg-white/40 dark:bg-transparent">
-                  <h3 className="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-2">
-                    <div className="w-1 h-3.5 bg-[#003875] rounded-full" />{" "}
+                  <h3 className="text-[13px] font-semibold text-gray-500 flex items-center gap-2">
+                    <div className="w-1 h-3.5 bg-[#2563EB] rounded-full" />{" "}
                     Operational Manifest
                   </h3>
                 </div>
                 <div className="p-6 grid grid-cols-1 sm:grid-cols-2 gap-y-8 gap-x-12">
                   {/* Step 1: Bill Update */}
                   <div className="space-y-4">
-                    <div className="flex items-center gap-2 text-[11px] font-black text-[#003875] dark:text-[#FFD500] uppercase tracking-widest border-b border-gray-100 pb-2">
+                    <div className="flex items-center gap-2 text-[14px] font-semibold text-[#2563EB] dark:text-[#60A5FA] border-b border-gray-100 pb-2">
                       <DocumentTextIcon className="w-4 h-4" />{" "}
                       Step 1: Bill Update
                     </div>
                     <div className="flex flex-col">
-                      <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">
+                      <span className="text-[13px] font-bold text-[#5B6472] tracking-tighter">
                         Voucher Number
                       </span>
-                      <span className="text-[14px] font-black text-gray-700 dark:text-gray-200">
+                      <span className="text-[14px] font-semibold text-gray-700 dark:text-gray-200">
                         {selectedOrder[0]?.voucher_num_1 || "-"}
                       </span>
                     </div>
@@ -4800,24 +4800,24 @@ function O2DDetailPanel({
                       const attachBill = selectedOrder[0]?.attach_bill_1;
                       if (!attachBill) return (
                         <div className="flex flex-col mt-3">
-                          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">
+                          <span className="text-[13px] font-bold text-[#5B6472] tracking-tighter">
                             Bill Attachment
                           </span>
-                          <span className="text-[14px] font-black text-gray-700 dark:text-gray-200">
+                          <span className="text-[14px] font-semibold text-gray-700 dark:text-gray-200">
                             -
                           </span>
                         </div>
                       );
                       return (
                         <div className="flex flex-col mt-3">
-                          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter mb-1">
+                          <span className="text-[13px] font-bold text-[#5B6472] tracking-tighter mb-1">
                             Bill Attachment
                           </span>
                           <div className="flex items-center gap-2">
                             <a
                               href={getPreviewUrl(attachBill)}
                               target="_blank"
-                              className="p-1 px-2.5 bg-[#003875]/5 dark:bg-[#FFD500]/5 text-[#003875] dark:text-[#FFD500] rounded-full text-[9px] font-black uppercase tracking-widest hover:bg-[#003875] hover:text-white dark:hover:bg-[#FFD500] dark:hover:text-black transition-all flex items-center gap-1"
+                              className="p-1 px-2.5 bg-[#2563EB]/5 dark:bg-[#60A5FA]/5 text-white dark:text-[#60A5FA] rounded-full text-[13px] font-semibold hover:bg-[#2563EB] hover:text-white dark:hover:bg-[#60A5FA] dark:hover:text-black transition-all flex items-center gap-1"
                             >
                               <EyeIcon className="w-3 h-3" />
                               View Bill
@@ -4830,7 +4830,7 @@ function O2DDetailPanel({
 
                   {/* Step 7: Share Billty */}
                   <div className="space-y-4">
-                    <div className="flex items-center gap-2 text-[11px] font-black text-[#003875] dark:text-[#FFD500] uppercase tracking-widest border-b border-gray-100 pb-2">
+                    <div className="flex items-center gap-2 text-[14px] font-semibold text-[#2563EB] dark:text-[#60A5FA] border-b border-gray-100 pb-2">
                       <HashtagIcon className="w-4 h-4" />{" "}
                       Step 7: Share Billty
                     </div>
@@ -4838,23 +4838,23 @@ function O2DDetailPanel({
                       const attachBillty = selectedOrder[0]?.attach_billty_7;
                       if (!attachBillty) return (
                         <div className="flex flex-col">
-                          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">
+                          <span className="text-[13px] font-bold text-[#5B6472] tracking-tighter">
                             Billty Attachment
                           </span>
-                          <span className="text-[14px] font-black text-gray-700 dark:text-gray-200">
+                          <span className="text-[14px] font-semibold text-gray-700 dark:text-gray-200">
                             -
                           </span>
                         </div>
                       );
                       return (
                         <div className="flex flex-col">
-                          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter mb-1">
+                          <span className="text-[13px] font-bold text-[#5B6472] tracking-tighter mb-1">
                             Billty Attachment
                           </span>
                           <a
                             href={getPreviewUrl(attachBillty)}
                             target="_blank"
-                            className="w-fit p-1 px-2.5 bg-[#003875]/5 dark:bg-[#FFD500]/5 text-[#003875] dark:text-[#FFD500] rounded-full text-[9px] font-black uppercase tracking-widest hover:bg-[#003875] hover:text-white dark:hover:bg-[#FFD500] dark:hover:text-black transition-all flex items-center gap-1"
+                            className="w-fit p-1 px-2.5 bg-[#2563EB]/5 dark:bg-[#60A5FA]/5 text-white dark:text-[#60A5FA] rounded-full text-[13px] font-semibold hover:bg-[#2563EB] hover:text-white dark:hover:bg-[#60A5FA] dark:hover:text-black transition-all flex items-center gap-1"
                           >
                             <EyeIcon className="w-3 h-3" />
                             View Billty
@@ -4867,16 +4867,16 @@ function O2DDetailPanel({
               </div>
 
               {/* Dark Blue Decorative Line */}
-              <div className="h-0.5 bg-gradient-to-r from-transparent via-[#003875]/20 to-transparent" />
+              <div className="h-0.5 bg-gradient-to-r from-transparent via-[#2563EB]/20 to-transparent" />
 
               {/* Compact Remarks - Cream Background */}
               {selectedOrder[0]?.remark && (
-                <div className="bg-[#FEF6DB] dark:bg-navy-800/50 p-5 rounded-2xl border-2 border-orange-100 dark:border-navy-700 relative shadow-md">
-                  <ChatBubbleBottomCenterTextIcon className="absolute top-4 right-4 w-6 h-6 text-[#003875]/10" />
-                  <span className="text-[9px] font-black text-[#003875]/40 uppercase tracking-[0.2em] block mb-1.5 font-bold">
+                <div className="bg-[#EFF4FF] dark:bg-navy-800/50 p-5 rounded-2xl border-2 border-[#E5E7EB] dark:border-navy-700 relative shadow-md">
+                  <ChatBubbleBottomCenterTextIcon className="absolute top-4 right-4 w-6 h-6 text-[#2563EB]/10" />
+                  <span className="text-[13px] font-semibold text-[#2563EB]/40 block mb-1.5 font-bold">
                     Intelligence Report
                   </span>
-                  <p className="text-[12px] font-bold text-gray-600 dark:text-gray-400 leading-relaxed italic">
+                  <p className="text-[14px] font-bold text-gray-600 dark:text-gray-400 leading-relaxed italic">
                     "{selectedOrder[0]?.remark}"
                   </p>
                 </div>
@@ -4902,30 +4902,30 @@ function O2DDetailPanel({
               <div className="bg-white dark:bg-navy-900 rounded-xl border-2 border-gray-100 dark:border-navy-700 shadow-xl w-max min-w-full overflow-hidden">
                 <table className="w-full text-left border-collapse whitespace-nowrap">
                   <thead>
-                    <tr className="bg-amber-100 dark:bg-navy-950 text-[11px] font-black text-[#003875] dark:text-[#FFD500] uppercase tracking-widest">
-                      <th className="px-6 py-4 border-r border-[#003875]/10 sticky left-0 z-10 bg-amber-100 dark:bg-navy-950">
+                    <tr className="bg-amber-100 dark:bg-navy-950 text-[14px] font-semibold text-[#2563EB] dark:text-[#60A5FA]">
+                      <th className="px-6 py-4 border-r border-[#2563EB]/10 sticky left-0 z-10 bg-amber-100 dark:bg-navy-950">
                         Nomenclature
                       </th>
-                      <th className="px-6 py-4 border-r border-[#003875]/10">
+                      <th className="px-6 py-4 border-r border-[#2563EB]/10">
                         Item Specification
                       </th>
-                      <th className="px-6 py-4 text-center border-r border-[#003875]/10">
+                      <th className="px-6 py-4 text-center border-r border-[#2563EB]/10">
                         Quantity
                       </th>
-                      <th className="px-6 py-4 text-right border-r border-[#003875]/10">
+                      <th className="px-6 py-4 text-right border-r border-[#2563EB]/10">
                         Estimated Amount
                       </th>
                       {O2DKB_STEPS.map((step, idx) => (
                         <th
                           key={idx}
-                          className="px-4 py-3 text-center border-r border-[#003875]/10 last:border-r-0 align-top"
+                          className="px-4 py-3 text-center border-r border-[#2563EB]/10 last:border-r-0 align-top"
                           title={step}
                         >
                           <div className="flex flex-col items-center justify-center gap-0.5 min-w-[120px]">
-                            <span className="text-[8px] opacity-50 uppercase tracking-[0.2em] font-black">
+                            <span className="text-[12px] opacity-50 font-semibold">
                               Step {idx + 1}
                             </span>
-                            <span className="text-[10px] whitespace-normal leading-tight">
+                            <span className="text-[13px] whitespace-normal leading-tight">
                               {O2DKB_STEP_SHORTS[idx]}
                             </span>
                           </div>
@@ -4933,7 +4933,7 @@ function O2DDetailPanel({
                       ))}
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[#CE2029]/5 dark:divide-navy-800/20">
+                  <tbody className="divide-y divide-[#DC2626]/5 dark:divide-navy-800/20">
                     {parsedItems.map((item: any, idx: number) => {
                       const parentOrder = selectedOrder[0] || {} as any;
                       return (
@@ -4941,19 +4941,19 @@ function O2DDetailPanel({
                         key={idx}
                         className="hover:bg-white/50 dark:hover:bg-white/5 transition-colors text-[13px] font-medium text-gray-700 dark:text-gray-200"
                       >
-                        <td className="px-6 py-3 border-r border-[#CE2029]/5 sticky left-0 z-10 bg-white dark:bg-navy-800">
+                        <td className="px-6 py-3 border-r border-[#DC2626]/5 sticky left-0 z-10 bg-white dark:bg-navy-800">
                           {item.item_name}
                         </td>
                         <td
-                          className="px-6 py-3 border-r border-[#CE2029]/5 italic text-gray-500 text-[11px] max-w-[250px] truncate"
+                          className="px-6 py-3 border-r border-[#DC2626]/5 italic text-gray-500 text-[14px] max-w-[250px] truncate"
                           title={item.item_specification}
                         >
                           {item.item_specification || "-"}
                         </td>
-                        <td className="px-6 py-3 text-center border-r border-[#CE2029]/5 bg-[#FFD500]/5 dark:bg-navy-900 font-black">
+                        <td className="px-6 py-3 text-center border-r border-[#DC2626]/5 bg-[#2563EB]/5 dark:bg-navy-900 font-semibold">
                           {item.item_qty}
                         </td>
-                        <td className="px-6 py-3 text-right font-black text-[#003875] dark:text-[#FFD500] border-r border-[#CE2029]/5">
+                        <td className="px-6 py-3 text-right font-semibold text-[#2563EB] dark:text-[#60A5FA] border-r border-[#DC2626]/5">
                           ₹
                           {(parseFloat(
                             item.est_amount,
@@ -4980,11 +4980,11 @@ function O2DDetailPanel({
                           return (
                             <td
                               key={stepIdx}
-                              className="px-6 py-2 min-w-[140px] border-r border-[#CE2029]/5 last:border-r-0"
+                              className="px-6 py-2 min-w-[140px] border-r border-[#DC2626]/5 last:border-r-0"
                             >
                               <div className="flex flex-col gap-1.5 text-[10.5px]">
                                 <div className="flex justify-between items-center gap-2">
-                                  <span className="text-gray-400 font-black tracking-widest uppercase text-[9px]">
+                                  <span className="text-[#5B6472] font-semibold text-[13px]">
                                     Plan
                                   </span>{" "}
                                   <span className="font-bold text-gray-800 dark:text-gray-200">
@@ -4992,19 +4992,19 @@ function O2DDetailPanel({
                                   </span>
                                 </div>
                                 <div className="flex justify-between items-center gap-2">
-                                  <span className="text-gray-400 font-black tracking-widest uppercase text-[9px]">
+                                  <span className="text-[#5B6472] font-semibold text-[13px]">
                                     Actual
                                   </span>{" "}
-                                  <span className="font-black text-[#003875] dark:text-[#FFD500]">
+                                  <span className="font-semibold text-[#2563EB] dark:text-[#60A5FA]">
                                     {actual}
                                   </span>
                                 </div>
                                 <div className="flex justify-between items-center gap-2">
-                                  <span className="text-gray-400 font-black tracking-widest uppercase text-[9px]">
+                                  <span className="text-[#5B6472] font-semibold text-[13px]">
                                     Status
                                   </span>{" "}
                                   <span
-                                    className={`font-black uppercase ${(status || "").toString().trim().toLowerCase() === "done" || (status || "").toString().trim().toLowerCase() === "yes" ? "text-green-500" : "text-[#CE2029]"}`}
+                                    className={`font-semibold  ${(status || "").toString().trim().toLowerCase() === "done" || (status || "").toString().trim().toLowerCase() === "yes" ? "text-green-500" : "text-[#DC2626]"}`}
                                   >
                                     {status || "-"}
                                   </span>
@@ -5013,11 +5013,11 @@ function O2DDetailPanel({
                                   <div
                                     className={`flex justify-between items-center gap-2 border-t pt-1.5 mt-0.5 ${delay.isDelayed ? "border-red-100 dark:border-red-900/30" : "border-green-100 dark:border-green-900/30"}`}
                                   >
-                                    <span className="text-gray-400 font-black tracking-widest uppercase text-[9px]">
+                                    <span className="text-[#5B6472] font-semibold text-[13px]">
                                       Delay
                                     </span>
                                     <span
-                                      className={`font-black text-[10px] ${delay.isDelayed ? "text-[#CE2029]" : "text-green-600"}`}
+                                      className={`font-semibold text-[13px] ${delay.isDelayed ? "text-[#DC2626]" : "text-green-600"}`}
                                     >
                                       {delay.text}
                                     </span>
@@ -5032,16 +5032,16 @@ function O2DDetailPanel({
                     })}
                   </tbody>
                   <tfoot>
-                    <tr className="bg-[#FEF6DB]/80 dark:bg-navy-950 font-black text-[#003875] dark:text-white text-[13px] border-t-2 border-[#003875]/20 shadow-inner">
-                      <td className="px-6 py-4 border-r border-[#003875]/10 sticky left-0 z-10 bg-[#FEF6DB]/80 dark:bg-navy-950 backdrop-blur-md">
+                    <tr className="bg-[#EFF4FF]/80 dark:bg-navy-950 font-semibold text-[#2563EB] dark:text-white text-[13px] border-t-2 border-[#2563EB]/20 shadow-inner">
+                      <td className="px-6 py-4 border-r border-[#2563EB]/10 sticky left-0 z-10 bg-[#EFF4FF]/80 dark:bg-navy-950 backdrop-blur-md">
                         AGGREGATE SUM
                       </td>
-                      <td className="px-6 py-4 border-r border-[#003875]/10"></td>
-                      <td className="px-6 py-4 text-center border-r border-[#003875]/10">
+                      <td className="px-6 py-4 border-r border-[#2563EB]/10"></td>
+                      <td className="px-6 py-4 text-center border-r border-[#2563EB]/10">
                         {detailTotalQty}{" "}
                         Units
                       </td>
-                      <td className="px-6 py-4 text-right text-[#003875] dark:text-[#FFD500] border-r border-[#003875]/10">
+                      <td className="px-6 py-4 text-right text-[#2563EB] dark:text-[#60A5FA] border-r border-[#2563EB]/10">
                         ₹
                         {detailTotalAmt.toLocaleString()}
                       </td>
@@ -5059,10 +5059,10 @@ function O2DDetailPanel({
         </div>
       ) : (
         <div className="flex-1 flex flex-col items-center justify-center p-10 opacity-30">
-          <div className="w-16 h-16 bg-[#003875]/5 rounded-full flex items-center justify-center mb-4">
-            <Squares2X2Icon className="w-8 h-8 text-[#003875]" />
+          <div className="w-16 h-16 bg-[#2563EB]/5 rounded-full flex items-center justify-center mb-4">
+            <Squares2X2Icon className="w-8 h-8 text-[#2563EB]" />
           </div>
-          <p className="text-[11px] font-black uppercase tracking-[0.3em] text-[#003875] italic">
+          <p className="text-[14px] font-semibold text-[#2563EB] italic">
             Select record to engage
           </p>
         </div>

@@ -220,11 +220,13 @@ export default function UsersPage() {
         });
         fetchUsers();
       } else {
-        throw new Error("Failed to save user");
+        // Show the server's reason (e.g. "Only admins can add, change or remove users.")
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body?.error || "Something went wrong while saving. Please try again.");
       }
     } catch (error) {
       setIsStatusModalOpen(false); // Close loader on error too
-      alert("Something went wrong while saving. Please try again.");
+      alert(error instanceof Error ? error.message : "Something went wrong while saving. Please try again.");
     }
   };
 
@@ -401,11 +403,12 @@ export default function UsersPage() {
         setIsStatusModalOpen(false); // Close loader immediately
         fetchUsers();
       } else {
-        throw new Error("Delete failed");
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body?.error || "Delete failed");
       }
     } catch (error) {
       setIsStatusModalOpen(false); // Close loader on error too
-      alert("Failed to delete user. Please try again.");
+      alert(error instanceof Error && error.message !== "Delete failed" ? error.message : "Failed to delete user. Please try again.");
     } finally {
       setPendingDeleteId(null);
     }
@@ -432,14 +435,17 @@ export default function UsersPage() {
         body: JSON.stringify({ ...user, permissions: newPermissions }),
       });
 
-      if (!res.ok) throw new Error("Failed to update permissions");
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body?.error || "Failed to update permission. Please try again.");
+      }
     } catch (error) {
       console.error(error);
       // Revert on error
       setUsers(prev => prev.map(u => 
         u.id === userId ? { ...u, permissions: currentPermissions } : u
       ));
-      alert("Failed to update permission. Please try again.");
+      alert(error instanceof Error ? error.message : "Failed to update permission. Please try again.");
     }
   };
 

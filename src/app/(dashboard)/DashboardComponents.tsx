@@ -41,7 +41,7 @@ export function CompactWelcome({ firstName, role }: any) {
           <span className="bg-[#2563EB] text-white px-2 py-0.5 rounded-full text-[12px] font-semibold flex items-center gap-1">
             <SparklesIcon className="w-2 h-2" /> System Active
           </span>
-          <span className="text-[12px] font-bold text-blue-200/60">Robotek ERP</span>
+          <span className="text-[12px] font-bold text-blue-200/60">Sarthi</span>
         </div>
         <h1 className="text-2xl font-semibold tracking-tighter leading-none mb-1">
           WELCOME,<br/>

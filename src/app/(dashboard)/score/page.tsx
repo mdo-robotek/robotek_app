@@ -1849,7 +1849,7 @@ function ScorePageContent() {
 
           {/* Branded Print Footer */}
           <div className="mt-16 pt-6 border-t border-gray-100 flex justify-between items-center">
-             <p className="text-[12px] font-semibold text-[#5B6472]">© {new Date().getFullYear()} Robotek ERP - Confidential Analytics Report</p>
+             <p className="text-[12px] font-semibold text-[#5B6472]">© {new Date().getFullYear()} Sarthi · Confidential analytics report</p>
              <div className="flex items-center gap-4">
                 <p className="text-[12px] font-semibold text-[#5B6472]">System Verify: OK</p>
                 <div className="w-12 h-1 bg-gray-100 rounded-full overflow-hidden">

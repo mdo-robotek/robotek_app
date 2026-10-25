@@ -9,10 +9,11 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Robotek ERP",
-  description: "Robotek internal ERP",
+  title: "Sarthi",
+  description: "Sarthi — the team's daily work system",
   icons: {
-    icon: "/logo_compact.png",
+    icon: "/sarthi-icon.svg",
+    apple: "/sarthi-icon.png",
   },
 };
 

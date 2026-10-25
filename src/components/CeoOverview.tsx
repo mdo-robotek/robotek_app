@@ -43,7 +43,7 @@ function Tile({ m }: { m: ModuleSummary }) {
         {m.headline.value}
       </p>
       <p className="mt-1.5 text-[14px] text-[#5B6472] dark:text-gray-400">{m.headline.label}</p>
-      <p className="mt-auto pt-2 text-[13px] text-[#5B6472] dark:text-gray-400 truncate">{m.note}</p>
+      <p className="mt-auto pt-2 text-[13px] leading-snug text-[#5B6472] dark:text-gray-400 line-clamp-2">{m.note}</p>
     </Link>
   );
 }

@@ -128,7 +128,7 @@ export function i2rSummary(items: I2R[], nowDate = new Date()): ModuleSummary {
     key: "i2r",
     title: "Purchase",
     href: "/i2r",
-    headline: { value: open, label: "purchase requests open", tone: late > 0 ? "warn" : "good" },
+    headline: { value: open, label: "requests open", tone: late > 0 ? "warn" : "good" },
     note: `${late} late · ${tbd} names to decide`,
     figures: [
       { key: "open", label: "Open", value: open, tone: "neutral" },
@@ -184,7 +184,7 @@ export function grnSummary(items: GRN[], nowDate = new Date()): ModuleSummary {
     key: "grn",
     title: "Goods In",
     href: "/grn",
-    headline: { value: open, label: "goods receipts open", tone: late > 0 ? "warn" : "good" },
+    headline: { value: open, label: "receipts open", tone: late > 0 ? "warn" : "good" },
     note: `${late} late · ${payment} payments to settle`,
     figures: [
       { key: "open", label: "Open", value: open, tone: "neutral" },

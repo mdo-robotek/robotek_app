@@ -158,7 +158,7 @@ export default function MeetingFormModal({
               </p>
             </div>
           </div>
-          <button onClick={onClose} className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors">
+          <button onClick={onClose} className="p-2 text-[#5B6472] hover:text-slate-600 dark:hover:text-slate-200 transition-colors">
             <XMarkIcon className="w-8 h-8" />
           </button>
         </div>
@@ -168,9 +168,9 @@ export default function MeetingFormModal({
             <div className="space-y-6">
               {/* Title */}
               <div className="space-y-1.5">
-                <label className="text-[13px] font-semibold text-slate-400 dark:text-slate-500 pl-1">Meeting Title</label>
+                <label className="text-[13px] font-semibold text-[#5B6472] dark:text-slate-500 pl-1">Meeting Title</label>
                 <div className="relative group">
-                   <DocumentTextIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
+                   <DocumentTextIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#5B6472] group-focus-within:text-blue-500 transition-colors" />
                    <input
                     type="text"
                     required
@@ -212,9 +212,9 @@ export default function MeetingFormModal({
 
               {/* Link */}
               <div className="space-y-1.5">
-                <label className="text-[13px] font-semibold text-slate-400 dark:text-slate-500 pl-1">Meeting Link (Optional)</label>
+                <label className="text-[13px] font-semibold text-[#5B6472] dark:text-slate-500 pl-1">Meeting Link (Optional)</label>
                 <div className="relative group">
-                   <VideoCameraIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-rose-500 transition-colors" />
+                   <VideoCameraIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#5B6472] group-focus-within:text-rose-500 transition-colors" />
                    <input
                     type="url"
                     value={formData.meeting_link}
@@ -229,7 +229,7 @@ export default function MeetingFormModal({
             <div className="space-y-6">
               {/* Description */}
               <div className="space-y-1.5">
-                <label className="text-[13px] font-semibold text-slate-400 dark:text-slate-500 pl-1">Description / Agenda</label>
+                <label className="text-[13px] font-semibold text-[#5B6472] dark:text-slate-500 pl-1">Description / Agenda</label>
                 <textarea
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
@@ -240,13 +240,13 @@ export default function MeetingFormModal({
 
               {/* Attendees */}
               <div className="space-y-3 relative">
-                <label className="flex items-center justify-between text-[13px] font-semibold text-slate-400 dark:text-slate-500 pl-1">
+                <label className="flex items-center justify-between text-[13px] font-semibold text-[#5B6472] dark:text-slate-500 pl-1">
                   <span>Attendees ({selectedUsers.length})</span>
                 </label>
                 
                 {/* Search Input */}
                 <div className="relative group shadow-sm rounded-2xl overflow-hidden">
-                   <UsersIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
+                   <UsersIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#5B6472] group-focus-within:text-blue-500 transition-colors" />
                    <input
                     type="text"
                     value={userSearch}
@@ -264,7 +264,7 @@ export default function MeetingFormModal({
                     {selectedUsers.map(u => (
                        <span key={u} className="flex items-center gap-1.5 pl-3 pr-1 py-1 text-[14px] font-semibold text-blue-700 dark:text-blue-300 bg-white dark:bg-slate-800 rounded-full shadow-[0_2px_4px_rgba(0,0,0,0.05)] border border-blue-100/50 animate-fade-in group/badge">
                           {u}
-                          <button type="button" onClick={() => handleToggleUser(u)} className="p-1 hover:bg-rose-500 text-slate-400 hover:text-white rounded-full transition-colors flex items-center justify-center">
+                          <button type="button" onClick={() => handleToggleUser(u)} className="p-1 hover:bg-rose-500 text-[#5B6472] hover:text-white rounded-full transition-colors flex items-center justify-center">
                              <XMarkIcon className="w-3.5 h-3.5" />
                           </button>
                        </span>
@@ -276,7 +276,7 @@ export default function MeetingFormModal({
                 {isSearchFocused && (
                   <div className="absolute top-[80px] left-0 right-0 z-10 bg-white dark:bg-slate-800 rounded-[1.5rem] border border-slate-200 dark:border-slate-700 shadow-2xl max-h-56 overflow-y-auto invisible-scrollbar">
                      {users.filter(u => u.username.toLowerCase().includes(userSearch.toLowerCase()) && !selectedUsers.includes(u.username)).length === 0 ? (
-                       <div className="p-6 flex flex-col items-center justify-center text-slate-400">
+                       <div className="p-6 flex flex-col items-center justify-center text-[#5B6472]">
                          <UsersIcon className="w-8 h-8 mb-2 opacity-20" />
                          <span className="text-[14px] font-bold text-slate-500">No matching users found</span>
                        </div>

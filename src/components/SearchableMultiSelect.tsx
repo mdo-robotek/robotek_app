@@ -114,7 +114,7 @@ export default function SearchableMultiSelect({
   return (
     <div className="w-full" ref={triggerRef}>
       {label && (
-        <label className="text-[13px] font-semibold text-gray-400 pl-1 mb-1 block">
+        <label className="text-[13px] font-semibold text-[#5B6472] pl-1 mb-1 block">
           {label}
         </label>
       )}
@@ -127,7 +127,7 @@ export default function SearchableMultiSelect({
       >
         <span
           className={`text-[13px] font-bold truncate ${
-            value.length > 0 ? "text-gray-900 dark:text-white" : "text-gray-400"
+            value.length > 0 ? "text-gray-900 dark:text-white" : "text-[#5B6472]"
           }`}
           title={selectedLabels.join(", ")}
         >
@@ -141,14 +141,14 @@ export default function SearchableMultiSelect({
                 e.stopPropagation();
                 clearAll();
               }}
-              className="p-0.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+              className="p-0.5 text-[#5B6472] hover:text-gray-600 dark:hover:text-gray-200"
               title="Clear selection"
             >
               <XMarkIcon className="w-3.5 h-3.5" />
             </button>
           )}
           <ChevronDownIcon
-            className={`w-3.5 h-3.5 text-gray-400 transition-transform ${isOpen ? "rotate-180" : ""}`}
+            className={`w-3.5 h-3.5 text-[#5B6472] transition-transform ${isOpen ? "rotate-180" : ""}`}
           />
         </div>
       </div>
@@ -164,7 +164,7 @@ export default function SearchableMultiSelect({
           }}
         >
           <div className="p-2 border-b border-gray-100 dark:border-white/5 flex items-center gap-2 bg-gray-50/50 dark:bg-slate-800/50">
-            <MagnifyingGlassIcon className="w-3.5 h-3.5 text-gray-400 ml-1 shrink-0" />
+            <MagnifyingGlassIcon className="w-3.5 h-3.5 text-[#5B6472] ml-1 shrink-0" />
             <input
               type="text"
               className="w-full bg-transparent border-none outline-none text-[13px] font-bold p-1 text-gray-900 dark:text-white placeholder-gray-400"
@@ -175,7 +175,7 @@ export default function SearchableMultiSelect({
             />
             {searchTerm && (
               <XMarkIcon
-                className="w-3.5 h-3.5 text-gray-400 cursor-pointer hover:text-gray-600 shrink-0"
+                className="w-3.5 h-3.5 text-[#5B6472] cursor-pointer hover:text-gray-600 shrink-0"
                 onClick={() => setSearchTerm("")}
               />
             )}
@@ -230,7 +230,7 @@ export default function SearchableMultiSelect({
                 );
               })
             ) : (
-              <div className="p-4 text-center text-[13px] font-bold text-gray-400 italic">
+              <div className="p-4 text-center text-[13px] font-bold text-[#5B6472] italic">
                 No results found
               </div>
             )}

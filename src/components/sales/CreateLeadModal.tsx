@@ -145,16 +145,16 @@ export default function CreateLeadModal({ isOpen, onClose, onSuccess, leadToEdit
     <Portal>
       <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4">
         <div className="absolute inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-sm" onClick={onClose} />
-        <div className="relative bg-[#FFFFFF] dark:bg-navy-900 w-full max-w-3xl rounded-2xl shadow-2xl border border-orange-100/50 dark:border-white/10 overflow-hidden animate-in fade-in zoom-in duration-300">
+        <div className="relative bg-[#FFFFFF] dark:bg-navy-900 w-full max-w-3xl rounded-2xl shadow-2xl border border-[#E5E7EB] dark:border-white/10 overflow-hidden animate-in fade-in zoom-in duration-300">
           
-          <div className="p-4 border-b border-orange-100/50 dark:border-zinc-800 flex items-center justify-between">
+          <div className="p-4 border-b border-[#E5E7EB] dark:border-zinc-800 flex items-center justify-between">
             <div>
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white tracking-tight">{leadToEdit ? `Edit Lead (${leadToEdit.id})` : 'Create New Lead'}</h2>
               <div className="flex items-center gap-2 mt-1">
-                <p className="text-gray-400 dark:text-slate-400 font-bold text-[12px]">Stage 1: Lead Details</p>
+                <p className="text-[#5B6472] dark:text-slate-400 font-bold text-[12px]">Stage 1: Lead Details</p>
               </div>
             </div>
-            <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-zinc-200 transition-colors">
+            <button onClick={onClose} className="p-2 text-[#5B6472] hover:text-gray-600 dark:hover:text-zinc-200 transition-colors">
               <XMarkIcon className="w-8 h-8" />
             </button>
           </div>
@@ -163,23 +163,23 @@ export default function CreateLeadModal({ isOpen, onClose, onSuccess, leadToEdit
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <label className="text-[13px] font-semibold text-[#2563EB] flex items-center gap-1"><UserIcon className="w-3 h-3"/> Name</label>
-                <input required name="name" value={formData.name} onChange={handleChange} className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-3 py-2 rounded-lg border border-orange-100 dark:border-zinc-800 focus:border-[#2563EB] focus:bg-white dark:focus:bg-zinc-900 outline-none font-semibold text-sm text-gray-900 dark:text-white transition-all shadow-sm" placeholder="Contact Name" />
+                <input required name="name" value={formData.name} onChange={handleChange} className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-3 py-2 rounded-lg border border-[#E5E7EB] dark:border-zinc-800 focus:border-[#2563EB] focus:bg-white dark:focus:bg-zinc-900 outline-none font-semibold text-sm text-gray-900 dark:text-white transition-all shadow-sm" placeholder="Contact Name" />
               </div>
               <div className="space-y-2">
                 <label className="text-[13px] font-semibold text-[#2563EB] flex items-center gap-1"><BuildingOfficeIcon className="w-3 h-3"/> Company Name</label>
-                <input name="company_name" value={formData.company_name} onChange={handleChange} className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-3 py-2 rounded-lg border border-orange-100 dark:border-zinc-800 focus:border-[#2563EB] focus:bg-white dark:focus:bg-zinc-900 outline-none font-semibold text-sm text-gray-900 dark:text-white transition-all shadow-sm" placeholder="Business Name" />
+                <input name="company_name" value={formData.company_name} onChange={handleChange} className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-3 py-2 rounded-lg border border-[#E5E7EB] dark:border-zinc-800 focus:border-[#2563EB] focus:bg-white dark:focus:bg-zinc-900 outline-none font-semibold text-sm text-gray-900 dark:text-white transition-all shadow-sm" placeholder="Business Name" />
               </div>
               <div className="space-y-2">
                 <label className="text-[13px] font-semibold text-[#2563EB] flex items-center gap-1"><PhoneIcon className="w-3 h-3"/> Phone Number</label>
-                <input required name="phone_number" value={formData.phone_number} onChange={handleChange} className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-3 py-2 rounded-lg border border-orange-100 dark:border-zinc-800 focus:border-[#2563EB] focus:bg-white dark:focus:bg-zinc-900 outline-none font-semibold text-sm text-gray-900 dark:text-white transition-all shadow-sm" placeholder="10-digit number" />
+                <input required name="phone_number" value={formData.phone_number} onChange={handleChange} className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-3 py-2 rounded-lg border border-[#E5E7EB] dark:border-zinc-800 focus:border-[#2563EB] focus:bg-white dark:focus:bg-zinc-900 outline-none font-semibold text-sm text-gray-900 dark:text-white transition-all shadow-sm" placeholder="10-digit number" />
               </div>
               <div className="space-y-2">
                 <label className="text-[13px] font-semibold text-[#2563EB] flex items-center gap-1"><MapPinIcon className="w-3 h-3"/> Area / City</label>
-                <input name="area" value={formData.area} onChange={handleChange} className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-3 py-2 rounded-lg border border-orange-100 dark:border-zinc-800 focus:border-[#2563EB] focus:bg-white dark:focus:bg-zinc-900 outline-none font-semibold text-sm text-gray-900 dark:text-white transition-all shadow-sm" placeholder="Locality" />
+                <input name="area" value={formData.area} onChange={handleChange} className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-3 py-2 rounded-lg border border-[#E5E7EB] dark:border-zinc-800 focus:border-[#2563EB] focus:bg-white dark:focus:bg-zinc-900 outline-none font-semibold text-sm text-gray-900 dark:text-white transition-all shadow-sm" placeholder="Locality" />
               </div>
               <div className="space-y-2">
                 <label className="text-[13px] font-semibold text-[#2563EB] flex items-center gap-1"><MapIcon className="w-3 h-3"/> State and UT</label>
-                <select name="state_and_ut" value={formData.state_and_ut} onChange={handleChange} className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-3 py-2 rounded-lg border border-orange-100 dark:border-zinc-800 focus:border-[#2563EB] focus:bg-white dark:focus:bg-zinc-900 outline-none font-semibold text-sm text-gray-900 dark:text-white transition-all shadow-sm">
+                <select name="state_and_ut" value={formData.state_and_ut} onChange={handleChange} className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-3 py-2 rounded-lg border border-[#E5E7EB] dark:border-zinc-800 focus:border-[#2563EB] focus:bg-white dark:focus:bg-zinc-900 outline-none font-semibold text-sm text-gray-900 dark:text-white transition-all shadow-sm">
                   <option value="">Select State</option>
                   {INDIAN_STATES.map(state => (
                     <option key={state} value={state}>{state}</option>
@@ -188,19 +188,19 @@ export default function CreateLeadModal({ isOpen, onClose, onSuccess, leadToEdit
               </div>
               <div className="space-y-2">
                 <label className="text-[13px] font-semibold text-[#2563EB] flex items-center gap-1"><GlobeAltIcon className="w-3 h-3"/> Country</label>
-                <input name="country" value={formData.country} onChange={handleChange} className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-3 py-2 rounded-lg border border-orange-100 dark:border-zinc-800 focus:border-[#2563EB] focus:bg-white dark:focus:bg-zinc-900 outline-none font-semibold text-sm text-gray-900 dark:text-white transition-all shadow-sm" placeholder="Country" />
+                <input name="country" value={formData.country} onChange={handleChange} className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-3 py-2 rounded-lg border border-[#E5E7EB] dark:border-zinc-800 focus:border-[#2563EB] focus:bg-white dark:focus:bg-zinc-900 outline-none font-semibold text-sm text-gray-900 dark:text-white transition-all shadow-sm" placeholder="Country" />
               </div>
               <div className="space-y-2">
                 <label className="text-[13px] font-semibold text-[#2563EB] flex items-center gap-1"><BriefcaseIcon className="w-3 h-3"/> Enquiry For</label>
-                <input name="enquiry_for" value={formData.enquiry_for} onChange={handleChange} className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-3 py-2 rounded-lg border border-orange-100 dark:border-zinc-800 focus:border-[#2563EB] focus:bg-white dark:focus:bg-zinc-900 outline-none font-semibold text-sm text-gray-900 dark:text-white transition-all shadow-sm" placeholder="e.g. Dealership" />
+                <input name="enquiry_for" value={formData.enquiry_for} onChange={handleChange} className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-3 py-2 rounded-lg border border-[#E5E7EB] dark:border-zinc-800 focus:border-[#2563EB] focus:bg-white dark:focus:bg-zinc-900 outline-none font-semibold text-sm text-gray-900 dark:text-white transition-all shadow-sm" placeholder="e.g. Dealership" />
               </div>
               <div className="space-y-2">
                 <label className="text-[13px] font-semibold text-[#2563EB] flex items-center gap-1"><CubeIcon className="w-3 h-3"/> Enquiry Products</label>
-                <input name="enquiry_products" value={formData.enquiry_products} onChange={handleChange} className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-3 py-2 rounded-lg border border-orange-100 dark:border-zinc-800 focus:border-[#2563EB] focus:bg-white dark:focus:bg-zinc-900 outline-none font-semibold text-sm text-gray-900 dark:text-white transition-all shadow-sm" placeholder="Products interested in" />
+                <input name="enquiry_products" value={formData.enquiry_products} onChange={handleChange} className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-3 py-2 rounded-lg border border-[#E5E7EB] dark:border-zinc-800 focus:border-[#2563EB] focus:bg-white dark:focus:bg-zinc-900 outline-none font-semibold text-sm text-gray-900 dark:text-white transition-all shadow-sm" placeholder="Products interested in" />
               </div>
               <div className="space-y-2">
                 <label className="text-[13px] font-semibold text-[#2563EB] flex items-center gap-1"><MegaphoneIcon className="w-3 h-3"/> Lead Source</label>
-                <select name="sources_of_customer" value={formData.sources_of_customer} onChange={handleChange} className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-3 py-2 rounded-lg border border-orange-100 dark:border-zinc-800 focus:border-[#2563EB] focus:bg-white dark:focus:bg-zinc-900 outline-none font-semibold text-sm text-gray-900 dark:text-white transition-all shadow-sm">
+                <select name="sources_of_customer" value={formData.sources_of_customer} onChange={handleChange} className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-3 py-2 rounded-lg border border-[#E5E7EB] dark:border-zinc-800 focus:border-[#2563EB] focus:bg-white dark:focus:bg-zinc-900 outline-none font-semibold text-sm text-gray-900 dark:text-white transition-all shadow-sm">
                   <option value="">Select Lead Source</option>
                   {LEAD_SOURCES.map(source => (
                     <option key={source} value={source}>{source}</option>
@@ -209,7 +209,7 @@ export default function CreateLeadModal({ isOpen, onClose, onSuccess, leadToEdit
               </div>
               <div className="space-y-2">
                 <label className="text-[13px] font-semibold text-[#2563EB] flex items-center gap-1"><IdentificationIcon className="w-3 h-3"/> Sales Person Assigned</label>
-                <select name="sales_person_assigned" value={formData.sales_person_assigned} onChange={handleChange} className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-3 py-2 rounded-lg border border-orange-100 dark:border-zinc-800 focus:border-[#2563EB] focus:bg-white dark:focus:bg-zinc-900 outline-none font-semibold text-sm text-gray-900 dark:text-white transition-all shadow-sm">
+                <select name="sales_person_assigned" value={formData.sales_person_assigned} onChange={handleChange} className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-3 py-2 rounded-lg border border-[#E5E7EB] dark:border-zinc-800 focus:border-[#2563EB] focus:bg-white dark:focus:bg-zinc-900 outline-none font-semibold text-sm text-gray-900 dark:text-white transition-all shadow-sm">
                   <option value="">Select Sales Person</option>
                   {users.map(user => (
                     <option key={user.id || user.username} value={user.username}>{user.username}</option>
@@ -218,15 +218,15 @@ export default function CreateLeadModal({ isOpen, onClose, onSuccess, leadToEdit
               </div>
               <div className="space-y-2">
                 <label className="text-[13px] font-semibold text-[#2563EB] flex items-center gap-1"><CurrencyRupeeIcon className="w-3 h-3"/> Investment Amount</label>
-                <input name="investment_amount" value={formData.investment_amount} onChange={handleChange} className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-3 py-2 rounded-lg border border-orange-100 dark:border-zinc-800 focus:border-[#2563EB] focus:bg-white dark:focus:bg-zinc-900 outline-none font-semibold text-sm text-gray-900 dark:text-white transition-all shadow-sm" placeholder="Investment Budget" />
+                <input name="investment_amount" value={formData.investment_amount} onChange={handleChange} className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-3 py-2 rounded-lg border border-[#E5E7EB] dark:border-zinc-800 focus:border-[#2563EB] focus:bg-white dark:focus:bg-zinc-900 outline-none font-semibold text-sm text-gray-900 dark:text-white transition-all shadow-sm" placeholder="Investment Budget" />
               </div>
               <div className="space-y-2">
                 <label className="text-[13px] font-semibold text-[#2563EB] flex items-center gap-1"><ChartBarIcon className="w-3 h-3"/> Current Monthly Turnover</label>
-                <input name="current_monthly_turnover" value={formData.current_monthly_turnover} onChange={handleChange} className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-3 py-2 rounded-lg border border-orange-100 dark:border-zinc-800 focus:border-[#2563EB] focus:bg-white dark:focus:bg-zinc-900 outline-none font-semibold text-sm text-gray-900 dark:text-white transition-all shadow-sm" placeholder="Current Turnover" />
+                <input name="current_monthly_turnover" value={formData.current_monthly_turnover} onChange={handleChange} className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-3 py-2 rounded-lg border border-[#E5E7EB] dark:border-zinc-800 focus:border-[#2563EB] focus:bg-white dark:focus:bg-zinc-900 outline-none font-semibold text-sm text-gray-900 dark:text-white transition-all shadow-sm" placeholder="Current Turnover" />
               </div>
               <div className="space-y-2 md:col-span-2">
                 <label className="text-[13px] font-semibold text-[#2563EB] flex items-center gap-1"><TagIcon className="w-3 h-3"/> Existing Products / Brands Selling</label>
-                <input name="existing_products" value={formData.existing_products} onChange={handleChange} className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-3 py-2 rounded-lg border border-orange-100 dark:border-zinc-800 focus:border-[#2563EB] focus:bg-white dark:focus:bg-zinc-900 outline-none font-semibold text-sm text-gray-900 dark:text-white transition-all shadow-sm" placeholder="Brands" />
+                <input name="existing_products" value={formData.existing_products} onChange={handleChange} className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-3 py-2 rounded-lg border border-[#E5E7EB] dark:border-zinc-800 focus:border-[#2563EB] focus:bg-white dark:focus:bg-zinc-900 outline-none font-semibold text-sm text-gray-900 dark:text-white transition-all shadow-sm" placeholder="Brands" />
               </div>
             </div>
             

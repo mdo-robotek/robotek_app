@@ -74,7 +74,7 @@ function GrnCheckBadge({ actual, status }: { actual?: string; status?: string })
     );
   }
   return (
-    <span className="inline-flex items-center gap-1 px-2 py-1 bg-gradient-to-r from-amber-400 to-orange-500 text-white rounded-md text-[13px] font-semibold shadow-sm">
+    <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#2563EB] text-white rounded-md text-[13px] font-semibold shadow-sm">
       <ClockIcon className="w-3.5 h-3.5 shrink-0" /> Pending
     </span>
   );
@@ -96,7 +96,7 @@ function PaymentStatusPill({ status }: { status: string }) {
         ? "bg-gradient-to-r from-blue-500 to-indigo-600 text-white border-blue-400 shadow-sm shadow-blue-500/20"
         : label === "Rejected"
           ? "bg-gradient-to-r from-rose-500 to-red-600 text-white border-rose-400 shadow-sm shadow-rose-500/20"
-          : "bg-gradient-to-r from-amber-400 to-orange-500 text-white border-amber-400 shadow-sm shadow-amber-500/20";
+          : "bg-[#2563EB] text-white border-amber-400 shadow-sm shadow-amber-500/20";
   return (
     <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[13px] font-semibold  tracking-wide border whitespace-nowrap ${styles}`}>
       {label}
@@ -524,7 +524,7 @@ export default function PaymentVendorApprovalPage() {
             <div className="flex items-center gap-2 min-w-max">
               {([
                 { id: "All", color: "from-slate-600 to-slate-800", ring: "ring-slate-300/50" },
-                { id: "Pending Approval", color: "from-amber-500 to-orange-500", ring: "ring-amber-300/50" },
+                { id: "Pending Approval", color: "from-amber-500 to-[#F7F8FA]", ring: "ring-amber-300/50" },
                 { id: "Pending Payment", color: "from-blue-500 to-indigo-600", ring: "ring-blue-300/50" },
                 { id: "Payed", color: "from-emerald-500 to-teal-600", ring: "ring-emerald-300/50" },
                 { id: "Rejected", color: "from-rose-500 to-red-600", ring: "ring-rose-300/50" },
@@ -602,7 +602,7 @@ export default function PaymentVendorApprovalPage() {
                       onChange={(e) => { if (e.target.value) { setStartDate(new Date(e.target.value)); setCurrentPage(1); } }}
                       className="bg-transparent text-[14px] font-bold outline-none dark:text-white"
                     />
-                    <span className="text-[13px] font-semibold text-slate-400">to</span>
+                    <span className="text-[13px] font-semibold text-[#5B6472]">to</span>
                     <input
                       type="date"
                       value={endDate ? format(endDate, "yyyy-MM-dd") : ""}
@@ -610,7 +610,7 @@ export default function PaymentVendorApprovalPage() {
                       className="bg-transparent text-[14px] font-bold outline-none dark:text-white"
                     />
                     {(startDate || endDate) && (
-                      <button type="button" onClick={() => handlePeriodChange("ALL")} className="p-1 text-slate-400 hover:text-rose-500">
+                      <button type="button" onClick={() => handlePeriodChange("ALL")} className="p-1 text-[#5B6472] hover:text-rose-500">
                         <XMarkIcon className="w-3.5 h-3.5" />
                       </button>
                     )}
@@ -627,7 +627,7 @@ export default function PaymentVendorApprovalPage() {
                 </button>
                 <button
                   onClick={exportToCSV}
-                  className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 text-white text-[14px] font-semibold tracking-wide shadow-md shadow-orange-500/25 hover:brightness-105 flex items-center gap-2"
+                  className="px-4 py-2.5 rounded-xl bg-[#2563EB] text-white text-[14px] font-semibold tracking-wide shadow-md hover:brightness-105 flex items-center gap-2"
                 >
                   <ArrowDownTrayIcon className="w-4 h-4" />
                   Export CSV
@@ -639,7 +639,7 @@ export default function PaymentVendorApprovalPage() {
           {grnLoading || vendorLoading ? (
             <div className="flex flex-col items-center justify-center py-24 flex-1">
               <div className="w-10 h-10 border-3 border-slate-100 border-t-blue-600 rounded-full animate-spin mb-4" />
-              <p className="text-[13px] font-semibold text-slate-400">Loading payments...</p>
+              <p className="text-[13px] font-semibold text-[#5B6472]">Loading payments...</p>
             </div>
           ) : (
             <div className="overflow-x-auto overflow-y-auto flex-1 min-h-0">
@@ -680,7 +680,7 @@ export default function PaymentVendorApprovalPage() {
                         ref={isHighlighted ? highlightRowRef : undefined}
                         className={`transition-colors ${isHighlighted ? "bg-amber-50 dark:bg-amber-900/20 ring-2 ring-amber-400 ring-inset" : "hover:bg-slate-50/80 dark:hover:bg-white/5"}`}
                       >
-                        <td className="px-3 py-3 text-[14px] font-bold text-slate-400">{rowNum}</td>
+                        <td className="px-3 py-3 text-[14px] font-bold text-[#5B6472]">{rowNum}</td>
                         <td className="px-3 py-3">
                           <div className="flex flex-col gap-1">
                             <span className="text-[14px] font-semibold text-blue-600 dark:text-blue-400">{item.GRN_No}</span>
@@ -689,8 +689,8 @@ export default function PaymentVendorApprovalPage() {
                         </td>
                         <td className="px-3 py-3">
                           <div className="space-y-1 text-[13px] font-semibold text-slate-600 dark:text-slate-300">
-                            <p><span className="text-slate-400">GRN:</span> {item.grnDate}</p>
-                            <p><span className="text-slate-400">I2R:</span> {item.createdAt}</p>
+                            <p><span className="text-[#5B6472]">GRN:</span> {item.grnDate}</p>
+                            <p><span className="text-[#5B6472]">I2R:</span> {item.createdAt}</p>
                             <p><span className="text-emerald-600 font-bold">Plan:</span> {item.calculatedPlannedDate}</p>
                           </div>
                         </td>
@@ -700,7 +700,7 @@ export default function PaymentVendorApprovalPage() {
                         <td className="px-3 py-3">
                           <div className="max-w-[140px]">
                             <p className="text-[14px] font-semibold text-slate-700 dark:text-slate-200 truncate" title={item.Item_Name}>{item.Item_Name}</p>
-                            <p className="text-[13px] text-slate-400 truncate">{item.Category} · {item.Country || "—"}</p>
+                            <p className="text-[13px] text-[#5B6472] truncate">{item.Category} · {item.Country || "—"}</p>
                           </div>
                         </td>
                         <td className="px-3 py-3 text-right">
@@ -751,7 +751,7 @@ export default function PaymentVendorApprovalPage() {
                                 </button>
                               </div>
                             ) : (
-                              <span className="text-[13px] font-bold text-slate-400">Awaiting MD</span>
+                              <span className="text-[13px] font-bold text-[#5B6472]">Awaiting MD</span>
                             )}
                             {item.Attach_Bill && (
                               <a href={item.Attach_Bill} target="_blank" rel="noopener noreferrer" className="text-[13px] font-bold text-blue-600 hover:underline">
@@ -765,7 +765,7 @@ export default function PaymentVendorApprovalPage() {
                   })}
                   {paginatedItems.length === 0 && (
                     <tr>
-                      <td colSpan={12} className="py-16 text-center text-[14px] font-semibold text-slate-400">
+                      <td colSpan={12} className="py-16 text-center text-[14px] font-semibold text-[#5B6472]">
                         No records match your filters
                       </td>
                     </tr>
@@ -777,7 +777,7 @@ export default function PaymentVendorApprovalPage() {
 
           {/* Pagination */}
           <div className="px-4 py-3 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-slate-900/30 shrink-0">
-            <p className="text-[13px] font-semibold text-slate-400">
+            <p className="text-[13px] font-semibold text-[#5B6472]">
               Showing {paginatedItems.length > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0}–{Math.min(currentPage * itemsPerPage, filteredItems.length)} of {filteredItems.length}
             </p>
             <div className="flex items-center gap-2">
@@ -839,7 +839,7 @@ export default function PaymentVendorApprovalPage() {
               </h2>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="p-1 text-gray-400 hover:text-gray-700 dark:hover:text-white transition-colors"
+                className="p-1 text-[#5B6472] hover:text-gray-700 dark:hover:text-white transition-colors"
               >
                 <XMarkIcon className="w-5 h-5" />
               </button>
@@ -851,7 +851,7 @@ export default function PaymentVendorApprovalPage() {
               </p>
 
               <div className="flex flex-col gap-1.5">
-                <label className="text-[13px] font-semibold text-gray-400">
+                <label className="text-[13px] font-semibold text-[#5B6472]">
                   Remarks (Optional)
                 </label>
                 <textarea
@@ -927,7 +927,7 @@ export default function PaymentVendorApprovalPage() {
 
               {/* Workflow Diagram */}
               <section>
-                <h3 className="text-[13px] font-semibold text-gray-400 mb-3 flex items-center gap-2">
+                <h3 className="text-[13px] font-semibold text-[#5B6472] mb-3 flex items-center gap-2">
                   <span className="w-6 h-0.5 bg-[#2563EB] rounded-full" />
                   Approval Workflow Diagram
                 </h3>
@@ -994,7 +994,7 @@ export default function PaymentVendorApprovalPage() {
                       </div>
                     </div>
                     <div className="flex justify-center">
-                      <ArrowRightIcon className="w-4 h-4 rotate-90 text-gray-400" />
+                      <ArrowRightIcon className="w-4 h-4 rotate-90 text-[#5B6472]" />
                     </div>
                     {/* Step 4 */}
                     <div className="flex items-center gap-3 p-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg shadow-emerald-500/20">
@@ -1012,14 +1012,14 @@ export default function PaymentVendorApprovalPage() {
 
               {/* Status Filter Cards */}
               <section>
-                <h3 className="text-[13px] font-semibold text-gray-400 mb-3 flex items-center gap-2">
+                <h3 className="text-[13px] font-semibold text-[#5B6472] mb-3 flex items-center gap-2">
                   <span className="w-6 h-0.5 bg-[#2563EB] rounded-full" />
                   Status Filter Tabs
                 </h3>
                 <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
                   {[
                     { label: "All", desc: "Every record", color: "from-slate-500 to-slate-600" },
-                    { label: "Pending Approval", desc: "Awaiting MD", color: "from-orange-400 to-amber-500" },
+                    { label: "Pending Approval", desc: "Awaiting MD", color: "from-[#F7F8FA] to-amber-500" },
                     { label: "Pending Payment", desc: "MD approved", color: "from-blue-500 to-indigo-600" },
                     { label: "Payed", desc: "Completed", color: "from-emerald-500 to-green-600" },
                     { label: "Rejected", desc: "MD declined", color: "from-red-500 to-rose-600" },
@@ -1034,7 +1034,7 @@ export default function PaymentVendorApprovalPage() {
 
               {/* Data & Notifications */}
               <section>
-                <h3 className="text-[13px] font-semibold text-gray-400 mb-3 flex items-center gap-2">
+                <h3 className="text-[13px] font-semibold text-[#5B6472] mb-3 flex items-center gap-2">
                   <span className="w-6 h-0.5 bg-[#2563EB] rounded-full" />
                   Data & Notifications
                 </h3>
@@ -1090,21 +1090,21 @@ export default function PaymentVendorApprovalPage() {
               {/* Tools row */}
               <section className="grid md:grid-cols-3 gap-2">
                 <div className="flex items-start gap-2 p-3 rounded-xl bg-gray-50 dark:bg-navy-900/40 border border-gray-100 dark:border-white/5">
-                  <MagnifyingGlassIcon className="w-4 h-4 text-gray-400 shrink-0 mt-0.5" />
+                  <MagnifyingGlassIcon className="w-4 h-4 text-[#5B6472] shrink-0 mt-0.5" />
                   <div>
                     <p className="text-[13px] font-semibold text-gray-700 dark:text-slate-300">Search</p>
                     <p className="text-[13px] text-gray-500 dark:text-slate-500 mt-0.5">GRN, PO, item, category, country…</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-2 p-3 rounded-xl bg-gray-50 dark:bg-navy-900/40 border border-gray-100 dark:border-white/5">
-                  <CalendarIcon className="w-4 h-4 text-gray-400 shrink-0 mt-0.5" />
+                  <CalendarIcon className="w-4 h-4 text-[#5B6472] shrink-0 mt-0.5" />
                   <div>
                     <p className="text-[13px] font-semibold text-gray-700 dark:text-slate-300">Date Filters</p>
                     <p className="text-[13px] text-gray-500 dark:text-slate-500 mt-0.5">Day / Week / Month / Custom range on Planned Date</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-2 p-3 rounded-xl bg-gray-50 dark:bg-navy-900/40 border border-gray-100 dark:border-white/5">
-                  <ArrowDownTrayIcon className="w-4 h-4 text-gray-400 shrink-0 mt-0.5" />
+                  <ArrowDownTrayIcon className="w-4 h-4 text-[#5B6472] shrink-0 mt-0.5" />
                   <div>
                     <p className="text-[13px] font-semibold text-gray-700 dark:text-slate-300">Export CSV</p>
                     <p className="text-[13px] text-gray-500 dark:text-slate-500 mt-0.5">Download filtered list with remarks</p>

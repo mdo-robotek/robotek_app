@@ -124,15 +124,15 @@ export default function AdminLogsView() {
 
       <div className="flex-1 overflow-auto">
         {isLoading ? (
-          <div className="flex items-center justify-center h-full text-gray-400 text-sm font-bold">Loading Logs...</div>
+          <div className="flex items-center justify-center h-full text-[#5B6472] text-sm font-bold">Loading Logs...</div>
         ) : filtered.length === 0 ? (
-          <div className="flex items-center justify-center h-full text-gray-400 text-sm font-bold">No check-ins found</div>
+          <div className="flex items-center justify-center h-full text-[#5B6472] text-sm font-bold">No check-ins found</div>
         ) : (
           <table className="w-full text-left text-sm">
             <thead className="bg-white dark:bg-slate-900 sticky top-0 z-10 shadow-sm">
               <tr>
                 {['Driver', 'Date', 'Timeline', 'ODO Proof', 'ODO KM', 'GPS KM', 'Diff %', 'Status'].map((h) => (
-                  <th key={h} className="p-3 text-[13px] font-semibold tracking-wider text-gray-400 border-b">
+                  <th key={h} className="p-3 text-[13px] font-semibold tracking-wider text-[#5B6472] border-b">
                     {h}
                   </th>
                 ))}
@@ -143,7 +143,7 @@ export default function AdminLogsView() {
                 <tr key={r.id || idx} className="hover:bg-gray-50/50">
                   <td className="p-3">
                     <div className="font-semibold text-[14px]">{r.userName}</div>
-                    <div className="text-[13px] text-gray-400">{r.userId}</div>
+                    <div className="text-[13px] text-[#5B6472]">{r.userId}</div>
                   </td>
                   <td className="p-3 text-[14px] font-bold">{r.date}</td>
                   <td className="p-3 text-[14px] min-w-[160px]">

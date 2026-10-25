@@ -59,7 +59,7 @@ export function CompactScore({ score, total, label, isNegative = false }: any) {
     
     return (
         <div className="bg-white dark:bg-navy-800 p-2 rounded-[2rem] border border-gray-100 dark:border-white/5 shadow-sm flex flex-col items-center justify-center min-h-[140px] overflow-hidden">
-            <p className="text-[13px] font-semibold text-gray-400 mb-1 text-center whitespace-nowrap">{label}</p>
+            <p className="text-[13px] font-semibold text-[#5B6472] mb-1 text-center whitespace-nowrap">{label}</p>
             <div className="w-full h-24 mt-[-10px]">
                 <SemiCircleGauge value={score} isNegative={isNegative} total={total} label="" />
             </div>
@@ -131,7 +131,7 @@ export function CompactOccasionCard({ birthdays = [], anniversaries = [] }: any)
                             </div>
                             <div>
                                 <p className="font-semibold text-gray-900 dark:text-white leading-none">{b.username}</p>
-                                <p className="text-[13px] font-semibold text-gray-400 dark:text-gray-500 mt-1">{b.role}</p>
+                                <p className="text-[13px] font-semibold text-[#5B6472] dark:text-gray-500 mt-1">{b.role}</p>
                             </div>
                             <div className="ml-auto">
                                 <span className="p-2 bg-pink-50 dark:bg-pink-950/30 text-pink-500 rounded-full flex items-center justify-center" title="Birthday">🎂</span>
@@ -145,7 +145,7 @@ export function CompactOccasionCard({ birthdays = [], anniversaries = [] }: any)
                             </div>
                             <div>
                                 <p className="font-semibold text-gray-900 dark:text-white leading-none">{b.username}</p>
-                                <p className="text-[13px] font-semibold text-gray-400 dark:text-gray-500 mt-1">{b.role}</p>
+                                <p className="text-[13px] font-semibold text-[#5B6472] dark:text-gray-500 mt-1">{b.role}</p>
                             </div>
                             <div className="ml-auto">
                                 <span className="p-2 bg-rose-50 dark:bg-rose-950/30 text-rose-500 rounded-full flex items-center justify-center" title="Work Anniversary">💍</span>
@@ -169,7 +169,7 @@ export function CompactPartyCelebrationCard({ partyBirthdays = [], partyAnnivers
   const totalCount = (partyBirthdays?.length || 0) + (partyAnniversaries?.length || 0);
 
   return (
-    <div className="bg-gradient-to-br from-amber-500 to-orange-600 p-4 rounded-[2rem] shadow-lg border border-white/10 relative overflow-hidden h-full flex flex-col justify-center text-white min-h-[140px]">
+    <div className="bg-[#2563EB] p-4 rounded-[2rem] shadow-lg border border-white/10 relative overflow-hidden h-full flex flex-col justify-center text-white min-h-[140px]">
       <div className="absolute top-0 right-0 p-2 opacity-10 transform -rotate-12 scale-125">
         <SparklesIcon className="w-16 h-16" />
       </div>
@@ -180,7 +180,7 @@ export function CompactPartyCelebrationCard({ partyBirthdays = [], partyAnnivers
           <div className="flex flex-col items-center gap-2">
             <div className="flex -space-x-3 overflow-hidden cursor-pointer" onClick={() => setShowAll(true)}>
               {[...(partyBirthdays || []), ...(partyAnniversaries || [])].slice(0, 3).map((b: any, i: number) => (
-                <div key={i} className={`inline-block h-10 w-10 rounded-full ring-2 ring-white/20 flex items-center justify-center text-sm font-semibold overflow-hidden bg-cover bg-center text-white ${partyAnniversaries.some((pa: any) => pa.partyName === b.partyName) ? 'bg-rose-400' : 'bg-orange-400'}`}>
+                <div key={i} className={`inline-block h-10 w-10 rounded-full ring-2 ring-white/20 flex items-center justify-center text-sm font-semibold overflow-hidden bg-cover bg-center text-white ${partyAnniversaries.some((pa: any) => pa.partyName === b.partyName) ? 'bg-rose-400' : 'bg-[#FEF3C7]'}`}>
                   {b.partyName.charAt(0)}
                 </div>
               ))}
@@ -210,7 +210,7 @@ export function CompactPartyCelebrationCard({ partyBirthdays = [], partyAnnivers
                 className="bg-white dark:bg-navy-800 rounded-[2.5rem] w-full max-w-sm overflow-hidden shadow-2xl border border-gray-100 dark:border-white/5"
                 onClick={e => e.stopPropagation()}
             >
-                <div className="bg-gradient-to-r from-amber-500 to-orange-600 p-6 flex justify-between items-center text-white">
+                <div className="bg-[#2563EB] p-6 flex justify-between items-center text-white">
                     <div className="flex items-center gap-3">
                         <SparklesIcon className="w-8 h-8 animate-bounce" />
                         <h3 className="text-xl font-semibold tracking-tighter">Party Celebrants!</h3>
@@ -222,12 +222,12 @@ export function CompactPartyCelebrationCard({ partyBirthdays = [], partyAnnivers
                 <div className="p-6 max-h-[400px] overflow-y-auto space-y-4">
                     {partyBirthdays.map((b: any, i: number) => (
                         <div key={`pb-${i}`} className="flex items-center gap-4 p-3 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/5 shadow-sm">
-                            <div className="w-12 h-12 rounded-xl bg-orange-400 flex items-center justify-center text-white text-xl font-semibold overflow-hidden bg-cover bg-center ring-4 ring-[#2563EB]/20">
+                            <div className="w-12 h-12 rounded-xl bg-[#FEF3C7] flex items-center justify-center text-white text-xl font-semibold overflow-hidden bg-cover bg-center ring-4 ring-[#2563EB]/20">
                                 {b.partyName.charAt(0)}
                             </div>
                             <div>
                                 <p className="font-semibold text-gray-900 dark:text-white leading-none">{b.partyName}</p>
-                                <p className="text-[13px] font-semibold text-gray-400 dark:text-gray-500 mt-1">{b.partyType}</p>
+                                <p className="text-[13px] font-semibold text-[#5B6472] dark:text-gray-500 mt-1">{b.partyType}</p>
                             </div>
                             <div className="ml-auto">
                                 <span className="p-2 bg-amber-50 dark:bg-amber-950/30 text-amber-500 rounded-full flex items-center justify-center" title="Party Birthday">🎂</span>
@@ -241,7 +241,7 @@ export function CompactPartyCelebrationCard({ partyBirthdays = [], partyAnnivers
                             </div>
                             <div>
                                 <p className="font-semibold text-gray-900 dark:text-white leading-none">{b.partyName}</p>
-                                <p className="text-[13px] font-semibold text-gray-400 dark:text-gray-500 mt-1">{b.partyType}</p>
+                                <p className="text-[13px] font-semibold text-[#5B6472] dark:text-gray-500 mt-1">{b.partyType}</p>
                             </div>
                             <div className="ml-auto">
                                 <span className="p-2 bg-rose-50 dark:bg-rose-950/30 text-rose-500 rounded-full flex items-center justify-center" title="Party Anniversary">💍</span>
@@ -266,7 +266,7 @@ export function StatusTile({ label, value, icon: Icon, color, bg }: any) {
     return (
         <div className="bg-white dark:bg-navy-800 p-4 rounded-[1.5rem] border border-gray-100 dark:border-white/5 shadow-sm flex items-center justify-between group hover:shadow-md transition-all h-[90px]">
             <div>
-                <p className="text-[12px] font-semibold text-gray-400 mb-0.5">{label}</p>
+                <p className="text-[12px] font-semibold text-[#5B6472] mb-0.5">{label}</p>
                 <h3 className="text-2xl font-semibold text-gray-900 dark:text-white tabular-nums tracking-tighter">{value}</h3>
             </div>
             <div className={`${bg} ${color} p-2 rounded-xl group-hover:scale-110 transition-transform`}>
@@ -306,14 +306,14 @@ export function HighightedCalendar({ history, leaveDates = [], avgIn, avgOut }: 
       <div className="flex-1">
           <div className="flex items-center justify-between mb-6">
             <div>
-                <h3 className="text-[13px] font-semibold text-gray-400 mb-1">Personal Presence</h3>
+                <h3 className="text-[13px] font-semibold text-[#5B6472] mb-1">Personal Presence</h3>
                 <span className="text-[14px] font-semibold text-[#2563EB] dark:text-[#60A5FA]">{today.toLocaleString('default', { month: 'long', year: 'numeric' })}</span>
             </div>
           </div>
 
           <div className="grid grid-cols-7 gap-y-1 gap-x-1">
             {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((d, i) => (
-              <div key={i} className="flex justify-center items-center h-7 w-7 text-[13px] font-semibold text-gray-300">{d}</div>
+              <div key={i} className="flex justify-center items-center h-7 w-7 text-[13px] font-semibold text-[#5B6472]">{d}</div>
             ))}
             {Array.from({ length: 42 }).map((_, i) => {
               const day = i - startDay + 1;
@@ -356,7 +356,7 @@ export function HighightedCalendar({ history, leaveDates = [], avgIn, avgOut }: 
 
       <div className="lg:w-32 flex flex-col justify-center border-t lg:border-t-0 lg:border-l border-gray-100 dark:border-white/5 pt-4 lg:pt-0 lg:pl-6 space-y-4">
             <div className="text-center lg:text-left">
-                <p className="text-[12px] font-semibold text-gray-400 mb-1 opacity-60">Success Rates</p>
+                <p className="text-[12px] font-semibold text-[#5B6472] mb-1 opacity-60">Success Rates</p>
                 <div>
                    <p className="text-[12px] font-semibold text-emerald-500 mb-0.5">Avg In</p>
                    <p className="text-lg font-semibold text-emerald-500 tracking-tighter leading-none">{avgIn || '--:--'}</p>
@@ -371,11 +371,11 @@ export function HighightedCalendar({ history, leaveDates = [], avgIn, avgOut }: 
             <div className="flex gap-2 justify-center lg:justify-start pt-2 border-t border-gray-50 dark:border-white/5">
                 <div className="flex items-center gap-1">
                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                   <span className="text-[6px] font-bold text-gray-400">Work</span>
+                   <span className="text-[6px] font-bold text-[#5B6472]">Work</span>
                 </div>
                 <div className="flex items-center gap-1">
                    <div className="w-1.5 h-1.5 rounded-full bg-purple-600" />
-                   <span className="text-[6px] font-bold text-gray-400">Leave</span>
+                   <span className="text-[6px] font-bold text-[#5B6472]">Leave</span>
                 </div>
             </div>
       </div>
@@ -414,7 +414,7 @@ export function UserAssetsPanel({ username }: { username?: string }) {
                             <span className="block font-semibold text-gray-900 dark:text-white leading-tight text-[14px] break-words">
                                 {row.asset_name || "Unnamed Asset"}
                             </span>
-                            <span className="text-[13px] text-gray-400 font-mono italic mt-0.5">
+                            <span className="text-[13px] text-[#5B6472] font-mono italic mt-0.5">
                                 {row.asset_id || "—"}
                             </span>
                         </div>
@@ -481,8 +481,8 @@ const COMPACT_TABLE_THEMES = {
   },
   amber: {
     cardHeader:
-      "bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 border-orange-400/40 shadow-inner",
-    thead: "bg-gradient-to-r from-amber-400 via-orange-500 to-orange-600",
+      "bg-gradient-to-r from-amber-500 via-[#F7F8FA] to-rose-500 border-[#E5E7EB] shadow-inner",
+    thead: "bg-gradient-to-r from-amber-400 via-[#F7F8FA] to-[#F7F8FA]",
     thText: "text-white drop-shadow-sm",
     rowBorder: "border-white/25",
     icon: "text-white",
@@ -539,7 +539,7 @@ export function CompactTable({
                     <tbody className="divide-y divide-gray-50 dark:divide-white/5">
                         {rows.length === 0 ? (
                             <tr>
-                                <td colSpan={columns.length} className="p-8 text-center text-[14px] font-bold text-gray-300 italic">{emptyLabel}</td>
+                                <td colSpan={columns.length} className="p-8 text-center text-[14px] font-bold text-[#5B6472] italic">{emptyLabel}</td>
                             </tr>
                         ) : rows.map((row: any, i: number) => (
                           <tr key={i} className="hover:bg-gray-50 dark:hover:bg-white/1 transition-colors group">
@@ -641,7 +641,7 @@ export function BirthdayCelebrationModal({ birthdays = [], anniversaries = [], p
                        <div className="absolute inset-0 bg-[#2563EB] blur-3xl opacity-20 rounded-full"></div>
                        {/* Avatar: orange tint for party, indigo for users, rose for anniversary */}
                        <div 
-                         className={`w-24 h-24 md:w-36 md:h-36 rounded-full border-[3px] border-[#2563EB] shadow-[0_0_40px_rgba(255,213,0,0.4)] flex items-center justify-center text-white text-4xl md:text-5xl font-semibold overflow-hidden bg-cover bg-center z-10 ${b.type === 'party' ? 'bg-orange-500' : (b.subType === 'anniversary' ? 'bg-rose-500' : 'bg-indigo-500')}`}
+                         className={`w-24 h-24 md:w-36 md:h-36 rounded-full border-[3px] border-[#2563EB] shadow-[0_0_40px_rgba(255,213,0,0.4)] flex items-center justify-center text-white text-4xl md:text-5xl font-semibold overflow-hidden bg-cover bg-center z-10 ${b.type === 'party' ? 'bg-[#D97706]' : (b.subType === 'anniversary' ? 'bg-rose-500' : 'bg-indigo-500')}`}
                          style={b.image ? {backgroundImage: `url(${b.image})`} : {}}
                        >
                             {!b.image && b.username.charAt(0)}
@@ -652,7 +652,7 @@ export function BirthdayCelebrationModal({ birthdays = [], anniversaries = [], p
                        {/* Badge */}
                        <div className={`mt-1 text-[12px] font-semibold   px-2 py-0.5 rounded-full border ${
                          b.type === 'party' 
-                           ? 'text-orange-300 bg-orange-500/20 border-orange-400/30' 
+                           ? 'text-[#D97706] bg-[#D97706]/20 border-[#E5E7EB]' 
                            : (b.subType === 'anniversary' 
                                ? 'text-rose-300 bg-rose-500/20 border-rose-400/30' 
                                : 'text-indigo-300 bg-indigo-500/20 border-indigo-400/30')

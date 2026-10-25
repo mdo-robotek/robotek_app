@@ -196,7 +196,7 @@ function SearchableDropdown({
   return (
     <div className="relative" ref={dropdownRef}>
       {!hideLabel && (
-        <label className="text-[13px] font-semibold text-gray-400 flex items-center gap-1.5 mb-1.5 group">
+        <label className="text-[13px] font-semibold text-[#5B6472] flex items-center gap-1.5 mb-1.5 group">
           <Icon className="w-3 h-3 transition-colors group-hover:text-[#2563EB]" />
           {label}
         </label>
@@ -211,7 +211,7 @@ function SearchableDropdown({
         }}
         onFocus={handleFocus}
         onKeyDown={handleTriggerKeyDown}
-        className={`w-full ${isMulti ? "min-h-[34px] py-1" : "h-[34px]"} ${error ? "bg-red-50 dark:bg-red-900/20 border-red-500 ring-1 ring-red-500 text-red-700 dark:text-red-400" : "bg-[#EFF4FF] dark:bg-black border-orange-100 dark:border-navy-700 focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB]"} px-3 rounded-lg border outline-none cursor-pointer flex items-center justify-between shadow-sm transition-all`}
+        className={`w-full ${isMulti ? "min-h-[34px] py-1" : "h-[34px]"} ${error ? "bg-red-50 dark:bg-red-900/20 border-red-500 ring-1 ring-red-500 text-red-700 dark:text-red-400" : "bg-[#EFF4FF] dark:bg-black border-[#E5E7EB] dark:border-navy-700 focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB]"} px-3 rounded-lg border outline-none cursor-pointer flex items-center justify-between shadow-sm transition-all`}
       >
         <div className="flex flex-wrap gap-1 items-center min-w-0 flex-1">
           {isMulti && selectedValues.length > 0 ? (
@@ -230,24 +230,24 @@ function SearchableDropdown({
             ))
           ) : (
             <span
-              className={`text-[14px] font-bold truncate pr-2 ${error ? "text-red-700 dark:text-red-400" : value ? "text-gray-800 dark:text-zinc-100" : "text-gray-400"}`}
+              className={`text-[14px] font-bold truncate pr-2 ${error ? "text-red-700 dark:text-red-400" : value ? "text-gray-800 dark:text-zinc-100" : "text-[#5B6472]"}`}
             >
               {value || placeholder || `Select...`}
             </span>
           )}
         </div>
         <ChevronDownIcon
-          className={`w-3.5 h-3.5 text-gray-400 transition-transform shrink-0 ${isOpen ? "rotate-180" : ""}`}
+          className={`w-3.5 h-3.5 text-[#5B6472] transition-transform shrink-0 ${isOpen ? "rotate-180" : ""}`}
         />
       </div>
 
       {isOpen && (
         <div
-          className={`${listPosition} z-[10000] w-full mt-1 bg-white dark:bg-navy-800 border border-orange-100 dark:border-navy-700 rounded-lg shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200`}
+          className={`${listPosition} z-[10000] w-full mt-1 bg-white dark:bg-navy-800 border border-[#E5E7EB] dark:border-navy-700 rounded-lg shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200`}
         >
           <div className="p-2 border-b border-gray-100 dark:border-navy-700">
             <div className="relative">
-              <MagnifyingGlassIcon className="absolute left-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
+              <MagnifyingGlassIcon className="absolute left-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#5B6472]" />
               <input
                 type="text"
                 autoFocus
@@ -282,8 +282,8 @@ function SearchableDropdown({
                     className={`px-4 py-2 text-[14px] font-bold cursor-pointer transition-colors flex items-center justify-between ${i === activeIndex
                         ? "bg-[#2563EB] text-white dark:bg-[#60A5FA] dark:text-black"
                         : isSelected
-                          ? "bg-orange-50 text-white dark:bg-white/10 dark:text-[#60A5FA]"
-                          : "text-gray-600 dark:text-gray-300 hover:bg-orange-50 dark:hover:bg-white/5"
+                          ? "bg-[#F7F8FA] text-white dark:bg-white/10 dark:text-[#60A5FA]"
+                          : "text-gray-600 dark:text-gray-300 hover:bg-[#F7F8FA] dark:hover:bg-white/5"
                       }`}
                   >
                     <span>{opt}</span>
@@ -292,7 +292,7 @@ function SearchableDropdown({
                 );
               })
             ) : (
-              <div className="px-4 py-3 text-[13px] text-gray-400 font-bold text-center italic">
+              <div className="px-4 py-3 text-[13px] text-[#5B6472] font-bold text-center italic">
                 No matches
               </div>
             )}
@@ -2215,7 +2215,7 @@ export default function O2DPage() {
                         {stepName}
                       </span>
                       <span
-                        className={`px-1.5 py-0.5 rounded-md text-[13px] font-semibold ${isActive ? "bg-white/20 text-white" : "bg-gray-100 dark:bg-navy-700 text-gray-400"}`}
+                        className={`px-1.5 py-0.5 rounded-md text-[13px] font-semibold ${isActive ? "bg-white/20 text-white" : "bg-gray-100 dark:bg-navy-700 text-[#5B6472]"}`}
                       >
                         {count}
                       </span>
@@ -2227,11 +2227,11 @@ export default function O2DPage() {
               {/* Advanced Filter Sub-Row */}
               <div className="flex flex-wrap items-center gap-4 px-4 py-2 bg-gray-50/50 dark:bg-navy-800/20 border-t border-gray-100 dark:border-navy-800">
                 <div className="flex items-center gap-2">
-                  <span className="text-[13px] font-semibold text-gray-400">
+                  <span className="text-[13px] font-semibold text-[#5B6472]">
                     Date Range:
                   </span>
                   <div className="relative group/date flex items-center bg-white dark:bg-black border border-gray-200 dark:border-navy-700 rounded-lg px-2 h-[34px] focus-within:border-[#2563EB] transition-all shadow-sm">
-                    <CalendarDaysIcon className="w-3.5 h-3.5 text-gray-400 group-focus-within/date:text-[#2563EB] shrink-0" />
+                    <CalendarDaysIcon className="w-3.5 h-3.5 text-[#5B6472] group-focus-within/date:text-[#2563EB] shrink-0" />
                     <input
                       type="date"
                       value={filterStartDate}
@@ -2239,9 +2239,9 @@ export default function O2DPage() {
                       className="bg-transparent border-none outline-none pl-1.5 text-[13px] font-bold text-gray-700 dark:text-zinc-100 min-w-[100px]"
                     />
                   </div>
-                  <span className="text-gray-300 font-bold">-</span>
+                  <span className="text-[#5B6472] font-bold">-</span>
                   <div className="relative group/date flex items-center bg-white dark:bg-black border border-gray-200 dark:border-navy-700 rounded-lg px-2 h-[34px] focus-within:border-[#2563EB] transition-all shadow-sm">
-                    <CalendarDaysIcon className="w-3.5 h-3.5 text-gray-400 group-focus-within/date:text-[#2563EB] shrink-0" />
+                    <CalendarDaysIcon className="w-3.5 h-3.5 text-[#5B6472] group-focus-within/date:text-[#2563EB] shrink-0" />
                     <input
                       type="date"
                       value={filterEndDate}
@@ -2252,7 +2252,7 @@ export default function O2DPage() {
                 </div>
                 <div className="h-4 w-[1px] bg-gray-200 dark:bg-navy-700" />
                 <div className="flex items-center gap-2">
-                  <span className="text-[13px] font-semibold text-gray-400">
+                  <span className="text-[13px] font-semibold text-[#5B6472]">
                     Party:
                   </span>
                   <div className="w-44">
@@ -2270,7 +2270,7 @@ export default function O2DPage() {
 
                 <div className="h-4 w-[1px] bg-gray-200 dark:bg-navy-700" />
                 <div className="flex items-center gap-2">
-                  <span className="text-[13px] font-semibold text-gray-400">
+                  <span className="text-[13px] font-semibold text-[#5B6472]">
                     Order ID:
                   </span>
                   <div className="w-32">
@@ -2288,7 +2288,7 @@ export default function O2DPage() {
 
                 <div className="h-4 w-[1px] bg-gray-200 dark:bg-navy-700" />
                 <div className="flex items-center gap-2">
-                  <span className="text-[13px] font-semibold text-gray-400">
+                  <span className="text-[13px] font-semibold text-[#5B6472]">
                     Item Name:
                   </span>
                   <div className="w-44">
@@ -2308,11 +2308,11 @@ export default function O2DPage() {
                   onClick={() => setTableFilterPending(!tableFilterPending)}
                   className={`px-3 py-1.5 rounded-lg text-[13px] font-semibold   transition-all flex items-center gap-1.5 border ${tableFilterPending
                       ? "bg-[#2563EB] text-white border-[#2563EB] shadow-md"
-                      : "bg-white dark:bg-navy-800 text-gray-400 border-gray-200 dark:border-navy-700 hover:border-[#2563EB]"
+                      : "bg-white dark:bg-navy-800 text-[#5B6472] border-gray-200 dark:border-navy-700 hover:border-[#2563EB]"
                     }`}
                 >
                   <ClockIcon
-                    className={`w-3.5 h-3.5 ${tableFilterPending ? "text-[#2563EB]" : "text-gray-400"}`}
+                    className={`w-3.5 h-3.5 ${tableFilterPending ? "text-[#2563EB]" : "text-[#5B6472]"}`}
                   />
                   Pending
                 </button>
@@ -2380,7 +2380,7 @@ export default function O2DPage() {
                                     {item.order_no}
                                   </span>
                                   {item.hold && (
-                                    <span className="text-[12px] text-orange-500 font-semibold tracking-tighter">
+                                    <span className="text-[12px] text-[#D97706] font-semibold tracking-tighter">
                                       On Hold
                                     </span>
                                   )}
@@ -2412,7 +2412,7 @@ export default function O2DPage() {
                               <td className="px-6 py-4 text-center font-semibold text-[#2563EB] dark:text-[#60A5FA] text-[13px]">
                                 {subItem.item_qty || 0}
                               </td>
-                              <td className="px-6 py-4 text-[14px] font-bold text-gray-400 tracking-tight">
+                              <td className="px-6 py-4 text-[14px] font-bold text-[#5B6472] tracking-tight">
                                 {item.created_at ? (
                                   <div className="flex flex-col">
                                     <span className="text-gray-700 dark:text-gray-200">
@@ -2464,7 +2464,7 @@ export default function O2DPage() {
                         <tr>
                           <td colSpan={7} className="px-6 py-20 text-center">
                             <ArchiveBoxIcon className="w-12 h-12 text-gray-200 mx-auto mb-4" />
-                            <p className="text-[14px] font-semibold text-gray-400">
+                            <p className="text-[14px] font-semibold text-[#5B6472]">
                               No data matches your intelligence criteria
                             </p>
                           </td>
@@ -2475,7 +2475,7 @@ export default function O2DPage() {
                 </div>
                 {/* Table Pagination Footer */}
                 <div className="p-4 bg-gray-50 dark:bg-navy-950 border-t border-gray-100 dark:border-navy-800 flex items-center justify-between shrink-0">
-                  <div className="text-[14px] font-semibold text-gray-400">
+                  <div className="text-[14px] font-semibold text-[#5B6472]">
                     Showing <span className="text-[#2563EB] dark:text-[#60A5FA]">{(tableCurrentPage - 1) * tableItemsPerPage + 1}</span> to <span className="text-[#2563EB] dark:text-[#60A5FA]">{Math.min(tableCurrentPage * tableItemsPerPage, totalOrdersServer)}</span> of <span className="text-[#2563EB] dark:text-[#60A5FA]">{totalOrdersServer}</span> entries
                   </div>
 
@@ -2522,7 +2522,7 @@ export default function O2DPage() {
                 >
                   <div className="p-2 border-b border-gray-50 dark:border-navy-800 bg-gray-50/30 dark:bg-navy-900/40">
                     <div className="relative group mb-2">
-                      <MagnifyingGlassIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-[#2563EB] transition-colors" />
+                      <MagnifyingGlassIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5B6472] group-focus-within:text-[#2563EB] transition-colors" />
                       <input
                         type="text"
                         placeholder="Search resources..."
@@ -2538,7 +2538,7 @@ export default function O2DPage() {
                         {isSidebarLoading && (
                           <div className="w-2.5 h-2.5 border-2 border-[#2563EB]/20 border-t-[#2563EB] dark:border-[#60A5FA]/20 dark:border-t-[#60A5FA] rounded-full animate-spin shrink-0" />
                         )}
-                        <span className="text-[13px] font-semibold text-gray-400">
+                        <span className="text-[13px] font-semibold text-[#5B6472]">
                           {sidebarCurrentPage} / {sidebarTotalPages}
                         </span>
                       </div>
@@ -2565,14 +2565,14 @@ export default function O2DPage() {
                     {isSidebarLoading && filteredOrderNumbers.length === 0 ? (
                       <div className="flex flex-col items-center justify-center h-40 space-y-3">
                         <div className="w-8 h-8 border-3 border-[#2563EB]/20 border-t-[#2563EB] rounded-full animate-spin" />
-                        <p className="text-[13px] font-semibold text-gray-400">
+                        <p className="text-[13px] font-semibold text-[#5B6472]">
                           Loading Orders...
                         </p>
                       </div>
                     ) : filteredOrderNumbers.length === 0 ? (
                       <div className="text-center py-20 opacity-50">
                         <ShoppingBagIcon className="w-10 h-10 text-gray-100 mx-auto mb-2" />
-                        <p className="text-[14px] font-semibold italic text-gray-400">
+                        <p className="text-[14px] font-semibold italic text-[#5B6472]">
                           No records
                         </p>
                       </div>
@@ -2642,7 +2642,7 @@ export default function O2DPage() {
                                   : isCancelled
                                     ? "border-red-200 dark:border-red-800/40 bg-gradient-to-br from-red-100 via-red-50 to-white dark:from-red-900/30 dark:via-red-900/10 dark:to-navy-800/50 shadow-md hover:shadow-lg hover:scale-[1.01]"
                                     : isHold
-                                      ? "border-orange-200 dark:border-orange-800/40 bg-gradient-to-br from-orange-100 via-orange-50 to-white dark:from-orange-900/30 dark:via-orange-900/10 dark:to-navy-800/50 shadow-md hover:shadow-lg hover:scale-[1.01]"
+                                      ? "border-[#E5E7EB] dark:border-[#E5E7EB] bg-gradient-to-br from-[#F7F8FA] via-[#F7F8FA] to-white dark:from-[#F7F8FA] dark:via-[#F7F8FA] dark:to-navy-800/50 shadow-md hover:shadow-lg hover:scale-[1.01]"
                                       : "border-gray-100 dark:border-navy-700 bg-white dark:bg-navy-800/50 shadow-md hover:shadow-lg dark:hover:border-navy-600 hover:scale-[1.01]"
                                 }`}
                             >
@@ -2652,7 +2652,7 @@ export default function O2DPage() {
                                     : isCancelled
                                       ? "bg-red-500"
                                       : isHold
-                                        ? "bg-orange-500"
+                                        ? "bg-[#D97706]"
                                         : "bg-[#2563EB]/10 group-hover:bg-[#2563EB]/20"
                                   }`}
                               />
@@ -2670,7 +2670,7 @@ export default function O2DPage() {
                                     </span>
                                   ) : null}
                                   {first?.hold && !first?.cancelled ? (
-                                    <span className="px-1.5 py-0.5 rounded-sm bg-orange-100 text-orange-600 dark:bg-orange-900/40 dark:text-orange-400 text-[12px] leading-none font-bold">
+                                    <span className="px-1.5 py-0.5 rounded-sm bg-[#F7F8FA] text-[#D97706] dark:bg-[#FEF3C7] dark:text-[#D97706] text-[12px] leading-none font-bold">
                                       Hold
                                     </span>
                                   ) : null}
@@ -2698,7 +2698,7 @@ export default function O2DPage() {
                               </div>
 
                               {/* Line 2: Party Name */}
-                              <div className="pl-1.5 mb-1 text-[13px] font-bold text-gray-400 tracking-wide truncate">
+                              <div className="pl-1.5 mb-1 text-[13px] font-bold text-[#5B6472] tracking-wide truncate">
                                 {first?.party_name}
                               </div>
 
@@ -2729,7 +2729,7 @@ export default function O2DPage() {
                                   )}
                                 </div>
                                 <div className="flex flex-col items-end shrink-0 leading-[1.1]">
-                                  <span className="text-[13px] font-semibold text-gray-400 tracking-tighter mb-0.5">
+                                  <span className="text-[13px] font-semibold text-[#5B6472] tracking-tighter mb-0.5">
                                     {itemsCount} ITEMS
                                   </span>
                                   <span className="text-[14px] font-semibold text-[#2563EB] dark:text-[#60A5FA]">
@@ -2794,13 +2794,13 @@ export default function O2DPage() {
                 <h2 className="text-xl font-semibold text-[#2563EB] dark:text-[#60A5FA] italic">
                   EXPORT SELECTION
                 </h2>
-                <p className="text-[13px] font-semibold text-gray-400 mt-1">
+                <p className="text-[13px] font-semibold text-[#5B6472] mt-1">
                   Configure your data payload
                 </p>
               </div>
               <button
                 onClick={() => setIsExportModalOpen(false)}
-                className="p-2 text-gray-400 hover:text-red-500 transition-colors"
+                className="p-2 text-[#5B6472] hover:text-red-500 transition-colors"
               >
                 <XMarkIcon className="w-6 h-6" />
               </button>
@@ -2819,7 +2819,7 @@ export default function O2DPage() {
                     <span className="text-[14px] font-semibold text-gray-700 dark:text-gray-200">
                       Order Details
                     </span>
-                    <span className="text-[13px] font-bold text-gray-400 tracking-wider">
+                    <span className="text-[13px] font-bold text-[#5B6472] tracking-wider">
                       No, Party, Item, Qty, Amount, etc.
                     </span>
                   </div>
@@ -2828,7 +2828,7 @@ export default function O2DPage() {
 
               <div className="space-y-3">
                 <div className="flex items-center justify-between px-1">
-                  <h3 className="text-[13px] font-semibold text-gray-400">
+                  <h3 className="text-[13px] font-semibold text-[#5B6472]">
                     Workflow Steps
                   </h3>
                   <div className="flex gap-3">
@@ -2871,7 +2871,7 @@ export default function O2DPage() {
                         }}
                         className={`flex items-center gap-2 p-3 rounded-xl border-2 transition-all ${isSelected
                             ? "bg-[#2563EB] border-[#2563EB] text-white shadow-md"
-                            : "bg-white dark:bg-black/20 border-gray-100 dark:border-navy-800 text-gray-400 hover:border-gray-200"
+                            : "bg-white dark:bg-black/20 border-gray-100 dark:border-navy-800 text-[#5B6472] hover:border-gray-200"
                           }`}
                       >
                         <div
@@ -2933,20 +2933,20 @@ export default function O2DPage() {
             onClick={() => setIsModalOpen(false)}
           />
           <div className="relative bg-white dark:bg-navy-900 w-full max-w-2xl rounded-3xl shadow-[0_32px_64px_-12px_rgba(0,0,0,0.4)] border border-gray-100 dark:border-navy-700 overflow-hidden animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[92vh]">
-            <div className="p-5 border-b border-orange-100/30 dark:border-navy-700 flex items-center justify-between shrink-0 bg-[#EFF4FF] dark:bg-navy-800">
+            <div className="p-5 border-b border-[#E5E7EB] dark:border-navy-700 flex items-center justify-between shrink-0 bg-[#EFF4FF] dark:bg-navy-800">
               <div>
                 <h2 className="text-xl font-semibold text-[#2563EB] dark:text-[#60A5FA] italic">
                   {editingOrderNo
                     ? `EDIT ORDER: ${editingOrderNo}`
                     : "CREATE NEW ORDER"}
                 </h2>
-                <p className="text-[13px] font-semibold text-gray-400 mt-0.5">
+                <p className="text-[13px] font-semibold text-[#5B6472] mt-0.5">
                   Automated Intelligence Protocol
                 </p>
               </div>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="p-2.5 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-white/5 rounded-2xl transition-all"
+                className="p-2.5 text-[#5B6472] hover:text-red-500 hover:bg-red-50 dark:hover:bg-white/5 rounded-2xl transition-all"
               >
                 <XMarkIcon className="w-6 h-6 shrink-0" />
               </button>
@@ -2969,7 +2969,7 @@ export default function O2DPage() {
                   <div className="flex flex-wrap items-end gap-5">
                     <div className="flex-1 flex flex-col gap-4">
                       <div className={!editingOrderNo ? "hidden" : ""}>
-                        <label className="text-[13px] font-semibold text-gray-400 flex items-center gap-1.5 mb-2">
+                        <label className="text-[13px] font-semibold text-[#5B6472] flex items-center gap-1.5 mb-2">
                           <IdentificationIcon className="w-3 h-3" />
                           Order ID
                         </label>
@@ -2977,7 +2977,7 @@ export default function O2DPage() {
                           type="text"
                           value={commonData.order_no}
                           readOnly
-                          className="w-full h-[36px] bg-gray-50 dark:bg-black border border-transparent dark:border-navy-700 px-3 rounded-xl font-bold text-[14px] text-gray-400 dark:text-gray-500 cursor-not-allowed shadow-inner"
+                          className="w-full h-[36px] bg-gray-50 dark:bg-black border border-transparent dark:border-navy-700 px-3 rounded-xl font-bold text-[14px] text-[#5B6472] dark:text-gray-500 cursor-not-allowed shadow-inner"
                         />
                       </div>
                       <div className="flex gap-2 items-end">
@@ -3007,7 +3007,7 @@ export default function O2DPage() {
                   </div>
 
                   <div className="mt-2">
-                    <label className="text-[13px] font-semibold text-gray-400 flex items-center gap-1.5 mb-2">
+                    <label className="text-[13px] font-semibold text-[#5B6472] flex items-center gap-1.5 mb-2">
                       <ChatBubbleBottomCenterTextIcon className="w-3 h-3" />
                       Remarks
                     </label>
@@ -3017,7 +3017,7 @@ export default function O2DPage() {
                       onChange={(e) =>
                         setCommonData({ ...commonData, remark: e.target.value })
                       }
-                      className="w-full bg-[#EFF4FF] dark:bg-black p-3 rounded-2xl border border-orange-100 dark:border-navy-700 focus:border-[#2563EB] outline-none font-bold text-[14px] text-gray-800 dark:text-gray-100 shadow-sm min-h-[60px] no-scrollbar"
+                      className="w-full bg-[#EFF4FF] dark:bg-black p-3 rounded-2xl border border-[#E5E7EB] dark:border-navy-700 focus:border-[#2563EB] outline-none font-bold text-[14px] text-gray-800 dark:text-gray-100 shadow-sm min-h-[60px] no-scrollbar"
                       placeholder="Order notes..."
                     />
                   </div>
@@ -3039,7 +3039,7 @@ export default function O2DPage() {
                     {/* Add Line Item - top (Controls-First) */}
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-3 py-2 px-1">
                       <div className="flex items-center bg-[#2563EB]/5 dark:bg-[#60A5FA]/5 px-4 py-2 rounded-2xl border border-[#2563EB]/10 dark:border-[#60A5FA]/10 shadow-sm">
-                          <label className="text-[13px] font-semibold text-gray-400 tracking-tighter mr-2 whitespace-nowrap">Bulk Rows:</label>
+                          <label className="text-[13px] font-semibold text-[#5B6472] tracking-tighter mr-2 whitespace-nowrap">Bulk Rows:</label>
                           <input 
                               type="number" 
                               min="1" 
@@ -3084,7 +3084,7 @@ export default function O2DPage() {
                             type="button"
                             tabIndex={-1}
                             onClick={() => removeItemRow(index)}
-                            className="absolute top-2.5 right-2.5 p-1.5 text-gray-300 hover:text-[#DC2626] hover:bg-red-50 dark:hover:bg-red-950/20 rounded-lg transition-all z-10"
+                            className="absolute top-2.5 right-2.5 p-1.5 text-[#5B6472] hover:text-[#DC2626] hover:bg-red-50 dark:hover:bg-red-950/20 rounded-lg transition-all z-10"
                             title="Remove Line Item"
                           >
                             <TrashIcon className="w-4 h-4" />
@@ -3133,7 +3133,7 @@ export default function O2DPage() {
                             </div>
                           </div>
                           <div className="md:col-span-2">
-                            <label className="text-[13px] font-semibold text-gray-400 flex items-center gap-1 mb-1.5">
+                            <label className="text-[13px] font-semibold text-[#5B6472] flex items-center gap-1 mb-1.5">
                               <HashtagIcon className="w-2.5 h-2.5" />
                               Qty <span className="text-red-500 ml-0.5">*</span>
                             </label>
@@ -3148,12 +3148,12 @@ export default function O2DPage() {
                                   e.target.value,
                                 )
                               }
-                              className="w-full h-[34px] bg-[#EFF4FF] dark:bg-black px-3 rounded-lg border border-orange-100 dark:border-navy-700 focus:border-[#2563EB] outline-none font-bold text-[14px] text-gray-800 dark:text-gray-100 shadow-sm transition-all"
+                              className="w-full h-[34px] bg-[#EFF4FF] dark:bg-black px-3 rounded-lg border border-[#E5E7EB] dark:border-navy-700 focus:border-[#2563EB] outline-none font-bold text-[14px] text-gray-800 dark:text-gray-100 shadow-sm transition-all"
                               required
                             />
                           </div>
                           <div className="md:col-span-3">
-                            <label className="text-[13px] font-semibold text-gray-400 flex items-center gap-1 mb-1.5">
+                            <label className="text-[13px] font-semibold text-[#5B6472] flex items-center gap-1 mb-1.5">
                               <CurrencyRupeeIcon className="w-2.5 h-2.5" />
                               Total
                             </label>
@@ -3172,7 +3172,7 @@ export default function O2DPage() {
                               readOnly={!!dropdownItems.find(di => di.name === item.item_name)}
                               className={`w-full h-[34px] px-3 rounded-lg border focus:border-[#2563EB] outline-none font-bold text-[14px] shadow-sm transition-all ${dropdownItems.find(di => di.name === item.item_name)
                                   ? "bg-gray-100 dark:bg-navy-950 text-gray-500 cursor-not-allowed border-gray-200 dark:border-navy-700"
-                                  : "bg-[#EFF4FF] dark:bg-black text-[#2563EB] dark:text-[#60A5FA] border-orange-100 dark:border-navy-700"
+                                  : "bg-[#EFF4FF] dark:bg-black text-[#2563EB] dark:text-[#60A5FA] border-[#E5E7EB] dark:border-navy-700"
                                 }`}
                             />
                           </div>
@@ -3195,7 +3195,7 @@ export default function O2DPage() {
                                     addItemRow(1);
                                 }
                             }}
-                            className="w-full h-[34px] bg-[#EFF4FF] dark:bg-black px-3 rounded-lg border border-orange-100 dark:border-navy-700 focus:border-[#2563EB] outline-none font-bold text-[14px] text-gray-800 dark:text-gray-100 shadow-sm transition-all"
+                            className="w-full h-[34px] bg-[#EFF4FF] dark:bg-black px-3 rounded-lg border border-[#E5E7EB] dark:border-navy-700 focus:border-[#2563EB] outline-none font-bold text-[14px] text-gray-800 dark:text-gray-100 shadow-sm transition-all"
                             placeholder="Item Specification..."
                           />
                         </div>
@@ -3207,11 +3207,11 @@ export default function O2DPage() {
                 </div>
               </div>
 
-              <div className="pt-5 border-t border-orange-100/30 dark:border-navy-700 flex gap-3 shrink-0">
+              <div className="pt-5 border-t border-[#E5E7EB] dark:border-navy-700 flex gap-3 shrink-0">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="flex-1 h-[48px] rounded-2xl font-semibold text-gray-400 hover:text-gray-600 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5 transition-all text-[13px]"
+                  className="flex-1 h-[48px] rounded-2xl font-semibold text-[#5B6472] hover:text-gray-600 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5 transition-all text-[13px]"
                 >
                   Abandon
                 </button>
@@ -3234,20 +3234,20 @@ export default function O2DPage() {
             className="absolute inset-0 bg-navy-950/60 backdrop-blur-md"
             onClick={() => setIsSetupModalOpen(false)}
           />
-          <div className="relative bg-[#EFF4FF] dark:bg-navy-900 w-full max-w-4xl rounded-3xl shadow-[0_32px_64px_-12px_rgba(0,0,0,0.3)] border border-orange-100 dark:border-navy-700 overflow-hidden animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[92vh]">
-            <div className="p-5 border-b border-orange-100/50 dark:border-white/5 flex items-center justify-between shrink-0">
+          <div className="relative bg-[#EFF4FF] dark:bg-navy-900 w-full max-w-4xl rounded-3xl shadow-[0_32px_64px_-12px_rgba(0,0,0,0.3)] border border-[#E5E7EB] dark:border-navy-700 overflow-hidden animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[92vh]">
+            <div className="p-5 border-b border-[#E5E7EB] dark:border-white/5 flex items-center justify-between shrink-0">
               <div>
                 <h2 className="text-xl font-semibold text-[#2563EB] dark:text-[#60A5FA] italic">
                   SYSTEM CONFIGURATION
                 </h2>
-                <p className="text-[13px] font-semibold text-gray-400 mt-0.5">
+                <p className="text-[13px] font-semibold text-[#5B6472] mt-0.5">
                   Define TAT and Operators
                 </p>
               </div>
               <button
                 type="button"
                 onClick={() => setIsSetupModalOpen(false)}
-                className="p-2.5 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-white/5 rounded-2xl transition-all"
+                className="p-2.5 text-[#5B6472] hover:text-red-500 hover:bg-red-50 dark:hover:bg-white/5 rounded-2xl transition-all"
               >
                 <XMarkIcon className="w-6 h-6 shrink-0" />
               </button>
@@ -3260,7 +3260,7 @@ export default function O2DPage() {
               {stepConfigs.map((config, index) => (
                 <div
                   key={index}
-                  className="grid grid-cols-1 md:grid-cols-12 gap-4 p-4 bg-white dark:bg-navy-800/50 rounded-2xl border border-gray-100 dark:border-navy-700 shadow-sm items-center hover:border-orange-100 dark:hover:border-[#60A5FA]/30 transition-colors"
+                  className="grid grid-cols-1 md:grid-cols-12 gap-4 p-4 bg-white dark:bg-navy-800/50 rounded-2xl border border-gray-100 dark:border-navy-700 shadow-sm items-center hover:border-[#E5E7EB] dark:hover:border-[#60A5FA]/30 transition-colors"
                 >
                   <div className="md:col-span-5 flex flex-col">
                     <span className="text-[13px] font-semibold text-[#2563EB]/50 dark:text-[#60A5FA]/50 mb-1">
@@ -3271,10 +3271,10 @@ export default function O2DPage() {
                     </span>
                   </div>
                   <div className="md:col-span-3">
-                    <label className="text-[13px] font-semibold text-gray-400 flex items-center gap-1.5 mb-1.5">
+                    <label className="text-[13px] font-semibold text-[#5B6472] flex items-center gap-1.5 mb-1.5">
                       <ClockIcon className="w-3 h-3 text-[#2563EB]" /> TAT
                     </label>
-                    <div className="flex h-[38px] bg-[#EFF4FF] dark:bg-navy-950/50 border border-orange-100 dark:border-navy-700 focus-within:border-[#2563EB] rounded-2xl shadow-sm transition-all overflow-hidden items-center p-1">
+                    <div className="flex h-[38px] bg-[#EFF4FF] dark:bg-navy-950/50 border border-[#E5E7EB] dark:border-navy-700 focus-within:border-[#2563EB] rounded-2xl shadow-sm transition-all overflow-hidden items-center p-1">
                       <div className="flex gap-1 bg-white/50 dark:bg-navy-900 p-0.5 rounded-xl border border-gray-100 dark:border-navy-800 shrink-0">
                         <button
                           type="button"
@@ -3284,7 +3284,7 @@ export default function O2DPage() {
                             newConfigs[index].tat = `${val} Hrs`;
                             setStepConfigs(newConfigs);
                           }}
-                          className={`px-2.5 py-1 rounded-lg text-[13px] font-semibold  tracking-wider transition-all ${config.tat.includes("Hrs") ? "bg-[#2563EB] text-black shadow-sm" : "text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"}`}
+                          className={`px-2.5 py-1 rounded-lg text-[13px] font-semibold  tracking-wider transition-all ${config.tat.includes("Hrs") ? "bg-[#2563EB] text-black shadow-sm" : "text-[#5B6472] hover:text-gray-600 dark:hover:text-gray-200"}`}
                         >
                           Hrs
                         </button>
@@ -3296,7 +3296,7 @@ export default function O2DPage() {
                             newConfigs[index].tat = `${val} Days`;
                             setStepConfigs(newConfigs);
                           }}
-                          className={`px-2.5 py-1 rounded-lg text-[13px] font-semibold  tracking-wider transition-all ${config.tat.includes("Days") ? "bg-[#2563EB] text-black shadow-sm" : "text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"}`}
+                          className={`px-2.5 py-1 rounded-lg text-[13px] font-semibold  tracking-wider transition-all ${config.tat.includes("Days") ? "bg-[#2563EB] text-black shadow-sm" : "text-[#5B6472] hover:text-gray-600 dark:hover:text-gray-200"}`}
                         >
                           Days
                         </button>
@@ -3335,11 +3335,11 @@ export default function O2DPage() {
               ))}
             </form>
 
-            <div className="p-5 border-t border-orange-100/50 dark:border-navy-700 flex gap-3 shrink-0 bg-white/40 dark:bg-transparent">
+            <div className="p-5 border-t border-[#E5E7EB] dark:border-navy-700 flex gap-3 shrink-0 bg-white/40 dark:bg-transparent">
               <button
                 type="button"
                 onClick={() => setIsSetupModalOpen(false)}
-                className="flex-1 h-[48px] rounded-2xl font-semibold text-gray-400 hover:text-gray-600 dark:hover:text-white hover:bg-orange-50 dark:hover:bg-white/5 transition-all text-[13px]"
+                className="flex-1 h-[48px] rounded-2xl font-semibold text-[#5B6472] hover:text-gray-600 dark:hover:text-white hover:bg-[#F7F8FA] dark:hover:bg-white/5 transition-all text-[13px]"
               >
                 Cancel
               </button>
@@ -3363,18 +3363,18 @@ export default function O2DPage() {
             onClick={() => setIsStepUpdateModalOpen(false)}
           />
           <div className="relative bg-white dark:bg-navy-900 w-full max-w-lg rounded-3xl shadow-2xl border border-gray-100 dark:border-navy-700 overflow-hidden animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[92vh]">
-            <div className="p-5 border-b border-orange-100/30 dark:border-navy-700 flex items-center justify-between shrink-0 bg-[#EFF4FF] dark:bg-navy-800">
+            <div className="p-5 border-b border-[#E5E7EB] dark:border-navy-700 flex items-center justify-between shrink-0 bg-[#EFF4FF] dark:bg-navy-800">
               <div>
                 <h2 className="text-lg font-semibold text-[#DC2626] italic tracking-tight">
                   Step Update: {O2DKB_STEP_SHORTS[currentStepToUpdate - 1]}
                 </h2>
-                <p className="text-[13px] font-semibold text-gray-400 mt-0.5">
+                <p className="text-[13px] font-semibold text-[#5B6472] mt-0.5">
                   Execution Protocol {selectedOrderNo}
                 </p>
               </div>
               <button
                 onClick={() => setIsStepUpdateModalOpen(false)}
-                className="p-2 text-gray-400 hover:text-red-500 transition-all"
+                className="p-2 text-[#5B6472] hover:text-red-500 transition-all"
               >
                 <XMarkIcon className="w-5 h-5" />
               </button>
@@ -3396,7 +3396,7 @@ export default function O2DPage() {
 
                 {/* Actual Time - Automated */}
                 <div className="hidden">
-                  <label className="text-[13px] font-semibold text-gray-400 flex items-center gap-1.5 mb-1.5">
+                  <label className="text-[13px] font-semibold text-[#5B6472] flex items-center gap-1.5 mb-1.5">
                     <ClockIcon className="w-3 h-3 text-[#2563EB]" /> Actual
                     Timestamp
                   </label>
@@ -3415,7 +3415,7 @@ export default function O2DPage() {
                         actual: new Date(e.target.value).toISOString(),
                       })
                     }
-                    className="w-full h-[38px] bg-[#EFF4FF] dark:bg-black px-4 rounded-xl border border-orange-100 dark:border-navy-700 font-bold text-[14px] outline-none focus:border-[#2563EB]"
+                    className="w-full h-[38px] bg-[#EFF4FF] dark:bg-black px-4 rounded-xl border border-[#E5E7EB] dark:border-navy-700 font-bold text-[14px] outline-none focus:border-[#2563EB]"
                   />
                 </div>
 
@@ -3423,7 +3423,7 @@ export default function O2DPage() {
                 {currentStepToUpdate === 1 && (
                   <div className="space-y-4 pt-2 border-t border-gray-100 dark:border-white/5">
                     <div>
-                      <label className="text-[13px] font-semibold text-gray-400 mb-1.5 block font-bold">
+                      <label className="text-[13px] font-semibold text-[#5B6472] mb-1.5 block font-bold">
                         Voucher Number <span className="text-red-500">*</span>
                       </label>
                       <input
@@ -3435,16 +3435,16 @@ export default function O2DPage() {
                             voucher_num_1: e.target.value,
                           })
                         }
-                        className="w-full h-[36px] bg-[#EFF4FF] dark:bg-black px-3 rounded-lg border border-orange-100 dark:border-navy-700 font-bold text-[14px] text-gray-800 dark:text-white"
+                        className="w-full h-[36px] bg-[#EFF4FF] dark:bg-black px-3 rounded-lg border border-[#E5E7EB] dark:border-navy-700 font-bold text-[14px] text-gray-800 dark:text-white"
                         placeholder="Voucher#..."
                       />
                     </div>
                     <div>
-                      <label className="text-[13px] font-semibold text-gray-400 mb-1.5 block flex items-center gap-1.5 font-bold">
+                      <label className="text-[13px] font-semibold text-[#5B6472] mb-1.5 block flex items-center gap-1.5 font-bold">
                         <PhotoIcon className="w-3 h-3" /> Upload Bill (Attachment) <span className="text-red-500">*</span>
                       </label>
                       <label
-                        className="flex items-center justify-center w-full h-24 border-2 border-dashed border-orange-100 rounded-2xl hover:bg-orange-50/30 cursor-pointer overflow-hidden relative"
+                        className="flex items-center justify-center w-full h-24 border-2 border-dashed border-[#E5E7EB] rounded-2xl hover:bg-[#F7F8FA] cursor-pointer overflow-hidden relative"
                         onDragOver={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
@@ -3468,14 +3468,14 @@ export default function O2DPage() {
                         ) : stepAttachment ? (
                           <div className="flex flex-col items-center gap-1">
                             <ArchiveBoxIcon className="w-8 h-8 text-[#2563EB]/40" />
-                            <span className="text-[12px] font-semibold text-gray-400 max-w-[150px] truncate">
+                            <span className="text-[12px] font-semibold text-[#5B6472] max-w-[150px] truncate">
                               {stepAttachment?.name}
                             </span>
                           </div>
                         ) : (
                           <div className="text-center">
-                            <PlusIcon className="w-5 h-5 text-gray-300 mx-auto" />
-                            <span className="text-[13px] font-semibold text-gray-300">
+                            <PlusIcon className="w-5 h-5 text-[#5B6472] mx-auto" />
+                            <span className="text-[13px] font-semibold text-[#5B6472]">
                               Select Bill File
                             </span>
                           </div>
@@ -3501,11 +3501,11 @@ export default function O2DPage() {
                 {currentStepToUpdate === 7 && (
                   <div className="space-y-4 pt-2 border-t border-gray-100 dark:border-white/5">
                     <div>
-                      <label className="text-[13px] font-semibold text-gray-400 block flex items-center gap-1.5 font-bold font-bold">
+                      <label className="text-[13px] font-semibold text-[#5B6472] block flex items-center gap-1.5 font-bold font-bold">
                         <PhotoIcon className="w-3 h-3" /> Upload Billty (Attachment) <span className="text-red-500">*</span>
                       </label>
                       <label
-                        className="flex items-center justify-center w-full h-24 border-2 border-dashed border-orange-100 rounded-2xl hover:bg-orange-50/30 cursor-pointer overflow-hidden relative mt-1.5"
+                        className="flex items-center justify-center w-full h-24 border-2 border-dashed border-[#E5E7EB] rounded-2xl hover:bg-[#F7F8FA] cursor-pointer overflow-hidden relative mt-1.5"
                         onDragOver={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
@@ -3529,14 +3529,14 @@ export default function O2DPage() {
                         ) : stepAttachment ? (
                           <div className="flex flex-col items-center gap-1">
                             <ArchiveBoxIcon className="w-8 h-8 text-[#2563EB]/40" />
-                            <span className="text-[12px] font-semibold text-gray-400 max-w-[150px] truncate">
+                            <span className="text-[12px] font-semibold text-[#5B6472] max-w-[150px] truncate">
                               {stepAttachment?.name}
                             </span>
                           </div>
                         ) : (
                           <div className="text-center">
-                            <PlusIcon className="w-5 h-5 text-gray-300 mx-auto" />
-                            <span className="text-[13px] font-semibold text-gray-300">
+                            <PlusIcon className="w-5 h-5 text-[#5B6472] mx-auto" />
+                            <span className="text-[13px] font-semibold text-[#5B6472]">
                               Select Billty File
                             </span>
                           </div>
@@ -3564,7 +3564,7 @@ export default function O2DPage() {
                 <button
                   type="button"
                   onClick={() => setIsStepUpdateModalOpen(false)}
-                  className="flex-1 h-[44px] rounded-xl font-semibold text-gray-400 text-[13px] hover:bg-gray-50 transition-all"
+                  className="flex-1 h-[44px] rounded-xl font-semibold text-[#5B6472] text-[13px] hover:bg-gray-50 transition-all"
                 >
                   Abort
                 </button>
@@ -3648,11 +3648,11 @@ export default function O2DPage() {
                   <ClipboardDocumentCheckIcon className="w-5 h-5 text-[#2563EB] dark:text-[#60A5FA]" />
                   Paste Items Data
                 </h2>
-                <p className="text-[13px] font-bold text-gray-400 mt-1">Paste your Excel data here. Ensure columns are: Name, Quantity, Specification.</p>
+                <p className="text-[13px] font-bold text-[#5B6472] mt-1">Paste your Excel data here. Ensure columns are: Name, Quantity, Specification.</p>
               </div>
               <button
                 onClick={() => setIsPasteModalOpen(false)}
-                className="p-2 text-gray-400 hover:text-red-500 transition-all"
+                className="p-2 text-[#5B6472] hover:text-red-500 transition-all"
               >
                 <XMarkIcon className="w-5 h-5" />
               </button>
@@ -3662,7 +3662,7 @@ export default function O2DPage() {
                 value={pasteText}
                 onChange={(e) => setPasteText(e.target.value)}
                 placeholder={`Item A\t10\tSpec A\nItem B\t5\tSpec B`}
-                className="w-full h-[200px] bg-[#EFF4FF] dark:bg-black p-4 rounded-2xl border border-orange-100 dark:border-navy-700 focus:border-[#2563EB] outline-none font-bold text-[14px] text-gray-800 dark:text-gray-100 shadow-sm whitespace-pre"
+                className="w-full h-[200px] bg-[#EFF4FF] dark:bg-black p-4 rounded-2xl border border-[#E5E7EB] dark:border-navy-700 focus:border-[#2563EB] outline-none font-bold text-[14px] text-gray-800 dark:text-gray-100 shadow-sm whitespace-pre"
               />
               <div className="mt-5 flex gap-3">
                 <button
@@ -3715,13 +3715,13 @@ export default function O2DPage() {
                 <h2 className="text-lg font-semibold text-gray-900 dark:text-white italic tracking-tight">
                   Revision Protocol
                 </h2>
-                <p className="text-[13px] font-semibold text-gray-400 mt-0.5">
+                <p className="text-[13px] font-semibold text-[#5B6472] mt-0.5">
                   Clear Operational Data: {selectedOrderNo}
                 </p>
               </div>
               <button
                 onClick={() => setIsRemoveFollowUpModalOpen(false)}
-                className="p-2 text-gray-400 hover:text-red-500 transition-all"
+                className="p-2 text-[#5B6472] hover:text-red-500 transition-all"
               >
                 <XMarkIcon className="w-5 h-5" />
               </button>
@@ -3729,13 +3729,13 @@ export default function O2DPage() {
 
             <div className="p-6 space-y-6">
               <div>
-                <label className="text-[13px] font-semibold text-gray-400 mb-2.5 block">
+                <label className="text-[13px] font-semibold text-[#5B6472] mb-2.5 block">
                   Target Step to Clear
                 </label>
                 <select
                   value={removeStep}
                   onChange={(e) => setRemoveStep(parseInt(e.target.value))}
-                  className="w-full h-[48px] bg-[#EFF4FF] dark:bg-black px-4 rounded-xl border border-orange-100 dark:border-navy-700 font-bold text-[13px] outline-none appearance-none"
+                  className="w-full h-[48px] bg-[#EFF4FF] dark:bg-black px-4 rounded-xl border border-[#E5E7EB] dark:border-navy-700 font-bold text-[13px] outline-none appearance-none"
                 >
                   {O2DKB_STEPS.map((step, idx) => (
                     <option key={idx} value={idx + 1}>
@@ -3746,13 +3746,13 @@ export default function O2DPage() {
               </div>
 
               <div className="space-y-3">
-                <label className="text-[13px] font-semibold text-gray-400 block">
+                <label className="text-[13px] font-semibold text-[#5B6472] block">
                   Clearance Scope
                 </label>
                 <div className="grid grid-cols-2 gap-3">
                   <button
                     onClick={() => setRemoveOnwards(false)}
-                    className={`py-3 px-4 rounded-xl border-2 transition-all text-center ${!removeOnwards ? "border-[#DC2626] bg-[#DC2626]/5 text-[#DC2626]" : "border-gray-100 dark:border-navy-700 text-gray-400 hover:border-gray-200"}`}
+                    className={`py-3 px-4 rounded-xl border-2 transition-all text-center ${!removeOnwards ? "border-[#DC2626] bg-[#DC2626]/5 text-[#DC2626]" : "border-gray-100 dark:border-navy-700 text-[#5B6472] hover:border-gray-200"}`}
                   >
                     <p className="text-[14px] font-semibold tracking-tighter">
                       Only Step {removeStep}
@@ -3763,7 +3763,7 @@ export default function O2DPage() {
                   </button>
                   <button
                     onClick={() => setRemoveOnwards(true)}
-                    className={`py-3 px-4 rounded-xl border-2 transition-all text-center ${removeOnwards ? "border-[#DC2626] bg-[#DC2626]/5 text-[#DC2626]" : "border-gray-100 dark:border-navy-700 text-gray-400 hover:border-gray-200"}`}
+                    className={`py-3 px-4 rounded-xl border-2 transition-all text-center ${removeOnwards ? "border-[#DC2626] bg-[#DC2626]/5 text-[#DC2626]" : "border-gray-100 dark:border-navy-700 text-[#5B6472] hover:border-gray-200"}`}
                   >
                     <p className="text-[14px] font-semibold tracking-tighter">
                       Step {removeStep} Onwards
@@ -3790,7 +3790,7 @@ export default function O2DPage() {
               <div className="flex gap-3 pt-2">
                 <button
                   onClick={() => setIsRemoveFollowUpModalOpen(false)}
-                  className="flex-1 h-[48px] rounded-xl font-semibold text-gray-400 text-[13px] hover:bg-gray-100 transition-all underline decoration-dotted"
+                  className="flex-1 h-[48px] rounded-xl font-semibold text-[#5B6472] text-[13px] hover:bg-gray-100 transition-all underline decoration-dotted"
                 >
                   Abort
                 </button>
@@ -3965,18 +3965,18 @@ function BusyModal({
         onClick={onClose}
       />
       <div className="relative bg-white dark:bg-navy-900 w-full max-w-lg rounded-3xl shadow-[0_32px_64px_-12px_rgba(0,0,0,0.4)] border border-gray-100 dark:border-navy-700 overflow-hidden flex flex-col max-h-[92vh] animate-in fade-in zoom-in-95 duration-200">
-        <div className="p-5 border-b border-orange-100/30 dark:border-navy-700 flex items-center justify-between shrink-0 bg-[#EFF4FF] dark:bg-navy-800">
+        <div className="p-5 border-b border-[#E5E7EB] dark:border-navy-700 flex items-center justify-between shrink-0 bg-[#EFF4FF] dark:bg-navy-800">
           <div>
             <h2 className="text-xl font-semibold text-[#2563EB] dark:text-[#60A5FA] italic">
               DATA FOR BUSY
             </h2>
-            <p className="text-[13px] font-semibold text-gray-400 mt-0.5">
+            <p className="text-[13px] font-semibold text-[#5B6472] mt-0.5">
               Simple Item Logistics
             </p>
           </div>
           <button
             onClick={onClose}
-            className="p-2.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-2xl transition-all"
+            className="p-2.5 text-[#5B6472] hover:text-red-500 hover:bg-red-50 rounded-2xl transition-all"
           >
             <XMarkIcon className="w-6 h-6" />
           </button>
@@ -3988,7 +3988,7 @@ function BusyModal({
             <div className="flex flex-wrap items-center gap-2 mb-4">
               <button
                 onClick={() => setSelectedBusyDate("")}
-                className={`px-3 py-1.5 rounded-lg text-[13px] font-semibold   transition-all ${!selectedBusyDate ? "bg-[#2563EB] text-white shadow-md" : "bg-white dark:bg-navy-950 text-gray-400 border border-gray-100 dark:border-navy-800"}`}
+                className={`px-3 py-1.5 rounded-lg text-[13px] font-semibold   transition-all ${!selectedBusyDate ? "bg-[#2563EB] text-white shadow-md" : "bg-white dark:bg-navy-950 text-[#5B6472] border border-gray-100 dark:border-navy-800"}`}
               >
                 Show All
               </button>
@@ -4013,19 +4013,19 @@ function BusyModal({
                   <>
                     <button
                       onClick={() => setSelectedBusyDate(dayBeforeYesterday)}
-                      className={`px-3 py-1.5 rounded-lg text-[13px] font-semibold   transition-all ${selectedBusyDate === dayBeforeYesterday ? "bg-[#2563EB] text-white shadow-md" : "bg-white dark:bg-navy-950 text-gray-400 border border-gray-100 dark:border-navy-800"}`}
+                      className={`px-3 py-1.5 rounded-lg text-[13px] font-semibold   transition-all ${selectedBusyDate === dayBeforeYesterday ? "bg-[#2563EB] text-white shadow-md" : "bg-white dark:bg-navy-950 text-[#5B6472] border border-gray-100 dark:border-navy-800"}`}
                     >
                       D-B Yesterday
                     </button>
                     <button
                       onClick={() => setSelectedBusyDate(yesterday)}
-                      className={`px-3 py-1.5 rounded-lg text-[13px] font-semibold   transition-all ${selectedBusyDate === yesterday ? "bg-[#2563EB] text-white shadow-md" : "bg-white dark:bg-navy-950 text-gray-400 border border-gray-100 dark:border-navy-800"}`}
+                      className={`px-3 py-1.5 rounded-lg text-[13px] font-semibold   transition-all ${selectedBusyDate === yesterday ? "bg-[#2563EB] text-white shadow-md" : "bg-white dark:bg-navy-950 text-[#5B6472] border border-gray-100 dark:border-navy-800"}`}
                     >
                       Yesterday
                     </button>
                     <button
                       onClick={() => setSelectedBusyDate(today)}
-                      className={`px-3 py-1.5 rounded-lg text-[13px] font-semibold   transition-all ${selectedBusyDate === today ? "bg-[#2563EB] text-white shadow-md" : "bg-white dark:bg-navy-950 text-gray-400 border border-gray-100 dark:border-navy-800"}`}
+                      className={`px-3 py-1.5 rounded-lg text-[13px] font-semibold   transition-all ${selectedBusyDate === today ? "bg-[#2563EB] text-white shadow-md" : "bg-white dark:bg-navy-950 text-[#5B6472] border border-gray-100 dark:border-navy-800"}`}
                     >
                       Today
                     </button>
@@ -4045,7 +4045,7 @@ function BusyModal({
                         return `${y}-${m}-${day}` === selectedBusyDate;
                       })
                       ? "bg-[#2563EB] text-white shadow-md"
-                      : "bg-white dark:bg-navy-950 text-gray-400 border border-gray-100 dark:border-navy-800"
+                      : "bg-white dark:bg-navy-950 text-[#5B6472] border border-gray-100 dark:border-navy-800"
                     }`}
                 >
                   <CalendarDaysIcon className="w-3.5 h-3.5" />
@@ -4122,7 +4122,7 @@ function BusyModal({
               results.map((r, idx) => (
                 <div
                   key={idx}
-                  className={`p-4 rounded-2xl border-2 ${r.found ? "bg-white dark:bg-navy-800/50 border-orange-100/30 dark:border-navy-700 shadow-sm" : "bg-red-50 border-red-100 text-red-500 opacity-60"}`}
+                  className={`p-4 rounded-2xl border-2 ${r.found ? "bg-white dark:bg-navy-800/50 border-[#E5E7EB] dark:border-navy-700 shadow-sm" : "bg-red-50 border-red-100 text-red-500 opacity-60"}`}
                 >
                   {!r.found ? (
                     <p className="text-[13px] font-semibold italic">
@@ -4143,10 +4143,10 @@ function BusyModal({
 
                       <div className="grid grid-cols-12 gap-2">
                         {/* Header */}
-                        <div className="col-span-10 text-[13px] font-semibold text-gray-400 border-b border-gray-50 dark:border-white/5 pb-1">
+                        <div className="col-span-10 text-[13px] font-semibold text-[#5B6472] border-b border-gray-50 dark:border-white/5 pb-1">
                           Item Description
                         </div>
-                        <div className="col-span-2 text-[13px] font-semibold text-gray-400 border-b border-gray-50 dark:border-white/5 pb-1 text-right">
+                        <div className="col-span-2 text-[13px] font-semibold text-[#5B6472] border-b border-gray-50 dark:border-white/5 pb-1 text-right">
                           Qty
                         </div>
 
@@ -4183,7 +4183,7 @@ function BusyModal({
               ))
             ) : (
               <div className="text-center py-12 opacity-30">
-                <ArchiveBoxIcon className="w-10 h-10 mx-auto mb-2 text-gray-300" />
+                <ArchiveBoxIcon className="w-10 h-10 mx-auto mb-2 text-[#5B6472]" />
                 <p className="text-[13px] font-semibold">
                   Ready for extraction
                 </p>
@@ -4203,7 +4203,7 @@ function BusyModal({
           </button>
           <button
             onClick={onClose}
-            className="w-full h-[40px] rounded-xl font-semibold text-gray-400 text-[13px] hover:bg-gray-100 dark:hover:bg-white/5 transition-all"
+            className="w-full h-[40px] rounded-xl font-semibold text-[#5B6472] text-[13px] hover:bg-gray-100 dark:hover:bg-white/5 transition-all"
           >
             Close Modal
           </button>
@@ -4223,7 +4223,7 @@ function YesNoToggle({
   onChange: (val: string) => void;
 }) {
   return (
-    <div className="flex items-center justify-between p-4 bg-gradient-to-r from-[#EFF4FF] to-white dark:from-navy-800 dark:to-navy-900 rounded-2xl border border-orange-100 dark:border-navy-700 shadow-sm relative overflow-hidden group">
+    <div className="flex items-center justify-between p-4 bg-gradient-to-r from-[#EFF4FF] to-white dark:from-navy-800 dark:to-navy-900 rounded-2xl border border-[#E5E7EB] dark:border-navy-700 shadow-sm relative overflow-hidden group">
       <div className="absolute top-0 left-0 w-1 h-full bg-[#2563EB]/30" />
       <span className="text-[13px] font-semibold text-gray-500 dark:text-gray-400">
         {label}
@@ -4238,14 +4238,14 @@ function YesNoToggle({
         <button
           type="button"
           onClick={() => onChange("Yes")}
-          className={`relative z-10 w-20 py-2 rounded-full text-[13px] font-semibold   transition-all duration-300 ${value === "Yes" ? "text-white" : "text-gray-400 hover:text-gray-600"}`}
+          className={`relative z-10 w-20 py-2 rounded-full text-[13px] font-semibold   transition-all duration-300 ${value === "Yes" ? "text-white" : "text-[#5B6472] hover:text-gray-600"}`}
         >
           Yes
         </button>
         <button
           type="button"
           onClick={() => onChange("No")}
-          className={`relative z-10 w-20 py-2 rounded-full text-[13px] font-semibold   transition-all duration-300 ${value === "No" ? "text-white" : "text-gray-400 hover:text-gray-600"}`}
+          className={`relative z-10 w-20 py-2 rounded-full text-[13px] font-semibold   transition-all duration-300 ${value === "No" ? "text-white" : "text-[#5B6472] hover:text-gray-600"}`}
         >
           No
         </button>
@@ -4352,7 +4352,7 @@ function O2DDetailPanel({
         <div className="absolute inset-0 bg-white/60 dark:bg-navy-900/60 backdrop-blur-sm flex items-center justify-center z-40 rounded-lg">
           <div className="flex flex-col items-center gap-3">
             <div className="w-8 h-8 border-3 border-[#2563EB]/20 dark:border-[#60A5FA]/20 border-t-[#2563EB] dark:border-t-[#60A5FA] rounded-full animate-spin" />
-            <p className="text-[13px] font-semibold text-gray-400">
+            <p className="text-[13px] font-semibold text-[#5B6472]">
               Loading...
             </p>
           </div>
@@ -4362,7 +4362,7 @@ function O2DDetailPanel({
         <div className="flex-1 flex flex-col overflow-y-auto no-scrollbar">
           {" "}
           {/* CREAM HEADER - Compact with all Actions */}
-          <div className="px-4 py-2 flex items-center justify-between bg-[#EFF4FF] dark:bg-navy-800 border-b border-orange-100 dark:border-navy-700 text-[#2563EB] dark:text-[#60A5FA]">
+          <div className="px-4 py-2 flex items-center justify-between bg-[#EFF4FF] dark:bg-navy-800 border-b border-[#E5E7EB] dark:border-navy-700 text-[#2563EB] dark:text-[#60A5FA]">
             <div className="flex items-center gap-2.5">
               <button
                 onClick={() => setSelectedOrderNo(null)}
@@ -4417,7 +4417,7 @@ function O2DDetailPanel({
                   });
                   setIsConfirmOpen(true);
                 }}
-                className={`flex items-center gap-1.5 p-1.5 sm:px-4 sm:py-1.5 rounded-full transition-all transition-transform active:scale-90 border ${selectedOrder[0]?.hold ? "bg-orange-500 text-white border-orange-400 shadow-md" : "bg-[#2563EB]/5 text-white/80 border-[#2563EB]/10 hover:bg-[#2563EB]/10 hover:text-white dark:text-[#60A5FA]/80 dark:border-[#60A5FA]/10 dark:hover:bg-[#60A5FA]/10 dark:hover:text-[#60A5FA]"}`}
+                className={`flex items-center gap-1.5 p-1.5 sm:px-4 sm:py-1.5 rounded-full transition-all transition-transform active:scale-90 border ${selectedOrder[0]?.hold ? "bg-[#D97706] text-white border-[#E5E7EB] shadow-md" : "bg-[#2563EB]/5 text-white/80 border-[#2563EB]/10 hover:bg-[#2563EB]/10 hover:text-white dark:text-[#60A5FA]/80 dark:border-[#60A5FA]/10 dark:hover:bg-[#60A5FA]/10 dark:hover:text-[#60A5FA]"}`}
                 title={
                   selectedOrder[0]?.hold
                     ? "Resume Order"
@@ -4475,7 +4475,7 @@ function O2DDetailPanel({
               <div className="bg-white dark:bg-navy-800/50 p-6 rounded-2xl border-2 border-gray-100 dark:border-navy-700 shadow-md grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
                 <div className="md:col-span-9">
                   <div className="mb-5">
-                    <p className="text-[13px] font-semibold text-gray-400 mb-1">
+                    <p className="text-[13px] font-semibold text-[#5B6472] mb-1">
                       ESTABLISHED PARTNER
                     </p>
                     <p className="text-lg font-semibold text-[#2563EB] dark:text-[#60A5FA] tracking-wide">
@@ -4486,7 +4486,7 @@ function O2DDetailPanel({
                     <div className="flex items-center gap-3">
                       <ArchiveBoxIcon className="w-4.5 h-4.5 text-[#2563EB]/40" />
                       <div className="flex flex-col">
-                        <span className="text-[13px] font-semibold text-gray-400">
+                        <span className="text-[13px] font-semibold text-[#5B6472]">
                           Loadout
                         </span>
                         <span className="text-[13px] font-semibold text-gray-700 dark:text-gray-100">
@@ -4498,7 +4498,7 @@ function O2DDetailPanel({
                     <div className="flex items-center gap-3">
                       <UserIcon className="w-4.5 h-4.5 text-[#2563EB]/40" />
                       <div className="flex flex-col">
-                        <span className="text-[13px] font-semibold text-gray-400">
+                        <span className="text-[13px] font-semibold text-[#5B6472]">
                           Operator
                         </span>
                         <span className="text-[13px] font-semibold text-gray-700 dark:text-gray-100 truncate max-w-[120px]">
@@ -4510,7 +4510,7 @@ function O2DDetailPanel({
                     <div className="flex items-center gap-3">
                       <CalendarDaysIcon className="w-4.5 h-4.5 text-[#2563EB]/40" />
                       <div className="flex flex-col">
-                        <span className="text-[13px] font-semibold text-gray-400">
+                        <span className="text-[13px] font-semibold text-[#5B6472]">
                           Timestamp
                         </span>
                         <div className="flex items-center gap-2">
@@ -4535,14 +4535,14 @@ function O2DDetailPanel({
                     {selectedOrder[0]?.hold &&
                       !selectedOrder[0]?.cancelled && (
                         <>
-                          <div className="w-px h-8 bg-orange-500/10 mx-1 hidden sm:block" />
+                          <div className="w-px h-8 bg-[#D97706]/10 mx-1 hidden sm:block" />
                           <div className="flex items-center gap-3">
-                            <PauseCircleIcon className="w-4.5 h-4.5 text-orange-500/60" />
+                            <PauseCircleIcon className="w-4.5 h-4.5 text-[#D97706]" />
                             <div className="flex flex-col">
-                              <span className="text-[13px] font-semibold text-orange-400">
+                              <span className="text-[13px] font-semibold text-[#D97706]">
                                 Held On
                               </span>
-                              <span className="text-[13px] font-semibold text-orange-500">
+                              <span className="text-[13px] font-semibold text-[#D97706]">
                                 {selectedOrder[0]?.hold &&
                                   new Date(
                                     selectedOrder[0]?.hold,
@@ -4671,13 +4671,13 @@ function O2DDetailPanel({
                                     name
                                   ] || {
                                     icon: GiftIcon,
-                                    color: "text-orange-500",
+                                    color: "text-[#D97706]",
                                   };
                                   const ItemIcon = promo.icon;
                                   return (
                                     <div
                                       key={idx}
-                                      className="bg-white dark:bg-black px-3 py-1.5 rounded-lg border border-orange-100 dark:border-navy-700 flex items-center gap-2 shadow-sm"
+                                      className="bg-white dark:bg-black px-3 py-1.5 rounded-lg border border-[#E5E7EB] dark:border-navy-700 flex items-center gap-2 shadow-sm"
                                     >
                                       <ItemIcon
                                         className={`w-3.5 h-3.5 shrink-0 ${promo.color}`}
@@ -4719,7 +4719,7 @@ function O2DDetailPanel({
                   <table className="w-full text-left border-collapse">
                     <thead>
                       <tr className="bg-amber-100 dark:bg-navy-950 text-[13px] font-semibold text-[#2563EB] dark:text-[#60A5FA]">
-                        <th className="px-6 py-3">NOMENCLATURE</th>
+                        <th className="px-6 py-3">Nomenclature</th>
                         <th className="px-6 py-3">
                           ITEM SPECIFICATION
                         </th>
@@ -4789,7 +4789,7 @@ function O2DDetailPanel({
                       Step 1: Bill Update
                     </div>
                     <div className="flex flex-col">
-                      <span className="text-[13px] font-bold text-gray-400 tracking-tighter">
+                      <span className="text-[13px] font-bold text-[#5B6472] tracking-tighter">
                         Voucher Number
                       </span>
                       <span className="text-[14px] font-semibold text-gray-700 dark:text-gray-200">
@@ -4800,7 +4800,7 @@ function O2DDetailPanel({
                       const attachBill = selectedOrder[0]?.attach_bill_1;
                       if (!attachBill) return (
                         <div className="flex flex-col mt-3">
-                          <span className="text-[13px] font-bold text-gray-400 tracking-tighter">
+                          <span className="text-[13px] font-bold text-[#5B6472] tracking-tighter">
                             Bill Attachment
                           </span>
                           <span className="text-[14px] font-semibold text-gray-700 dark:text-gray-200">
@@ -4810,7 +4810,7 @@ function O2DDetailPanel({
                       );
                       return (
                         <div className="flex flex-col mt-3">
-                          <span className="text-[13px] font-bold text-gray-400 tracking-tighter mb-1">
+                          <span className="text-[13px] font-bold text-[#5B6472] tracking-tighter mb-1">
                             Bill Attachment
                           </span>
                           <div className="flex items-center gap-2">
@@ -4838,7 +4838,7 @@ function O2DDetailPanel({
                       const attachBillty = selectedOrder[0]?.attach_billty_7;
                       if (!attachBillty) return (
                         <div className="flex flex-col">
-                          <span className="text-[13px] font-bold text-gray-400 tracking-tighter">
+                          <span className="text-[13px] font-bold text-[#5B6472] tracking-tighter">
                             Billty Attachment
                           </span>
                           <span className="text-[14px] font-semibold text-gray-700 dark:text-gray-200">
@@ -4848,7 +4848,7 @@ function O2DDetailPanel({
                       );
                       return (
                         <div className="flex flex-col">
-                          <span className="text-[13px] font-bold text-gray-400 tracking-tighter mb-1">
+                          <span className="text-[13px] font-bold text-[#5B6472] tracking-tighter mb-1">
                             Billty Attachment
                           </span>
                           <a
@@ -4871,7 +4871,7 @@ function O2DDetailPanel({
 
               {/* Compact Remarks - Cream Background */}
               {selectedOrder[0]?.remark && (
-                <div className="bg-[#EFF4FF] dark:bg-navy-800/50 p-5 rounded-2xl border-2 border-orange-100 dark:border-navy-700 relative shadow-md">
+                <div className="bg-[#EFF4FF] dark:bg-navy-800/50 p-5 rounded-2xl border-2 border-[#E5E7EB] dark:border-navy-700 relative shadow-md">
                   <ChatBubbleBottomCenterTextIcon className="absolute top-4 right-4 w-6 h-6 text-[#2563EB]/10" />
                   <span className="text-[13px] font-semibold text-[#2563EB]/40 block mb-1.5 font-bold">
                     Intelligence Report
@@ -4984,7 +4984,7 @@ function O2DDetailPanel({
                             >
                               <div className="flex flex-col gap-1.5 text-[10.5px]">
                                 <div className="flex justify-between items-center gap-2">
-                                  <span className="text-gray-400 font-semibold text-[13px]">
+                                  <span className="text-[#5B6472] font-semibold text-[13px]">
                                     Plan
                                   </span>{" "}
                                   <span className="font-bold text-gray-800 dark:text-gray-200">
@@ -4992,7 +4992,7 @@ function O2DDetailPanel({
                                   </span>
                                 </div>
                                 <div className="flex justify-between items-center gap-2">
-                                  <span className="text-gray-400 font-semibold text-[13px]">
+                                  <span className="text-[#5B6472] font-semibold text-[13px]">
                                     Actual
                                   </span>{" "}
                                   <span className="font-semibold text-[#2563EB] dark:text-[#60A5FA]">
@@ -5000,7 +5000,7 @@ function O2DDetailPanel({
                                   </span>
                                 </div>
                                 <div className="flex justify-between items-center gap-2">
-                                  <span className="text-gray-400 font-semibold text-[13px]">
+                                  <span className="text-[#5B6472] font-semibold text-[13px]">
                                     Status
                                   </span>{" "}
                                   <span
@@ -5013,7 +5013,7 @@ function O2DDetailPanel({
                                   <div
                                     className={`flex justify-between items-center gap-2 border-t pt-1.5 mt-0.5 ${delay.isDelayed ? "border-red-100 dark:border-red-900/30" : "border-green-100 dark:border-green-900/30"}`}
                                   >
-                                    <span className="text-gray-400 font-semibold text-[13px]">
+                                    <span className="text-[#5B6472] font-semibold text-[13px]">
                                       Delay
                                     </span>
                                     <span

@@ -201,7 +201,7 @@ export default function ActionLogView() {
   const getPriorityStyle = (p: string) => {
     switch(p) {
       case 'Urgent': return 'bg-rose-100 text-rose-700 border-rose-200 dark:bg-rose-900/40 dark:text-rose-400';
-      case 'High':   return 'bg-orange-100 text-orange-700 border-orange-200 dark:bg-orange-900/40 dark:text-orange-400';
+      case 'High':   return 'bg-[#F7F8FA] text-[#D97706] border-[#E5E7EB] dark:bg-[#FEF3C7] dark:text-[#D97706]';
       case 'Medium': return 'bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-900/40 dark:text-amber-400';
       default:       return 'bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/40 dark:text-blue-400';
     }
@@ -234,7 +234,7 @@ export default function ActionLogView() {
       {/* Filter & Action Bar */}
       <div className="bg-white dark:bg-navy-800 p-3 rounded-2xl border border-gray-100 dark:border-navy-700 shadow-sm flex items-center justify-between overflow-x-auto no-scrollbar gap-4">
         <div className="flex items-center gap-2">
-          <span className="text-[13px] font-semibold text-gray-400 px-2">Filter:</span>
+          <span className="text-[13px] font-semibold text-[#5B6472] px-2">Filter:</span>
           {filters.map(f => {
             const count = getFilterCount(f);
             return (
@@ -290,18 +290,18 @@ export default function ActionLogView() {
                   </tr>
                 ) : filteredItems.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="py-20 text-center text-gray-400 font-bold text-[14px] italic bg-gray-50/30">
+                    <td colSpan={7} className="py-20 text-center text-[#5B6472] font-bold text-[14px] italic bg-gray-50/30">
                       No items found
                     </td>
                   </tr>
                 ) : (
                   filteredItems.map((item, index) => (
                     <tr key={item.id} className="hover:bg-gray-50/50 dark:hover:bg-navy-800/50 transition-colors group">
-                      <td className="px-4 py-4 text-[13px] font-semibold text-gray-400 text-center">{index + 1}</td>
+                      <td className="px-4 py-4 text-[13px] font-semibold text-[#5B6472] text-center">{index + 1}</td>
                       <td className="px-4 py-4 text-[14px] font-bold text-gray-800 dark:text-gray-200 min-w-[200px]">
                         {item.task}
                         {item.notes && (
-                          <div className="mt-1 text-[13px] text-gray-400 font-medium italic truncate max-w-sm">
+                          <div className="mt-1 text-[13px] text-[#5B6472] font-medium italic truncate max-w-sm">
                             NB: {item.notes}
                           </div>
                         )}
@@ -352,13 +352,13 @@ export default function ActionLogView() {
                     {editingItem ? "Update Task" : "Create New Task"}
                   </h2>
                   <div className="flex items-center gap-2 mt-1">
-                    <p className="text-gray-400 dark:text-slate-400 font-bold text-[12px]">EA-MD Hub Action Tracker</p>
-                    <span className="px-2 py-0.5 bg-orange-50 dark:bg-navy-800 text-[12px] font-semibold text-[#2563EB] dark:text-[#60A5FA] rounded border border-orange-100 dark:border-navy-700">
+                    <p className="text-[#5B6472] dark:text-slate-400 font-bold text-[12px]">EA-MD Hub Action Tracker</p>
+                    <span className="px-2 py-0.5 bg-[#F7F8FA] dark:bg-navy-800 text-[12px] font-semibold text-[#2563EB] dark:text-[#60A5FA] rounded border border-[#E5E7EB] dark:border-navy-700">
                       Task Details
                     </span>
                   </div>
                 </div>
-                <button onClick={closeModal} className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-white transition-colors">
+                <button onClick={closeModal} className="p-2 text-[#5B6472] hover:text-gray-600 dark:hover:text-white transition-colors">
                   <XMarkIcon className="w-8 h-8" />
                 </button>
               </div>
@@ -377,17 +377,17 @@ export default function ActionLogView() {
                 </div>
 
                 <div>
-                  <label className="flex items-center gap-2 text-[13px] font-semibold text-gray-400 mb-2 px-1">
+                  <label className="flex items-center gap-2 text-[13px] font-semibold text-[#5B6472] mb-2 px-1">
                     Task Description *
                   </label>
                   <textarea required rows={3} value={formTask} onChange={e => setFormTask(e.target.value)}
                     placeholder="Enter task details..."
-                    className="w-full bg-[#FFFFFF] dark:bg-navy-900 px-4 py-3 rounded-xl border border-orange-100 dark:border-navy-700/50 focus:border-[#2563EB] dark:focus:border-[#60A5FA] focus:bg-white outline-none text-[13px] font-bold text-gray-800 dark:text-white transition-all shadow-sm resize-none" />
+                    className="w-full bg-[#FFFFFF] dark:bg-navy-900 px-4 py-3 rounded-xl border border-[#E5E7EB] dark:border-navy-700/50 focus:border-[#2563EB] dark:focus:border-[#60A5FA] focus:bg-white outline-none text-[13px] font-bold text-gray-800 dark:text-white transition-all shadow-sm resize-none" />
                 </div>
 
                 <div className="grid grid-cols-2 gap-6">
                   <div>
-                    <label className="text-[13px] font-semibold text-gray-400 mb-2 px-1 block">
+                    <label className="text-[13px] font-semibold text-[#5B6472] mb-2 px-1 block">
                       Owner *
                     </label>
                     <SearchableSelect 
@@ -395,29 +395,29 @@ export default function ActionLogView() {
                       value={formOwner} 
                       onChange={setFormOwner} 
                       placeholder="Assign to" 
-                      className="bg-[#FFFFFF] dark:bg-navy-900 border border-orange-100 dark:border-navy-700/50"
+                      className="bg-[#FFFFFF] dark:bg-navy-900 border border-[#E5E7EB] dark:border-navy-700/50"
                     />
                   </div>
                   <div>
-                    <label className="text-[13px] font-semibold text-gray-400 mb-2 px-1 block">
+                    <label className="text-[13px] font-semibold text-[#5B6472] mb-2 px-1 block">
                       Due Date *
                     </label>
                     <div className="relative group/date">
-                      <CalendarDaysIcon className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none group-focus-within/date:text-[#2563EB] dark:group-focus-within/date:text-[#60A5FA]" />
+                      <CalendarDaysIcon className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5B6472] pointer-events-none group-focus-within/date:text-[#2563EB] dark:group-focus-within/date:text-[#60A5FA]" />
                       <input required type="date" value={formDue} onChange={e => setFormDue(e.target.value)}
-                        className="w-full bg-[#FFFFFF] dark:bg-navy-900 pr-12 pl-4 py-2.5 rounded-xl border border-orange-100 dark:border-navy-700/50 focus:border-[#2563EB] dark:focus:border-[#60A5FA] outline-none text-sm font-bold text-gray-800 dark:text-white transition-all shadow-sm" />
+                        className="w-full bg-[#FFFFFF] dark:bg-navy-900 pr-12 pl-4 py-2.5 rounded-xl border border-[#E5E7EB] dark:border-navy-700/50 focus:border-[#2563EB] dark:focus:border-[#60A5FA] outline-none text-sm font-bold text-gray-800 dark:text-white transition-all shadow-sm" />
                     </div>
                   </div>
                 </div>
 
                 <div>
-                  <label className="flex items-center gap-2 text-[13px] font-semibold text-gray-400 mb-3 px-1">
+                  <label className="flex items-center gap-2 text-[13px] font-semibold text-[#5B6472] mb-3 px-1">
                     Priority Level *
                   </label>
                   <div className="flex flex-wrap gap-2">
                     {[
                       { l: 'Urgent', c: 'bg-rose-600 text-white border-rose-700' },
-                      { l: 'High', c: 'bg-orange-600 text-white border-orange-700' },
+                      { l: 'High', c: 'bg-[#FEF3C7] text-white border-[#E5E7EB]' },
                       { l: 'Medium', c: 'bg-amber-500 text-white border-amber-600' },
                       { l: 'Low', c: 'bg-blue-600 text-white border-blue-700' }
                     ].map(p => {
@@ -430,7 +430,7 @@ export default function ActionLogView() {
                           className={`flex-1 px-4 py-2.5 rounded-xl text-[13px] font-semibold   border transition-all shadow-sm ${
                             isActive 
                             ? p.c + ' ring-2 ring-offset-1 ring-gray-100 scale-105'
-                            : 'bg-white text-gray-400 border-gray-200 dark:bg-navy-900 dark:border-white/5 opacity-50 grayscale hover:grayscale-0 hover:opacity-100'
+                            : 'bg-white text-[#5B6472] border-gray-200 dark:bg-navy-900 dark:border-white/5 opacity-50 grayscale hover:grayscale-0 hover:opacity-100'
                           }`}
                         >
                           {p.l}
@@ -441,7 +441,7 @@ export default function ActionLogView() {
                 </div>
 
                 <div>
-                  <label className="flex items-center gap-2 text-[13px] font-semibold text-gray-400 mb-3 px-1">
+                  <label className="flex items-center gap-2 text-[13px] font-semibold text-[#5B6472] mb-3 px-1">
                     Task Status *
                   </label>
                   <div className="flex flex-row overflow-x-auto no-scrollbar gap-2 pb-1">
@@ -460,7 +460,7 @@ export default function ActionLogView() {
                           className={`flex-1 min-w-[100px] px-3 py-3 rounded-xl text-[13px] font-semibold   border transition-all text-center whitespace-nowrap shadow-sm ${
                             isActive 
                             ? s.c + ' ring-2 ring-offset-1 ring-gray-100'
-                            : 'bg-white text-gray-400 border-gray-200 dark:bg-navy-900 dark:border-white/5 opacity-60 hover:opacity-100'
+                            : 'bg-white text-[#5B6472] border-gray-200 dark:bg-navy-900 dark:border-white/5 opacity-60 hover:opacity-100'
                           }`}
                         >
                           {s.l}
@@ -471,14 +471,14 @@ export default function ActionLogView() {
                 </div>
 
                 <div>
-                  <label className="text-[13px] font-semibold text-gray-400 mb-2 px-1 block">Notes & Details</label>
+                  <label className="text-[13px] font-semibold text-[#5B6472] mb-2 px-1 block">Notes & Details</label>
                   <input type="text" value={formNotes} onChange={e => setFormNotes(e.target.value)}
                     placeholder="Any specific instructions?"
-                    className="w-full bg-[#FFFFFF] dark:bg-navy-900 px-4 py-2.5 rounded-xl border border-orange-100 dark:border-navy-700/50 focus:border-[#2563EB] dark:focus:border-[#60A5FA] outline-none text-sm font-bold text-gray-800 dark:text-white transition-all shadow-sm" />
+                    className="w-full bg-[#FFFFFF] dark:bg-navy-900 px-4 py-2.5 rounded-xl border border-[#E5E7EB] dark:border-navy-700/50 focus:border-[#2563EB] dark:focus:border-[#60A5FA] outline-none text-sm font-bold text-gray-800 dark:text-white transition-all shadow-sm" />
                 </div>
 
                 <div className="pt-4 flex justify-end gap-5">
-                  <button type="button" onClick={closeModal} className="px-8 py-3 rounded-xl text-[13px] font-semibold text-gray-400 hover:text-gray-900 transition-colors">
+                  <button type="button" onClick={closeModal} className="px-8 py-3 rounded-xl text-[13px] font-semibold text-[#5B6472] hover:text-gray-900 transition-colors">
                     Dismiss
                   </button>
                   <button type="submit" 

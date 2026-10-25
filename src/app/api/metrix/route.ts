@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAllO2DsForAnalytics, getPendingStepIdx } from "@/lib/o2d-sheets";
-import { O2D_STEPS } from "@/types/o2d";
+import { O2D_STEPS, O2D_STEP_LABELS } from "@/types/o2d";
 import { getOrderFollowupRemarks, latestRemarkByOrder } from "@/lib/o2d-remarks-sheets";
 import { imsService } from "@/lib/ims-sheets";
 import { auth } from "@/auth";
@@ -129,7 +129,7 @@ export async function GET(req: NextRequest) {
       // Dispatch-pending only (steps 1-7); post-dispatch paperwork counted separately.
       const isPending = hasOpenStep && currentStep <= 7;
       const isPostDispatchPending = hasOpenStep && currentStep >= 8;
-      const pendingStepName = currentStep >= 1 ? `${currentStep}. ${O2D_STEPS[currentStep - 1] || ""}` : "";
+      const pendingStepName = currentStep >= 1 ? `${currentStep}. ${O2D_STEP_LABELS[currentStep - 1] || O2D_STEPS[currentStep - 1] || ""}` : "";
 
       const totalAmount = items.reduce((sum, item) => sum + (parseFloat(item.est_amount) || 0), 0);
 

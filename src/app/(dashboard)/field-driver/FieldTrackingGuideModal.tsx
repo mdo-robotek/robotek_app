@@ -48,7 +48,7 @@ function Section({
           {Icon && <Icon className="w-4 h-4 text-[#2563EB] dark:text-[#60A5FA]" />}
           {title}
         </span>
-        <ChevronDownIcon className={`w-4 h-4 text-gray-400 transition-transform ${open ? "rotate-180" : ""}`} />
+        <ChevronDownIcon className={`w-4 h-4 text-[#5B6472] transition-transform ${open ? "rotate-180" : ""}`} />
       </button>
       {open && <div className="p-4 space-y-3">{children}</div>}
     </section>
@@ -135,7 +135,7 @@ export default function FieldTrackingGuideModal({ open, onClose, isAdmin }: Fiel
           <button
             type="button"
             onClick={onClose}
-            className="shrink-0 p-2 rounded-xl text-gray-400 hover:text-gray-700 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
+            className="shrink-0 p-2 rounded-xl text-[#5B6472] hover:text-gray-700 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
             aria-label="Close guide"
           >
             <XMarkIcon className="w-6 h-6" />
@@ -203,7 +203,7 @@ export default function FieldTrackingGuideModal({ open, onClose, isAdmin }: Fiel
           <Section id="storage" title="How Data Is Saved" icon={CircleStackIcon}>
             <Detail label="Google Spreadsheet" value="Single spreadsheet (ID configured in field-driver-sheets.ts). Two tabs:" />
 
-            <p className="text-[14px] font-semibold tracking-wider text-gray-400 mt-2">Tab 1 — “Field Driver” (check-in / check-out records)</p>
+            <p className="text-[14px] font-semibold tracking-wider text-[#5B6472] mt-2">Tab 1 — “Field Driver” (check-in / check-out records)</p>
             <ColTable
               headers={["Column", "Field", "Saved when"]}
               rows={[
@@ -224,7 +224,7 @@ export default function FieldTrackingGuideModal({ open, onClose, isAdmin }: Fiel
               ]}
             />
 
-            <p className="text-[14px] font-semibold tracking-wider text-gray-400 mt-3">Tab 2 — “Live Tracking” (GPS route pings)</p>
+            <p className="text-[14px] font-semibold tracking-wider text-[#5B6472] mt-3">Tab 2 — “Live Tracking” (GPS route pings)</p>
             <ColTable
               headers={["Column", "Field", "Saved when"]}
               rows={[
@@ -235,7 +235,7 @@ export default function FieldTrackingGuideModal({ open, onClose, isAdmin }: Fiel
               ]}
             />
 
-            <p className="text-[14px] font-semibold tracking-wider text-gray-400 mt-3">Google Drive — Odometer photos</p>
+            <p className="text-[14px] font-semibold tracking-wider text-[#5B6472] mt-3">Google Drive — Odometer photos</p>
             <BulletList
               items={[
                 "Photos captured as base64 JPEG on the client.",
@@ -289,7 +289,7 @@ export default function FieldTrackingGuideModal({ open, onClose, isAdmin }: Fiel
               ]}
             />
 
-            <p className="text-[14px] font-semibold tracking-wider text-gray-400 mt-2">Background sync logic (while CHECKED_IN)</p>
+            <p className="text-[14px] font-semibold tracking-wider text-[#5B6472] mt-2">Background sync logic (while CHECKED_IN)</p>
             <BulletList
               items={[
                 "Every 60 seconds (+ immediately on check-in): POST /api/field-driver/live with current lat/lng.",

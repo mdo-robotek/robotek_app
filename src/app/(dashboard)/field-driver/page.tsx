@@ -37,7 +37,7 @@ export default function FieldDriverPage() {
   if (isPageLoading) {
     return (
       <div className="min-h-[50vh] flex items-center justify-center bg-[#F8FAFC] dark:bg-slate-950 -m-1 md:-m-2">
-        <p className="text-gray-400 font-bold text-sm">Loading Field Tracking...</p>
+        <p className="text-[#5B6472] font-bold text-sm">Loading Field Tracking...</p>
       </div>
     );
   }

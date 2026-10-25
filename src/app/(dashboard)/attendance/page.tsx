@@ -673,7 +673,7 @@ export default function AttendancePage() {
                     if (hours <= 4) isHalfDay = true;
                 }
                 if (isHalfDay) {
-                    color = 'bg-orange-500/90 text-white shadow-orange-200';
+                    color = 'bg-[#D97706]/90 text-white';
                 } else {
                     color = record.outTime ? 'bg-green-500/90 text-white shadow-green-200' : 'bg-[#2563EB] text-white shadow-amber-300';
                 }
@@ -702,7 +702,7 @@ export default function AttendancePage() {
         return days;
     };
 
-    if (!user) return <div className="p-8 text-center text-gray-400 font-bold">Initializing Attendance...</div>;
+    if (!user) return <div className="p-8 text-center text-[#5B6472] font-bold">Initializing Attendance...</div>;
 
     return (
         <div className="space-y-6 relative">
@@ -762,7 +762,7 @@ export default function AttendancePage() {
                             </h2>
                             <button onClick={() => setCurrentDate(new Date(currentDate.setMonth(currentDate.getMonth() + 1)))} className="p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition"><ChevronRightIcon className="w-5 h-5" /></button>
                         </div>
-                        <div className="grid grid-cols-7 py-4 text-center text-[13px] font-semibold text-gray-400 border-b border-gray-50/5">
+                        <div className="grid grid-cols-7 py-4 text-center text-[13px] font-semibold text-[#5B6472] border-b border-gray-50/5">
                             {['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'].map(d => <div key={d}>{d}</div>)}
                         </div>
                         <div className="grid grid-cols-7 border-separate">
@@ -779,7 +779,7 @@ export default function AttendancePage() {
                         
                         {/* Global Work System (Left Half) */}
                         <div className="flex-1 flex flex-col text-center items-center justify-start relative xl:border-r border-gray-200 dark:border-white/10 xl:pr-6 pb-6 xl:pb-0 border-b xl:border-b-0">
-                            <h3 className="text-[13px] font-semibold text-gray-400 mb-2 opacity-70">
+                            <h3 className="text-[13px] font-semibold text-[#5B6472] mb-2 opacity-70">
                                 {currentStatus === 'CHECKED_IN' ? 'Active Shift' : 'Global Work System'}
                             </h3>
                             {currentStatus === 'CHECKED_IN' && checkInTime && (
@@ -799,7 +799,7 @@ export default function AttendancePage() {
                                     <button
                                         onClick={() => setShowCameraMode('CHECK_IN')}
                                         disabled={!isInRange || isPageLoading}
-                                        className={`w-full py-5 rounded-[24px] font-semibold text-sm   transition-all ${isInRange ? 'bg-[#2563EB] hover:bg-[#002a58] text-white shadow-xl shadow-[#2563EB]/20 hover:-translate-y-1' : 'bg-gray-200 text-gray-400 cursor-not-allowed opacity-50'}`}
+                                        className={`w-full py-5 rounded-[24px] font-semibold text-sm   transition-all ${isInRange ? 'bg-[#2563EB] hover:bg-[#002a58] text-white shadow-xl shadow-[#2563EB]/20 hover:-translate-y-1' : 'bg-gray-200 text-[#5B6472] cursor-not-allowed opacity-50'}`}
                                     >
                                         {isPageLoading ? 'Processing...' : 'Check In System'}
                                     </button>
@@ -838,10 +838,10 @@ export default function AttendancePage() {
                                         )}
                                         <div className="flex justify-center gap-6">
                                             <div className="text-[14px] font-mono font-bold text-gray-600 dark:text-gray-300">
-                                                <span className="text-gray-400 mr-1">LAT</span> {liveLocation.lat.toFixed(5)}
+                                                <span className="text-[#5B6472] mr-1">LAT</span> {liveLocation.lat.toFixed(5)}
                                             </div>
                                             <div className="text-[14px] font-mono font-bold text-gray-600 dark:text-gray-300">
-                                                <span className="text-gray-400 mr-1">LNG</span> {liveLocation.lng.toFixed(5)}
+                                                <span className="text-[#5B6472] mr-1">LNG</span> {liveLocation.lng.toFixed(5)}
                                             </div>
                                         </div>
                                     </div>
@@ -882,7 +882,7 @@ export default function AttendancePage() {
                                      {/* Registered Bases */}
                                      {registeredPoints && registeredPoints.length > 0 && (
                                          <div className="p-3 bg-gray-50 dark:bg-slate-900/50 rounded-2xl border border-white/5 space-y-2 shadow-inner">
-                                             <div className="text-[13px] font-semibold text-gray-400 flex items-center justify-between pb-1">
+                                             <div className="text-[13px] font-semibold text-[#5B6472] flex items-center justify-between pb-1">
                                                  <span>Registered Bases ({registeredPoints.length})</span>
                                                  {liveLocation && <span>Distance</span>}
                                              </div>
@@ -893,7 +893,7 @@ export default function AttendancePage() {
                                                  return (
                                                      <div key={idx} className={`flex items-center justify-between p-3 rounded-xl border transition-all ${isNearest ? 'border-[#2563EB]/20 bg-[#2563EB]/5 dark:border-[#60A5FA]/20 dark:bg-[#60A5FA]/10 shadow-sm' : 'border-transparent hover:bg-white/50 dark:hover:bg-slate-800/50'}`}>
                                                          <div className="flex items-center gap-2">
-                                                             <MapPinIcon className={`w-4 h-4 shrink-0 ${isNearest ? 'text-[#2563EB] dark:text-[#60A5FA]' : 'text-gray-400'}`} />
+                                                             <MapPinIcon className={`w-4 h-4 shrink-0 ${isNearest ? 'text-[#2563EB] dark:text-[#60A5FA]' : 'text-[#5B6472]'}`} />
                                                              <div>
                                                                  <div className={`text-[14px] font-bold  tracking-wider ${isNearest ? 'text-[#2563EB] dark:text-[#60A5FA]' : 'text-gray-600 dark:text-gray-400'}`}>
                                                                      {pt.name || `Location ${idx + 1}`}
@@ -903,7 +903,7 @@ export default function AttendancePage() {
                                                          </div>
                                                          
                                                          {ptDist !== null && (
-                                                             <div className={`text-[14px] font-semibold tracking-tighter ${ptDist <= rangeThreshold ? 'text-green-500' : 'text-gray-400'}`}>
+                                                             <div className={`text-[14px] font-semibold tracking-tighter ${ptDist <= rangeThreshold ? 'text-green-500' : 'text-[#5B6472]'}`}>
                                                                  {Math.round(ptDist)}m
                                                              </div>
                                                          )}
@@ -915,7 +915,7 @@ export default function AttendancePage() {
 
                                      {/* Big Distance Display */}
                                      <div className="text-center py-2 flex flex-col items-center justify-center mt-4">
-                                         <div className="text-[12px] font-semibold text-gray-400 mb-1">Nearest Gap</div>
+                                         <div className="text-[12px] font-semibold text-[#5B6472] mb-1">Nearest Gap</div>
                                          <div className={`text-4xl font-semibold tracking-tighter ${isInRange ? 'text-green-500' : 'text-red-500'} drop-shadow-sm`}>
                                              {distance !== null ? `${Math.round(distance)}m` : '...'}
                                          </div>
@@ -963,7 +963,7 @@ export default function AttendancePage() {
                         />
                     </div>
                     {!masterData ? (
-                        <div className="text-gray-400 text-sm animate-pulse font-semibold text-center py-20">SYNCING DATA...</div>
+                        <div className="text-[#5B6472] text-sm animate-pulse font-semibold text-center py-20">SYNCING DATA...</div>
                     ) : (
                         <table className="w-full text-left border-separate border-spacing-y-4 min-w-[1000px] font-serif">
                             <thead>
@@ -1016,7 +1016,7 @@ export default function AttendancePage() {
                                         });
 
                                         let statusChar = '-';
-                                        let statusColor = 'text-gray-300';
+                                        let statusColor = 'text-[#5B6472]';
                                         let dotColor = null;
                                         let dotText = '';
 
@@ -1028,7 +1028,7 @@ export default function AttendancePage() {
 
                                         if (isWeeklyOff) {
                                             statusChar = offLabel;
-                                            statusColor = 'text-gray-300 font-bold';
+                                            statusColor = 'text-[#5B6472] font-bold';
                                         } else if (leave) {
                                             leavesCount++;
                                             statusChar = 'L';
@@ -1044,8 +1044,8 @@ export default function AttendancePage() {
                                             if (record.outTime && hours <= 4) {
                                                 halfDays++;
                                                 statusChar = isLate ? 'HD(L)' : 'HD';
-                                                statusColor = 'text-orange-500 font-semibold';
-                                                dotColor = 'bg-orange-500';
+                                                statusColor = 'text-[#D97706] font-semibold';
+                                                dotColor = 'bg-[#D97706]';
                                                 dotText = '0.5';
                                             } else {
                                                 presents++;
@@ -1079,7 +1079,7 @@ export default function AttendancePage() {
                                                         </div>
                                                         <div>
                                                             <div className="text-sm font-semibold text-[#2563EB] dark:text-white tracking-tighter">{u.full_name || u.username}</div>
-                                                            <div className="text-[13px] font-bold text-gray-400 mt-0.5">ID: {String(u.id).substring(0, 6)}</div>
+                                                            <div className="text-[13px] font-bold text-[#5B6472] mt-0.5">ID: {String(u.id).substring(0, 6)}</div>
                                                         </div>
                                                     </div>
                                                 </td>
@@ -1093,7 +1093,7 @@ export default function AttendancePage() {
                                                     <span className="bg-yellow-100 text-yellow-600 dark:bg-yellow-500/20 px-4 py-2 rounded-full text-sm font-semibold">{leavesCount}</span>
                                                 </td>
                                                 <td className="px-4 py-4 text-center">
-                                                    <span className="bg-orange-100 text-orange-600 dark:bg-orange-500/20 px-4 py-2 rounded-full text-sm font-semibold">{halfDays}</span>
+                                                    <span className="bg-[#F7F8FA] text-[#D97706] dark:bg-[#D97706]/20 px-4 py-2 rounded-full text-sm font-semibold">{halfDays}</span>
                                                 </td>
                                                 <td className="px-4 py-4 text-center text-sm font-semibold text-[#2563EB]">
                                                     {totalHours.toFixed(1)}h
@@ -1124,19 +1124,19 @@ export default function AttendancePage() {
                                                                 </h4>
                                                                 <div className="flex gap-8 text-right bg-gray-50/50 dark:bg-slate-900/50 p-4 rounded-2xl w-full md:w-auto overflow-hidden">
                                                                     <div className="flex-1 md:flex-none">
-                                                                        <div className="text-[13px] font-semibold text-gray-400 mb-1">Monthly Points</div>
+                                                                        <div className="text-[13px] font-semibold text-[#5B6472] mb-1">Monthly Points</div>
                                                                         <div className="text-xl font-semibold text-[#2563EB] dark:text-white">{monthlyScore.toFixed(1)}</div>
                                                                     </div>
                                                                     <div className="w-[1px] bg-gray-200 dark:bg-white/10 shrink-0"></div>
                                                                     <div className="flex-1 md:flex-none">
-                                                                        <div className="text-[13px] font-semibold text-gray-400 mb-1">Cumulative Score</div>
+                                                                        <div className="text-[13px] font-semibold text-[#5B6472] mb-1">Cumulative Score</div>
                                                                         <div className="text-xl font-semibold text-[#2563EB]">{cumulativePercent}%</div>
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                             <div className="grid grid-cols-5 sm:grid-cols-7 md:grid-cols-10 gap-3">
                                                                 {dayCells.map((c, idx) => (
-                                                                    <div key={idx} className={`relative ${c.isLate && c.statusChar.includes('HD') ? 'bg-orange-50 dark:bg-orange-900/20 border-orange-200 dark:border-orange-500/30' : 'bg-gray-50/50 dark:bg-slate-900 border-gray-100 dark:border-white/5'} rounded-[20px] p-3 flex flex-col items-center justify-center min-h-[72px] shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)] hover:shadow-md transition-shadow group`}>
+                                                                    <div key={idx} className={`relative ${c.isLate && c.statusChar.includes('HD') ? 'bg-[#F7F8FA] dark:bg-[#FEF3C7] border-[#E5E7EB] dark:border-[#E5E7EB]' : 'bg-gray-50/50 dark:bg-slate-900 border-gray-100 dark:border-white/5'} rounded-[20px] p-3 flex flex-col items-center justify-center min-h-[72px] shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)] hover:shadow-md transition-shadow group`}>
                                                                         {c.dotColor && <div className={`absolute -top-2 -right-2 w-auto min-w-[22px] h-5 px-1.5 rounded-full ${c.dotColor} border-[3px] border-white dark:border-slate-800 text-[13px] text-white flex items-center justify-center font-semibold shadow-sm z-10 scale-105`}>{c.dotText}</div>}
                                                                         <div className="text-[14px] font-semibold text-gray-800 dark:text-gray-200 mb-2 opacity-80">{c.d}</div>
                                                                         <div className={`text-[14px] font-semibold  tracking-wider ${c.statusColor}`}>{c.statusChar}</div>
@@ -1171,9 +1171,9 @@ export default function AttendancePage() {
                         
                         {/* Toggle Mode */}
                         <div className="flex items-center bg-white dark:bg-slate-900 rounded-full p-1 border border-gray-200 dark:border-white/10 shadow-sm shrink-0">
-                            <button onClick={() => setReportViewMode('STATUS')} className={`px-4 py-1 rounded-full text-[13px] font-semibold   transition-all ${reportViewMode === 'STATUS' ? 'bg-[#2563EB] text-white shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}>Status</button>
-                            <button onClick={() => setReportViewMode('TIME')} className={`px-4 py-1 rounded-full text-[13px] font-semibold   transition-all ${reportViewMode === 'TIME' ? 'bg-[#2563EB] text-white shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}>Time</button>
-                            <button onClick={() => setReportViewMode('INFO')} className={`px-4 py-1 rounded-full text-[13px] font-semibold   transition-all ${reportViewMode === 'INFO' ? 'bg-[#2563EB] text-white shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}>Info</button>
+                            <button onClick={() => setReportViewMode('STATUS')} className={`px-4 py-1 rounded-full text-[13px] font-semibold   transition-all ${reportViewMode === 'STATUS' ? 'bg-[#2563EB] text-white shadow-sm' : 'text-[#5B6472] hover:text-gray-600'}`}>Status</button>
+                            <button onClick={() => setReportViewMode('TIME')} className={`px-4 py-1 rounded-full text-[13px] font-semibold   transition-all ${reportViewMode === 'TIME' ? 'bg-[#2563EB] text-white shadow-sm' : 'text-[#5B6472] hover:text-gray-600'}`}>Time</button>
+                            <button onClick={() => setReportViewMode('INFO')} className={`px-4 py-1 rounded-full text-[13px] font-semibold   transition-all ${reportViewMode === 'INFO' ? 'bg-[#2563EB] text-white shadow-sm' : 'text-[#5B6472] hover:text-gray-600'}`}>Info</button>
                         </div>
 
                         <div className="flex items-center gap-2 bg-white dark:bg-slate-900 px-3 py-1 rounded-full shadow-sm border border-gray-100 dark:border-white/5 shrink-0">
@@ -1213,7 +1213,7 @@ export default function AttendancePage() {
                     </div>
 
                     {!masterData ? (
-                        <div className="flex-1 flex items-center justify-center text-gray-400 text-sm animate-pulse font-semibold">SYNCING DATA...</div>
+                        <div className="flex-1 flex items-center justify-center text-[#5B6472] text-sm animate-pulse font-semibold">SYNCING DATA...</div>
                     ) : (
                         <>
                             {/* Dummy Top Scrollbar */}
@@ -1237,7 +1237,7 @@ export default function AttendancePage() {
                                         <th 
                                           style={{ backgroundColor: 'var(--background)', borderColor: 'var(--panel-border)' }}
                                           className="sticky top-0 left-0 z-50 p-4 min-w-[200px] border-b border-r text-[14px] font-semibold text-[#2563EB] dark:text-[#60A5FA] flex flex-col justify-center shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]"
-                                        >USER DETAILS / DAYS</th>
+                                        >User Details / Days</th>
                                         {(() => {
                                             const year = currentDate.getFullYear();
                                             const month = currentDate.getMonth();
@@ -1283,7 +1283,7 @@ export default function AttendancePage() {
                                                 });
 
                                                 let statusChar = '-';
-                                                let statusColor = 'text-gray-300';
+                                                let statusColor = 'text-[#5B6472]';
                                                 let dotText = '';
                                                 let rawIn = record?.inTime;
                                                 let rawOut = record?.outTime;
@@ -1311,7 +1311,7 @@ export default function AttendancePage() {
                                                     if (rawOut && hours <= 4) {
                                                         halfDays++;
                                                         statusChar = isLate ? 'HD(L)' : 'HD';
-                                                        statusColor = 'text-orange-500 font-semibold';
+                                                        statusColor = 'text-[#D97706] font-semibold';
                                                         dotText = '+0.5';
                                                     } else {
                                                         presents++;
@@ -1355,13 +1355,13 @@ export default function AttendancePage() {
                                                         <td 
                                                           key={idx} 
                                                           style={{ borderColor: 'var(--panel-border)' }}
-                                                          className={`p-2 border-b border-r text-center min-w-[60px] align-middle ${c.isWeeklyOff ? 'bg-gray-50 dark:bg-slate-900/40' : ''} ${c.isLate && c.statusChar.includes('HD') ? 'bg-orange-50/50 dark:bg-orange-900/10' : ''}`}
+                                                          className={`p-2 border-b border-r text-center min-w-[60px] align-middle ${c.isWeeklyOff ? 'bg-gray-50 dark:bg-slate-900/40' : ''} ${c.isLate && c.statusChar.includes('HD') ? 'bg-[#F7F8FA] dark:bg-[#FEF3C7]' : ''}`}
                                                         >
                                                             {reportViewMode === 'STATUS' ? (
                                                                 <div className="flex flex-col items-center justify-center gap-1">
                                                                     <div className={`text-[14px] font-semibold  tracking-tighter ${c.statusColor}`}>{c.statusChar}</div>
                                                                     {c.dotText && (
-                                                                         <div className={`text-[13px] font-semibold ${c.statusChar === 'P' || c.statusChar === 'P(L)' ? 'text-green-500' : c.statusChar === 'HD' || c.statusChar === 'HD(L)' ? 'text-orange-500' : 'text-red-500'}`}>
+                                                                         <div className={`text-[13px] font-semibold ${c.statusChar === 'P' || c.statusChar === 'P(L)' ? 'text-green-500' : c.statusChar === 'HD' || c.statusChar === 'HD(L)' ? 'text-[#D97706]' : 'text-red-500'}`}>
                                                                             {c.dotText}
                                                                          </div>
                                                                     )}
@@ -1462,7 +1462,7 @@ export default function AttendancePage() {
                         </div>
                     </div>
                     {!masterData ? (
-                        <div className="text-gray-400 text-sm animate-pulse font-semibold text-center py-20">SYNCING DATA...</div>
+                        <div className="text-[#5B6472] text-sm animate-pulse font-semibold text-center py-20">SYNCING DATA...</div>
                     ) : (
                         <table className="w-full text-left border-separate border-spacing-y-4 min-w-[800px] font-serif">
                             <thead>
@@ -1495,7 +1495,7 @@ export default function AttendancePage() {
                                                         </div>
                                                         <div>
                                                             <div className="text-sm font-semibold text-[#2563EB] dark:text-white tracking-tighter">{u.full_name || u.username}</div>
-                                                            <div className="text-[13px] font-bold text-gray-400 mt-0.5">ID: {String(u.id).substring(0, 6)}</div>
+                                                            <div className="text-[13px] font-bold text-[#5B6472] mt-0.5">ID: {String(u.id).substring(0, 6)}</div>
                                                         </div>
                                                     </div>
                                                 </td>
@@ -1541,7 +1541,7 @@ export default function AttendancePage() {
                                 <div className="px-4 py-3 border-b border-slate-800 flex items-center justify-between bg-slate-900/90">
                                     <div className="flex items-center gap-2">
                                         <DocumentTextIcon className="w-4 h-4 text-emerald-400" />
-                                        <span className="text-[13px] font-semibold text-slate-300">File Preview</span>
+                                        <span className="text-[13px] font-semibold text-[#5B6472]">File Preview</span>
                                     </div>
                                     <span className="text-[13px] font-bold text-slate-500">XLSX</span>
                                 </div>
@@ -1559,7 +1559,7 @@ export default function AttendancePage() {
 
                                     <div className="absolute inset-x-4 top-4 rounded-lg border border-emerald-500/20 bg-emerald-500/5 px-3 py-2">
                                         <p className="text-[13px] font-semibold text-emerald-300">Monthly Attendance Report</p>
-                                        <p className="text-[13px] font-medium text-slate-400 mt-1 truncate">{importFileName}</p>
+                                        <p className="text-[13px] font-medium text-[#5B6472] mt-1 truncate">{importFileName}</p>
                                     </div>
 
                                     <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-emerald-400/10 to-transparent pointer-events-none" />
@@ -1615,7 +1615,7 @@ export default function AttendancePage() {
                                         <span className="w-2.5 h-2.5 rounded-full bg-amber-400/80" />
                                         <span className="w-2.5 h-2.5 rounded-full bg-emerald-400/80" />
                                     </div>
-                                    <span className="text-[13px] font-semibold text-slate-400">Import Console</span>
+                                    <span className="text-[13px] font-semibold text-[#5B6472]">Import Console</span>
                                 </div>
                                 <div
                                     ref={importLogRef}

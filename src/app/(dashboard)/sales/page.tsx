@@ -55,7 +55,7 @@ const getStageConfig = (stage: string) => {
     case '1st billing':
     case '2nd billing':
     case '3rd billing': return { icon: <ReceiptRefundIcon className="w-4 h-4" />, borderColor: 'border-green-500', textColor: 'text-green-600 dark:text-green-400' };
-    case 'potential lead but not interesting': return { icon: <HandThumbDownIcon className="w-4 h-4" />, borderColor: 'border-orange-500', textColor: 'text-orange-600 dark:text-orange-400' };
+    case 'potential lead but not interesting': return { icon: <HandThumbDownIcon className="w-4 h-4" />, borderColor: 'border-[#E5E7EB]', textColor: 'text-[#D97706] dark:text-[#D97706]' };
     case 'deal in reserved area': return { icon: <MapPinIcon className="w-4 h-4" />, borderColor: 'border-rose-500', textColor: 'text-rose-600 dark:text-rose-400' };
     case 'existing customer': return { icon: <StarIcon className="w-4 h-4" />, borderColor: 'border-yellow-500', textColor: 'text-yellow-600 dark:text-yellow-400' };
     case 'not qualified lead': return { icon: <NoSymbolIcon className="w-4 h-4" />, borderColor: 'border-stone-500', textColor: 'text-stone-600 dark:text-stone-400' };
@@ -300,7 +300,7 @@ export default function SalesPage() {
                   </div>
 
                   <div className="relative group w-full max-w-[200px] sm:w-64">
-                    <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 group-focus-within:text-blue-500 transition-colors" />
+                    <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#5B6472] group-focus-within:text-blue-500 transition-colors" />
                     <input type="text" placeholder="Search leads..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full pl-9 pr-3 py-1.5 bg-white dark:bg-navy-900 border border-gray-300 dark:border-gray-700 rounded-lg shadow-sm focus:border-blue-500 outline-none font-bold text-[14px] text-gray-700 dark:text-white transition-all" />
                   </div>
                 </div>
@@ -331,12 +331,12 @@ export default function SalesPage() {
                 {isValidating && !leads.length ? (
                   <div className="flex flex-col items-center justify-center py-20">
                     <div className="w-8 h-8 border-4 border-gray-200 dark:border-gray-700 border-t-[#2563EB] rounded-full animate-spin mb-4" />
-                    <p className="text-gray-400 font-bold text-[13px]">Loading Leads...</p>
+                    <p className="text-[#5B6472] font-bold text-[13px]">Loading Leads...</p>
                   </div>
                 ) : paginatedLeads.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-20">
                     <div className="w-16 h-16 bg-gray-100 dark:bg-navy-900 rounded-full flex items-center justify-center mb-4 border-2 border-dashed border-gray-300 dark:border-white/10">
-                      <InboxIcon className="w-8 h-8 text-gray-400 dark:text-slate-600" />
+                      <InboxIcon className="w-8 h-8 text-[#5B6472] dark:text-slate-600" />
                     </div>
                     <p className="text-sm text-gray-500 font-bold">No leads found</p>
                   </div>
@@ -387,7 +387,7 @@ export default function SalesPage() {
                               
                               {/* Lead Type (Priority) Pill */}
                               <span className={`text-[13px] font-semibold   px-3 py-1.5 rounded-full shadow-sm border ${!lead.lead_priority_type ? 'bg-gray-50 text-gray-500 border-gray-200' : lead.lead_priority_type.toLowerCase() === 'high' ? 'bg-red-50 text-red-600 border-red-200' :
-                                lead.lead_priority_type.toLowerCase() === 'medium' ? 'bg-orange-50 text-orange-600 border-orange-200' :
+                                lead.lead_priority_type.toLowerCase() === 'medium' ? 'bg-[#F7F8FA] text-[#D97706] border-[#E5E7EB]' :
                                   'bg-green-50 text-green-600 border-green-200'
                                 }`}>
                                 {lead.lead_priority_type ? `${lead.lead_priority_type} Priority` : 'No Priority'}
@@ -448,7 +448,7 @@ export default function SalesPage() {
                                 {((!lead.qualified_status || lead.qualified_status === 'Not Qualified') && lead.status && lead.status !== 'Lead Generated') && (
                                   <button onClick={() => openQualifyModal(lead)} className="p-1.5 text-purple-600 hover:bg-purple-50 dark:text-purple-400 dark:hover:bg-purple-900/30 rounded-full transition-all" title="Qualify Process"><ShieldCheckIcon className="w-4 h-4" /></button>
                                 )}
-                                <button onClick={() => openGlobalModal(lead)} className="p-1.5 text-orange-600 hover:bg-orange-50 dark:text-orange-400 dark:hover:bg-orange-900/30 rounded-full transition-all" title="Global Fields"><GlobeAltIcon className="w-4 h-4" /></button>
+                                <button onClick={() => openGlobalModal(lead)} className="p-1.5 text-[#D97706] hover:bg-[#F7F8FA] dark:text-[#D97706] dark:hover:bg-[#FEF3C7] rounded-full transition-all" title="Global Fields"><GlobeAltIcon className="w-4 h-4" /></button>
                                 {(lead.qualified_status === 'Qualified') && (
                                   <button onClick={() => openFollowUpModal(lead)} className="p-1.5 text-green-600 hover:bg-green-50 dark:text-green-400 dark:hover:bg-green-900/30 rounded-full transition-all" title="Manage Follow Ups"><ChatBubbleLeftRightIcon className="w-4 h-4" /></button>
                                 )}
@@ -526,10 +526,10 @@ export default function SalesPage() {
                                   { label: "Enquiry For", value: lead.enquiry_for || "—", icon: <MagnifyingGlassIcon className="w-3 h-3 shrink-0" />, color: "text-pink-500" },
                                   { label: "Monthly Turnover", value: lead.current_monthly_turnover || "—", icon: <CurrencyDollarIcon className="w-3 h-3 shrink-0" />, color: "text-green-500" },
                                   { label: "Existing Products", value: lead.existing_products || "—", icon: <ListBulletIcon className="w-3 h-3 shrink-0" />, color: "text-purple-500" },
-                                  { label: "SC Remark", value: lead.sc_remark || "—", icon: <ChatBubbleLeftRightIcon className="w-3 h-3 shrink-0" />, color: "text-orange-500" },
-                                  { label: "SS Remark", value: lead.ss_remark || "—", icon: <ChatBubbleLeftRightIcon className="w-3 h-3 shrink-0" />, color: "text-orange-500" },
-                                  { label: "Party Remark", value: lead.party_remark || "—", icon: <ChatBubbleLeftRightIcon className="w-3 h-3 shrink-0" />, color: "text-orange-500" },
-                                  { label: "Remark", value: lead.remark || "—", icon: <ChatBubbleLeftRightIcon className="w-3 h-3 shrink-0" />, color: "text-orange-500" },
+                                  { label: "SC Remark", value: lead.sc_remark || "—", icon: <ChatBubbleLeftRightIcon className="w-3 h-3 shrink-0" />, color: "text-[#D97706]" },
+                                  { label: "SS Remark", value: lead.ss_remark || "—", icon: <ChatBubbleLeftRightIcon className="w-3 h-3 shrink-0" />, color: "text-[#D97706]" },
+                                  { label: "Party Remark", value: lead.party_remark || "—", icon: <ChatBubbleLeftRightIcon className="w-3 h-3 shrink-0" />, color: "text-[#D97706]" },
+                                  { label: "Remark", value: lead.remark || "—", icon: <ChatBubbleLeftRightIcon className="w-3 h-3 shrink-0" />, color: "text-[#D97706]" },
                                 ].map((detail, idx) => (
                                   <div key={idx} className="flex flex-col min-w-0">
                                     <span className={`text-[13px] font-semibold   flex items-center gap-1 truncate ${detail.color}`}>
@@ -561,7 +561,7 @@ export default function SalesPage() {
                   onClick={() => setPriorityFilter(p as any)}
                   className={`flex-1 py-2 text-[13px] font-semibold   rounded-full transition-all duration-300 ${priorityFilter === p
                     ? p === 'High' ? 'bg-red-500 text-white shadow-md'
-                      : p === 'Medium' ? 'bg-orange-500 text-white shadow-md'
+                      : p === 'Medium' ? 'bg-[#D97706] text-white shadow-md'
                         : p === 'Low' ? 'bg-green-500 text-white shadow-md'
                           : 'bg-white text-gray-800 dark:bg-navy-700 dark:text-white shadow-md'
                     : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-black/5 dark:hover:bg-white/5'

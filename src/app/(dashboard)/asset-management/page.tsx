@@ -322,7 +322,7 @@ const SearchableUserSelect = ({
               </div>
             ))
           ) : (
-            <div className="px-4 py-3 text-[14px] font-semibold text-gray-400 text-center">
+            <div className="px-4 py-3 text-[14px] font-semibold text-[#5B6472] text-center">
               No users found
             </div>
           )}
@@ -562,9 +562,9 @@ export default function AssetManagementPage() {
       case "Maintenance":
         return "text-amber-500 bg-amber-50 dark:bg-[#FF9500]/10";
       case "Retired":
-        return "text-gray-400 bg-gray-100 dark:bg-gray-800";
+        return "text-[#5B6472] bg-gray-100 dark:bg-gray-800";
       default:
-        return "text-gray-400 bg-gray-100 dark:bg-gray-800";
+        return "text-[#5B6472] bg-gray-100 dark:bg-gray-800";
     }
   };
 
@@ -677,7 +677,7 @@ export default function AssetManagementPage() {
 
         <div className="flex flex-wrap items-center gap-2.5 mr-1">
           <div className="relative">
-            <MagnifyingGlassIcon className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <MagnifyingGlassIcon className="w-4 h-4 text-[#5B6472] absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               placeholder="Search..."
@@ -796,7 +796,7 @@ export default function AssetManagementPage() {
                             {item.assigned_to || "Unassigned"}
                           </p>
                         </div>
-                        <div className="text-[14px] font-semibold text-gray-400 tracking-wide">
+                        <div className="text-[14px] font-semibold text-[#5B6472] tracking-wide">
                           Category:{" "}
                           <span className="text-gray-600 dark:text-gray-300">
                             {normalizeCategory(item.category)}
@@ -807,7 +807,7 @@ export default function AssetManagementPage() {
 
                     <div className="flex gap-6 lg:gap-8 min-w-[220px] border-l border-gray-100 dark:border-white/5 pl-4 lg:pl-6 shrink-0">
                       <div>
-                        <p className="text-[13px] font-bold text-gray-400 mb-1.5">
+                        <p className="text-[13px] font-bold text-[#5B6472] mb-1.5">
                           Serial No.
                         </p>
                         <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">
@@ -815,7 +815,7 @@ export default function AssetManagementPage() {
                         </p>
                       </div>
                       <div>
-                        <p className="text-[13px] font-bold text-gray-400 mb-1.5">
+                        <p className="text-[13px] font-bold text-[#5B6472] mb-1.5">
                           Purchase Date
                         </p>
                         <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">
@@ -825,14 +825,14 @@ export default function AssetManagementPage() {
                     </div>
 
                     <div className="min-w-[120px] text-left lg:text-right border-l border-gray-100 dark:border-white/5 pl-4 lg:pl-6 shrink-0">
-                      <p className="text-[13px] font-bold text-gray-400 mb-1.5">
+                      <p className="text-[13px] font-bold text-[#5B6472] mb-1.5">
                         Location
                       </p>
                       <p className="text-base font-bold text-gray-800 dark:text-gray-200">
                         {item.location || "-"}
                       </p>
                       {item.remarks && (
-                        <p className="text-[13px] font-semibold text-gray-400 mt-1 truncate max-w-[140px]" title={item.remarks}>
+                        <p className="text-[13px] font-semibold text-[#5B6472] mt-1 truncate max-w-[140px]" title={item.remarks}>
                           {item.remarks}
                         </p>
                       )}
@@ -861,7 +861,7 @@ export default function AssetManagementPage() {
               })}
 
               {filteredItems.length === 0 && (
-                <div className="p-8 text-center text-[14px] font-bold text-gray-400 bg-white dark:bg-[#1C1C1E] rounded-3xl border border-gray-200 dark:border-white/5">
+                <div className="p-8 text-center text-[14px] font-bold text-[#5B6472] bg-white dark:bg-[#1C1C1E] rounded-3xl border border-gray-200 dark:border-white/5">
                   No assets found for this filter
                 </div>
               )}

@@ -26,7 +26,7 @@ export default function ActionStatusModal({ isOpen, status, message, onClose }: 
         {!isLoading && (
           <button 
             onClick={onClose}
-            className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-white transition-colors"
+            className="absolute top-4 right-4 text-[#5B6472] hover:text-gray-600 dark:hover:text-white transition-colors"
           >
             <XMarkIcon className="w-5 h-5" />
           </button>

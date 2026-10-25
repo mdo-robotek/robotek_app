@@ -37,7 +37,7 @@ function InfoBox({
         {icon}
       </div>
       <div className="min-w-0 flex-1">
-        <p className="text-[13px] font-bold tracking-wide text-gray-400">{label}</p>
+        <p className="text-[13px] font-bold tracking-wide text-[#5B6472]">{label}</p>
         {valueLine2 ? (
           <div className="mt-0.5">
             <p className="text-[14px] font-semibold text-[#1D4ED8] dark:text-white leading-snug">{value}</p>
@@ -147,11 +147,11 @@ export default function JourneyStatus({
                   <p className="font-mono font-semibold text-sm text-[#1D4ED8] dark:text-white leading-none">
                     {elapsedTime.slice(0, 5)}
                   </p>
-                  <p className="text-[12px] font-bold text-gray-400 mt-0.5">HH:MM</p>
+                  <p className="text-[12px] font-bold text-[#5B6472] mt-0.5">HH:MM</p>
                 </div>
               </div>
               <div className="flex items-center justify-center gap-1.5 py-1 px-2 bg-[#FEF9C3] border border-[#FDE047] rounded-full">
-                <span className="w-1.5 h-1.5 rounded-full bg-orange-500" />
+                <span className="w-1.5 h-1.5 rounded-full bg-[#D97706]" />
                 <span className="text-[13px] font-semibold text-gray-800">Field Check-in Active</span>
               </div>
             </>

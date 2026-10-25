@@ -260,10 +260,10 @@ function SearchableDropdown({
         style={{ backgroundColor: 'var(--input-bg)', borderColor: 'var(--panel-border)' }}
         className="w-full px-3 py-1.5 rounded-lg border focus:border-[#2563EB] outline-none font-bold text-[14px] text-gray-800 dark:text-zinc-100 transition-all shadow-sm flex items-center justify-between gap-2"
       >
-        <span className={value ? "text-gray-800 dark:text-zinc-100" : "text-gray-400 dark:text-zinc-500"}>
+        <span className={value ? "text-gray-800 dark:text-zinc-100" : "text-[#5B6472] dark:text-zinc-500"}>
           {value || placeholder || "Select..."}
         </span>
-        <ChevronDownIcon className={`w-3.5 h-3.5 text-gray-400 transition-transform ${open ? "rotate-180" : ""}`} />
+        <ChevronDownIcon className={`w-3.5 h-3.5 text-[#5B6472] transition-transform ${open ? "rotate-180" : ""}`} />
       </button>
 
       {open && (
@@ -286,7 +286,7 @@ function SearchableDropdown({
           </div>
           <ul className="max-h-40 overflow-y-auto relative z-[100]">
             {filtered.length === 0 ? (
-              <li className="px-3 py-2 text-[13px] text-gray-400 font-bold">No results</li>
+              <li className="px-3 py-2 text-[13px] text-[#5B6472] font-bold">No results</li>
             ) : (
               filtered.map((opt) => (
                 <li
@@ -490,16 +490,16 @@ export default function PartyFormModal({
           <div>
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white tracking-tight">{editingParty ? "Edit Party" : "Add New Party"}</h2>
             <div className="flex items-center gap-2 mt-1">
-              <p className="text-gray-400 dark:text-slate-400 font-bold text-[12px]">Party Configuration</p>
-              {editingParty && <span className="px-2 py-0.5 bg-orange-50 dark:bg-zinc-800 text-[12px] font-semibold text-gray-500 rounded border border-orange-100 dark:border-zinc-700">ID: {editingParty.id}</span>}
+              <p className="text-[#5B6472] dark:text-slate-400 font-bold text-[12px]">Party Configuration</p>
+              {editingParty && <span className="px-2 py-0.5 bg-[#F7F8FA] dark:bg-zinc-800 text-[12px] font-semibold text-gray-500 rounded border border-[#E5E7EB] dark:border-zinc-700">ID: {editingParty.id}</span>}
             </div>
           </div>
-          <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-zinc-200 transition-colors"><XMarkIcon className="w-8 h-8" /></button>
+          <button onClick={onClose} className="p-2 text-[#5B6472] hover:text-gray-600 dark:hover:text-zinc-200 transition-colors"><XMarkIcon className="w-8 h-8" /></button>
         </div>
 
         <form onSubmit={handleSubmit} className="p-4 space-y-5 max-h-[80vh] overflow-y-auto bg-white dark:bg-navy-800/50">
           <div>
-            <label className="flex items-center gap-1.5 text-[13px] font-semibold text-gray-400 mb-2">
+            <label className="flex items-center gap-1.5 text-[13px] font-semibold text-[#5B6472] mb-2">
               <TagIcon className="w-3.5 h-3.5 text-[#FFFFFF]" />
               Customer Type
             </label>
@@ -522,7 +522,7 @@ export default function PartyFormModal({
           </div>
 
           <div>
-            <label className="flex items-center gap-1.5 text-[13px] font-semibold text-gray-400 mb-2">
+            <label className="flex items-center gap-1.5 text-[13px] font-semibold text-[#5B6472] mb-2">
               <UserIcon className="w-3.5 h-3.5 text-[#FFFFFF]" />
               Party Name
             </label>
@@ -562,7 +562,7 @@ export default function PartyFormModal({
           {isNewCustomer && (
             <>
               <div>
-                <label className="flex items-center gap-1.5 text-[13px] font-semibold text-gray-400 mb-2">
+                <label className="flex items-center gap-1.5 text-[13px] font-semibold text-[#5B6472] mb-2">
                   <BriefcaseIcon className="w-3.5 h-3.5 text-[#FFFFFF]" />
                   Party Type
                 </label>
@@ -597,7 +597,7 @@ export default function PartyFormModal({
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="flex items-center gap-1.5 text-[13px] font-semibold text-gray-400 mb-2">
+                  <label className="flex items-center gap-1.5 text-[13px] font-semibold text-[#5B6472] mb-2">
                     <Bars3BottomLeftIcon className="w-3.5 h-3.5 text-[#FFFFFF]" />
                     Sales Funnel Unique Num
                   </label>
@@ -610,7 +610,7 @@ export default function PartyFormModal({
                   />
                 </div>
                 <div>
-                  <label className="flex items-center gap-1.5 text-[13px] font-semibold text-gray-400 mb-2">
+                  <label className="flex items-center gap-1.5 text-[13px] font-semibold text-[#5B6472] mb-2">
                     <IdentificationIcon className="w-3.5 h-3.5 text-[#FFFFFF]" />
                     Sale Person Name
                   </label>
@@ -624,7 +624,7 @@ export default function PartyFormModal({
               </div>
 
               <div>
-                <label className="flex items-center gap-1.5 text-[13px] font-semibold text-gray-400 mb-2">
+                <label className="flex items-center gap-1.5 text-[13px] font-semibold text-[#5B6472] mb-2">
                   <QueueListIcon className="w-3.5 h-3.5 text-[#FFFFFF]" />
                   Add following items with First order :
                 </label>
@@ -632,7 +632,7 @@ export default function PartyFormModal({
               </div>
 
               <div>
-                <label className="flex items-center gap-1.5 text-[13px] font-semibold text-gray-400 mb-2">
+                <label className="flex items-center gap-1.5 text-[13px] font-semibold text-[#5B6472] mb-2">
                   <DocumentTextIcon className="w-3.5 h-3.5 text-[#FFFFFF]" />
                   Details and Instructions :
                 </label>
@@ -642,7 +642,7 @@ export default function PartyFormModal({
           )}
 
           <div>
-            <label className="flex items-center gap-1.5 text-[13px] font-semibold text-gray-400 mb-2">
+            <label className="flex items-center gap-1.5 text-[13px] font-semibold text-[#5B6472] mb-2">
               <ChatBubbleBottomCenterTextIcon className="w-3.5 h-3.5 text-[#FFFFFF]" />
               Remarks
             </label>
@@ -654,8 +654,8 @@ export default function PartyFormModal({
             />
           </div>
 
-          <div className="pt-2 border-t border-orange-100/50 dark:border-zinc-800 flex gap-2">
-            <button type="button" onClick={onClose} className="flex-1 px-4 py-2 rounded-xl font-semibold text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-all text-[13px]">Cancel</button>
+          <div className="pt-2 border-t border-[#E5E7EB] dark:border-zinc-800 flex gap-2">
+            <button type="button" onClick={onClose} className="flex-1 px-4 py-2 rounded-xl font-semibold text-[#5B6472] hover:text-gray-600 hover:bg-gray-50 transition-all text-[13px]">Cancel</button>
             <button 
               type="submit" 
               disabled={isDuplicateName}

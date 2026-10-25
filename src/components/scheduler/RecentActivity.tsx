@@ -24,7 +24,7 @@ export default function RecentActivity({ activities, onEventClick }: RecentActiv
     switch (type) {
       case "delegation": return "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-100 dark:border-blue-900/30";
       case "checklist": return "bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-100 dark:border-purple-900/30";
-      case "ticket": return "bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-100 dark:border-orange-900/30";
+      case "ticket": return "bg-[#D97706]/10 text-[#D97706] dark:text-[#D97706] border-[#E5E7EB] dark:border-[#E5E7EB]";
       case "o2d": return "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-100 dark:border-emerald-900/30";
       case "meeting": return "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-100 dark:border-rose-900/30";
       default: return "bg-slate-500/10 text-slate-600 dark:text-slate-400 border-slate-100 dark:border-slate-900/30";
@@ -43,8 +43,8 @@ export default function RecentActivity({ activities, onEventClick }: RecentActiv
     >
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-xl bg-orange-500/10 flex items-center justify-center">
-            <BellIcon className="w-5 h-5 text-orange-600" />
+          <div className="w-8 h-8 rounded-xl bg-[#D97706]/10 flex items-center justify-center">
+            <BellIcon className="w-5 h-5 text-[#D97706]" />
           </div>
           <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Recent Activity</h2>
         </div>
@@ -55,7 +55,7 @@ export default function RecentActivity({ activities, onEventClick }: RecentActiv
 
       <div className="flex-1 overflow-y-auto space-y-4 pr-1 invisible-scrollbar">
         {activities.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 text-slate-400 dark:text-slate-600">
+          <div className="flex flex-col items-center justify-center py-12 text-[#5B6472] dark:text-slate-600">
             <CheckCircleIcon className="w-12 h-12 mb-2 opacity-20" />
             <p className="text-sm font-bold">No pending activities</p>
           </div>

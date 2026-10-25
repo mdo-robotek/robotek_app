@@ -72,7 +72,7 @@ export default function MdDashboardView() {
       {/* Header section */}
       <div>
         <h2 className="text-3xl font-bold text-[#1D4ED8] dark:text-white tracking-tight" style={{ fontFamily: 'Georgia, serif' }}>Good morning</h2>
-        <p className="text-[13px] font-bold text-gray-400 mt-1">Good morning - here is your operations summary prepared by EA.</p>
+        <p className="text-[13px] font-bold text-[#5B6472] mt-1">Good morning - here is your operations summary prepared by EA.</p>
       </div>
 
       {loading ? (
@@ -89,7 +89,7 @@ export default function MdDashboardView() {
               <h3 className="text-4xl font-bold text-rose-700 dark:text-rose-500" style={{ fontFamily: 'Georgia, serif' }}>
                 {openUrgentLogs.length}
               </h3>
-              <p className="text-[13px] font-semibold text-gray-400 mt-2">Require your action</p>
+              <p className="text-[13px] font-semibold text-[#5B6472] mt-2">Require your action</p>
             </div>
 
             {/* Pending MD Card */}
@@ -97,7 +97,7 @@ export default function MdDashboardView() {
               <h3 className="text-4xl font-bold text-blue-700 dark:text-blue-500" style={{ fontFamily: 'Georgia, serif' }}>
                 {pendingMDActions.length}
               </h3>
-              <p className="text-[13px] font-semibold text-gray-400 mt-2">Pending your decision</p>
+              <p className="text-[13px] font-semibold text-[#5B6472] mt-2">Pending your decision</p>
             </div>
 
             {/* Done This Week Card */}
@@ -105,7 +105,7 @@ export default function MdDashboardView() {
               <h3 className="text-4xl font-bold text-emerald-700 dark:text-emerald-500" style={{ fontFamily: 'Georgia, serif' }}>
                 {doneActions.length}
               </h3>
-              <p className="text-[13px] font-semibold text-gray-400 mt-2">Completed this week</p>
+              <p className="text-[13px] font-semibold text-[#5B6472] mt-2">Completed this week</p>
             </div>
 
             {/* Open Queries Card */}
@@ -113,7 +113,7 @@ export default function MdDashboardView() {
               <h3 className="text-4xl font-bold text-amber-600 dark:text-amber-500" style={{ fontFamily: 'Georgia, serif' }}>
                 {openQueries.length}
               </h3>
-              <p className="text-[13px] font-semibold text-gray-400 mt-2">Team queries open</p>
+              <p className="text-[13px] font-semibold text-[#5B6472] mt-2">Team queries open</p>
             </div>
 
           </div>
@@ -125,7 +125,7 @@ export default function MdDashboardView() {
             <section className="flex flex-col space-y-3 pb-6 border-b border-gray-200 dark:border-navy-700">
               <h4 className="text-sm font-bold text-rose-600 dark:text-rose-500" style={{ fontFamily: 'Georgia, serif' }}>Requires your immediate attention</h4>
               {openUrgentLogs.length === 0 ? (
-                <p className="text-[14px] font-medium text-gray-400 py-4 text-center">No urgent items - all clear</p>
+                <p className="text-[14px] font-medium text-[#5B6472] py-4 text-center">No urgent items - all clear</p>
               ) : (
                 <div className="flex flex-col space-y-2">
                   {openUrgentLogs.map(log => (
@@ -134,7 +134,7 @@ export default function MdDashboardView() {
                           {log.urgencyLevel.split(' ')[0]}
                        </span>
                        <span className="text-[13px] font-bold text-gray-800 dark:text-gray-200">{log.issueSummary}</span>
-                       <span className="ml-auto text-[13px] font-semibold text-gray-400">{log.channelUsed?.split(' ')[0]}</span>
+                       <span className="ml-auto text-[13px] font-semibold text-[#5B6472]">{log.channelUsed?.split(' ')[0]}</span>
                     </div>
                   ))}
                 </div>
@@ -145,7 +145,7 @@ export default function MdDashboardView() {
             <section className="flex flex-col space-y-3 pb-6 border-b border-gray-200 dark:border-navy-700">
               <h4 className="text-sm font-bold text-[#1D4ED8] dark:text-blue-400" style={{ fontFamily: 'Georgia, serif' }}>Pending your decision or approval</h4>
               {pendingMDActions.length === 0 ? (
-                <p className="text-[14px] font-medium text-gray-400 py-4 text-center">Nothing pending</p>
+                <p className="text-[14px] font-medium text-[#5B6472] py-4 text-center">Nothing pending</p>
               ) : (
                 <div className="flex flex-col space-y-2">
                   {pendingMDActions.map(action => (
@@ -162,7 +162,7 @@ export default function MdDashboardView() {
             <section className="flex flex-col space-y-3 pb-6 border-b border-gray-200 dark:border-navy-700">
               <h4 className="text-sm font-bold text-amber-600 dark:text-amber-500" style={{ fontFamily: 'Georgia, serif' }}>Team queries awaiting your response</h4>
               {openQueries.length === 0 ? (
-                <p className="text-[14px] font-medium text-gray-400 py-4 text-center">No open team queries</p>
+                <p className="text-[14px] font-medium text-[#5B6472] py-4 text-center">No open team queries</p>
               ) : (
                 <div className="flex flex-col space-y-2">
                   {openQueries.map(query => (
@@ -182,7 +182,7 @@ export default function MdDashboardView() {
             <section className="flex flex-col space-y-3 pb-6 border-b border-gray-200 dark:border-navy-700">
               <h4 className="text-sm font-bold text-emerald-600 dark:text-emerald-500" style={{ fontFamily: 'Georgia, serif' }}>Completed this week</h4>
               {doneActions.length === 0 ? (
-                <p className="text-[14px] font-medium text-gray-400 py-4 text-center">No completed items yet</p>
+                <p className="text-[14px] font-medium text-[#5B6472] py-4 text-center">No completed items yet</p>
               ) : (
                 <div className="flex flex-col space-y-2">
                   {doneActions.map(action => (

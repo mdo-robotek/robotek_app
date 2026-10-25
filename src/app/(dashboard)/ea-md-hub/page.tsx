@@ -109,7 +109,7 @@ export default function EaMdHubPage() {
                     </div>
                   ) : (
                     <div key={tab.id} className="flex-1 flex flex-col items-center justify-center text-center opacity-50 py-20">
-                       <div className="scale-[3] mb-8 text-gray-400">{tab.icon}</div>
+                       <div className="scale-[3] mb-8 text-[#5B6472]">{tab.icon}</div>
                        <h2 className="text-xl font-semibold text-gray-900 dark:text-white tracking-tight">{tab.label}</h2>
                        <p className="text-[14px] font-bold text-gray-500 mt-2">Workspace Module in Development</p>
                     </div>

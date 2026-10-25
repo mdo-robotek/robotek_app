@@ -189,7 +189,7 @@ const FloatingInput = ({
   label, value, onChange, type = "text", step, disabled, name, list, icon: Icon
 }: { label: string, value: any, onChange: (val: string) => void, type?: string, step?: string, disabled?: boolean, name?: string, list?: string, icon?: React.ElementType }) => (
   <div className="relative z-0 w-full mt-2">
-    {Icon && <Icon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500 z-10" />}
+    {Icon && <Icon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5B6472] dark:text-gray-500 z-10" />}
     <input
       type={type}
       step={step}
@@ -1456,8 +1456,8 @@ function parseDateStr(dStr: string) {
               className="px-3 py-2 bg-gray-50 dark:bg-[#0a0f1c] border border-gray-200 dark:border-white/10 rounded-lg text-[14px] font-semibold tracking-wider outline-none focus:ring-2 focus:ring-purple-500 dark:text-white shadow-sm h-[42px] cursor-pointer shrink-0"
             >
               <option value="ALL">All Packed</option>
-              <option value="PACKED">PACKED</option>
-              <option value="UNPACKED">UNPACKED</option>
+              <option value="PACKED">Packed</option>
+              <option value="UNPACKED">Unpacked</option>
             </select>
           )}
           <select
@@ -1477,9 +1477,9 @@ function parseDateStr(dStr: string) {
               onChange={(e) => setTransferFilter(e.target.value as TransferFilter)}
               className="px-3 py-2 bg-gray-50 dark:bg-[#0a0f1c] border border-gray-200 dark:border-white/10 rounded-lg text-[14px] font-semibold tracking-wider outline-none focus:ring-2 focus:ring-emerald-500 dark:text-white shadow-sm h-[42px] cursor-pointer shrink-0"
             >
-              <option value="ALL">ALL TRANSFERS</option>
-              <option value="PENDING">PENDING TRANSFER</option>
-              <option value="TRANSFERRED">TRANSFERRED</option>
+              <option value="ALL">All Transfers</option>
+              <option value="PENDING">Pending Transfer</option>
+              <option value="TRANSFERRED">Transferred</option>
             </select>
           )}
           {viewMode === 'datewise' && (
@@ -1490,9 +1490,9 @@ function parseDateStr(dStr: string) {
                 location === '1st' ? 'focus:ring-2 focus:ring-purple-500' : 'focus:ring-2 focus:ring-emerald-500'
               }`}
             >
-              <option value="ALL">ALL CHECKS</option>
-              <option value="CHECKED">CHECKED</option>
-              <option value="UNCHECKED">UNCHECKED</option>
+              <option value="ALL">All Checks</option>
+              <option value="CHECKED">Checked</option>
+              <option value="UNCHECKED">Unchecked</option>
             </select>
           )}
           {(categoryFilters.length > 0 || itemNameFilters.length > 0 || checkedFilter !== 'ALL' || activeFilter !== 'ALL' || transferFilter !== 'ALL') && (
@@ -1661,7 +1661,7 @@ function parseDateStr(dStr: string) {
                             }`}
                           />
                         ) : (
-                          <span className="text-gray-300 dark:text-gray-600">-</span>
+                          <span className="text-[#5B6472] dark:text-gray-600">-</span>
                         )}
                       </td>
                       <td className="py-2 px-4 text-[14px] font-bold text-gray-500">{formatDate(log.date || log.updated_at)}</td>
@@ -1676,7 +1676,7 @@ function parseDateStr(dStr: string) {
                             <span className="px-2 py-0.5 bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400 rounded-md text-[13px] font-semibold">Packed</span>
                           ) : log.packed_status === 'UNPACKED' ? (
                             <span className="px-2 py-0.5 bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400 rounded-md text-[13px] font-semibold">Unpacked</span>
-                          ) : <span className="text-gray-300">-</span>}
+                          ) : <span className="text-[#5B6472]">-</span>}
                         </td>
                       )}
                       {isSfg && (
@@ -1736,7 +1736,7 @@ function parseDateStr(dStr: string) {
                             </button>
                           </div>
                         ) : (
-                          <span className="text-gray-300 dark:text-gray-600">-</span>
+                          <span className="text-[#5B6472] dark:text-gray-600">-</span>
                         )}
                       </td>
                     </tr>
@@ -1744,7 +1744,7 @@ function parseDateStr(dStr: string) {
                   })}
                   {filteredDatewiseItems.length === 0 && (
                     <tr>
-                      <td colSpan={showPacked ? (isSfg || location === "1st" ? 11 : 10) : 9} className="py-8 text-center text-gray-400 text-[14px] font-semibold">No items found</td>
+                      <td colSpan={showPacked ? (isSfg || location === "1st" ? 11 : 10) : 9} className="py-8 text-center text-[#5B6472] text-[14px] font-semibold">No items found</td>
                     </tr>
                   )}
                 </tbody>
@@ -1841,7 +1841,7 @@ function parseDateStr(dStr: string) {
                           <button onClick={() => { 
                             setSelectedLogItem(item.item_name);
                             setIsLogModalOpen(true);
-                          }} className="text-gray-400 hover:text-[#2563EB] dark:hover:text-[#60A5FA] transition-colors" title="View Transactions">
+                          }} className="text-[#5B6472] hover:text-[#2563EB] dark:hover:text-[#60A5FA] transition-colors" title="View Transactions">
                             <EyeIcon className="w-4 h-4" />
                           </button>
                         </div>
@@ -1870,7 +1870,7 @@ function parseDateStr(dStr: string) {
                         <div className="flex flex-col gap-1 w-full max-w-[180px]">
                           <div className="flex justify-between items-baseline leading-none">
                             <span className={`text-[14px] font-semibold ${health.text}`}>{(item.live_stock || 0).toLocaleString()}</span>
-                            <span className="text-[13px] font-bold text-gray-400">{health.label}</span>
+                            <span className="text-[13px] font-bold text-[#5B6472]">{health.label}</span>
                           </div>
                           <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 overflow-hidden flex">
                             <div className={`h-full ${health.color} transition-all duration-500`} style={{ width: `${health.pct}%` }} />
@@ -1890,7 +1890,7 @@ function parseDateStr(dStr: string) {
                             <span className="px-2 py-0.5 bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400 rounded-md text-[13px] font-semibold">Packed</span>
                           ) : item.packed_status === 'UNPACKED' ? (
                             <span className="px-2 py-0.5 bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400 rounded-md text-[13px] font-semibold">Unpacked</span>
-                          ) : <span className="text-gray-300">-</span>}
+                          ) : <span className="text-[#5B6472]">-</span>}
                         </td>
                       )}
                     </tr>
@@ -1898,7 +1898,7 @@ function parseDateStr(dStr: string) {
                 })}
                 {filteredItems.length === 0 && (
                   <tr>
-                    <td colSpan={showPacked ? 14 : 13} className="py-8 text-center text-gray-400 text-[14px] font-semibold">No items found</td>
+                    <td colSpan={showPacked ? 14 : 13} className="py-8 text-center text-[#5B6472] text-[14px] font-semibold">No items found</td>
                   </tr>
                 )}
               </tbody>
@@ -1926,7 +1926,7 @@ function parseDateStr(dStr: string) {
             >
               <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-white/5 bg-gray-50 dark:bg-[#1f2937]/50 shrink-0">
                 <h3 className="text-sm font-semibold flex items-center gap-2 text-gray-900 dark:text-white">
-                  <EyeIcon className="w-5 h-5 text-gray-400" />
+                  <EyeIcon className="w-5 h-5 text-[#5B6472]" />
                   Transaction Logs - {selectedLogItem}
                 </h3>
                 <button onClick={() => setIsLogModalOpen(false)} className="p-1.5 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white rounded-lg transition-colors">
@@ -1961,7 +1961,7 @@ function parseDateStr(dStr: string) {
                     ))}
                     {transactionLogs.length === 0 && (
                       <tr>
-                        <td colSpan={4} className="py-8 text-center text-gray-400 text-[14px] font-semibold">No logs found</td>
+                        <td colSpan={4} className="py-8 text-center text-[#5B6472] text-[14px] font-semibold">No logs found</td>
                       </tr>
                     )}
                   </tbody>
@@ -2128,7 +2128,7 @@ function parseDateStr(dStr: string) {
                           <td className={`${tdClass} text-center`}>
                             <button
                               onClick={() => removeBulkRow(row.id)}
-                              className="p-1.5 text-gray-400 hover:text-rose-500 rounded-md hover:bg-rose-50 dark:hover:bg-rose-500/10"
+                              className="p-1.5 text-[#5B6472] hover:text-rose-500 rounded-md hover:bg-rose-50 dark:hover:bg-rose-500/10"
                               title="Remove row"
                             >
                               <TrashIcon className="w-4 h-4" />
@@ -2287,13 +2287,13 @@ function parseDateStr(dStr: string) {
                               <span className="text-[13px] font-semibold text-gray-500">Matched</span>
                             )}
                             {row.diff_type === "NONE" && (!row.physical_qty || !row.item_name) && (
-                              <span className="text-[13px] font-bold text-gray-400">—</span>
+                              <span className="text-[13px] font-bold text-[#5B6472]">—</span>
                             )}
                           </td>
                           <td className={`${tdClass} text-center`}>
                             <button
                               onClick={() => removeAuditRow(row.id)}
-                              className="p-1.5 text-gray-400 hover:text-rose-500 rounded-md hover:bg-rose-50 dark:hover:bg-rose-500/10"
+                              className="p-1.5 text-[#5B6472] hover:text-rose-500 rounded-md hover:bg-rose-50 dark:hover:bg-rose-500/10"
                               title="Remove row"
                             >
                               <TrashIcon className="w-4 h-4" />
@@ -2348,7 +2348,7 @@ function parseDateStr(dStr: string) {
 
               <div className="p-6 space-y-4 bg-white dark:bg-[#111827]">
                 <div className="p-3 rounded-xl bg-gray-50 dark:bg-white/[0.02] border border-gray-100 dark:border-white/5 space-y-2">
-                  <p className="text-[13px] font-semibold text-gray-400">Item Name</p>
+                  <p className="text-[13px] font-semibold text-[#5B6472]">Item Name</p>
                   <SearchableSelect
                     label=""
                     options={editItemOptions}

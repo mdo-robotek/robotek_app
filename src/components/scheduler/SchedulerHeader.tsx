@@ -56,7 +56,7 @@ export default function SchedulerHeader({
     { value: 'All', label: 'All Tasks', colorClass: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border-slate-200' },
     { value: 'delegation', label: 'Delegation', colorClass: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20' },
     { value: 'checklist', label: 'Checklist', colorClass: 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20' },
-    { value: 'ticket', label: 'Help Ticket', colorClass: 'bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/20' },
+    { value: 'ticket', label: 'Help Ticket', colorClass: 'bg-[#D97706]/10 text-[#D97706] dark:text-[#D97706] border-[#E5E7EB]' },
     { value: 'o2d', label: 'O2D', colorClass: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20' },
     { value: 'meeting', label: 'Meeting', colorClass: 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20' },
     { value: 'scot', label: 'Scot Calls', colorClass: 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20' }
@@ -65,7 +65,7 @@ export default function SchedulerHeader({
   const bgMap: Record<string, string> = {
     'delegation': 'bg-blue-500',
     'checklist': 'bg-purple-500',
-    'ticket': 'bg-orange-500',
+    'ticket': 'bg-[#D97706]',
     'o2d': 'bg-emerald-500',
     'meeting': 'bg-rose-500',
     'scot': 'bg-indigo-500',
@@ -144,7 +144,7 @@ export default function SchedulerHeader({
           
           {showTypeDropdown && (
             <div className="absolute top-[calc(100%+8px)] mt-0 right-0 md:left-0 md:right-auto w-48 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 p-2 z-50 overflow-hidden flex flex-col gap-1">
-               <div className="text-[13px] font-semibold text-slate-400 mb-1 px-3 mt-1">Filter & Legend</div>
+               <div className="text-[13px] font-semibold text-[#5B6472] mb-1 px-3 mt-1">Filter & Legend</div>
                {typeOptions.map(option => (
                  <button
                    key={option.value}
@@ -162,7 +162,7 @@ export default function SchedulerHeader({
         {/* User Search (Admin Only) */}
         {isAdmin && (
           <div className="relative">
-            <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5B6472]" />
             <input
               type="text"
               placeholder="Filter by user..."

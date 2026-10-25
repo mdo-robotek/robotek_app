@@ -185,7 +185,7 @@ export default function SchedulerPage() {
                     selectedEvent.type === 'meeting' ? 'bg-rose-500/10 text-rose-500' :
                     selectedEvent.type === 'delegation' ? 'bg-blue-500/10 text-blue-500' :
                     selectedEvent.type === 'checklist' ? 'bg-purple-500/10 text-purple-500' :
-                    selectedEvent.type === 'ticket' ? 'bg-orange-500/10 text-orange-500' :
+                    selectedEvent.type === 'ticket' ? 'bg-[#D97706]/10 text-[#D97706]' :
                     selectedEvent.type === 'scot' ? 'bg-indigo-500/10 text-indigo-500' :
                     'bg-emerald-500/10 text-emerald-500'
                   }`}>
@@ -200,7 +200,7 @@ export default function SchedulerPage() {
                     </p>
                   </div>
                 </div>
-                <button onClick={() => setSelectedEvent(null)} className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors">
+                <button onClick={() => setSelectedEvent(null)} className="p-2 text-[#5B6472] hover:text-slate-600 dark:hover:text-slate-200 transition-colors">
                   <XMarkIcon className="w-8 h-8" />
                 </button>
               </div>
@@ -213,14 +213,14 @@ export default function SchedulerPage() {
 
                 <div className="grid grid-cols-2 gap-4">
                    <div className="flex flex-col gap-1 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-800">
-                      <div className="flex items-center gap-1.5 text-[13px] font-semibold text-slate-400">
+                      <div className="flex items-center gap-1.5 text-[13px] font-semibold text-[#5B6472]">
                         <ClockIcon className="w-3.5 h-3.5" />
                         Time
                       </div>
                       <p className="text-[14px] font-semibold text-slate-900 dark:text-white">{format(selectedEvent.start, "hh:mm a")}</p>
                    </div>
                    <div className="flex flex-col gap-1 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-800">
-                      <div className="flex items-center gap-1.5 text-[13px] font-semibold text-slate-400">
+                      <div className="flex items-center gap-1.5 text-[13px] font-semibold text-[#5B6472]">
                         <CalendarIcon className="w-3.5 h-3.5" />
                         Date
                       </div>
@@ -235,7 +235,7 @@ export default function SchedulerPage() {
                           <UserIcon className="w-4 h-4 text-blue-500" />
                         </div>
                         <div className="flex-1">
-                           <p className="text-[13px] font-semibold text-slate-400 tracking-tighter leading-none mb-0.5">Assigned To</p>
+                           <p className="text-[13px] font-semibold text-[#5B6472] tracking-tighter leading-none mb-0.5">Assigned To</p>
                            <p className="truncate">{selectedEvent.assignedTo}</p>
                         </div>
                      </div>
@@ -257,7 +257,7 @@ export default function SchedulerPage() {
                           <TagIcon className="w-4 h-4 text-emerald-500" />
                         </div>
                         <div className="flex-1">
-                           <p className="text-[13px] font-semibold text-slate-400 tracking-tighter leading-none mb-0.5">Status</p>
+                           <p className="text-[13px] font-semibold text-[#5B6472] tracking-tighter leading-none mb-0.5">Status</p>
                            <p className="truncate">{selectedEvent.status}</p>
                         </div>
                      </div>

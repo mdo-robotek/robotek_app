@@ -73,7 +73,7 @@ export default function ItemNamePicker({
         placeholder={placeholder}
         className={
           className ||
-          "w-full px-4 py-3 bg-[#FFFFFF] dark:bg-navy-800 border border-orange-100/50 dark:border-navy-800 rounded-xl font-bold text-sm text-gray-900 dark:text-white outline-none focus:border-[#2563EB] dark:focus:border-[#60A5FA] transition-all shadow-sm"
+          "w-full px-4 py-3 bg-[#FFFFFF] dark:bg-navy-800 border border-[#E5E7EB] dark:border-navy-800 rounded-xl font-bold text-sm text-gray-900 dark:text-white outline-none focus:border-[#2563EB] dark:focus:border-[#60A5FA] transition-all shadow-sm"
         }
       />
       <datalist id={listId}>
@@ -84,7 +84,7 @@ export default function ItemNamePicker({
       {!inList && (
         <div className="flex items-center gap-2 flex-wrap">
           <p className="text-[13px] font-semibold text-amber-600 tracking-wide">
-            ⚠ Ye naam official list mein nahi hai — spelling check karein
+            This name is not in the official list — please check the spelling
           </p>
           {isAdmin && (
             <button

@@ -34,7 +34,7 @@ export default function RecentActivity({
       }
     >
       {events.length === 0 ? (
-        <p className="text-sm text-gray-400 text-center py-4">No activity yet today</p>
+        <p className="text-sm text-[#5B6472] text-center py-4">No activity yet today</p>
       ) : (
         <div className="space-y-0">
           {events.map((ev, i) => (
@@ -45,7 +45,7 @@ export default function RecentActivity({
               <div className="shrink-0 mt-0.5 z-10 bg-white dark:bg-slate-900">{ICONS[ev.type]}</div>
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-bold text-gray-900 dark:text-white">{ev.title}</p>
-                <p className="text-[13px] font-bold text-gray-400 mt-0.5">{ev.time}</p>
+                <p className="text-[13px] font-bold text-[#5B6472] mt-0.5">{ev.time}</p>
                 {ev.detail && (
                   <p className="text-[13px] text-gray-500 mt-1 leading-relaxed line-clamp-2">{ev.detail}</p>
                 )}

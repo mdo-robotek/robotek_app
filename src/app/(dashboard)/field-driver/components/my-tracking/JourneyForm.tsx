@@ -85,7 +85,7 @@ function FormButtons({
           Retake
         </button>
       ) : disabled ? (
-        <span className="flex items-center gap-1.5 px-4 py-2.5 bg-white border border-gray-200 text-gray-400 rounded-xl font-semibold text-[13px] opacity-60">
+        <span className="flex items-center gap-1.5 px-4 py-2.5 bg-white border border-gray-200 text-[#5B6472] rounded-xl font-semibold text-[13px] opacity-60">
           <ArrowPathIcon className="w-4 h-4" />
           Retake
         </span>
@@ -256,7 +256,7 @@ export function JourneyFormSection({
         <p className="text-[13px] font-bold text-gray-500">Starting Odometer: {odometerInValue} KM</p>
       )}
       <div>
-        <label className="text-[13px] font-semibold text-gray-400">
+        <label className="text-[13px] font-semibold text-[#5B6472]">
           Odometer Reading
         </label>
         <div className="flex gap-1.5 mt-1">
@@ -378,7 +378,7 @@ export function JourneyForm({
       <FormShell title="Check-in Form" fillHeight={fillHeight}>
         <div className={`space-y-3 ${fillHeight ? 'flex-1 flex flex-col' : ''}`}>
           <div>
-            <label className="text-[13px] font-semibold text-gray-400">
+            <label className="text-[13px] font-semibold text-[#5B6472]">
               Odometer Reading
             </label>
             <div className="flex gap-2 mt-1.5">
@@ -430,7 +430,7 @@ export function JourneyForm({
           </p>
         )}
         <div>
-          <label className="text-[13px] font-semibold text-gray-400">
+          <label className="text-[13px] font-semibold text-[#5B6472]">
             Odometer Reading
           </label>
           <div className="flex gap-2 mt-1.5">

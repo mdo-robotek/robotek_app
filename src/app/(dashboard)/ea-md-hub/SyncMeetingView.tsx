@@ -212,7 +212,7 @@ export default function SyncMeetingView() {
       <div className="flex-1 overflow-y-auto space-y-4 pr-2 custom-scrollbar pb-6 pl-1">
         {history.length === 0 ? (
           <div className="bg-white dark:bg-navy-800 rounded-3xl border border-dashed border-gray-200 dark:border-navy-700 p-12 text-center h-full flex flex-col items-center justify-center">
-            <ClipboardDocumentCheckIcon className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+            <ClipboardDocumentCheckIcon className="w-12 h-12 text-[#5B6472] mx-auto mb-4" />
             <h3 className="text-gray-900 dark:text-white font-semibold mb-1">No Meetings Found</h3>
             <p className="text-gray-500 text-[14px] font-bold">Click the button above to create your first sync meeting.</p>
           </div>
@@ -240,29 +240,29 @@ export default function SyncMeetingView() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full bg-gray-50 dark:bg-navy-900/30 p-3 rounded-2xl mx-1 border border-gray-100 dark:border-navy-700/50">
                   <div>
-                    <h5 className="text-[13px] font-semibold text-gray-400 mb-1 flex items-center gap-1.5">
+                    <h5 className="text-[13px] font-semibold text-[#5B6472] mb-1 flex items-center gap-1.5">
                         <CheckBadgeIcon className="w-3.5 h-3.5" /> Decisions Made
                     </h5>
                     <p className="text-[14px] font-bold text-gray-800 dark:text-gray-200 line-clamp-2">
-                      {m.decisions || <span className="text-gray-400 italic font-normal">No decisions recorded</span>}
+                      {m.decisions || <span className="text-[#5B6472] italic font-normal">No decisions recorded</span>}
                     </p>
                   </div>
                   <div>
-                    <h5 className="text-[13px] font-semibold text-gray-400 mb-1 flex items-center gap-1.5">
+                    <h5 className="text-[13px] font-semibold text-[#5B6472] mb-1 flex items-center gap-1.5">
                         <PencilSquareIcon className="w-3.5 h-3.5" /> Meeting Notes
                     </h5>
                     <p className="text-[14px] font-bold text-gray-800 dark:text-gray-200 line-clamp-2">
-                      {m.notes || <span className="text-gray-400 italic font-normal">No notes added</span>}
+                      {m.notes || <span className="text-[#5B6472] italic font-normal">No notes added</span>}
                     </p>
                   </div>
                 </div>
                 
                 <div className="mt-3 pt-3 flex justify-end gap-6 w-full pr-2">
-                  <span className="text-[13px] font-semibold text-gray-400 flex items-center gap-1">
+                  <span className="text-[13px] font-semibold text-[#5B6472] flex items-center gap-1">
                     <ClipboardDocumentCheckIcon className="w-3.5 h-3.5" />
                     {m.agenda?.length || 0} Topics
                   </span>
-                  <span className="text-[13px] font-semibold text-gray-400 flex items-center gap-1">
+                  <span className="text-[13px] font-semibold text-[#5B6472] flex items-center gap-1">
                     <CheckBadgeIcon className="w-3.5 h-3.5" />
                     {m.actionItems?.length || 0} Actions
                   </span>
@@ -298,8 +298,8 @@ export default function SyncMeetingView() {
                         {meetingId ? 'Edit Meeting Record' : 'New Meeting Record'}
                     </h2>
                     <div className="flex items-center gap-2 mt-1">
-                      <p className="text-gray-400 dark:text-slate-400 font-bold text-[12px]">EA-MD Hub</p>
-                      <span className="px-2 py-0.5 bg-orange-50 dark:bg-navy-800 text-[12px] font-semibold text-[#2563EB] dark:text-[#60A5FA] rounded border border-orange-100 dark:border-navy-700">
+                      <p className="text-[#5B6472] dark:text-slate-400 font-bold text-[12px]">EA-MD Hub</p>
+                      <span className="px-2 py-0.5 bg-[#F7F8FA] dark:bg-navy-800 text-[12px] font-semibold text-[#2563EB] dark:text-[#60A5FA] rounded border border-[#E5E7EB] dark:border-navy-700">
                         Sync Meeting
                       </span>
                     </div>
@@ -324,30 +324,30 @@ export default function SyncMeetingView() {
                   
                   {/* Meeting Details Section */}
                   <div className="bg-white dark:bg-navy-800 p-5 rounded-2xl border border-gray-100 dark:border-navy-700 shadow-sm">
-                    <h3 className="text-[13px] font-semibold text-gray-400 mb-3 flex items-center gap-2">
+                    <h3 className="text-[13px] font-semibold text-[#5B6472] mb-3 flex items-center gap-2">
                       <CalendarDaysIcon className="w-4 h-4" /> Meeting details
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div className="space-y-1">
                         <label className="text-[13px] font-semibold text-gray-500 px-1">Date</label>
                         <div className="relative group/date">
-                          <CalendarDaysIcon className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none group-focus-within/date:text-[#1D4ED8]" />
+                          <CalendarDaysIcon className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5B6472] pointer-events-none group-focus-within/date:text-[#1D4ED8]" />
                           <input type="date" value={date} onChange={e => setDate(e.target.value)}
-                            className="w-full bg-[#FFFFFF] dark:bg-navy-900 pr-10 pl-3 py-2.5 rounded-xl border border-orange-100 dark:border-navy-700/50 outline-none text-[14px] font-bold text-gray-800 dark:text-white transition-all focus:ring-2 focus:ring-[#1D4ED8]/20 shadow-sm" />
+                            className="w-full bg-[#FFFFFF] dark:bg-navy-900 pr-10 pl-3 py-2.5 rounded-xl border border-[#E5E7EB] dark:border-navy-700/50 outline-none text-[14px] font-bold text-gray-800 dark:text-white transition-all focus:ring-2 focus:ring-[#1D4ED8]/20 shadow-sm" />
                         </div>
                       </div>
                       <div className="space-y-1">
                         <label className="text-[13px] font-semibold text-gray-500 px-1">Time</label>
                         <div className="relative group">
                           <input type="time" value={time} onChange={e => setTime(e.target.value)}
-                            className="w-full bg-[#FFFFFF] dark:bg-navy-900 px-3 py-2.5 rounded-xl border border-orange-100 dark:border-navy-700/50 outline-none text-[14px] font-bold text-gray-800 dark:text-white transition-all focus:ring-2 focus:ring-[#1D4ED8]/20 shadow-sm" />
+                            className="w-full bg-[#FFFFFF] dark:bg-navy-900 px-3 py-2.5 rounded-xl border border-[#E5E7EB] dark:border-navy-700/50 outline-none text-[14px] font-bold text-gray-800 dark:text-white transition-all focus:ring-2 focus:ring-[#1D4ED8]/20 shadow-sm" />
                         </div>
                       </div>
                       <div className="space-y-1">
                         <label className="text-[13px] font-semibold text-gray-500 px-1">Location</label>
                         <div className="relative group">
                           <input type="text" value={location} onChange={e => setLocation(e.target.value)} placeholder="Where?"
-                            className="w-full bg-[#FFFFFF] dark:bg-navy-900 px-3 py-2.5 rounded-xl border border-orange-100 dark:border-navy-700/50 outline-none text-[14px] font-bold text-gray-800 dark:text-white transition-all focus:ring-2 focus:ring-[#1D4ED8]/20 shadow-sm" />
+                            className="w-full bg-[#FFFFFF] dark:bg-navy-900 px-3 py-2.5 rounded-xl border border-[#E5E7EB] dark:border-navy-700/50 outline-none text-[14px] font-bold text-gray-800 dark:text-white transition-all focus:ring-2 focus:ring-[#1D4ED8]/20 shadow-sm" />
                         </div>
                       </div>
                     </div>
@@ -356,7 +356,7 @@ export default function SyncMeetingView() {
                   {/* Agenda Section */}
                   <div className="bg-white dark:bg-navy-800 p-5 rounded-2xl border border-gray-100 dark:border-navy-700 shadow-sm flex flex-col">
                     <div className="flex items-center justify-between mb-3">
-                      <h3 className="text-[13px] font-semibold text-gray-400 flex items-center gap-2">
+                      <h3 className="text-[13px] font-semibold text-[#5B6472] flex items-center gap-2">
                         <ClipboardDocumentCheckIcon className="w-4 h-4" /> Agenda
                       </h3>
                       <button
@@ -397,7 +397,7 @@ export default function SyncMeetingView() {
                                 <button
                                   key={o}
                                   onClick={() => updateAgendaItem(item.id, { owner: o })}
-                                  className={`px-2 py-1 rounded-md text-[12px] font-semibold  transition-all ${item.owner === o ? 'bg-[#1D4ED8] text-white shadow-sm scale-105' : 'text-gray-400 hover:text-gray-600'
+                                  className={`px-2 py-1 rounded-md text-[12px] font-semibold  transition-all ${item.owner === o ? 'bg-[#1D4ED8] text-white shadow-sm scale-105' : 'text-[#5B6472] hover:text-gray-600'
                                     }`}
                                 >
                                   {o}
@@ -406,7 +406,7 @@ export default function SyncMeetingView() {
                             </div>
                             <button
                               onClick={() => removeAgendaItem(item.id)}
-                              className="p-1 px-1.5 text-gray-300 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-all opacity-0 group-hover:opacity-100 shrink-0"
+                              className="p-1 px-1.5 text-[#5B6472] hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-all opacity-0 group-hover:opacity-100 shrink-0"
                             >
                               <XMarkIcon className="w-3.5 h-3.5 stroke-[3]" />
                             </button>
@@ -419,20 +419,20 @@ export default function SyncMeetingView() {
                   {/* Decisions & Actions Section */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="bg-white dark:bg-navy-800 p-6 rounded-3xl border border-gray-100 dark:border-navy-700 shadow-sm flex flex-col">
-                      <h3 className="text-[13px] font-semibold text-gray-400 flex items-center gap-2 mb-4">
+                      <h3 className="text-[13px] font-semibold text-[#5B6472] flex items-center gap-2 mb-4">
                         <CheckBadgeIcon className="w-4 h-4" /> Decisions Made
                       </h3>
                       <textarea
                         value={decisions}
                         onChange={e => setDecisions(e.target.value)}
                         placeholder="Record key decisions..."
-                        className="flex-1 w-full bg-[#FFFFFF] dark:bg-navy-900 p-3 rounded-xl border border-orange-100 dark:border-navy-700/50 outline-none text-[14px] font-bold text-gray-800 dark:text-white transition-all focus:ring-2 focus:ring-blue-100 min-h-[100px] resize-none custom-scrollbar shadow-sm"
+                        className="flex-1 w-full bg-[#FFFFFF] dark:bg-navy-900 p-3 rounded-xl border border-[#E5E7EB] dark:border-navy-700/50 outline-none text-[14px] font-bold text-gray-800 dark:text-white transition-all focus:ring-2 focus:ring-blue-100 min-h-[100px] resize-none custom-scrollbar shadow-sm"
                       />
                     </div>
 
                     <div className="bg-white dark:bg-navy-800 p-5 rounded-2xl border border-gray-100 dark:border-navy-700 shadow-sm flex flex-col">
                       <div className="flex items-center justify-between mb-3">
-                        <h3 className="text-[13px] font-semibold text-gray-400 flex items-center gap-2">
+                        <h3 className="text-[13px] font-semibold text-[#5B6472] flex items-center gap-2">
                           <CheckBadgeIcon className="w-4 h-4" /> New Action Items
                         </h3>
                         <button
@@ -446,7 +446,7 @@ export default function SyncMeetingView() {
                       <div className="flex-1 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">
                         {actionItems.length === 0 ? (
                           <div className="bg-gray-50 dark:bg-navy-900/50 rounded-xl p-4 text-center border border-dashed border-gray-200 dark:border-navy-700">
-                            <p className="text-[13px] font-bold text-gray-400">No action items</p>
+                            <p className="text-[13px] font-bold text-[#5B6472]">No action items</p>
                           </div>
                         ) : (
                           <div className="space-y-1.5">
@@ -462,7 +462,7 @@ export default function SyncMeetingView() {
                                 />
                                 <button
                                   onClick={() => removeActionItem(item.id)}
-                                  className="p-1 opacity-0 group-hover:opacity-100 text-gray-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-all"
+                                  className="p-1 opacity-0 group-hover:opacity-100 text-[#5B6472] hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-all"
                                 >
                                   <XMarkIcon className="w-3.5 h-3.5 stroke-[3]" />
                                 </button>
@@ -476,14 +476,14 @@ export default function SyncMeetingView() {
 
                   {/* Meeting Notes Section */}
                   <div className="bg-white dark:bg-navy-800 p-5 rounded-2xl border border-gray-100 dark:border-navy-700 shadow-sm">
-                    <h3 className="text-[13px] font-semibold text-gray-400 mb-3 flex items-center gap-2">
+                    <h3 className="text-[13px] font-semibold text-[#5B6472] mb-3 flex items-center gap-2">
                       <PencilSquareIcon className="w-4 h-4" /> Meeting notes
                     </h3>
                     <textarea
                       value={notes}
                       onChange={e => setNotes(e.target.value)}
                       placeholder="General notes, details, context..."
-                      className="w-full bg-[#FFFFFF] dark:bg-navy-900 p-3 rounded-xl border border-orange-100 dark:border-navy-700/50 outline-none text-[14px] font-bold text-gray-800 dark:text-white transition-all focus:ring-2 focus:ring-blue-100 min-h-[80px] resize-none custom-scrollbar shadow-sm"
+                      className="w-full bg-[#FFFFFF] dark:bg-navy-900 p-3 rounded-xl border border-[#E5E7EB] dark:border-navy-700/50 outline-none text-[14px] font-bold text-gray-800 dark:text-white transition-all focus:ring-2 focus:ring-blue-100 min-h-[80px] resize-none custom-scrollbar shadow-sm"
                     />
                   </div>
                 </div>
@@ -492,7 +492,7 @@ export default function SyncMeetingView() {
                 <div className="bg-[#FFFFFF] dark:bg-navy-900 px-8 py-4 border-t border-gray-100 dark:border-navy-800 flex items-center justify-between shrink-0">
                   <button
                     onClick={resetForm}
-                    className="px-6 py-3 text-gray-400 hover:text-gray-900 dark:hover:text-white font-semibold text-[13px] transition-colors"
+                    className="px-6 py-3 text-[#5B6472] hover:text-gray-900 dark:hover:text-white font-semibold text-[13px] transition-colors"
                   >
                     Reset Form
                   </button>

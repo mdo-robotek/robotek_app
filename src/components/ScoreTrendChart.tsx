@@ -35,7 +35,7 @@ export default function ScoreTrendChart({ data, granularity, onGranularityChange
     return (
       <div className="flex flex-col h-full">
         {!isPrint && <ChartHeader granularity={granularity} onGranularityChange={onGranularityChange || (() => {})} />}
-        <div className="flex items-center justify-center flex-1 text-[13px] font-semibold text-gray-300">
+        <div className="flex items-center justify-center flex-1 text-[13px] font-semibold text-[#5B6472]">
           No Trend Data
         </div>
       </div>
@@ -259,11 +259,11 @@ function ChartHeader({ granularity, onGranularityChange }: { granularity: Granul
         {/* Legend */}
         <div className="flex items-center gap-1">
           <span className="w-3 h-0.5 rounded-full bg-[#2563EB] dark:bg-[#60A5FA]" />
-          <span className="text-[12px] font-semibold text-gray-400">Score</span>
+          <span className="text-[12px] font-semibold text-[#5B6472]">Score</span>
         </div>
         <div className="flex items-center gap-1">
           <span className="w-3 h-0.5 rounded-full bg-emerald-500" />
-          <span className="text-[12px] font-semibold text-gray-400">On-Time</span>
+          <span className="text-[12px] font-semibold text-[#5B6472]">On-Time</span>
         </div>
         {/* Granularity dropdown */}
         <select

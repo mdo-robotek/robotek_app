@@ -51,7 +51,7 @@ const FloatingInput = ({
       className="block px-3 pb-2.5 pt-4 w-full text-sm font-bold text-gray-900 bg-transparent rounded-lg border-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-[#60A5FA] focus:outline-none focus:ring-0 focus:border-[#2563EB] peer disabled:opacity-50 disabled:bg-gray-100 dark:disabled:bg-white/5"
       placeholder=" "
     />
-    <label htmlFor={name} className="absolute text-[13px] font-semibold text-gray-400 dark:text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white dark:bg-[#111827] px-2 peer-focus:px-2 peer-focus:text-[#2563EB] peer-focus:dark:text-[#2563EB] peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1">{label}</label>
+    <label htmlFor={name} className="absolute text-[13px] font-semibold text-[#5B6472] dark:text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white dark:bg-[#111827] px-2 peer-focus:px-2 peer-focus:text-[#2563EB] peer-focus:dark:text-[#2563EB] peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1">{label}</label>
   </div>
 );
 
@@ -440,7 +440,7 @@ export default function StationaryInventoryPage() {
           </div>
           <div>
             <h1 className="text-base font-semibold text-gray-900 dark:text-white leading-none">Stationary Inventory</h1>
-            <p className="text-gray-400 font-bold text-[13px] mt-1">ERP Master Module</p>
+            <p className="text-[#5B6472] font-bold text-[13px] mt-1">ERP Master Module</p>
           </div>
         </div>
 
@@ -608,7 +608,7 @@ export default function StationaryInventoryPage() {
               {/* Color Logic Filter */}
               <div className="flex items-center gap-2 overflow-x-auto bg-white dark:bg-[#111827] p-2 rounded-xl border border-gray-200 dark:border-white/5 flex-1 min-w-0">
                 <div className="flex items-center gap-1 px-2 shrink-0">
-                  <InformationCircleIcon className="w-4 h-4 text-gray-400" />
+                  <InformationCircleIcon className="w-4 h-4 text-[#5B6472]" />
                   <span className="text-[13px] font-semibold text-gray-500 mr-2">Color Logic:</span>
                 </div>
                 <div className="flex flex-wrap gap-2 text-[13px] font-semibold text-white text-center cursor-pointer">
@@ -626,7 +626,7 @@ export default function StationaryInventoryPage() {
 
               {/* Search Bar MOVED HERE */}
               <div className="relative shrink-0">
-                <MagnifyingGlassIcon className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                <MagnifyingGlassIcon className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#5B6472]" />
                 <input
                   type="text"
                   placeholder="SEARCH SKU / ITEM..."
@@ -642,7 +642,7 @@ export default function StationaryInventoryPage() {
           {activeTab === "logs" && (
             <div className="flex items-center gap-2 overflow-x-auto shrink-0 bg-white dark:bg-[#111827] p-2 rounded-xl border border-gray-200 dark:border-white/5">
               <div className="flex items-center gap-1 px-2 shrink-0">
-                <MagnifyingGlassIcon className="w-4 h-4 text-gray-400" />
+                <MagnifyingGlassIcon className="w-4 h-4 text-[#5B6472]" />
                 <span className="text-[13px] font-semibold text-gray-500 mr-2">Filter Ledger:</span>
               </div>
               <div className="flex gap-2">
@@ -680,7 +680,7 @@ export default function StationaryInventoryPage() {
 
               <div
                 onClick={() => setFilterType("IN_TRANSIT")}
-                className={`relative overflow-hidden bg-gradient-to-br from-amber-400 to-orange-500 dark:from-amber-600 dark:to-orange-800 text-white border rounded-xl p-3 flex items-center justify-between cursor-pointer transition-all hover:scale-[1.01] ${filterType === "IN_TRANSIT" ? "ring-2 ring-amber-500 shadow-lg" : "border-transparent shadow-sm"}`}
+                className={`relative overflow-hidden bg-[#2563EB]  text-white border rounded-xl p-3 flex items-center justify-between cursor-pointer transition-all hover:scale-[1.01] ${filterType === "IN_TRANSIT" ? "ring-2 ring-amber-500 shadow-lg" : "border-transparent shadow-sm"}`}
               >
                 <div className="z-10 relative">
                   <p className="text-[13px] font-semibold text-white/80">Items in Transit</p>
@@ -793,7 +793,7 @@ export default function StationaryInventoryPage() {
                               <div className="flex flex-col gap-1 w-full max-w-[180px]">
                                 <div className="flex justify-between items-baseline leading-none">
                                   <span className={`text-[14px] font-semibold ${health.text}`}>{item.total_available}</span>
-                                  <span className="text-[13px] font-bold text-gray-400">{health.label}</span>
+                                  <span className="text-[13px] font-bold text-[#5B6472]">{health.label}</span>
                                 </div>
                                 <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 overflow-hidden flex">
                                   <div className={`h-full ${health.color} transition-all duration-500`} style={{ width: `${health.pct}%` }}></div>
@@ -805,7 +805,7 @@ export default function StationaryInventoryPage() {
                       })}
                       {filteredItems.length === 0 && (
                         <tr>
-                          <td colSpan={12} className="py-8 text-center text-gray-400 text-[14px] font-semibold">No inventory records found</td>
+                          <td colSpan={12} className="py-8 text-center text-[#5B6472] text-[14px] font-semibold">No inventory records found</td>
                         </tr>
                       )}
                     </tbody>
@@ -858,7 +858,7 @@ export default function StationaryInventoryPage() {
                             <p className="text-[13px] font-semibold text-gray-500 mb-1">Current Stock / Max</p>
                             <div className="flex items-end justify-end gap-2">
                               <span className={`text-2xl font-semibold leading-none ${health.text}`}>{item.total_available}</span>
-                              <span className="text-sm font-bold text-gray-400 mb-0.5">/ {item.max_level?.toFixed(1) || 0}</span>
+                              <span className="text-sm font-bold text-[#5B6472] mb-0.5">/ {item.max_level?.toFixed(1) || 0}</span>
                             </div>
                           </div>
                         </div>
@@ -908,7 +908,7 @@ export default function StationaryInventoryPage() {
                             ))}
                             {filteredItemLogs.length === 0 && (
                               <tr>
-                                <td colSpan={5} className="py-8 text-center text-gray-400 font-sans text-[14px] font-semibold">No transactions recorded for this item.</td>
+                                <td colSpan={5} className="py-8 text-center text-[#5B6472] font-sans text-[14px] font-semibold">No transactions recorded for this item.</td>
                               </tr>
                             )}
                           </tbody>
@@ -972,7 +972,7 @@ export default function StationaryInventoryPage() {
                       ))}
                       {filteredLogs.length === 0 && (
                         <tr>
-                          <td colSpan={7} className="py-8 text-center text-gray-400 font-sans text-[14px] font-semibold">No transaction logs found for this filter</td>
+                          <td colSpan={7} className="py-8 text-center text-[#5B6472] font-sans text-[14px] font-semibold">No transaction logs found for this filter</td>
                         </tr>
                       )}
                     </tbody>
@@ -1118,7 +1118,7 @@ export default function StationaryInventoryPage() {
                           <option key={i.sku_code} value={i.sku_code} className="dark:bg-gray-800">{i.sku_code} - {i.item_name}</option>
                         ))}
                       </select>
-                      <label htmlFor="select-sku" className="absolute text-[13px] font-semibold text-gray-400 dark:text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white dark:bg-[#111827] px-2 peer-focus:px-2 peer-focus:text-[#2563EB] peer-focus:dark:text-[#2563EB] peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1">Target SKU</label>
+                      <label htmlFor="select-sku" className="absolute text-[13px] font-semibold text-[#5B6472] dark:text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white dark:bg-[#111827] px-2 peer-focus:px-2 peer-focus:text-[#2563EB] peer-focus:dark:text-[#2563EB] peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1">Target SKU</label>
                     </div>
 
                     <FloatingInput

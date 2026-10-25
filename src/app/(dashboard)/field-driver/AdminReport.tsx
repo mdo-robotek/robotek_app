@@ -132,17 +132,17 @@ export default function AdminReport() {
                 {isLoading ? (
                     <div className="w-full h-full flex flex-col items-center justify-center gap-3">
                         <div className="w-8 h-8 border-4 border-[#2563EB] dark:border-[#60A5FA] border-t-transparent rounded-full animate-spin"></div>
-                        <div className="text-[14px] font-bold text-gray-400">Loading Report...</div>
+                        <div className="text-[14px] font-bold text-[#5B6472]">Loading Report...</div>
                     </div>
                 ) : uniqueUsers.length === 0 ? (
-                    <div className="w-full h-full flex flex-col items-center justify-center text-gray-400 text-sm font-bold">
+                    <div className="w-full h-full flex flex-col items-center justify-center text-[#5B6472] text-sm font-bold">
                         No field drivers found.
                     </div>
                 ) : (
                     <table className="w-full border-collapse border-spacing-0 text-left">
                         <thead className="bg-white dark:bg-slate-900 sticky top-0 z-20 shadow-sm">
                             <tr>
-                                <th className="p-4 text-[13px] font-semibold text-gray-400 border-b border-gray-200 dark:border-white/10 border-r min-w-[200px] sticky left-0 z-30 bg-white dark:bg-slate-900 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
+                                <th className="p-4 text-[13px] font-semibold text-[#5B6472] border-b border-gray-200 dark:border-white/10 border-r min-w-[200px] sticky left-0 z-30 bg-white dark:bg-slate-900 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
                                     Driver Name
                                 </th>
                                 {Array.from({ length: daysInMonth }).map((_, i) => {
@@ -151,7 +151,7 @@ export default function AdminReport() {
                                     const isToday = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}` === todayStr;
                                     return (
                                         <th key={d} className={`p-2 text-center text-[13px] font-semibold   border-b border-r border-gray-200 dark:border-white/10 min-w-[60px]
-                                            ${isSunday ? 'bg-red-500/10 text-red-500' : 'text-gray-400'}
+                                            ${isSunday ? 'bg-red-500/10 text-red-500' : 'text-[#5B6472]'}
                                             ${isToday ? 'border-b-2 border-b-[#2563EB] dark:border-b-[#60A5FA] bg-[#2563EB]/5 dark:bg-[#60A5FA]/10 text-white dark:text-[#60A5FA]' : ''}
                                         `}>
                                             <div className="flex flex-col gap-0.5">
@@ -170,7 +170,7 @@ export default function AdminReport() {
                                 <tr key={u.id} className="hover:bg-white dark:hover:bg-slate-800/50 transition-colors group">
                                     <td className="p-3 border-r border-gray-200 dark:border-white/10 sticky left-0 z-10 bg-gray-50/95 dark:bg-slate-900/95 group-hover:bg-white dark:group-hover:bg-slate-800 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)] backdrop-blur-sm">
                                         <div className="font-semibold text-[14px] text-gray-900 dark:text-white truncate" title={u.name}>{u.name}</div>
-                                        <div className="text-[13px] font-bold text-gray-400">{u.id}</div>
+                                        <div className="text-[13px] font-bold text-[#5B6472]">{u.id}</div>
                                     </td>
                                     
                                     {Array.from({ length: daysInMonth }).map((_, i) => {
@@ -180,7 +180,7 @@ export default function AdminReport() {
                                         const record = records.find(r => String(r.userId) === String(u.id) && r.date === dateStr);
                                         const isToday = dateStr === todayStr;
                                         
-                                        let cellContent = <span className="text-gray-300 dark:text-gray-600">-</span>;
+                                        let cellContent = <span className="text-[#5B6472] dark:text-gray-600">-</span>;
                                         let cellBg = '';
 
                                         if (isSunday) {
@@ -190,12 +190,12 @@ export default function AdminReport() {
                                             cellContent = (
                                                 <div className="flex flex-col items-center gap-1">
                                                     <div className="flex flex-col items-center">
-                                                        <span className="text-[12px] font-semibold text-gray-400 leading-none">IN</span>
+                                                        <span className="text-[12px] font-semibold text-[#5B6472] leading-none">IN</span>
                                                         <span className="text-green-600 dark:text-green-400 font-semibold text-[13px] leading-none">{formatTime(record.inTime)}</span>
                                                     </div>
                                                     {record.outTime && (
                                                         <div className="flex flex-col items-center">
-                                                            <span className="text-[12px] font-semibold text-gray-400 leading-none">OUT</span>
+                                                            <span className="text-[12px] font-semibold text-[#5B6472] leading-none">OUT</span>
                                                             <span className="text-red-600 dark:text-red-400 font-semibold text-[13px] leading-none">{formatTime(record.outTime)}</span>
                                                         </div>
                                                     )}

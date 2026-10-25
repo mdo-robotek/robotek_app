@@ -219,7 +219,7 @@ export default function ChatInput({
               {replyTo.type === "text" ? replyTo.text : `[${replyTo.type}]`}
             </p>
           </div>
-          <button onClick={onCancelReply} className="text-gray-400 hover:text-gray-600">
+          <button onClick={onCancelReply} className="text-[#5B6472] hover:text-gray-600">
             <XMarkIcon className="w-5 h-5" />
           </button>
         </div>

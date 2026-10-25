@@ -958,14 +958,14 @@ export default function ChecklistsPage() {
             <div className="flex items-center bg-gray-50 dark:bg-navy-900 rounded-full p-0.5 border border-gray-100 dark:border-navy-700 shrink-0">
               <button
                 onClick={() => setViewMode('list')}
-                className={`p-1.5 rounded-full transition-all ${viewMode === 'list' ? 'bg-[#2563EB] text-white shadow-sm' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'}`}
+                className={`p-1.5 rounded-full transition-all ${viewMode === 'list' ? 'bg-[#2563EB] text-white shadow-sm' : 'text-[#5B6472] hover:text-gray-600 dark:hover:text-gray-300'}`}
                 title="List View"
               >
                 <ListBulletIcon className="w-4 h-4" />
               </button>
               <button
                 onClick={() => setViewMode('tile')}
-                className={`p-1.5 rounded-full transition-all ${viewMode === 'tile' ? 'bg-[#2563EB] text-white shadow-sm' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'}`}
+                className={`p-1.5 rounded-full transition-all ${viewMode === 'tile' ? 'bg-[#2563EB] text-white shadow-sm' : 'text-[#5B6472] hover:text-gray-600 dark:hover:text-gray-300'}`}
                 title="Tile View"
               >
                 <Squares2X2Icon className="w-4 h-4" />
@@ -1021,7 +1021,7 @@ export default function ChecklistsPage() {
           className="p-2.5 flex flex-nowrap items-center gap-2 overflow-x-auto no-scrollbar rounded-2xl shadow-sm"
         >
           <div className="relative group flex-shrink-0 w-[140px] sm:w-[180px]">
-            <MagnifyingGlassIcon className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 group-focus-within:text-[#2563EB] transition-colors" />
+            <MagnifyingGlassIcon className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#5B6472] group-focus-within:text-[#2563EB] transition-colors" />
             <input
               type="text"
               placeholder="Search..."
@@ -1101,17 +1101,17 @@ export default function ChecklistsPage() {
             })}
 
           <div className="flex items-center gap-1.5 ml-auto flex-shrink-0">
-            <p className="text-[13px] font-semibold text-gray-400 whitespace-nowrap">
+            <p className="text-[13px] font-semibold text-[#5B6472] whitespace-nowrap">
               Page <span className="text-[#2563EB] dark:text-[#60A5FA]">{currentPage}</span> of {totalPages || 1}
             </p>
-            <button onClick={() => setCurrentPage(1)} disabled={currentPage === 1} className="px-1.5 py-1 text-[13px] font-bold text-gray-400 hover:text-black dark:hover:text-white disabled:opacity-30 rounded-md">First</button>
-            <button onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))} disabled={currentPage === 1} className="p-1 text-gray-400 hover:text-black dark:hover:text-white disabled:opacity-30 rounded-md">
+            <button onClick={() => setCurrentPage(1)} disabled={currentPage === 1} className="px-1.5 py-1 text-[13px] font-bold text-[#5B6472] hover:text-black dark:hover:text-white disabled:opacity-30 rounded-md">First</button>
+            <button onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))} disabled={currentPage === 1} className="p-1 text-[#5B6472] hover:text-black dark:hover:text-white disabled:opacity-30 rounded-md">
               <ChevronLeftIcon className="w-3.5 h-3.5" />
             </button>
-            <button onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))} disabled={currentPage === totalPages || totalPages === 0} className="p-1 text-gray-400 hover:text-black dark:hover:text-white disabled:opacity-30 rounded-md">
+            <button onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))} disabled={currentPage === totalPages || totalPages === 0} className="p-1 text-[#5B6472] hover:text-black dark:hover:text-white disabled:opacity-30 rounded-md">
               <ChevronRightIcon className="w-3.5 h-3.5" />
             </button>
-            <button onClick={() => setCurrentPage(totalPages)} disabled={currentPage === totalPages || totalPages === 0} className="px-1.5 py-1 text-[13px] font-bold text-gray-400 hover:text-black dark:hover:text-white disabled:opacity-30 rounded-md">Last</button>
+            <button onClick={() => setCurrentPage(totalPages)} disabled={currentPage === totalPages || totalPages === 0} className="px-1.5 py-1 text-[13px] font-bold text-[#5B6472] hover:text-black dark:hover:text-white disabled:opacity-30 rounded-md">Last</button>
             <select
               value={itemsPerPage}
               onChange={(e) => {
@@ -1205,13 +1205,13 @@ export default function ChecklistsPage() {
                 <tr>
                   <td colSpan={activeTab === "tasks" ? 10 : 9} className="px-4 py-10 text-center">
                     <div className="w-6 h-6 border-2 border-gray-100 border-t-[#2563EB] rounded-full animate-spin mx-auto mb-2" />
-                    <p className="text-gray-400 font-bold text-[12px]">Syncing...</p>
+                    <p className="text-[#5B6472] font-bold text-[12px]">Syncing...</p>
                   </td>
                 </tr>
               ) : paginatedChecklists.length === 0 ? (
                 <tr>
                   <td colSpan={activeTab === "tasks" ? 10 : 9} className="px-4 py-10 text-center">
-                    <p className="text-[14px] text-gray-400 font-bold">No checklists found</p>
+                    <p className="text-[14px] text-[#5B6472] font-bold">No checklists found</p>
                   </td>
                 </tr>
               ) : (
@@ -1234,7 +1234,7 @@ export default function ChecklistsPage() {
                         ? "bg-red-50/80 dark:bg-red-950/30 hover:bg-red-100/80 dark:hover:bg-red-900/40"
                         : isSelected
                           ? "bg-emerald-50/60 dark:bg-emerald-900/15"
-                          : "hover:bg-orange-50/10"
+                          : "hover:bg-[#F7F8FA]"
                     }`}
                   >
                     {activeTab === "master" && (
@@ -1288,7 +1288,7 @@ export default function ChecklistsPage() {
                     )}
                     {activeTab === "master" && (
                       <td className="px-4 py-3">
-                        <span className="font-mono text-[13px] text-gray-400 font-bold">#{item.id}</span>
+                        <span className="font-mono text-[13px] text-[#5B6472] font-bold">#{item.id}</span>
                       </td>
                     )}
                     <td className="px-4 py-3 min-w-[260px] max-w-[420px]">
@@ -1350,12 +1350,12 @@ export default function ChecklistsPage() {
           {isLoading ? (
             <div className="flex flex-col items-center justify-center py-20">
               <div className="w-8 h-8 border-3 border-gray-100 border-t-[#2563EB] rounded-full animate-spin mb-4" />
-              <p className="text-gray-400 font-semibold text-[13px]">Syncing Checklists...</p>
+              <p className="text-[#5B6472] font-semibold text-[13px]">Syncing Checklists...</p>
             </div>
           ) : paginatedChecklists.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20 bg-white/50 dark:bg-navy-900/50 rounded-2xl border-2 border-dashed border-gray-200 dark:border-white/5">
               <DocumentTextIcon className="w-10 h-10 text-gray-200 dark:text-white/10 mb-2" />
-              <p className="text-[14px] text-gray-400 font-bold">No checklists found</p>
+              <p className="text-[14px] text-[#5B6472] font-bold">No checklists found</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -1410,17 +1410,17 @@ export default function ChecklistsPage() {
                     <div className="p-3 md:p-4 flex-1 flex flex-col gap-4">
                       <div className="grid grid-cols-2 gap-3 mt-auto">
                         <div className="flex flex-col gap-1.5 overflow-hidden">
-                          <span className="text-[12px] font-semibold text-gray-400">Assigned To</span>
+                          <span className="text-[12px] font-semibold text-[#5B6472]">Assigned To</span>
                           {renderUserName(item.assigned_to)}
                         </div>
                         <div className="flex flex-col gap-1 overflow-hidden">
-                          <span className="text-[12px] font-semibold text-gray-400">Dept</span>
+                          <span className="text-[12px] font-semibold text-[#5B6472]">Dept</span>
                           <div className="scale-75 origin-left">
                             {getDeptBadge(item.department)}
                           </div>
                         </div>
                         <div className="flex flex-col gap-1 overflow-hidden">
-                          <span className="text-[12px] font-semibold text-gray-400">Due Date</span>
+                          <span className="text-[12px] font-semibold text-[#5B6472]">Due Date</span>
                           <span className="text-[13px] font-semibold text-gray-700 dark:text-slate-300 truncate">
                             {formatDateDisplay(
                               activeTab === "tasks"
@@ -1431,14 +1431,14 @@ export default function ChecklistsPage() {
                         </div>
                         {activeTab === "tasks" ? (
                           <div className="flex flex-col gap-1 overflow-hidden">
-                            <span className="text-[12px] font-semibold text-gray-400">Completed</span>
+                            <span className="text-[12px] font-semibold text-[#5B6472]">Completed</span>
                             <span className="text-[13px] font-semibold text-gray-700 dark:text-slate-300 truncate">
                               {formatDateDisplay(occ.completed_date || "") || "—"}
                             </span>
                           </div>
                         ) : (
                           <div className="flex flex-col gap-1.5 overflow-hidden">
-                            <span className="text-[12px] font-semibold text-gray-400">Assigned By</span>
+                            <span className="text-[12px] font-semibold text-[#5B6472]">Assigned By</span>
                             {renderUserName(item.assigned_by)}
                           </div>
                         )}
@@ -1529,16 +1529,16 @@ export default function ChecklistsPage() {
         <Portal>
         <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-sm" onClick={() => setIsModalOpen(false)} />
-          <div className="relative bg-[#FFFFFF] dark:bg-navy-900 w-full max-w-2xl rounded-2xl shadow-2xl border border-orange-100/50 dark:border-white/10 overflow-hidden animate-in fade-in zoom-in duration-300">
-            <div className="p-4 border-b border-orange-100/50 dark:border-zinc-800 flex items-center justify-between">
+          <div className="relative bg-[#FFFFFF] dark:bg-navy-900 w-full max-w-2xl rounded-2xl shadow-2xl border border-[#E5E7EB] dark:border-white/10 overflow-hidden animate-in fade-in zoom-in duration-300">
+            <div className="p-4 border-b border-[#E5E7EB] dark:border-zinc-800 flex items-center justify-between">
               <div>
                 <h2 className="text-lg font-semibold text-gray-900 dark:text-white tracking-tight">
                   {editingItem ? "Edit Checklist" : "New Checklist"}
                 </h2>
                 <div className="flex items-center gap-2 mt-1">
-                  <p className="text-gray-400 dark:text-slate-400 font-bold text-[12px]">Task Configuration</p>
+                  <p className="text-[#5B6472] dark:text-slate-400 font-bold text-[12px]">Task Configuration</p>
                   {editingItem && (
-                    <span className="px-2 py-0.5 bg-orange-50 dark:bg-zinc-800 text-[12px] font-semibold text-gray-500 rounded border border-orange-100 dark:border-zinc-700">
+                    <span className="px-2 py-0.5 bg-[#F7F8FA] dark:bg-zinc-800 text-[12px] font-semibold text-gray-500 rounded border border-[#E5E7EB] dark:border-zinc-700">
                       ID: {editingItem.id}
                     </span>
                   )}
@@ -1546,7 +1546,7 @@ export default function ChecklistsPage() {
               </div>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-zinc-200 transition-colors"
+                className="p-2 text-[#5B6472] hover:text-gray-600 dark:hover:text-zinc-200 transition-colors"
               >
                 <XMarkIcon className="w-8 h-8" />
               </button>
@@ -1559,7 +1559,7 @@ export default function ChecklistsPage() {
                 <textarea
                   value={formData.task}
                   onChange={(e) => setFormData({ ...formData, task: e.target.value })}
-                  className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-3 py-2 rounded-lg border border-orange-100 dark:border-zinc-800 focus:border-[#2563EB] focus:bg-white dark:focus:bg-zinc-900 outline-none font-bold text-[14px] text-gray-800 dark:text-zinc-100 transition-all shadow-sm min-h-[80px]"
+                  className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-3 py-2 rounded-lg border border-[#E5E7EB] dark:border-zinc-800 focus:border-[#2563EB] focus:bg-white dark:focus:bg-zinc-900 outline-none font-bold text-[14px] text-gray-800 dark:text-zinc-100 transition-all shadow-sm min-h-[80px]"
                   required
                   rows={2}
                   placeholder="Enter task description..."
@@ -1570,9 +1570,9 @@ export default function ChecklistsPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Assigned By Searchable Dropdown */}
                 <div className="relative">
-                  <label className="text-[13px] font-semibold text-gray-400 block mb-1">Assigned By</label>
+                  <label className="text-[13px] font-semibold text-[#5B6472] block mb-1">Assigned By</label>
                   <div 
-                    className={`w-full bg-[#FFFFFF] dark:bg-zinc-900 border border-orange-100 dark:border-zinc-800 rounded-lg shadow-sm ${userRole?.toUpperCase() === 'USER' ? 'cursor-not-allowed opacity-75' : 'cursor-pointer'}`}
+                    className={`w-full bg-[#FFFFFF] dark:bg-zinc-900 border border-[#E5E7EB] dark:border-zinc-800 rounded-lg shadow-sm ${userRole?.toUpperCase() === 'USER' ? 'cursor-not-allowed opacity-75' : 'cursor-pointer'}`}
                     onClick={() => {
                       if (userRole?.toUpperCase() !== 'USER') {
                         setAssignedByOpen(!assignedByOpen);
@@ -1583,15 +1583,15 @@ export default function ChecklistsPage() {
                   >
                     <div className="px-3 py-1.5 font-bold text-[14px] text-gray-800 dark:text-zinc-100 flex justify-between items-center hover:border-[#2563EB] transition-colors">
                       <div className="flex items-center gap-2">
-                        <UserIcon className="w-3.5 h-3.5 text-gray-400" />
+                        <UserIcon className="w-3.5 h-3.5 text-[#5B6472]" />
                         <span>{formData.assigned_by || (userRole?.toUpperCase() === 'USER' ? currentUser : "Select User...")}</span>
                       </div>
-                      {userRole?.toUpperCase() !== 'USER' && <ChevronDownIcon className="w-3 h-3 text-gray-400" />}
+                      {userRole?.toUpperCase() !== 'USER' && <ChevronDownIcon className="w-3 h-3 text-[#5B6472]" />}
                     </div>
                   </div>
                   {assignedByOpen && userRole?.toUpperCase() !== 'USER' && (
-                    <div className="absolute z-[10000] w-full mt-1 bg-white dark:bg-zinc-900 border border-orange-100 dark:border-zinc-800 rounded-lg shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-                      <div className="p-2 border-b border-orange-50 dark:border-zinc-800">
+                    <div className="absolute z-[10000] w-full mt-1 bg-white dark:bg-zinc-900 border border-[#E5E7EB] dark:border-zinc-800 rounded-lg shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                      <div className="p-2 border-b border-[#E5E7EB] dark:border-zinc-800">
                         <input 
                           type="text" 
                           placeholder="Search users..." 
@@ -1613,7 +1613,7 @@ export default function ChecklistsPage() {
                           >{u.username}</div>
                         ))}
                         {usersList.filter(u => ['ADMIN', 'EA'].includes(u.role_name?.toUpperCase() || '') && u.username.toLowerCase().includes(assignedBySearch.toLowerCase())).length === 0 && (
-                          <div className="px-3 py-2 text-[13px] text-gray-400 text-center">No users found</div>
+                          <div className="px-3 py-2 text-[13px] text-[#5B6472] text-center">No users found</div>
                         )}
                       </div>
                     </div>
@@ -1622,9 +1622,9 @@ export default function ChecklistsPage() {
 
                 {/* Assigned To Searchable Dropdown */}
                 <div className="relative">
-                  <label className="text-[13px] font-semibold text-gray-400 block mb-2">Assigned To</label>
+                  <label className="text-[13px] font-semibold text-[#5B6472] block mb-2">Assigned To</label>
                   <div 
-                    className="w-full bg-[#FFFFFF] dark:bg-zinc-900 border border-orange-100 dark:border-zinc-800 rounded-lg shadow-sm cursor-pointer"
+                    className="w-full bg-[#FFFFFF] dark:bg-zinc-900 border border-[#E5E7EB] dark:border-zinc-800 rounded-lg shadow-sm cursor-pointer"
                     onClick={() => {
                       setAssignedToOpen(!assignedToOpen);
                       setAssignedByOpen(false);
@@ -1633,15 +1633,15 @@ export default function ChecklistsPage() {
                   >
                     <div className="px-3 py-1.5 font-bold text-[14px] text-gray-800 dark:text-zinc-100 flex justify-between items-center hover:border-[#2563EB] transition-colors">
                       <div className="flex items-center gap-2">
-                        <UserIcon className="w-3.5 h-3.5 text-gray-400" />
+                        <UserIcon className="w-3.5 h-3.5 text-[#5B6472]" />
                         <span>{formData.assigned_to || "Select User..."}</span>
                       </div>
-                      <ChevronDownIcon className="w-3 h-3 text-gray-400" />
+                      <ChevronDownIcon className="w-3 h-3 text-[#5B6472]" />
                     </div>
                   </div>
                   {assignedToOpen && (
-                    <div className="absolute z-[10000] w-full mt-1 bg-white dark:bg-zinc-900 border border-orange-100 dark:border-zinc-800 rounded-lg shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-                      <div className="p-2 border-b border-orange-50 dark:border-zinc-800">
+                    <div className="absolute z-[10000] w-full mt-1 bg-white dark:bg-zinc-900 border border-[#E5E7EB] dark:border-zinc-800 rounded-lg shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                      <div className="p-2 border-b border-[#E5E7EB] dark:border-zinc-800">
                         <input 
                           type="text" 
                           placeholder="Search users..." 
@@ -1663,7 +1663,7 @@ export default function ChecklistsPage() {
                           >{u.username}</div>
                         ))}
                         {usersList.filter(u => u.username.toLowerCase().includes(assignedToSearch.toLowerCase())).length === 0 && (
-                          <div className="px-3 py-2 text-[13px] text-gray-400 text-center">No users found</div>
+                          <div className="px-3 py-2 text-[13px] text-[#5B6472] text-center">No users found</div>
                         )}
                       </div>
                     </div>
@@ -1675,9 +1675,9 @@ export default function ChecklistsPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Department Searchable Dropdown */}
                 <div className="relative">
-                  <label className="text-[13px] font-semibold text-gray-400 block mb-2">Department</label>
+                  <label className="text-[13px] font-semibold text-[#5B6472] block mb-2">Department</label>
                   <div 
-                    className="w-full bg-[#FFFFFF] dark:bg-zinc-900 border border-orange-100 dark:border-zinc-800 rounded-lg shadow-sm cursor-pointer"
+                    className="w-full bg-[#FFFFFF] dark:bg-zinc-900 border border-[#E5E7EB] dark:border-zinc-800 rounded-lg shadow-sm cursor-pointer"
                     onClick={() => { 
                       setDepartmentOpen(!departmentOpen); 
                       setAssignedByOpen(false); 
@@ -1686,15 +1686,15 @@ export default function ChecklistsPage() {
                   >
                     <div className="px-3 py-1.5 font-bold text-[14px] text-gray-800 dark:text-zinc-100 flex justify-between items-center hover:border-[#2563EB] transition-colors">
                       <div className="flex items-center gap-2">
-                        <TagIcon className="w-3.5 h-3.5 text-gray-400" />
+                        <TagIcon className="w-3.5 h-3.5 text-[#5B6472]" />
                         <span>{formData.department || "Select Department..."}</span>
                       </div>
-                      <ChevronDownIcon className="w-3 h-3 text-gray-400" />
+                      <ChevronDownIcon className="w-3 h-3 text-[#5B6472]" />
                     </div>
                   </div>
                   {departmentOpen && (
-                    <div className="absolute z-[10000] w-full mt-1 bg-white dark:bg-zinc-900 border border-orange-100 dark:border-zinc-800 rounded-lg shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-                      <div className="p-2 border-b border-orange-50 dark:border-zinc-800">
+                    <div className="absolute z-[10000] w-full mt-1 bg-white dark:bg-zinc-900 border border-[#E5E7EB] dark:border-zinc-800 rounded-lg shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                      <div className="p-2 border-b border-[#E5E7EB] dark:border-zinc-800">
                         <input 
                           type="text" 
                           placeholder="Search departments..." 
@@ -1730,7 +1730,7 @@ export default function ChecklistsPage() {
                 </div>
 
                 <div>
-                  <label className="text-[13px] font-semibold text-gray-400 block mb-2">Priority</label>
+                  <label className="text-[13px] font-semibold text-[#5B6472] block mb-2">Priority</label>
                   <div className="flex bg-gray-100 dark:bg-zinc-900/50 p-1 rounded-xl">
                     {(['Low', 'Medium', 'High'] as const).map((pri) => (
                       <button key={pri} type="button"
@@ -1751,7 +1751,7 @@ export default function ChecklistsPage() {
               {(
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <label className="text-[13px] font-semibold text-gray-400 block">Frequency</label>
+                    <label className="text-[13px] font-semibold text-[#5B6472] block">Frequency</label>
                     <div className="flex flex-nowrap overflow-x-auto pb-1.5 gap-1.5 custom-scrollbar no-scrollbar">
                       {['Daily', 'Weekly', 'Monthly', 'Quarterly', 'Half Yearly', 'Yearly'].map((freq) => {
                         const isSelected = formData.frequency?.startsWith(freq);
@@ -1772,7 +1772,7 @@ export default function ChecklistsPage() {
                             className={`px-3 py-1.5 text-[13px] font-semibold   rounded-lg transition-all border whitespace-nowrap shadow-sm flex-shrink-0 ${
                               isSelected 
                                 ? 'bg-[#2563EB] text-black border-[#2563EB] shadow-[#2563EB]/20' 
-                                : 'bg-white dark:bg-zinc-900 text-gray-500 border-orange-50 dark:border-zinc-800 hover:border-[#2563EB] hover:text-white dark:hover:text-[#60A5FA]'
+                                : 'bg-white dark:bg-zinc-900 text-gray-500 border-[#E5E7EB] dark:border-zinc-800 hover:border-[#2563EB] hover:text-white dark:hover:text-[#60A5FA]'
                             }`}
                           >
                             {freq}
@@ -1783,8 +1783,8 @@ export default function ChecklistsPage() {
                   </div>
 
                   {formData.frequency?.startsWith('Weekly') && (
-                    <div className="animate-in fade-in slide-in-from-top-1 duration-300 border-t border-orange-50 dark:border-zinc-800/50 pt-3">
-                      <p className="text-[13px] font-semibold text-gray-400 mb-2">Select Days (Next occurrence set automatically)</p>
+                    <div className="animate-in fade-in slide-in-from-top-1 duration-300 border-t border-[#E5E7EB] dark:border-zinc-800/50 pt-3">
+                      <p className="text-[13px] font-semibold text-[#5B6472] mb-2">Select Days (Next occurrence set automatically)</p>
                       <div className="flex flex-wrap gap-2.5">
                         {[
                           { label: 'M', value: 'Mon', full: 'Monday' },
@@ -1830,7 +1830,7 @@ export default function ChecklistsPage() {
                               className={`w-9 h-9 rounded-full flex flex-col items-center justify-center transition-all border shadow-sm ${
                                 isDaySelected
                                   ? 'bg-[#DC2626] text-white border-[#DC2626] shadow-[#DC2626]/20 scale-110'
-                                  : 'bg-gray-50 dark:bg-zinc-800 text-gray-400 border-orange-50 dark:border-zinc-700 hover:border-[#DC2626] hover:text-[#DC2626]'
+                                  : 'bg-gray-50 dark:bg-zinc-800 text-[#5B6472] border-[#E5E7EB] dark:border-zinc-700 hover:border-[#DC2626] hover:text-[#DC2626]'
                               }`}
                             >
                               <span className="text-[13px] font-semibold">{day.label}</span>
@@ -1844,7 +1844,7 @@ export default function ChecklistsPage() {
               )}
 
               {/* Anchor due date (date only) */}
-              <div className="border-t border-orange-50 dark:border-zinc-800/50 pt-4">
+              <div className="border-t border-[#E5E7EB] dark:border-zinc-800/50 pt-4">
                 <PremiumDatePicker
                   label={editingItem ? "Anchor Due Date" : "Start / Due Date"}
                   value={(formData.due_date || "").split(",")[0] || ""}
@@ -1858,16 +1858,16 @@ export default function ChecklistsPage() {
                   allowPast={false}
                   allowSundays={true}
                 />
-                <p className="text-[13px] text-gray-400 font-semibold mt-1">
+                <p className="text-[13px] text-[#5B6472] font-semibold mt-1">
                   Saved as date only. Tasks tab expands by frequency through today.
                 </p>
               </div>
 
-              <div className="p-4 border-t border-orange-100/50 dark:border-zinc-800 flex gap-2">
+              <div className="p-4 border-t border-[#E5E7EB] dark:border-zinc-800 flex gap-2">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="flex-1 px-4 py-2 rounded-xl font-semibold text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-all text-[13px]"
+                  className="flex-1 px-4 py-2 rounded-xl font-semibold text-[#5B6472] hover:text-gray-600 hover:bg-gray-50 transition-all text-[13px]"
                 >
                   Cancel
                 </button>
@@ -1953,7 +1953,7 @@ export default function ChecklistsPage() {
                         {selectedTask.assigned_to?.substring(0, 2).toUpperCase() || "TO"}
                       </div>
                       <div>
-                        <p className="text-[12px] font-semibold text-gray-400 tracking-tighter leading-none mb-1">Assigned To</p>
+                        <p className="text-[12px] font-semibold text-[#5B6472] tracking-tighter leading-none mb-1">Assigned To</p>
                         <p className="text-[14px] font-semibold text-gray-900 dark:text-white truncate max-w-[120px]">{selectedTask.assigned_to}</p>
                       </div>
                     </div>
@@ -1962,7 +1962,7 @@ export default function ChecklistsPage() {
                         {selectedTask.assigned_by?.substring(0, 2).toUpperCase() || "BY"}
                       </div>
                       <div>
-                        <p className="text-[12px] font-semibold text-gray-400 tracking-tighter leading-none mb-1">Assigned By</p>
+                        <p className="text-[12px] font-semibold text-[#5B6472] tracking-tighter leading-none mb-1">Assigned By</p>
                         <p className="text-[14px] font-bold text-gray-600 dark:text-slate-400 truncate max-w-[120px]">{selectedTask.assigned_by}</p>
                       </div>
                     </div>
@@ -1975,7 +1975,7 @@ export default function ChecklistsPage() {
                         <TagIcon className="w-4 h-4" />
                       </div>
                       <div>
-                        <p className="text-[12px] font-semibold text-gray-400 leading-none mb-1">Department</p>
+                        <p className="text-[12px] font-semibold text-[#5B6472] leading-none mb-1">Department</p>
                         <p className="text-[14px] font-semibold text-gray-900 dark:text-white">{selectedTask.department}</p>
                       </div>
                     </div>
@@ -1984,7 +1984,7 @@ export default function ChecklistsPage() {
                         <CalendarDaysIcon className="w-4 h-4" />
                       </div>
                       <div>
-                        <p className="text-[12px] font-semibold text-gray-400 leading-none mb-1">Due Date</p>
+                        <p className="text-[12px] font-semibold text-[#5B6472] leading-none mb-1">Due Date</p>
                         <p className="text-[14px] font-semibold text-gray-900 dark:text-white">{formatDateDisplay(selectedTask.due_date)}</p>
                       </div>
                     </div>
@@ -1997,7 +1997,7 @@ export default function ChecklistsPage() {
                         <ClockIcon className="w-4 h-4" />
                       </div>
                       <div>
-                        <p className="text-[12px] font-semibold text-gray-400 leading-none mb-1">Registered</p>
+                        <p className="text-[12px] font-semibold text-[#5B6472] leading-none mb-1">Registered</p>
                         <p className="text-[13px] font-bold text-gray-600 dark:text-slate-400">{formatDateDisplay(selectedTask.created_at)}</p>
                       </div>
                     </div>
@@ -2007,7 +2007,7 @@ export default function ChecklistsPage() {
                           <ArrowPathIcon className="w-4 h-4" />
                         </div>
                         <div>
-                          <p className="text-[12px] font-semibold text-gray-400 leading-none mb-1">Updated</p>
+                          <p className="text-[12px] font-semibold text-[#5B6472] leading-none mb-1">Updated</p>
                           <p className="text-[13px] font-bold text-gray-600 dark:text-slate-400">{formatDateDisplay(selectedTask.updated_at)}</p>
                         </div>
                       </div>
@@ -2019,7 +2019,7 @@ export default function ChecklistsPage() {
                 <div className="space-y-4 border-t border-gray-100 dark:border-white/5 pt-6 pb-2">
                   <div className="grid grid-cols-2 gap-3 text-[13px]">
                     <div className="p-3 rounded-xl bg-gray-50 dark:bg-navy-950/40 border border-gray-100 dark:border-white/5">
-                      <p className="font-semibold text-gray-400 mb-1">Due</p>
+                      <p className="font-semibold text-[#5B6472] mb-1">Due</p>
                       <p className="font-bold text-gray-800 dark:text-white">
                         {formatDateDisplay(
                           (selectedTask as ChecklistOccurrence).occurrence_due_date ||
@@ -2028,7 +2028,7 @@ export default function ChecklistsPage() {
                       </p>
                     </div>
                     <div className="p-3 rounded-xl bg-gray-50 dark:bg-navy-950/40 border border-gray-100 dark:border-white/5">
-                      <p className="font-semibold text-gray-400 mb-1">Completed</p>
+                      <p className="font-semibold text-[#5B6472] mb-1">Completed</p>
                       <p className="font-bold text-gray-800 dark:text-white">
                         {formatDateDisplay(
                           (selectedTask as ChecklistOccurrence).completed_date || ""
@@ -2040,7 +2040,7 @@ export default function ChecklistsPage() {
 
                 {/* Completion History */}
                 <div className="pt-8 border-t border-gray-100 dark:border-white/5 pb-10 w-full">
-                  <h4 className="text-[13px] font-semibold text-gray-400 mb-6 flex items-center gap-2 px-1">
+                  <h4 className="text-[13px] font-semibold text-[#5B6472] mb-6 flex items-center gap-2 px-1">
                     <ClockIcon className="w-4 h-4 text-blue-500" /> Completion History
                   </h4>
                   
@@ -2059,7 +2059,7 @@ export default function ChecklistsPage() {
                               <span className="text-[13px] font-semibold text-gray-900 dark:text-white tracking-tight">
                                 {item.new_status || "Completed"}
                               </span>
-                              <span className="text-[12px] font-bold text-gray-400">
+                              <span className="text-[12px] font-bold text-[#5B6472]">
                                 {formatDateDisplay(item.timestamp || item.created_at)}
                               </span>
                             </div>
@@ -2134,7 +2134,7 @@ export default function ChecklistsPage() {
           <div className="absolute inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-sm animate-in fade-in duration-300" onClick={() => setIsFilterModalOpen(false)} />
           <div className="relative bg-[#FFFFFF] dark:bg-navy-900 w-full max-w-lg rounded-[2.5rem] shadow-2xl border-4 border-[#2563EB] dark:border-[#60A5FA] overflow-hidden animate-in fade-in zoom-in duration-300">
             {/* Header */}
-            <div className="bg-[#2563EB] dark:bg-[#60A5FA] p-6 border-b-4 border-orange-100 dark:border-zinc-800 flex items-center justify-between">
+            <div className="bg-[#2563EB] dark:bg-[#60A5FA] p-6 border-b-4 border-[#E5E7EB] dark:border-zinc-800 flex items-center justify-between">
               <div>
                 <h2 className="text-xl font-semibold text-white dark:text-[#60A5FA] tracking-tight">Advanced Filters</h2>
                 <p className="text-white/60 dark:text-[#60A5FA]/60 font-bold text-[13px] mt-0.5">Refine Checklist View</p>
@@ -2147,27 +2147,27 @@ export default function ChecklistsPage() {
             <div className="p-6 space-y-6 max-h-[60vh] overflow-y-auto custom-scrollbar bg-white dark:bg-navy-900/50">
               {/* Date Range */}
               <div className="space-y-3">
-                <label className="text-[14px] font-semibold text-gray-400 flex items-center gap-2 px-1">
+                <label className="text-[14px] font-semibold text-[#5B6472] flex items-center gap-2 px-1">
                   <CalendarDaysIcon className="w-4 h-4 text-[#2563EB] dark:text-[#60A5FA]" /> Due Date Range
                 </label>
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1">
-                    <span className="text-[13px] font-semibold text-gray-400 pl-1">Start Date</span>
+                    <span className="text-[13px] font-semibold text-[#5B6472] pl-1">Start Date</span>
                     <div className="relative group/date">
-                      <CalendarDaysIcon className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none group-focus-within/date:text-[#2563EB] dark:group-focus-within/date:text-[#60A5FA]" />
+                      <CalendarDaysIcon className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#5B6472] pointer-events-none group-focus-within/date:text-[#2563EB] dark:group-focus-within/date:text-[#60A5FA]" />
                       <input 
                         type="date" value={modalStartDate} onChange={(e) => setModalStartDate(e.target.value)}
-                        className="w-full bg-[#FFFFFF] dark:bg-navy-900 border-2 border-orange-50 dark:border-navy-700 rounded-xl pl-3 pr-10 py-2 text-[14px] font-bold outline-none focus:border-[#2563EB] dark:focus:border-[#60A5FA] transition-colors"
+                        className="w-full bg-[#FFFFFF] dark:bg-navy-900 border-2 border-[#E5E7EB] dark:border-navy-700 rounded-xl pl-3 pr-10 py-2 text-[14px] font-bold outline-none focus:border-[#2563EB] dark:focus:border-[#60A5FA] transition-colors"
                       />
                     </div>
                   </div>
                   <div className="space-y-1">
-                    <span className="text-[13px] font-semibold text-gray-400 pl-1">End Date</span>
+                    <span className="text-[13px] font-semibold text-[#5B6472] pl-1">End Date</span>
                     <div className="relative group/date">
-                      <CalendarDaysIcon className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none group-focus-within/date:text-[#2563EB] dark:group-focus-within/date:text-[#60A5FA]" />
+                      <CalendarDaysIcon className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#5B6472] pointer-events-none group-focus-within/date:text-[#2563EB] dark:group-focus-within/date:text-[#60A5FA]" />
                       <input 
                         type="date" value={modalEndDate} onChange={(e) => setModalEndDate(e.target.value)}
-                        className="w-full bg-[#FFFFFF] dark:bg-navy-900 border-2 border-orange-50 dark:border-navy-700 rounded-xl pl-3 pr-10 py-2 text-[14px] font-bold outline-none focus:border-[#2563EB] dark:focus:border-[#60A5FA] transition-colors"
+                        className="w-full bg-[#FFFFFF] dark:bg-navy-900 border-2 border-[#E5E7EB] dark:border-navy-700 rounded-xl pl-3 pr-10 py-2 text-[14px] font-bold outline-none focus:border-[#2563EB] dark:focus:border-[#60A5FA] transition-colors"
                       />
                     </div>
                   </div>
@@ -2177,9 +2177,9 @@ export default function ChecklistsPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-2">
                 {/* Status Filter */}
                 <div className="relative">
-                  <label className="text-[14px] font-semibold text-gray-400 mb-2 block">Status</label>
+                  <label className="text-[14px] font-semibold text-[#5B6472] mb-2 block">Status</label>
                   <div 
-                    className="w-full bg-[#FFFFFF] dark:bg-navy-900 border-2 border-orange-50 dark:border-navy-700 rounded-xl px-4 py-2.5 cursor-pointer flex justify-between items-center hover:border-[#2563EB] dark:hover:border-[#60A5FA] transition-colors shadow-sm"
+                    className="w-full bg-[#FFFFFF] dark:bg-navy-900 border-2 border-[#E5E7EB] dark:border-navy-700 rounded-xl px-4 py-2.5 cursor-pointer flex justify-between items-center hover:border-[#2563EB] dark:hover:border-[#60A5FA] transition-colors shadow-sm"
                     onClick={() => {
                         setModalStatusOpen(!modalStatusOpen);
                          setModalPriorityOpen(false);
@@ -2192,11 +2192,11 @@ export default function ChecklistsPage() {
                     <span className="text-[14px] font-bold truncate">
                       {modalStatusFilter.length > 0 ? `${modalStatusFilter.length} Selected` : "All Statuses"}
                     </span>
-                    <ChevronDownIcon className={`w-4 h-4 text-gray-400 transition-transform ${modalStatusOpen ? 'rotate-180' : ''}`} />
+                    <ChevronDownIcon className={`w-4 h-4 text-[#5B6472] transition-transform ${modalStatusOpen ? 'rotate-180' : ''}`} />
                   </div>
                   {modalStatusOpen && (
                     <div className="absolute z-[10000] w-full mt-2 bg-white dark:bg-navy-900 border-2 border-[#2563EB] dark:border-[#60A5FA] rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2">
-                      <div className="p-2 border-b border-orange-50 dark:border-navy-700">
+                      <div className="p-2 border-b border-[#E5E7EB] dark:border-navy-700">
                         <input 
                           type="text" placeholder="Search status..." value={modalStatusSearch}
                           onChange={(e) => setModalStatusSearch(e.target.value)}
@@ -2235,9 +2235,9 @@ export default function ChecklistsPage() {
 
                 {/* Priority Filter */}
                 <div className="relative">
-                  <label className="text-[14px] font-semibold text-gray-400 mb-2 block">Priority</label>
+                  <label className="text-[14px] font-semibold text-[#5B6472] mb-2 block">Priority</label>
                   <div 
-                    className="w-full bg-[#FFFFFF] dark:bg-navy-900 border-2 border-orange-50 dark:border-navy-700 rounded-xl px-4 py-2.5 cursor-pointer flex justify-between items-center hover:border-[#2563EB] dark:hover:border-[#60A5FA] transition-colors shadow-sm"
+                    className="w-full bg-[#FFFFFF] dark:bg-navy-900 border-2 border-[#E5E7EB] dark:border-navy-700 rounded-xl px-4 py-2.5 cursor-pointer flex justify-between items-center hover:border-[#2563EB] dark:hover:border-[#60A5FA] transition-colors shadow-sm"
                     onClick={() => {
                         setModalPriorityOpen(!modalPriorityOpen);
                         setModalStatusOpen(false);
@@ -2250,7 +2250,7 @@ export default function ChecklistsPage() {
                     <span className="text-[14px] font-bold truncate">
                       {modalPriorityFilter.length > 0 ? `${modalPriorityFilter.length} Selected` : "All Priorities"}
                     </span>
-                    <ChevronDownIcon className={`w-4 h-4 text-gray-400 transition-transform ${modalPriorityOpen ? 'rotate-180' : ''}`} />
+                    <ChevronDownIcon className={`w-4 h-4 text-[#5B6472] transition-transform ${modalPriorityOpen ? 'rotate-180' : ''}`} />
                   </div>
                   {modalPriorityOpen && (
                     <div className="absolute z-[10000] w-full mt-2 bg-white dark:bg-navy-900 border-2 border-[#2563EB] dark:border-[#60A5FA] rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2">
@@ -2284,9 +2284,9 @@ export default function ChecklistsPage() {
 
                 {/* Assigned To Filter */}
                 <div className="relative">
-                  <label className="text-[14px] font-semibold text-gray-400 mb-2 block">Assigned To</label>
+                  <label className="text-[14px] font-semibold text-[#5B6472] mb-2 block">Assigned To</label>
                   <div 
-                    className="w-full bg-[#FFFFFF] dark:bg-navy-900 border-2 border-orange-50 dark:border-navy-700 rounded-xl px-4 py-2.5 cursor-pointer flex justify-between items-center hover:border-[#2563EB] dark:hover:border-[#60A5FA] transition-colors shadow-sm"
+                    className="w-full bg-[#FFFFFF] dark:bg-navy-900 border-2 border-[#E5E7EB] dark:border-navy-700 rounded-xl px-4 py-2.5 cursor-pointer flex justify-between items-center hover:border-[#2563EB] dark:hover:border-[#60A5FA] transition-colors shadow-sm"
                     onClick={() => {
                         setModalAssignedToOpen(!modalAssignedToOpen);
                         setModalStatusOpen(false);
@@ -2299,11 +2299,11 @@ export default function ChecklistsPage() {
                     <span className="text-[14px] font-bold truncate">
                       {modalAssignedToFilter.length > 0 ? `${modalAssignedToFilter.length} Selected` : "Everyone"}
                     </span>
-                    <ChevronDownIcon className={`w-4 h-4 text-gray-400 transition-transform ${modalAssignedToOpen ? 'rotate-180' : ''}`} />
+                    <ChevronDownIcon className={`w-4 h-4 text-[#5B6472] transition-transform ${modalAssignedToOpen ? 'rotate-180' : ''}`} />
                   </div>
                   {modalAssignedToOpen && (
                     <div className="absolute z-[10000] w-full mt-2 bg-white dark:bg-navy-900 border-2 border-[#2563EB] dark:border-[#60A5FA] rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2">
-                       <div className="p-2 border-b border-orange-50 dark:border-navy-700">
+                       <div className="p-2 border-b border-[#E5E7EB] dark:border-navy-700">
                         <input 
                           type="text" placeholder="Search users..." value={modalAssignedToSearch}
                           onChange={(e) => setModalAssignedToSearch(e.target.value)}
@@ -2342,9 +2342,9 @@ export default function ChecklistsPage() {
 
                 {/* Assigned By Filter */}
                 <div className="relative">
-                  <label className="text-[14px] font-semibold text-gray-400 mb-2 block">Assigned By</label>
+                  <label className="text-[14px] font-semibold text-[#5B6472] mb-2 block">Assigned By</label>
                   <div 
-                    className="w-full bg-[#FFFFFF] dark:bg-navy-900 border-2 border-orange-50 dark:border-navy-700 rounded-xl px-4 py-2.5 cursor-pointer flex justify-between items-center hover:border-[#2563EB] dark:hover:border-[#60A5FA] transition-colors shadow-sm"
+                    className="w-full bg-[#FFFFFF] dark:bg-navy-900 border-2 border-[#E5E7EB] dark:border-navy-700 rounded-xl px-4 py-2.5 cursor-pointer flex justify-between items-center hover:border-[#2563EB] dark:hover:border-[#60A5FA] transition-colors shadow-sm"
                     onClick={() => {
                         setModalAssignedByOpen(!modalAssignedByOpen);
                         setModalStatusOpen(false);
@@ -2357,11 +2357,11 @@ export default function ChecklistsPage() {
                     <span className="text-[14px] font-bold truncate">
                       {modalAssignedByFilter.length > 0 ? `${modalAssignedByFilter.length} Selected` : "All Senders"}
                     </span>
-                    <ChevronDownIcon className={`w-4 h-4 text-gray-400 transition-transform ${modalAssignedByOpen ? 'rotate-180' : ''}`} />
+                    <ChevronDownIcon className={`w-4 h-4 text-[#5B6472] transition-transform ${modalAssignedByOpen ? 'rotate-180' : ''}`} />
                   </div>
                   {modalAssignedByOpen && (
                     <div className="absolute z-[10000] w-full mt-2 bg-white dark:bg-navy-900 border-2 border-[#2563EB] dark:border-[#60A5FA] rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2">
-                       <div className="p-2 border-b border-orange-50 dark:border-navy-700">
+                       <div className="p-2 border-b border-[#E5E7EB] dark:border-navy-700">
                         <input 
                           type="text" placeholder="Search users..." value={modalAssignedBySearch}
                           onChange={(e) => setModalAssignedBySearch(e.target.value)}
@@ -2400,9 +2400,9 @@ export default function ChecklistsPage() {
 
                 {/* Department Filter */}
                 <div className="relative">
-                  <label className="text-[14px] font-semibold text-gray-400 mb-2 block">Department</label>
+                  <label className="text-[14px] font-semibold text-[#5B6472] mb-2 block">Department</label>
                   <div 
-                    className="w-full bg-[#FFFFFF] dark:bg-navy-900 border-2 border-orange-50 dark:border-navy-700 rounded-xl px-4 py-2.5 cursor-pointer flex justify-between items-center hover:border-[#2563EB] dark:hover:border-[#60A5FA] transition-colors shadow-sm"
+                    className="w-full bg-[#FFFFFF] dark:bg-navy-900 border-2 border-[#E5E7EB] dark:border-navy-700 rounded-xl px-4 py-2.5 cursor-pointer flex justify-between items-center hover:border-[#2563EB] dark:hover:border-[#60A5FA] transition-colors shadow-sm"
                     onClick={() => {
                         setModalDepartmentOpen(!modalDepartmentOpen);
                         setModalStatusOpen(false);
@@ -2415,11 +2415,11 @@ export default function ChecklistsPage() {
                     <span className="text-[14px] font-bold truncate">
                       {modalDepartmentFilter.length > 0 ? `${modalDepartmentFilter.length} Selected` : "All Departments"}
                     </span>
-                    <ChevronDownIcon className={`w-4 h-4 text-gray-400 transition-transform ${modalDepartmentOpen ? 'rotate-180' : ''}`} />
+                    <ChevronDownIcon className={`w-4 h-4 text-[#5B6472] transition-transform ${modalDepartmentOpen ? 'rotate-180' : ''}`} />
                   </div>
                   {modalDepartmentOpen && (
                     <div className="absolute z-[10000] w-full mt-2 bg-white dark:bg-navy-900 border-2 border-[#2563EB] dark:border-[#60A5FA] rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2">
-                       <div className="p-2 border-b border-orange-50 dark:border-navy-700">
+                       <div className="p-2 border-b border-[#E5E7EB] dark:border-navy-700">
                         <input 
                           type="text" placeholder="Search departments..." value={modalDepartmentSearch}
                           onChange={(e) => setModalDepartmentSearch(e.target.value)}
@@ -2458,9 +2458,9 @@ export default function ChecklistsPage() {
 
                 {/* Frequency Filter */}
                 <div className="relative">
-                  <label className="text-[14px] font-semibold text-gray-400 mb-2 block">Frequency</label>
+                  <label className="text-[14px] font-semibold text-[#5B6472] mb-2 block">Frequency</label>
                   <div 
-                    className="w-full bg-[#FFFFFF] dark:bg-navy-900 border-2 border-orange-50 dark:border-navy-700 rounded-xl px-4 py-2.5 cursor-pointer flex justify-between items-center hover:border-[#2563EB] dark:hover:border-[#60A5FA] transition-colors shadow-sm"
+                    className="w-full bg-[#FFFFFF] dark:bg-navy-900 border-2 border-[#E5E7EB] dark:border-navy-700 rounded-xl px-4 py-2.5 cursor-pointer flex justify-between items-center hover:border-[#2563EB] dark:hover:border-[#60A5FA] transition-colors shadow-sm"
                     onClick={() => {
                         setModalFrequencyOpen(!modalFrequencyOpen);
                         setModalStatusOpen(false);
@@ -2473,11 +2473,11 @@ export default function ChecklistsPage() {
                     <span className="text-[14px] font-bold truncate">
                       {modalFrequencyFilter.length > 0 ? `${modalFrequencyFilter.length} Selected` : "All Frequencies"}
                     </span>
-                    <ChevronDownIcon className={`w-4 h-4 text-gray-400 transition-transform ${modalFrequencyOpen ? 'rotate-180' : ''}`} />
+                    <ChevronDownIcon className={`w-4 h-4 text-[#5B6472] transition-transform ${modalFrequencyOpen ? 'rotate-180' : ''}`} />
                   </div>
                   {modalFrequencyOpen && (
                     <div className="absolute z-[10000] w-full mt-2 bg-white dark:bg-navy-900 border-2 border-[#2563EB] dark:border-[#60A5FA] rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2">
-                       <div className="p-2 border-b border-orange-50 dark:border-navy-700">
+                       <div className="p-2 border-b border-[#E5E7EB] dark:border-navy-700">
                         <input 
                           type="text" placeholder="Search frequency..." value={modalFrequencySearch}
                           onChange={(e) => setModalFrequencySearch(e.target.value)}
@@ -2517,7 +2517,7 @@ export default function ChecklistsPage() {
             </div>
 
             {/* Footer */}
-            <div className="p-6 bg-gray-50 dark:bg-navy-900 border-t-4 border-orange-50 dark:border-navy-700 flex gap-3">
+            <div className="p-6 bg-gray-50 dark:bg-navy-900 border-t-4 border-[#E5E7EB] dark:border-navy-700 flex gap-3">
               <button 
                 onClick={() => {
                   setModalStartDate("");

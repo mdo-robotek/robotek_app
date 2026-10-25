@@ -24,7 +24,7 @@ export default function TodayRecord({ todayRecord }: { todayRecord: FieldDriverR
       compact
       icon={<CalendarDaysIcon className="w-3.5 h-3.5 text-[#1D4ED8] dark:text-[#60A5FA]" />}
       headerRight={
-        <span className="text-[13px] font-bold text-gray-400">{dateLabel}</span>
+        <span className="text-[13px] font-bold text-[#5B6472]">{dateLabel}</span>
       }
     >
       <div className="grid grid-cols-3 gap-2">

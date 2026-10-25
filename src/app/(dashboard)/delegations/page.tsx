@@ -1041,14 +1041,14 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
           <div className="flex items-center bg-gray-100 dark:bg-navy-900 rounded-full p-0.5 mr-1">
             <button
               onClick={() => setViewMode('list')}
-              className={`p-1.5 rounded-full transition-all ${viewMode === 'list' ? 'bg-[#2563EB] text-white shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}
+              className={`p-1.5 rounded-full transition-all ${viewMode === 'list' ? 'bg-[#2563EB] text-white shadow-sm' : 'text-[#5B6472] hover:text-gray-600'}`}
               title="List View"
             >
               <ListBulletIcon className="w-3.5 h-3.5" />
             </button>
             <button
               onClick={() => setViewMode('tile')}
-              className={`p-1.5 rounded-full transition-all ${viewMode === 'tile' ? 'bg-[#2563EB] text-white shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}
+              className={`p-1.5 rounded-full transition-all ${viewMode === 'tile' ? 'bg-[#2563EB] text-white shadow-sm' : 'text-[#5B6472] hover:text-gray-600'}`}
               title="Tile View"
             >
               <Squares2X2Icon className="w-3.5 h-3.5" />
@@ -1165,7 +1165,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
             {/* Search & Assignment Row */}
             <div className="flex flex-row items-center gap-2 w-full lg:w-auto lg:flex-1 lg:max-w-md">
               <div className="relative group flex-1">
-                <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-[#2563EB] transition-colors" />
+                <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5B6472] group-focus-within:text-[#2563EB] transition-colors" />
                 <input
                   type="text"
                   placeholder="Search..."
@@ -1235,23 +1235,23 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
           <div className="flex flex-wrap items-center gap-3 md:gap-4">
             <div className="flex items-center gap-2">
-              <p className="text-[13px] md:text-[10px] font-semibold text-gray-400 whitespace-nowrap">
+              <p className="text-[13px] md:text-[10px] font-semibold text-[#5B6472] whitespace-nowrap">
                 Page <span className="text-[#2563EB] dark:text-[#60A5FA]">{currentPage}</span> of {totalPages || 1}
               </p>
               <div className="flex gap-0.5">
-                <button onClick={() => setCurrentPage(1)} disabled={currentPage === 1} className="px-1.5 py-1 text-[13px] md:text-[10px] font-bold text-gray-400 hover:text-black dark:hover:text-white hover:bg-white dark:hover:bg-white/5 disabled:opacity-30 rounded-md transition-all">First</button>
-                <button onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))} disabled={currentPage === 1} className="p-1 text-gray-400 hover:text-black dark:hover:text-white hover:bg-white dark:hover:bg-white/5 disabled:opacity-30 rounded-md transition-all">
+                <button onClick={() => setCurrentPage(1)} disabled={currentPage === 1} className="px-1.5 py-1 text-[13px] md:text-[10px] font-bold text-[#5B6472] hover:text-black dark:hover:text-white hover:bg-white dark:hover:bg-white/5 disabled:opacity-30 rounded-md transition-all">First</button>
+                <button onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))} disabled={currentPage === 1} className="p-1 text-[#5B6472] hover:text-black dark:hover:text-white hover:bg-white dark:hover:bg-white/5 disabled:opacity-30 rounded-md transition-all">
                   <ChevronLeftIcon className="w-3.5 h-3.5" />
                 </button>
-                <button onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))} disabled={currentPage === totalPages || totalPages === 0} className="p-1 text-gray-400 hover:text-black dark:hover:text-white hover:bg-white dark:hover:bg-white/5 disabled:opacity-30 rounded-md transition-all">
+                <button onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))} disabled={currentPage === totalPages || totalPages === 0} className="p-1 text-[#5B6472] hover:text-black dark:hover:text-white hover:bg-white dark:hover:bg-white/5 disabled:opacity-30 rounded-md transition-all">
                   <ChevronRightIcon className="w-3.5 h-3.5" />
                 </button>
-                <button onClick={() => setCurrentPage(totalPages)} disabled={currentPage === totalPages || totalPages === 0} className="px-1.5 py-1 text-[13px] md:text-[10px] font-bold text-gray-400 hover:text-black dark:hover:text-white hover:bg-white dark:hover:bg-white/5 disabled:opacity-30 rounded-md transition-all">Last</button>
+                <button onClick={() => setCurrentPage(totalPages)} disabled={currentPage === totalPages || totalPages === 0} className="px-1.5 py-1 text-[13px] md:text-[10px] font-bold text-[#5B6472] hover:text-black dark:hover:text-white hover:bg-white dark:hover:bg-white/5 disabled:opacity-30 rounded-md transition-all">Last</button>
               </div>
             </div>
             <div className="hidden xs:block h-4 w-[1px] bg-gray-200 dark:bg-white/10" />
             <div className="flex items-center gap-2">
-              <label className="text-[13px] md:text-[10px] font-semibold text-gray-400">Show</label>
+              <label className="text-[13px] md:text-[10px] font-semibold text-[#5B6472]">Show</label>
               <select 
                 value={itemsPerPage}
                 onChange={(e) => { setItemsPerPage(Number(e.target.value)); setCurrentPage(1); }}
@@ -1307,18 +1307,18 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                   <tr>
                     <td colSpan={9} className="px-4 py-10 text-center">
                       <div className="w-6 h-6 border-2 border-gray-100 border-t-[#2563EB] rounded-full animate-spin mx-auto mb-2" />
-                      <p className="text-gray-400 font-bold text-[12px]">Syncing...</p>
+                      <p className="text-[#5B6472] font-bold text-[12px]">Syncing...</p>
                     </td>
                   </tr>
                 ) : paginatedDelegations.length === 0 ? (
                   <tr>
-                    <td colSpan={9} className="px-4 py-10 text-center text-gray-400 text-[14px]">No delegations found</td>
+                    <td colSpan={9} className="px-4 py-10 text-center text-[#5B6472] text-[14px]">No delegations found</td>
                   </tr>
                 ) : (
                   paginatedDelegations.map((del) => (
-                    <tr key={del.id} className="hover:bg-orange-50/10 border-b-2 border-gray-200 dark:border-white/10 last:border-0 transition-colors group">
+                    <tr key={del.id} className="hover:bg-[#F7F8FA] border-b-2 border-gray-200 dark:border-white/10 last:border-0 transition-colors group">
                       <td className="px-4 py-3 text-center">
-                        <span className="font-mono text-[13px] text-gray-400 font-bold">#{del.id}</span>
+                        <span className="font-mono text-[13px] text-[#5B6472] font-bold">#{del.id}</span>
                       </td>
                       <td className="px-4 py-3">
                         <p className="font-semibold text-[14px] text-gray-900 dark:text-white leading-tight">{del.title}</p>
@@ -1365,12 +1365,12 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
             {isLoading ? (
               <div className="flex flex-col items-center justify-center py-20">
                 <div className="w-8 h-8 border-3 border-gray-100 border-t-[#2563EB] rounded-full animate-spin mb-4" />
-                <p className="text-gray-400 font-semibold text-[13px]">Syncing Delegations...</p>
+                <p className="text-[#5B6472] font-semibold text-[13px]">Syncing Delegations...</p>
               </div>
             ) : paginatedDelegations.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-20 bg-white/50 dark:bg-navy-900/50 rounded-2xl border-2 border-dashed border-gray-200 dark:border-white/5">
                 <DocumentTextIcon className="w-10 h-10 text-gray-200 dark:text-white/10 mb-2" />
-                <p className="text-[14px] text-gray-400 font-bold">No delegations found</p>
+                <p className="text-[14px] text-[#5B6472] font-bold">No delegations found</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -1416,21 +1416,21 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
                         <div className="grid grid-cols-2 gap-3 mt-auto pt-4 border-t border-gray-50 dark:border-white/5">
                           <div className="flex flex-col gap-1 overflow-hidden">
-                            <span className="text-[12px] font-semibold text-gray-400">Assigned To</span>
+                            <span className="text-[12px] font-semibold text-[#5B6472]">Assigned To</span>
                             <span className="text-[13px] font-semibold text-gray-800 dark:text-gray-200 truncate">{del.assigned_to || "—"}</span>
                           </div>
                           <div className="flex flex-col gap-1 overflow-hidden">
-                            <span className="text-[12px] font-semibold text-gray-400">Dept</span>
+                            <span className="text-[12px] font-semibold text-[#5B6472]">Dept</span>
                             <div className="scale-75 origin-left">
                               {getDepartmentBadge(del.department)}
                             </div>
                           </div>
                           <div className="flex flex-col gap-1 overflow-hidden">
-                            <span className="text-[12px] font-semibold text-gray-400">Due Date</span>
+                            <span className="text-[12px] font-semibold text-[#5B6472]">Due Date</span>
                             <span className="text-[13px] font-semibold text-gray-700 dark:text-slate-300 truncate">{formatDateDisplay(del.due_date) || "—"}</span>
                           </div>
                           <div className="flex flex-col gap-1 overflow-hidden">
-                            <span className="text-[12px] font-semibold text-gray-400">Assigned By</span>
+                            <span className="text-[12px] font-semibold text-[#5B6472]">Assigned By</span>
                             <span className="text-[13px] font-bold text-gray-500 dark:text-gray-400 truncate">{del.assigned_by || "—"}</span>
                           </div>
                         </div>
@@ -1536,7 +1536,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                         {selectedTask.assigned_to?.substring(0, 2).toUpperCase() || "TO"}
                       </div>
                       <div>
-                        <p className="text-[12px] font-semibold text-gray-400 tracking-tighter leading-none mb-1">Assigned To</p>
+                        <p className="text-[12px] font-semibold text-[#5B6472] tracking-tighter leading-none mb-1">Assigned To</p>
                         <p className="text-[14px] font-semibold text-gray-900 dark:text-white truncate max-w-[120px]">{selectedTask.assigned_to}</p>
                       </div>
                     </div>
@@ -1545,7 +1545,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                         {selectedTask.assigned_by?.substring(0, 2).toUpperCase() || "BY"}
                       </div>
                       <div>
-                        <p className="text-[12px] font-semibold text-gray-400 tracking-tighter leading-none mb-1">Assigned By</p>
+                        <p className="text-[12px] font-semibold text-[#5B6472] tracking-tighter leading-none mb-1">Assigned By</p>
                         <p className="text-[14px] font-bold text-gray-600 dark:text-slate-400 truncate max-w-[120px]">{selectedTask.assigned_by}</p>
                       </div>
                     </div>
@@ -1558,7 +1558,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                         <TagIcon className="w-4 h-4" />
                       </div>
                       <div>
-                        <p className="text-[12px] font-semibold text-gray-400 leading-none mb-1">Department</p>
+                        <p className="text-[12px] font-semibold text-[#5B6472] leading-none mb-1">Department</p>
                         <p className="text-[14px] font-semibold text-gray-900 dark:text-white">{selectedTask.department}</p>
                       </div>
                     </div>
@@ -1567,7 +1567,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                         <CalendarDaysIcon className="w-4 h-4" />
                       </div>
                       <div>
-                        <p className="text-[12px] font-semibold text-gray-400 leading-none mb-1">Due Date</p>
+                        <p className="text-[12px] font-semibold text-[#5B6472] leading-none mb-1">Due Date</p>
                         <p className="text-[14px] font-semibold text-gray-900 dark:text-white">{formatDateDisplay(selectedTask.due_date)}</p>
                       </div>
                     </div>
@@ -1580,7 +1580,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                         <ClockIcon className="w-4 h-4" />
                       </div>
                       <div>
-                        <p className="text-[12px] font-semibold text-gray-400 leading-none mb-1">Registered</p>
+                        <p className="text-[12px] font-semibold text-[#5B6472] leading-none mb-1">Registered</p>
                         <p className="text-[13px] font-bold text-gray-600 dark:text-slate-400">{formatDateDisplay(selectedTask.created_at)}</p>
                       </div>
                     </div>
@@ -1590,7 +1590,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                           <ArrowPathIcon className="w-4 h-4" />
                         </div>
                         <div>
-                          <p className="text-[12px] font-semibold text-gray-400 leading-none mb-1">Updated</p>
+                          <p className="text-[12px] font-semibold text-[#5B6472] leading-none mb-1">Updated</p>
                           <p className="text-[13px] font-bold text-gray-600 dark:text-slate-400">{formatDateDisplay(selectedTask.updated_at)}</p>
                         </div>
                       </div>
@@ -1641,7 +1641,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                               />
                               <div className="flex justify-between mt-1.5">
                                 <span className="text-[13px] font-mono text-gray-500 dark:text-gray-400 font-bold">{formatAudioTime(audioCurrentTime)}</span>
-                                <span className="text-[13px] font-mono text-gray-400 font-bold">{formatAudioTime(audioDuration)}</span>
+                                <span className="text-[13px] font-mono text-[#5B6472] font-bold">{formatAudioTime(audioDuration)}</span>
                               </div>
                             </div>
                           </div>
@@ -1662,8 +1662,8 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                       </div>
                     ) : (
                       <div className="p-4 bg-red-50/10 dark:bg-red-950/5 rounded-2xl border border-dashed border-red-100 dark:border-red-900/20 text-center flex flex-col items-center justify-center h-full">
-                        <MicrophoneIcon className="w-6 h-6 text-gray-300 mb-2" />
-                        <p className="text-[13px] font-semibold text-gray-400">No Voice note</p>
+                        <MicrophoneIcon className="w-6 h-6 text-[#5B6472] mb-2" />
+                        <p className="text-[13px] font-semibold text-[#5B6472]">No Voice note</p>
                       </div>
                     )}
                   </div>
@@ -1698,8 +1698,8 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                     ) : (
 
                       <div className="p-4 bg-red-50/10 dark:bg-red-950/5 rounded-2xl border border-dashed border-red-100 dark:border-red-900/20 text-center flex flex-col items-center justify-center h-full">
-                        <PaperClipIcon className="w-6 h-6 text-gray-300 mb-2" />
-                        <p className="text-[12px] font-semibold text-gray-400 tracking-tighter">No Doc</p>
+                        <PaperClipIcon className="w-6 h-6 text-[#5B6472] mb-2" />
+                        <p className="text-[12px] font-semibold text-[#5B6472] tracking-tighter">No Doc</p>
                       </div>
                     )}
                   </div>
@@ -1708,7 +1708,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                 {/* Status Update & Remarks Section */}
                 <div className="space-y-6 border-t border-gray-100 dark:border-white/5 pt-6 pb-2">
                   <div className="w-full">
-                    <h4 className="text-[13px] font-semibold text-gray-400 mb-4 flex items-center gap-2 px-1">
+                    <h4 className="text-[13px] font-semibold text-[#5B6472] mb-4 flex items-center gap-2 px-1">
                       <BoltIcon className="w-4 h-4 text-amber-500" /> Quick Status Update
                     </h4>
                     <div className="grid grid-cols-3 gap-1.5">
@@ -1751,7 +1751,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                         />
                         <CalendarDaysIcon className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-red-400 pointer-events-none group-hover/date:scale-110 transition-transform" />
                       </div>
-                      <p className="text-[12px] text-gray-400 mt-1 font-bold italic tracking-tighter">* Set the new target completion time</p>
+                      <p className="text-[12px] text-[#5B6472] mt-1 font-bold italic tracking-tighter">* Set the new target completion time</p>
                     </div>
                   )}
 
@@ -1808,7 +1808,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
                 {/* History Timeline Tracking */}
                 <div className="pt-8 border-t border-gray-100 dark:border-white/5 pb-10 w-full">
-                  <h4 className="text-[13px] font-semibold text-gray-400 mb-6 flex items-center gap-2 px-1">
+                  <h4 className="text-[13px] font-semibold text-[#5B6472] mb-6 flex items-center gap-2 px-1">
                     <ClockIcon className="w-4 h-4 text-blue-500" /> Activity History
                   </h4>
                   
@@ -1830,7 +1830,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                               <span className="text-[13px] font-semibold text-gray-900 dark:text-white tracking-tight">
                                 {item.type === 'remark' ? item.username : `Status -> ${item.new_status}`}
                               </span>
-                              <span className="text-[12px] font-bold text-gray-400">{formatDateDisplay(item.created_at)}</span>
+                              <span className="text-[12px] font-bold text-[#5B6472]">{formatDateDisplay(item.created_at)}</span>
                             </div>
                             
                             {item.type === 'remark' ? (
@@ -1909,16 +1909,16 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
           <Portal>
           <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4">
             <div className="absolute inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-sm" onClick={() => setIsModalOpen(false)} />
-            <div className="relative bg-[#FFFFFF] dark:bg-navy-900 w-full max-w-3xl rounded-2xl shadow-2xl border border-orange-100/50 dark:border-white/10 overflow-hidden animate-in fade-in zoom-in duration-300">
-              <div className="p-4 border-b border-orange-100/50 dark:border-zinc-800 flex items-center justify-between">
+            <div className="relative bg-[#FFFFFF] dark:bg-navy-900 w-full max-w-3xl rounded-2xl shadow-2xl border border-[#E5E7EB] dark:border-white/10 overflow-hidden animate-in fade-in zoom-in duration-300">
+              <div className="p-4 border-b border-[#E5E7EB] dark:border-zinc-800 flex items-center justify-between">
                 <div>
                   <h2 className="text-lg font-semibold text-gray-900 dark:text-white tracking-tight">
                     {editingDelegation ? "Edit Delegation" : "Create Delegation"}
                   </h2>
                   <div className="flex items-center gap-2 mt-1">
-                    <p className="text-gray-400 dark:text-slate-400 font-bold text-[12px]">Task Configuration</p>
+                    <p className="text-[#5B6472] dark:text-slate-400 font-bold text-[12px]">Task Configuration</p>
                     {editingDelegation && (
-                      <span className="px-2 py-0.5 bg-orange-50 dark:bg-zinc-800 text-[12px] font-semibold text-gray-500 rounded border border-orange-100 dark:border-zinc-700">
+                      <span className="px-2 py-0.5 bg-[#F7F8FA] dark:bg-zinc-800 text-[12px] font-semibold text-gray-500 rounded border border-[#E5E7EB] dark:border-zinc-700">
                         ID: {editingDelegation?.id}
                       </span>
                     )}
@@ -1926,7 +1926,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                 </div>
                 <button
                   onClick={() => setIsModalOpen(false)}
-                  className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-zinc-200 transition-colors"
+                  className="p-2 text-[#5B6472] hover:text-gray-600 dark:hover:text-zinc-200 transition-colors"
                 >
                   <XMarkIcon className="w-8 h-8" />
                 </button>
@@ -1941,18 +1941,18 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                       type="text"
                       value={formData.title}
                       onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                      className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-3 py-2 rounded-lg border border-orange-100 dark:border-zinc-800 focus:border-[#2563EB] focus:bg-white dark:focus:bg-zinc-900 outline-none font-semibold text-sm text-gray-900 dark:text-white transition-all shadow-sm"
+                      className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-3 py-2 rounded-lg border border-[#E5E7EB] dark:border-zinc-800 focus:border-[#2563EB] focus:bg-white dark:focus:bg-zinc-900 outline-none font-semibold text-sm text-gray-900 dark:text-white transition-all shadow-sm"
                       required
                       placeholder="Brief title for this delegation..."
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-[13px] font-semibold text-gray-400 block">Description / Task Details</label>
+                    <label className="text-[13px] font-semibold text-[#5B6472] block">Description / Task Details</label>
                     <textarea
                       value={formData.description}
                       onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                      className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-3 py-2 rounded-lg border border-orange-100 dark:border-zinc-800 focus:border-[#2563EB] focus:bg-white dark:focus:bg-zinc-900 outline-none font-bold text-[14px] text-gray-800 dark:text-zinc-100 transition-all shadow-sm min-h-[80px]"
+                      className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-3 py-2 rounded-lg border border-[#E5E7EB] dark:border-zinc-800 focus:border-[#2563EB] focus:bg-white dark:focus:bg-zinc-900 outline-none font-bold text-[14px] text-gray-800 dark:text-zinc-100 transition-all shadow-sm min-h-[80px]"
                       required
                       placeholder="Enter full task description..."
                     />
@@ -1963,9 +1963,9 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Assigned By Dropdown */}
                   <div className="relative">
-                    <label className="text-[13px] font-semibold text-gray-400 block mb-2">Assigned By</label>
+                    <label className="text-[13px] font-semibold text-[#5B6472] block mb-2">Assigned By</label>
                     <div 
-                      className={`w-full bg-[#FFFFFF] dark:bg-zinc-900 border border-orange-100 dark:border-zinc-800 rounded-lg shadow-sm ${isRegularUser ? 'cursor-not-allowed opacity-75' : 'cursor-pointer'}`}
+                      className={`w-full bg-[#FFFFFF] dark:bg-zinc-900 border border-[#E5E7EB] dark:border-zinc-800 rounded-lg shadow-sm ${isRegularUser ? 'cursor-not-allowed opacity-75' : 'cursor-pointer'}`}
                       onClick={() => {
                         if (!isRegularUser) {
                           setAssignedByOpen(!assignedByOpen)
@@ -1976,15 +1976,15 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                     >
                       <div className="px-3 py-1.5 font-bold text-[14px] text-gray-800 dark:text-zinc-100 flex justify-between items-center group-hover:border-[#2563EB] transition-colors">
                         <div className="flex items-center gap-2">
-                          <UserIcon className="w-3.5 h-3.5 text-gray-400" />
+                          <UserIcon className="w-3.5 h-3.5 text-[#5B6472]" />
                           <span>{formData.assigned_by || (isRegularUser ? currentUser : "Select User...")}</span>
                         </div>
-                        {!isRegularUser && <ChevronDownIcon className="w-3 h-3 text-gray-400" />}
+                        {!isRegularUser && <ChevronDownIcon className="w-3 h-3 text-[#5B6472]" />}
                       </div>
                     </div>
                     {assignedByOpen && !isRegularUser && (
-                      <div className="absolute z-[10000] w-full mt-1 bg-white dark:bg-zinc-900 border border-orange-100 dark:border-zinc-800 rounded-lg shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-                        <div className="p-2 border-b border-orange-50 dark:border-zinc-800">
+                      <div className="absolute z-[10000] w-full mt-1 bg-white dark:bg-zinc-900 border border-[#E5E7EB] dark:border-zinc-800 rounded-lg shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                        <div className="p-2 border-b border-[#E5E7EB] dark:border-zinc-800">
                           <input 
                             type="text" placeholder="Search users..." value={assignedBySearch}
                             onChange={(e) => setAssignedBySearch(e.target.value)}
@@ -2003,7 +2003,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                             </div>
                           ))}
                           {usersList.filter(u => u.username.toLowerCase().includes(assignedBySearch.toLowerCase())).length === 0 && (
-                            <div className="px-3 py-2 text-[13px] text-gray-400 text-center">No users found</div>
+                            <div className="px-3 py-2 text-[13px] text-[#5B6472] text-center">No users found</div>
                           )}
                         </div>
                       </div>
@@ -2012,9 +2012,9 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
                   {/* Assigned To Dropdown */}
                   <div className="relative">
-                    <label className="text-[13px] font-semibold text-gray-400 block mb-2">Assigned To</label>
+                    <label className="text-[13px] font-semibold text-[#5B6472] block mb-2">Assigned To</label>
                     <div 
-                      className="w-full bg-[#FFFFFF] dark:bg-zinc-900 border border-orange-100 dark:border-zinc-800 rounded-lg shadow-sm cursor-pointer"
+                      className="w-full bg-[#FFFFFF] dark:bg-zinc-900 border border-[#E5E7EB] dark:border-zinc-800 rounded-lg shadow-sm cursor-pointer"
                       onClick={() => {
                         setAssignedToOpen(!assignedToOpen)
                         setAssignedByOpen(false)
@@ -2023,15 +2023,15 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                     >
                       <div className="px-3 py-1.5 font-bold text-[14px] text-gray-800 dark:text-zinc-100 flex justify-between items-center group-hover:border-[#2563EB] transition-colors">
                         <div className="flex items-center gap-2">
-                          <UserIcon className="w-3.5 h-3.5 text-gray-400" />
+                          <UserIcon className="w-3.5 h-3.5 text-[#5B6472]" />
                           <span>{formData.assigned_to || "Select User..."}</span>
                         </div>
-                        <ChevronDownIcon className="w-3 h-3 text-gray-400" />
+                        <ChevronDownIcon className="w-3 h-3 text-[#5B6472]" />
                       </div>
                     </div>
                     {assignedToOpen && (
-                      <div className="absolute z-[10000] w-full mt-1 bg-white dark:bg-zinc-900 border border-orange-100 dark:border-zinc-800 rounded-lg shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-                        <div className="p-2 border-b border-orange-50 dark:border-zinc-800">
+                      <div className="absolute z-[10000] w-full mt-1 bg-white dark:bg-zinc-900 border border-[#E5E7EB] dark:border-zinc-800 rounded-lg shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                        <div className="p-2 border-b border-[#E5E7EB] dark:border-zinc-800">
                           <input 
                             type="text" placeholder="Search users..." value={assignedToSearch}
                             onChange={(e) => setAssignedToSearch(e.target.value)}
@@ -2050,7 +2050,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                             </div>
                           ))}
                           {usersList.filter(u => u.username.toLowerCase().includes(assignedToSearch.toLowerCase())).length === 0 && (
-                            <div className="px-3 py-2 text-[13px] text-gray-400 text-center">No users found</div>
+                            <div className="px-3 py-2 text-[13px] text-[#5B6472] text-center">No users found</div>
                           )}
                         </div>
                       </div>
@@ -2061,7 +2061,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                 {/* Row 2: Priority + Evidence Required */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="text-[13px] font-semibold text-gray-400 block mb-2">Priority</label>
+                    <label className="text-[13px] font-semibold text-[#5B6472] block mb-2">Priority</label>
                     <div className="flex bg-gray-100 dark:bg-zinc-900/50 p-1 rounded-xl">
                       {(['Low', 'Medium', 'High'] as const).map((pri) => (
                         <button key={pri} type="button"
@@ -2079,7 +2079,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                   </div>
 
                   <div>
-                    <label className="text-[13px] font-semibold text-gray-400 block mb-2">Evidence Required?</label>
+                    <label className="text-[13px] font-semibold text-[#5B6472] block mb-2">Evidence Required?</label>
                     <div className="flex bg-gray-100 dark:bg-zinc-900/50 p-1 rounded-xl">
                       {(['No', 'Yes'] as const).map((val) => (
                         <button key={val} type="button"
@@ -2099,22 +2099,22 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Department Dropdown */}
                   <div className="relative">
-                    <label className="text-[13px] font-semibold text-gray-400 block mb-2">Department</label>
+                    <label className="text-[13px] font-semibold text-[#5B6472] block mb-2">Department</label>
                     <div 
-                      className="w-full bg-[#FFFFFF] dark:bg-zinc-900 border border-orange-100 dark:border-zinc-800 rounded-lg shadow-sm cursor-pointer"
+                      className="w-full bg-[#FFFFFF] dark:bg-zinc-900 border border-[#E5E7EB] dark:border-zinc-800 rounded-lg shadow-sm cursor-pointer"
                       onClick={() => { setDepartmentOpen(!departmentOpen); setAssignedByOpen(false); setAssignedToOpen(false); }}
                     >
                       <div className="px-3 py-1.5 font-bold text-[14px] text-gray-800 dark:text-zinc-100 flex justify-between items-center group-hover:border-[#2563EB] transition-colors">
                         <div className="flex items-center gap-2">
-                          <TagIcon className="w-3.5 h-3.5 text-gray-400" />
+                          <TagIcon className="w-3.5 h-3.5 text-[#5B6472]" />
                           <span>{formData.department || "Select Department..."}</span>
                         </div>
-                        <ChevronDownIcon className="w-3 h-3 text-gray-400" />
+                        <ChevronDownIcon className="w-3 h-3 text-[#5B6472]" />
                       </div>
                     </div>
                     {departmentOpen && (
-                      <div className="absolute z-[10000] w-full mt-1 bg-white dark:bg-zinc-900 border border-orange-100 dark:border-zinc-800 rounded-lg shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-                        <div className="p-2 border-b border-orange-50 dark:border-zinc-800">
+                      <div className="absolute z-[10000] w-full mt-1 bg-white dark:bg-zinc-900 border border-[#E5E7EB] dark:border-zinc-800 rounded-lg shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                        <div className="p-2 border-b border-[#E5E7EB] dark:border-zinc-800">
                           <input type="text" placeholder="Search departments..." value={departmentSearch}
                             onChange={(e) => setDepartmentSearch(e.target.value)}
                             onClick={(e) => e.stopPropagation()}
@@ -2140,14 +2140,14 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
                   {/* Due Date & Time */}
                   <div>
-                    <label className="text-[13px] font-semibold text-gray-400 block mb-2">Due Date &amp; Time</label>
+                    <label className="text-[13px] font-semibold text-[#5B6472] block mb-2">Due Date &amp; Time</label>
                   <div className="relative group/date">
-                    <CalendarDaysIcon className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none group-focus-within/date:text-[#2563EB]" />
+                    <CalendarDaysIcon className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5B6472] pointer-events-none group-focus-within/date:text-[#2563EB]" />
                     <input
                       type="datetime-local"
                       value={formData.due_date}
                       onChange={(e) => setFormData({ ...formData, due_date: e.target.value })}
-                      className="w-full bg-[#FFFFFF] dark:bg-zinc-900 pr-10 pl-3 py-1.5 rounded-lg border border-orange-100 dark:border-zinc-800 focus:border-[#2563EB] focus:bg-white dark:focus:bg-zinc-900 outline-none font-bold text-[14px] text-gray-800 dark:text-zinc-100 transition-all shadow-sm cursor-pointer"
+                      className="w-full bg-[#FFFFFF] dark:bg-zinc-900 pr-10 pl-3 py-1.5 rounded-lg border border-[#E5E7EB] dark:border-zinc-800 focus:border-[#2563EB] focus:bg-white dark:focus:bg-zinc-900 outline-none font-bold text-[14px] text-gray-800 dark:text-zinc-100 transition-all shadow-sm cursor-pointer"
                     />
                   </div>
                   </div>
@@ -2155,7 +2155,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 
                 {/* Attachments */}
-                <div className="space-y-4 pt-4 border-t border-orange-50 dark:border-zinc-800/50">
+                <div className="space-y-4 pt-4 border-t border-[#E5E7EB] dark:border-zinc-800/50">
                   <p className="text-[13px] font-semibold text-[#2563EB]">Attachments</p>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     
@@ -2240,11 +2240,11 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                     <div className="p-4 bg-gray-50 dark:bg-zinc-900/50 rounded-xl border border-dashed border-gray-300 dark:border-zinc-700">
                       <label className="flex items-center gap-3 cursor-pointer group">
                         <div className="p-3 bg-white dark:bg-zinc-800 rounded-lg shadow-sm group-hover:scale-105 transition-transform">
-                          <PaperClipIcon className="w-5 h-5 text-gray-400 dark:text-zinc-400 group-hover:text-[#2563EB] dark:group-hover:text-[#60A5FA] transition-colors" />
+                          <PaperClipIcon className="w-5 h-5 text-[#5B6472] dark:text-zinc-400 group-hover:text-[#2563EB] dark:group-hover:text-[#60A5FA] transition-colors" />
                         </div>
                         <div>
                           <p className="text-[14px] font-semibold text-gray-800 dark:text-zinc-200">Reference Doc</p>
-                          <p className="text-[13px] font-bold text-gray-400 mt-0.5">
+                          <p className="text-[13px] font-bold text-[#5B6472] mt-0.5">
                             {refDocFile ? refDocFile.name : (formData.reference_docs ? "[Existing File Linked]" : "Click to upload document")}
                           </p>
                         </div>
@@ -2263,11 +2263,11 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                   </div>
                 </div>
 
-                <div className="pt-4 mt-6 border-t border-orange-100/50 dark:border-zinc-800 flex gap-2">
+                <div className="pt-4 mt-6 border-t border-[#E5E7EB] dark:border-zinc-800 flex gap-2">
                   <button
                     type="button"
                     onClick={() => setIsModalOpen(false)}
-                    className="flex-1 px-4 py-2 rounded-xl font-semibold text-gray-400 hover:text-gray-600 hover:bg-gray-50 dark:hover:bg-zinc-800 transition-all text-[13px]"
+                    className="flex-1 px-4 py-2 rounded-xl font-semibold text-[#5B6472] hover:text-gray-600 hover:bg-gray-50 dark:hover:bg-zinc-800 transition-all text-[13px]"
                   >
                     Cancel
                   </button>
@@ -2297,9 +2297,9 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
           <Portal>
           <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4">
             <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={setIsFilterModalOpen.bind(null, false)} />
-            <div className="relative bg-white dark:bg-zinc-950 w-full max-w-2xl rounded-3xl shadow-2xl border border-orange-100 dark:border-zinc-800 overflow-hidden animate-in fade-in zoom-in duration-300">
+            <div className="relative bg-white dark:bg-zinc-950 w-full max-w-2xl rounded-3xl shadow-2xl border border-[#E5E7EB] dark:border-zinc-800 overflow-hidden animate-in fade-in zoom-in duration-300">
               {/* Header */}
-              <div className="p-6 bg-[#2563EB] border-b border-orange-200 dark:border-zinc-800 flex items-center justify-between">
+              <div className="p-6 bg-[#2563EB] border-b border-[#E5E7EB] dark:border-zinc-800 flex items-center justify-between">
                 <div className="flex items-center gap-3 text-[#2563EB]">
                   <div className="p-2 bg-white/20 rounded-xl">
                     <FunnelIcon className="w-6 h-6" />
@@ -2325,26 +2325,26 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                   </label>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-1.5">
-                      <span className="text-[13px] font-semibold text-gray-400 px-1">Start Date</span>
+                      <span className="text-[13px] font-semibold text-[#5B6472] px-1">Start Date</span>
                       <div className="relative group/date">
-                        <CalendarDaysIcon className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none group-focus-within/date:text-[#2563EB]" />
+                        <CalendarDaysIcon className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5B6472] pointer-events-none group-focus-within/date:text-[#2563EB]" />
                         <input 
                           type="date"
                           value={filterStartDate}
                           onChange={(e) => setFilterStartDate(e.target.value)}
-                          className="w-full pl-4 pr-10 py-2.5 bg-[#FFFFFF] dark:bg-zinc-900 border-2 border-orange-50 dark:border-zinc-800 rounded-xl text-[14px] font-bold text-gray-700 dark:text-zinc-100 outline-none focus:border-[#2563EB] transition-all"
+                          className="w-full pl-4 pr-10 py-2.5 bg-[#FFFFFF] dark:bg-zinc-900 border-2 border-[#E5E7EB] dark:border-zinc-800 rounded-xl text-[14px] font-bold text-gray-700 dark:text-zinc-100 outline-none focus:border-[#2563EB] transition-all"
                         />
                       </div>
                     </div>
                     <div className="space-y-1.5">
-                      <span className="text-[13px] font-semibold text-gray-400 px-1">End Date</span>
+                      <span className="text-[13px] font-semibold text-[#5B6472] px-1">End Date</span>
                       <div className="relative group/date">
-                        <CalendarDaysIcon className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none group-focus-within/date:text-[#2563EB]" />
+                        <CalendarDaysIcon className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5B6472] pointer-events-none group-focus-within/date:text-[#2563EB]" />
                         <input 
                           type="date"
                           value={filterEndDate}
                           onChange={(e) => setFilterEndDate(e.target.value)}
-                          className="w-full pl-4 pr-10 py-2.5 bg-[#FFFFFF] dark:bg-zinc-900 border-2 border-orange-50 dark:border-zinc-800 rounded-xl text-[14px] font-bold text-gray-700 dark:text-zinc-100 outline-none focus:border-[#2563EB] transition-all"
+                          className="w-full pl-4 pr-10 py-2.5 bg-[#FFFFFF] dark:bg-zinc-900 border-2 border-[#E5E7EB] dark:border-zinc-800 rounded-xl text-[14px] font-bold text-gray-700 dark:text-zinc-100 outline-none focus:border-[#2563EB] transition-all"
                         />
                       </div>
                     </div>
@@ -2354,19 +2354,19 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   {/* Status Filter */}
                   <div className="relative">
-                    <label className="text-[14px] font-semibold text-gray-400 mb-2 block">Status</label>
+                    <label className="text-[14px] font-semibold text-[#5B6472] mb-2 block">Status</label>
                     <div 
-                      className="w-full bg-[#FFFFFF] dark:bg-zinc-900 border-2 border-orange-50 dark:border-zinc-800 rounded-xl px-4 py-2.5 cursor-pointer flex justify-between items-center"
+                      className="w-full bg-[#FFFFFF] dark:bg-zinc-900 border-2 border-[#E5E7EB] dark:border-zinc-800 rounded-xl px-4 py-2.5 cursor-pointer flex justify-between items-center"
                       onClick={() => setModalStatusOpen(!modalStatusOpen)}
                     >
                       <span className="text-[14px] font-bold truncate">
                         {modalStatusFilter.length > 0 ? `${modalStatusFilter.length} Selected` : "All Statuses"}
                       </span>
-                      <ChevronDownIcon className={`w-4 h-4 text-gray-400 transition-transform ${modalStatusOpen ? 'rotate-180' : ''}`} />
+                      <ChevronDownIcon className={`w-4 h-4 text-[#5B6472] transition-transform ${modalStatusOpen ? 'rotate-180' : ''}`} />
                     </div>
                     {modalStatusOpen && (
-                      <div className="absolute z-20 w-full mt-2 bg-white dark:bg-zinc-900 border border-orange-50 dark:border-zinc-800 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2">
-                        <div className="p-2 border-b border-orange-50 dark:border-zinc-800">
+                      <div className="absolute z-20 w-full mt-2 bg-white dark:bg-zinc-900 border border-[#E5E7EB] dark:border-zinc-800 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2">
+                        <div className="p-2 border-b border-[#E5E7EB] dark:border-zinc-800">
                           <input 
                             type="text" placeholder="Search status..." value={modalStatusSearch}
                             onChange={(e) => setModalStatusSearch(e.target.value)}
@@ -2405,18 +2405,18 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
                   {/* Priority Filter */}
                   <div className="relative">
-                    <label className="text-[14px] font-semibold text-gray-400 mb-2 block">Priority</label>
+                    <label className="text-[14px] font-semibold text-[#5B6472] mb-2 block">Priority</label>
                     <div 
-                      className="w-full bg-[#FFFFFF] dark:bg-zinc-900 border-2 border-orange-50 dark:border-zinc-800 rounded-xl px-4 py-2.5 cursor-pointer flex justify-between items-center"
+                      className="w-full bg-[#FFFFFF] dark:bg-zinc-900 border-2 border-[#E5E7EB] dark:border-zinc-800 rounded-xl px-4 py-2.5 cursor-pointer flex justify-between items-center"
                       onClick={() => setModalPriorityOpen(!modalPriorityOpen)}
                     >
                       <span className="text-[14px] font-bold truncate">
                         {modalPriorityFilter.length > 0 ? `${modalPriorityFilter.length} Selected` : "All Priorities"}
                       </span>
-                      <ChevronDownIcon className={`w-4 h-4 text-gray-400 transition-transform ${modalPriorityOpen ? 'rotate-180' : ''}`} />
+                      <ChevronDownIcon className={`w-4 h-4 text-[#5B6472] transition-transform ${modalPriorityOpen ? 'rotate-180' : ''}`} />
                     </div>
                     {modalPriorityOpen && (
-                      <div className="absolute z-20 w-full mt-2 bg-white dark:bg-zinc-900 border border-orange-50 dark:border-zinc-800 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2">
+                      <div className="absolute z-20 w-full mt-2 bg-white dark:bg-zinc-900 border border-[#E5E7EB] dark:border-zinc-800 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2">
                         <div className="p-1 max-h-48 overflow-y-auto">
                           {['Low', 'Medium', 'High'].map(p => {
                             const count = baseDelegations.filter(d => d.priority === p).length;
@@ -2447,19 +2447,19 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
                   {/* Assigned To Filter */}
                   <div className="relative">
-                    <label className="text-[14px] font-semibold text-gray-400 mb-2 block">Assigned To</label>
+                    <label className="text-[14px] font-semibold text-[#5B6472] mb-2 block">Assigned To</label>
                     <div 
-                      className="w-full bg-[#FFFFFF] dark:bg-zinc-900 border-2 border-orange-50 dark:border-zinc-800 rounded-xl px-4 py-2.5 cursor-pointer flex justify-between items-center"
+                      className="w-full bg-[#FFFFFF] dark:bg-zinc-900 border-2 border-[#E5E7EB] dark:border-zinc-800 rounded-xl px-4 py-2.5 cursor-pointer flex justify-between items-center"
                       onClick={() => setModalAssignedToOpen(!modalAssignedToOpen)}
                     >
                       <span className="text-[14px] font-bold truncate">
                         {modalAssignedToFilter.length > 0 ? `${modalAssignedToFilter.length} Selected` : "Everyone"}
                       </span>
-                      <ChevronDownIcon className={`w-4 h-4 text-gray-400 transition-transform ${modalAssignedToOpen ? 'rotate-180' : ''}`} />
+                      <ChevronDownIcon className={`w-4 h-4 text-[#5B6472] transition-transform ${modalAssignedToOpen ? 'rotate-180' : ''}`} />
                     </div>
                     {modalAssignedToOpen && (
-                      <div className="absolute z-20 w-full mt-2 bg-white dark:bg-zinc-900 border border-orange-50 dark:border-zinc-800 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2">
-                        <div className="p-2 border-b border-orange-50 dark:border-zinc-800">
+                      <div className="absolute z-20 w-full mt-2 bg-white dark:bg-zinc-900 border border-[#E5E7EB] dark:border-zinc-800 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2">
+                        <div className="p-2 border-b border-[#E5E7EB] dark:border-zinc-800">
                           <input 
                             type="text" placeholder="Search users..." value={modalAssignedToSearch}
                             onChange={(e) => setModalAssignedToSearch(e.target.value)}
@@ -2498,19 +2498,19 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
                   {/* Assigned By Filter */}
                   <div className="relative">
-                    <label className="text-[14px] font-semibold text-gray-400 mb-2 block">Assigned By</label>
+                    <label className="text-[14px] font-semibold text-[#5B6472] mb-2 block">Assigned By</label>
                     <div 
-                      className="w-full bg-[#FFFFFF] dark:bg-zinc-900 border-2 border-orange-50 dark:border-zinc-800 rounded-xl px-4 py-2.5 cursor-pointer flex justify-between items-center"
+                      className="w-full bg-[#FFFFFF] dark:bg-zinc-900 border-2 border-[#E5E7EB] dark:border-zinc-800 rounded-xl px-4 py-2.5 cursor-pointer flex justify-between items-center"
                       onClick={() => setModalAssignedByOpen(!modalAssignedByOpen)}
                     >
                       <span className="text-[14px] font-bold truncate">
                         {modalAssignedByFilter.length > 0 ? `${modalAssignedByFilter.length} Selected` : "All Senders"}
                       </span>
-                      <ChevronDownIcon className={`w-4 h-4 text-gray-400 transition-transform ${modalAssignedByOpen ? 'rotate-180' : ''}`} />
+                      <ChevronDownIcon className={`w-4 h-4 text-[#5B6472] transition-transform ${modalAssignedByOpen ? 'rotate-180' : ''}`} />
                     </div>
                     {modalAssignedByOpen && (
-                      <div className="absolute z-20 w-full mt-2 bg-white dark:bg-zinc-900 border border-orange-50 dark:border-zinc-800 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2">
-                        <div className="p-2 border-b border-orange-50 dark:border-zinc-800">
+                      <div className="absolute z-20 w-full mt-2 bg-white dark:bg-zinc-900 border border-[#E5E7EB] dark:border-zinc-800 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2">
+                        <div className="p-2 border-b border-[#E5E7EB] dark:border-zinc-800">
                           <input 
                             type="text" placeholder="Search users..." value={modalAssignedBySearch}
                             onChange={(e) => setModalAssignedBySearch(e.target.value)}
@@ -2549,19 +2549,19 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
                   {/* Department Filter */}
                   <div className="relative">
-                    <label className="text-[14px] font-semibold text-gray-400 mb-2 block">Department</label>
+                    <label className="text-[14px] font-semibold text-[#5B6472] mb-2 block">Department</label>
                     <div 
-                      className="w-full bg-[#FFFFFF] dark:bg-zinc-900 border-2 border-orange-50 dark:border-zinc-800 rounded-xl px-4 py-2.5 cursor-pointer flex justify-between items-center"
+                      className="w-full bg-[#FFFFFF] dark:bg-zinc-900 border-2 border-[#E5E7EB] dark:border-zinc-800 rounded-xl px-4 py-2.5 cursor-pointer flex justify-between items-center"
                       onClick={() => setModalDepartmentOpen(!modalDepartmentOpen)}
                     >
                       <span className="text-[14px] font-bold truncate">
                         {modalDepartmentFilter.length > 0 ? `${modalDepartmentFilter.length} Selected` : "All Departments"}
                       </span>
-                      <ChevronDownIcon className={`w-4 h-4 text-gray-400 transition-transform ${modalDepartmentOpen ? 'rotate-180' : ''}`} />
+                      <ChevronDownIcon className={`w-4 h-4 text-[#5B6472] transition-transform ${modalDepartmentOpen ? 'rotate-180' : ''}`} />
                     </div>
                     {modalDepartmentOpen && (
-                      <div className="absolute z-[10000] w-full mt-2 bg-white dark:bg-zinc-900 border border-orange-50 dark:border-zinc-800 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2">
-                        <div className="p-2 border-b border-orange-50 dark:border-zinc-800">
+                      <div className="absolute z-[10000] w-full mt-2 bg-white dark:bg-zinc-900 border border-[#E5E7EB] dark:border-zinc-800 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2">
+                        <div className="p-2 border-b border-[#E5E7EB] dark:border-zinc-800">
                           <input 
                             type="text" placeholder="Search departments..." value={modalDepartmentSearch}
                             onChange={(e) => setModalDepartmentSearch(e.target.value)}
@@ -2601,7 +2601,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
               </div>
 
               {/* Footer */}
-              <div className="p-6 bg-[#2563EB]/5 dark:bg-zinc-900/50 border-t border-orange-100 dark:border-zinc-800 flex items-center justify-between gap-4">
+              <div className="p-6 bg-[#2563EB]/5 dark:bg-zinc-900/50 border-t border-[#E5E7EB] dark:border-zinc-800 flex items-center justify-between gap-4">
                 <button
                   onClick={() => {
                     setFilterStartDate("");

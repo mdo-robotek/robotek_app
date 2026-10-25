@@ -104,7 +104,7 @@ export default function SemiCircleGauge({ value, label = "Overall Avg", isNegati
                </>
              )}
            </div>
-           <div className="text-[13px] font-bold text-gray-400 mt-1">
+           <div className="text-[13px] font-bold text-[#5B6472] mt-1">
              {label}
            </div>
         </div>

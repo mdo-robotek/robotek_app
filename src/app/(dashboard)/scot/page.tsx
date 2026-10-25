@@ -745,7 +745,7 @@ export default function ScotPage() {
                       htmlFor="file-upload" 
                       className={`flex items-center gap-2 px-4 py-1.5 rounded-xl font-semibold   text-[13px] transition-all cursor-pointer shadow-sm active:scale-95 whitespace-nowrap ${
                         uploading 
-                          ? 'bg-slate-100 text-slate-400 dark:bg-slate-800 pointer-events-none' 
+                          ? 'bg-slate-100 text-[#5B6472] dark:bg-slate-800 pointer-events-none' 
                           : 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-600/20'
                       }`}
                     >
@@ -757,7 +757,7 @@ export default function ScotPage() {
                   {/* Pagination Actions */}
                   <div className="flex gap-1.5">
                     <button onClick={() => setFeederPage(p => Math.max(1, p - 1))} disabled={feederPage === 1} className="px-3 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[13px] font-semibold rounded-xl disabled:opacity-50 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors shadow-sm text-slate-700 dark:text-slate-300">Prev</button>
-                    <span className="flex items-center px-2 text-[13px] font-semibold text-slate-400 whitespace-nowrap">{feederPage} / {Math.ceil(filteredFeeders.length / itemsPerPage) || 1}</span>
+                    <span className="flex items-center px-2 text-[13px] font-semibold text-[#5B6472] whitespace-nowrap">{feederPage} / {Math.ceil(filteredFeeders.length / itemsPerPage) || 1}</span>
                     <button onClick={() => setFeederPage(p => Math.min(Math.ceil(filteredFeeders.length / itemsPerPage), p + 1))} disabled={feederPage >= Math.ceil(filteredFeeders.length / itemsPerPage)} className="px-3 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[13px] font-semibold rounded-xl disabled:opacity-50 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors shadow-sm text-slate-700 dark:text-slate-300">Next</button>
                   </div>
 
@@ -786,7 +786,7 @@ export default function ScotPage() {
                 </thead>
                 <tbody className="divide-y-2 divide-slate-200 dark:divide-slate-800">
                   {paginatedFeeders.length === 0 ? (
-                    <tr><td colSpan={4} className="px-6 py-10 text-center text-sm font-bold text-slate-400">No data available</td></tr>
+                    <tr><td colSpan={4} className="px-6 py-10 text-center text-sm font-bold text-[#5B6472]">No data available</td></tr>
                   ) : paginatedFeeders.map((f, idx) => (
                     <tr key={idx} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
                       <td className="px-6 py-4">
@@ -806,11 +806,11 @@ export default function ScotPage() {
                       <td className="px-6 py-4">
                         <div className="flex flex-col gap-1">
                           <p className="text-[14px] font-semibold text-slate-900 dark:text-white flex items-center gap-1.5">
-                            <UserGroupIcon className="w-3.5 h-3.5 text-slate-400" />
+                            <UserGroupIcon className="w-3.5 h-3.5 text-[#5B6472]" />
                             {f.toName || "Unknown"}
                           </p>
                           <p className="text-[14px] font-bold text-slate-500 flex items-center gap-1.5">
-                            <PhoneIcon className="w-3 h-3 text-slate-400" />
+                            <PhoneIcon className="w-3 h-3 text-[#5B6472]" />
                             {f.countryCode ? `+${f.countryCode} ` : ""}{f.toNumber || "N/A"}
                           </p>
                         </div>
@@ -821,7 +821,7 @@ export default function ScotPage() {
                             {f.callType || 'N/A'}
                           </span>
                           <span className="text-[14px] font-bold text-slate-500 flex items-center gap-1.5">
-                            <ClockIcon className="w-3 h-3 text-slate-400" />
+                            <ClockIcon className="w-3 h-3 text-[#5B6472]" />
                             {f.duration || '0s'}
                           </span>
                         </div>
@@ -833,7 +833,7 @@ export default function ScotPage() {
                             {formatCallDate(f.callDate)} {formatCallTime(f.callTime) !== "No Time" ? `at ${formatCallTime(f.callTime)}` : ""}
                           </span>
                           <span className="text-[13px] font-bold text-slate-500 flex items-center gap-1.5 mt-1" title="Created At / Uploaded At">
-                            <ClockIcon className="w-3 h-3 text-slate-400" />
+                            <ClockIcon className="w-3 h-3 text-[#5B6472]" />
                             Uploaded: {f.timestamp ? new Date(f.timestamp).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: '2-digit', hour: '2-digit', minute: '2-digit' }) : "N/A"}
                           </span>
                         </div>
@@ -905,7 +905,7 @@ export default function ScotPage() {
               {/* Pagination Actions */}
               <div className="flex gap-1.5">
                 <button onClick={() => setScotPage(p => Math.max(1, p - 1))} disabled={scotPage === 1} className="px-3 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[13px] font-semibold rounded-xl disabled:opacity-50 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors shadow-sm text-slate-700 dark:text-slate-300">Prev</button>
-                <span className="flex items-center px-2 text-[13px] font-semibold text-slate-400 whitespace-nowrap">{scotPage} / {Math.ceil(scotRows.length / itemsPerPage) || 1}</span>
+                <span className="flex items-center px-2 text-[13px] font-semibold text-[#5B6472] whitespace-nowrap">{scotPage} / {Math.ceil(scotRows.length / itemsPerPage) || 1}</span>
                 <button onClick={() => setScotPage(p => Math.min(Math.ceil(scotRows.length / itemsPerPage), p + 1))} disabled={scotPage >= Math.ceil(scotRows.length / itemsPerPage)} className="px-3 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[13px] font-semibold rounded-xl disabled:opacity-50 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors shadow-sm text-slate-700 dark:text-slate-300">Next</button>
               </div>
 
@@ -1035,7 +1035,7 @@ export default function ScotPage() {
               </thead>
               <tbody className="divide-y-2 divide-slate-200 dark:divide-slate-700">
                 {paginatedScotRows.length === 0 ? (
-                  <tr><td colSpan={8 + scotMonthDates.length} className="px-6 py-10 text-center text-sm font-bold text-slate-400">No target records found</td></tr>
+                  <tr><td colSpan={8 + scotMonthDates.length} className="px-6 py-10 text-center text-sm font-bold text-[#5B6472]">No target records found</td></tr>
                 ) : paginatedScotRows.map((row, idx) => (
                   <tr key={idx} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors group/row">
                     <td className="px-2 py-4 text-center whitespace-nowrap sticky left-0 z-20 bg-white dark:bg-slate-900 border-r-2 border-slate-200 dark:border-slate-700 group-hover/row:bg-slate-50 dark:group-hover/row:bg-slate-800/80 transition-colors">
@@ -1069,7 +1069,7 @@ export default function ScotPage() {
                           {row.lastOrderDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: '2-digit' })}
                         </span>
                       ) : (
-                        <span className="text-[13px] font-bold text-slate-400">N/A</span>
+                        <span className="text-[13px] font-bold text-[#5B6472]">N/A</span>
                       )}
                     </td>
                     <td className="px-2 py-4 text-center whitespace-nowrap bg-white dark:bg-slate-900 border-r-2 border-slate-200 dark:border-slate-700 group-hover/row:bg-slate-50 dark:group-hover/row:bg-slate-800/80 transition-colors">
@@ -1078,18 +1078,18 @@ export default function ScotPage() {
                           {row.lastCallDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: '2-digit' })}
                         </span>
                       ) : (
-                        <span className="text-[13px] font-bold text-slate-400">N/A</span>
+                        <span className="text-[13px] font-bold text-[#5B6472]">N/A</span>
                       )}
                     </td>
                     <td className="px-2 py-4 text-center whitespace-nowrap group bg-white dark:bg-slate-900 border-r-2 border-slate-200 dark:border-slate-700 group-hover/row:bg-slate-50 dark:group-hover/row:bg-slate-800/80 transition-colors">
                       <div className="flex items-center justify-center gap-2">
                         {row.frequencyDays ? (
-                          <span className={`inline-flex items-center gap-1.5 px-3 py-1 text-[13px] font-semibold   rounded-full border shadow-sm ${row.isManualFrequency ? 'bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/20' : 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20'}`} title={row.isManualFrequency ? 'Manual Frequency' : 'Calculated Frequency'}>
+                          <span className={`inline-flex items-center gap-1.5 px-3 py-1 text-[13px] font-semibold   rounded-full border shadow-sm ${row.isManualFrequency ? 'bg-[#D97706]/10 text-[#D97706] dark:text-[#D97706] border-[#E5E7EB]' : 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20'}`} title={row.isManualFrequency ? 'Manual Frequency' : 'Calculated Frequency'}>
                             <ArrowPathIcon className="w-3.5 h-3.5" />
                             {row.frequencyDays} Days
                           </span>
                         ) : (
-                          <span className="text-[13px] font-bold text-slate-400">N/A</span>
+                          <span className="text-[13px] font-bold text-[#5B6472]">N/A</span>
                         )}
                         <button 
                           onClick={() => { setFreqParty(row.toName); setFreqValue(row.isManualFrequency ? String(row.frequencyDays) : ""); setIsFreqModalOpen(true); }}
@@ -1106,7 +1106,7 @@ export default function ScotPage() {
                             {row.manualFollowUpDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: '2-digit' })}
                           </span>
                         ) : (
-                          <span className="text-[13px] font-bold text-slate-400">N/A</span>
+                          <span className="text-[13px] font-bold text-[#5B6472]">N/A</span>
                         )}
                         <button 
                           onClick={() => { 
@@ -1128,7 +1128,7 @@ export default function ScotPage() {
                           {row.nextPlannedDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: '2-digit' })}
                         </span>
                       ) : (
-                        <span className="text-[13px] font-bold text-slate-400">N/A</span>
+                        <span className="text-[13px] font-bold text-[#5B6472]">N/A</span>
                       )}
                     </td>
 

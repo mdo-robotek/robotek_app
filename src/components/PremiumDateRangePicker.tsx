@@ -109,7 +109,7 @@ export default function PremiumDateRangePicker({
         </div>
         <div className="grid grid-cols-7 mb-2">
           {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map(d => (
-            <div key={d} className="text-center text-[13px] font-semibold text-gray-300">{d}</div>
+            <div key={d} className="text-center text-[13px] font-semibold text-[#5B6472]">{d}</div>
           ))}
         </div>
         <div className="grid grid-cols-7 gap-y-1">
@@ -160,12 +160,12 @@ export default function PremiumDateRangePicker({
         style={{ backgroundColor: 'var(--panel-card)', borderColor: 'var(--panel-border)' }}
         className="border-2 rounded-xl px-4 py-2 flex items-center gap-3 cursor-pointer shadow-sm hover:border-[#2563EB]/20 group transition-all"
       >
-        <CalendarDaysIcon className="w-4 h-4 text-gray-400 group-hover:text-blue-500 transition-colors" />
+        <CalendarDaysIcon className="w-4 h-4 text-[#5B6472] group-hover:text-blue-500 transition-colors" />
         <div className="flex items-center gap-2">
           <span className="text-[14px] font-semibold text-gray-900 dark:text-white tracking-tight">
             {formatDate(value.from)}
           </span>
-          <span className="text-gray-300 font-bold">-</span>
+          <span className="text-[#5B6472] font-bold">-</span>
           <span className="text-[14px] font-semibold text-gray-900 dark:text-white tracking-tight">
             {formatDate(value.to)}
           </span>
@@ -183,13 +183,13 @@ export default function PremiumDateRangePicker({
           >
              <div className="flex items-center justify-between pb-4 border-b border-gray-100">
                 <h3 className="text-[14px] font-semibold text-gray-900 dark:text-white">Select Analysis Range</h3>
-                <button onClick={() => setIsOpen(false)} className="p-1.5 hover:bg-gray-100 rounded-full"><XMarkIcon className="w-5 h-5 text-gray-400" /></button>
+                <button onClick={() => setIsOpen(false)} className="p-1.5 hover:bg-gray-100 rounded-full"><XMarkIcon className="w-5 h-5 text-[#5B6472]" /></button>
              </div>
 
              <div className="flex gap-8 items-start relative">
                 {/* Navigation Arrows */}
-                <button onClick={handlePrevMonth} className="absolute -left-2 top-0 p-2 hover:bg-gray-100 rounded-lg transition-all z-20"><ChevronLeftIcon className="w-5 h-5 text-gray-400" /></button>
-                <button onClick={handleNextMonth} className="absolute -right-2 top-0 p-2 hover:bg-gray-100 rounded-lg transition-all z-20"><ChevronRightIcon className="w-5 h-5 text-gray-400" /></button>
+                <button onClick={handlePrevMonth} className="absolute -left-2 top-0 p-2 hover:bg-gray-100 rounded-lg transition-all z-20"><ChevronLeftIcon className="w-5 h-5 text-[#5B6472]" /></button>
+                <button onClick={handleNextMonth} className="absolute -right-2 top-0 p-2 hover:bg-gray-100 rounded-lg transition-all z-20"><ChevronRightIcon className="w-5 h-5 text-[#5B6472]" /></button>
 
                 {renderCalendar(leftMonth)}
                 <div className="w-[1px] bg-gray-100 self-stretch" />

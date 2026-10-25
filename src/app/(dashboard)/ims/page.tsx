@@ -354,8 +354,8 @@ export default function IMSHub() {
             "Total Storage Overview",
             <ClipboardDocumentListIcon />,
             finalData,
-            "bg-gradient-to-br from-orange-500 to-amber-700",
-            "shadow-orange-900/20"
+            "bg-[#2563EB]",
+            ""
           )}
         </div>
 
@@ -386,7 +386,7 @@ export default function IMSHub() {
 
               <div className="p-5 space-y-4 overflow-y-auto custom-scrollbar">
                 <div className="rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 px-4 py-3">
-                  <p className="text-[13px] font-semibold text-gray-400 mb-1">Formula</p>
+                  <p className="text-[13px] font-semibold text-[#5B6472] mb-1">Formula</p>
                   <p className="text-sm font-semibold text-[#2563EB] dark:text-[#60A5FA]">{IMS_CALC_INFO[infoLocation].formula}</p>
                 </div>
 
@@ -399,9 +399,9 @@ export default function IMSHub() {
                     <ul className="space-y-3">
                       {IMS_CALC_INFO[infoLocation].inSources.map((source) => (
                         <li key={source.label} className="border-t border-emerald-100/80 dark:border-emerald-500/10 pt-3 first:border-t-0 first:pt-0">
-                          <p className="text-[13px] font-semibold text-gray-400 mb-1">Data Source</p>
+                          <p className="text-[13px] font-semibold text-[#5B6472] mb-1">Data Source</p>
                           <p className="text-[14px] font-bold text-gray-800 dark:text-gray-200 mb-1.5">{source.label}</p>
-                          <p className="text-[13px] font-semibold text-gray-400 mb-1">How Calculated</p>
+                          <p className="text-[13px] font-semibold text-[#5B6472] mb-1">How Calculated</p>
                           <p className="text-[14px] font-medium text-gray-600 dark:text-gray-300 leading-relaxed">{source.detail}</p>
                         </li>
                       ))}
@@ -416,9 +416,9 @@ export default function IMSHub() {
                     <ul className="space-y-3">
                       {IMS_CALC_INFO[infoLocation].outSources.map((source) => (
                         <li key={source.label} className="border-t border-rose-100/80 dark:border-rose-500/10 pt-3 first:border-t-0 first:pt-0">
-                          <p className="text-[13px] font-semibold text-gray-400 mb-1">Data Source</p>
+                          <p className="text-[13px] font-semibold text-[#5B6472] mb-1">Data Source</p>
                           <p className="text-[14px] font-bold text-gray-800 dark:text-gray-200 mb-1.5">{source.label}</p>
-                          <p className="text-[13px] font-semibold text-gray-400 mb-1">How Calculated</p>
+                          <p className="text-[13px] font-semibold text-[#5B6472] mb-1">How Calculated</p>
                           <p className="text-[14px] font-medium text-gray-600 dark:text-gray-300 leading-relaxed">{source.detail}</p>
                         </li>
                       ))}

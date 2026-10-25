@@ -61,7 +61,7 @@ export default function CooReport({ data: coo, loading }: CooReportProps) {
     return (
       <div className="flex flex-col items-center justify-center py-24 gap-4">
         <ArrowPathIcon className="w-12 h-12 animate-spin text-[#2563EB] dark:text-[#60A5FA]" />
-        <p className="text-[13px] font-semibold text-gray-400">Synchronizing Command Center...</p>
+        <p className="text-[13px] font-semibold text-[#5B6472]">Synchronizing Command Center...</p>
       </div>
     );
   }
@@ -101,53 +101,43 @@ export default function CooReport({ data: coo, loading }: CooReportProps) {
 
   return (
     <div className="space-y-6">
-      {/* Header Banner */}
-      <div className="flex items-center justify-between bg-[#2563EB] dark:bg-navy-900 text-white p-6 rounded-[2.5rem] shadow-2xl relative overflow-hidden ring-1 ring-white/10">
-        <div className="relative z-10">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-white/10 rounded-xl">
-              <ArrowTrendingUpIcon className="w-6 h-6 text-[#2563EB]" />
-            </div>
-            <div>
-              <h2 className="text-2xl font-semibold tracking-tighter">COO Command Center <span className="text-[13px] bg-[#2563EB] text-white px-2 py-0.5 rounded-full ml-2">v2.0</span></h2>
-              <p className="text-[13px] text-white/50 mt-1 font-bold">
-                Robotek Enterprise Intelligence Engine &nbsp;·&nbsp; Period: <span className="text-[#2563EB]">{periodLabel}</span>
-              </p>
-            </div>
-          </div>
+      {/* Header — calm line, not a heavy blue banner. Sahil, 25 Oct:
+          "no heavy dark headers, ek screen pe ek hi accent". */}
+      <div className="flex items-end justify-between gap-4 flex-wrap">
+        <div>
+          <h2 className="text-[22px] font-semibold text-[#1A1D21] dark:text-white">
+            COO Command Center
+          </h2>
+          <p className="text-[14px] text-[#5B6472] dark:text-gray-400 mt-0.5">
+            {periodLabel}
+          </p>
         </div>
-
-        <div className="flex items-center gap-4 relative z-10">
-          <div className="hidden md:flex flex-col items-end">
-             <p className="text-[13px] font-semibold text-white/40">Last Sync</p>
-             <p className="text-[14px] font-semibold text-[#2563EB]">{new Date(coo.generatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</p>
-          </div>
-          <div className="h-10 w-px bg-white/10" />
+        <div className="flex items-center gap-3 text-[13px] text-[#5B6472] dark:text-gray-400">
+          <span>
+            Last sync{" "}
+            {new Date(coo.generatedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+          </span>
           {loading ? (
-            <div className="flex items-center gap-2 bg-white/10 rounded-full px-4 py-2 text-[13px] font-semibold border border-white/10">
-              <ArrowPathIcon className="w-3 h-3 animate-spin" /> Syncing
-            </div>
+            <span className="flex items-center gap-1.5 font-semibold text-[#5B6472]">
+              <ArrowPathIcon className="w-3.5 h-3.5 animate-spin" /> Syncing
+            </span>
           ) : (
-            <div className="flex items-center gap-2 bg-emerald-500/20 border border-emerald-400/30 rounded-full px-4 py-2 text-[13px] font-semibold text-emerald-400">
-              <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" /> Live
-            </div>
+            <span className="flex items-center gap-1.5 font-semibold text-[#15803D]">
+              <span className="w-2 h-2 bg-[#15803D] rounded-full" /> Live
+            </span>
           )}
-        </div>
-        {/* Background Decal */}
-        <div className="absolute top-0 right-0 opacity-5 -mr-12 -mt-12">
-            <ArrowTrendingUpIcon className="w-64 h-64" />
         </div>
       </div>
 
       {/* KPI STRIP */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         {[
-          { label: "Today's Revenue", value: fmtAmount(ord.todayRevenue || 0), sub: `MTD: ${fmtAmount(rev.mtdActual || 0)}`, icon: CurrencyDollarIcon, color: "text-blue-500", border: "border-t-blue-500" },
-          { label: "Orders (MTD)", value: ord.mtdOrders?.toLocaleString() || 0, sub: `${ord.mtdDispatched || 0} Dispatched`, icon: ShoppingBagIcon, color: "text-emerald-500", border: "border-t-emerald-500" },
-          { label: "OTD % (Order→Dispatch)", value: `${ord.otdRate || 0}%`, sub: `Dispatch tak ka on-time · Target: 85%`, icon: ClockIcon, color: ord.otdRate >= 85 ? "text-emerald-500" : "text-red-500", border: ord.otdRate >= 85 ? "border-t-emerald-500" : "border-t-red-500" },
-          { label: "Pending Dispatch", value: ord.delayAging?.total || 0, sub: `${fmtAmount(ord.delayAging?.gt7?.revenueAtRisk || 0)} at risk · ${ord.delayAging?.postDispatchCount || 0} post-dispatch pending`, icon: ExclamationTriangleIcon, color: "text-amber-500", border: "border-t-amber-500", onClick: () => setDrillDownModal({ isOpen: true, title: "Pending Orders (O2D)", data: ord.delayAging?.undispatchedList || [], columns: [{ key: 'id', label: 'Order No' }, { key: 'party', label: 'Party' }, { key: 'step', label: 'Pending Step' }, { key: 'date', label: 'Date' }, { key: 'amount', label: 'Amount', render: (item: any) => `₹${item.amount.toLocaleString()}` }, { key: 'remark', label: 'Followup Remark', render: (item: any) => <OrderRemarkCell orderNo={item.id} initial={item.remark} /> }] }) },
-          { label: "Team Miss Score", value: `${(() => { const w = scorecard.reduce((a: number, u: any) => a + (u.assigned || 0), 0); const s = scorecard.reduce((a: number, u: any) => a + (u.missPct ?? 0) * (u.assigned || 0), 0); return w ? Math.round(s / w) : 0; })()}%`, sub: `${scorecard.filter((u: any) => (u.missPct ?? 0) === 0).length}/${scorecard.length} members at 0% target`, icon: ClipboardDocumentCheckIcon, color: "text-violet-500", border: "border-t-violet-500" },
-          { label: "Team Present", value: `${att.present || 0}/${att.total || 0}`, sub: `${att.absent || 0} Absent · ${att.onLeave || 0} Leave`, icon: UsersIcon, color: "text-indigo-500", border: "border-t-indigo-500", onClick: () => setDrillDownModal({ isOpen: true, title: "Team Attendance", data: [...(att.presentList || []).map((x: any) => ({ ...x, status: 'Present' })), ...(att.absentList || []).map((x: any) => ({ ...x, status: 'Absent' })), ...(att.onLeaveList || []).map((x: any) => ({ ...x, status: `On Leave (${x.type})` }))], columns: [{ key: 'id', label: 'Employee ID' }, { key: 'name', label: 'Name' }, { key: 'status', label: 'Status' }] }) },
+          { label: "Today's Revenue", value: fmtAmount(ord.todayRevenue || 0), sub: `MTD: ${fmtAmount(rev.mtdActual || 0)}`, icon: CurrencyDollarIcon },
+          { label: "Orders (MTD)", value: ord.mtdOrders?.toLocaleString() || 0, sub: `${ord.mtdDispatched || 0} Dispatched`, icon: ShoppingBagIcon },
+          { label: "OTD % (Order→Dispatch)", value: `${ord.otdRate || 0}%`, sub: `On-time up to dispatch · Target: 85%`, icon: ClockIcon, color: ord.otdRate >= 85 ? "text-[#15803D]" : "text-[#DC2626]" },
+          { label: "Pending Dispatch", value: ord.delayAging?.total || 0, sub: `${fmtAmount(ord.delayAging?.gt7?.revenueAtRisk || 0)} at risk · ${ord.delayAging?.postDispatchCount || 0} post-dispatch pending`, icon: ExclamationTriangleIcon, color: (ord.delayAging?.total || 0) > 0 ? "text-[#D97706]" : undefined, onClick: () => setDrillDownModal({ isOpen: true, title: "Pending Orders (O2D)", data: ord.delayAging?.undispatchedList || [], columns: [{ key: 'id', label: 'Order No' }, { key: 'party', label: 'Party' }, { key: 'step', label: 'Pending Step' }, { key: 'date', label: 'Date' }, { key: 'amount', label: 'Amount', render: (item: any) => `₹${item.amount.toLocaleString()}` }, { key: 'remark', label: 'Followup Remark', render: (item: any) => <OrderRemarkCell orderNo={item.id} initial={item.remark} /> }] }) },
+          { label: "Team Miss Score", value: `${(() => { const w = scorecard.reduce((a: number, u: any) => a + (u.assigned || 0), 0); const s = scorecard.reduce((a: number, u: any) => a + (u.missPct ?? 0) * (u.assigned || 0), 0); return w ? Math.round(s / w) : 0; })()}%`, sub: `${scorecard.filter((u: any) => (u.missPct ?? 0) === 0).length}/${scorecard.length} members at 0% target`, icon: ClipboardDocumentCheckIcon },
+          { label: "Team Present", value: `${att.present || 0}/${att.total || 0}`, sub: `${att.absent || 0} Absent · ${att.onLeave || 0} Leave`, icon: UsersIcon, onClick: () => setDrillDownModal({ isOpen: true, title: "Team Attendance", data: [...(att.presentList || []).map((x: any) => ({ ...x, status: 'Present' })), ...(att.absentList || []).map((x: any) => ({ ...x, status: 'Absent' })), ...(att.onLeaveList || []).map((x: any) => ({ ...x, status: `On Leave (${x.type})` }))], columns: [{ key: 'id', label: 'Employee ID' }, { key: 'name', label: 'Name' }, { key: 'status', label: 'Status' }] }) },
         ].map((kpi, i) => (
           <motion.div 
             initial={{ opacity: 0, y: 20 }} 
@@ -155,15 +145,15 @@ export default function CooReport({ data: coo, loading }: CooReportProps) {
             transition={{ delay: i * 0.05 }}
             key={i} 
             onClick={kpi.onClick}
-            className={`bg-white dark:bg-navy-800 border border-gray-100 dark:border-white/5 border-t-4 ${kpi.border} rounded-2xl p-5 shadow-xl hover:shadow-2xl transition-all group ${kpi.onClick ? 'cursor-pointer hover:scale-[1.02]' : ''}`}
+            className={`bg-white dark:bg-navy-800 border border-[#E5E7EB] dark:border-white/5 rounded-2xl p-5 transition-colors group ${kpi.onClick ? 'cursor-pointer hover:border-[#2563EB]' : ''}`}
           >
             <div className="flex items-center justify-between mb-3">
-              <p className="text-[13px] text-gray-400 font-semibold">{kpi.label}</p>
-              <kpi.icon className={`w-4 h-4 ${kpi.color} opacity-40 group-hover:opacity-100 transition-opacity`} />
+              <p className="text-[13px] text-[#5B6472] font-semibold">{kpi.label}</p>
+              <kpi.icon className="w-4 h-4 text-[#5B6472] opacity-50" />
             </div>
-            <p className={`text-2xl font-semibold ${kpi.color} tracking-tighter`}>{kpi.value}</p>
-            <div className="mt-2 pt-2 border-t border-gray-50 dark:border-white/5">
-              <p className="text-[13px] font-bold text-gray-400">{kpi.sub}</p>
+            <p className={`text-[28px] leading-none font-semibold tabular-nums ${kpi.color || "text-[#1A1D21] dark:text-white"}`}>{kpi.value}</p>
+            <div className="mt-3 pt-2 border-t border-[#E5E7EB] dark:border-white/5">
+              <p className="text-[13px] font-semibold text-[#5B6472]">{kpi.sub}</p>
             </div>
           </motion.div>
         ))}
@@ -176,7 +166,7 @@ export default function CooReport({ data: coo, loading }: CooReportProps) {
         <div className="bg-white dark:bg-navy-800 rounded-2xl px-4 py-3 shadow-xl border border-gray-100 dark:border-white/5 ring-1 ring-black/5">
           <div className="flex items-center justify-between mb-2">
             <p className="text-[13px] font-semibold text-gray-500 dark:text-zinc-400">⚡ Dispatch Speed — avg time order → dispatch (click a day for orders)</p>
-            <div className="hidden md:flex items-center gap-3 text-[13px] font-semibold text-gray-400">
+            <div className="hidden md:flex items-center gap-3 text-[13px] font-semibold text-[#5B6472]">
               <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-emerald-500" />≤9h fast</span>
               <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-amber-500" />≤24h ok</span>
               <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-red-500" />&gt;24h slow</span>
@@ -206,7 +196,7 @@ export default function CooReport({ data: coo, loading }: CooReportProps) {
 
               const noOrders = (gap.count || 0) === 0;
               const speedClass = noOrders
-                ? "bg-gray-50 dark:bg-white/5 text-gray-400 border-gray-100 dark:border-white/10"
+                ? "bg-gray-50 dark:bg-white/5 text-[#5B6472] border-gray-100 dark:border-white/10"
                 : gap.avgHours <= 9
                 ? "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 border-emerald-100 dark:border-emerald-500/20"
                 : gap.avgHours <= 24
@@ -233,11 +223,11 @@ export default function CooReport({ data: coo, loading }: CooReportProps) {
           delay, taaki bilty jaise slow steps alag se pakde jayein. */}
       {(ord.stepPerformance || []).length > 0 && (
         <div className="bg-white dark:bg-navy-800 rounded-2xl px-4 py-3 shadow-xl border border-gray-100 dark:border-white/5 ring-1 ring-black/5">
-          <p className="text-[13px] font-semibold text-gray-500 dark:text-zinc-400 mb-2">🪜 Step Performance — har step ka on-time % (planned vs actual)</p>
+          <p className="text-[13px] font-semibold text-gray-500 dark:text-zinc-400 mb-2">Step Performance — on-time % for each step (planned vs actual)</p>
           <div className="overflow-x-auto custom-scrollbar">
             <table className="w-full text-[14px]">
               <thead>
-                <tr className="text-[13px] font-semibold text-gray-400">
+                <tr className="text-[13px] font-semibold text-[#5B6472]">
                   <th className="text-left py-1.5 px-2">Step</th>
                   <th className="text-right py-1.5 px-2">Done</th>
                   <th className="text-right py-1.5 px-2">On-Time %</th>
@@ -251,10 +241,10 @@ export default function CooReport({ data: coo, loading }: CooReportProps) {
                   <tr key={s.step} className={`border-t border-gray-50 dark:border-white/5 ${s.pending > 20 || (s.completed > 0 && s.onTimePct < 50) ? "bg-red-50/60 dark:bg-red-950/20" : ""}`}>
                     <td className="py-1.5 px-2 font-semibold text-gray-800 dark:text-zinc-100">{s.step}. {s.name}</td>
                     <td className="py-1.5 px-2 text-right font-bold text-gray-500">{s.completed}</td>
-                    <td className={`py-1.5 px-2 text-right font-semibold ${s.completed === 0 ? "text-gray-400" : s.onTimePct >= 85 ? "text-emerald-600" : s.onTimePct >= 50 ? "text-amber-600" : "text-red-600"}`}>{s.completed === 0 ? "—" : `${s.onTimePct}%`}</td>
+                    <td className={`py-1.5 px-2 text-right font-semibold ${s.completed === 0 ? "text-[#5B6472]" : s.onTimePct >= 85 ? "text-emerald-600" : s.onTimePct >= 50 ? "text-amber-600" : "text-red-600"}`}>{s.completed === 0 ? "—" : `${s.onTimePct}%`}</td>
                     <td className="py-1.5 px-2 text-right font-bold text-gray-500">{s.late || "—"}</td>
                     <td className="py-1.5 px-2 text-right font-bold text-gray-500">{s.avgDelayHours > 0 ? (s.avgDelayHours >= 24 ? `${Math.floor(s.avgDelayHours / 24)}d ${s.avgDelayHours % 24}h` : `${s.avgDelayHours}h`) : "—"}</td>
-                    <td className={`py-1.5 px-2 text-right font-semibold ${s.pending > 20 ? "text-red-600" : s.pending > 0 ? "text-amber-600" : "text-gray-400"}`}>{s.pending || "—"}</td>
+                    <td className={`py-1.5 px-2 text-right font-semibold ${s.pending > 20 ? "text-red-600" : s.pending > 0 ? "text-amber-600" : "text-[#5B6472]"}`}>{s.pending || "—"}</td>
                   </tr>
                 ))}
               </tbody>
@@ -284,24 +274,24 @@ export default function CooReport({ data: coo, loading }: CooReportProps) {
               >
                 <p className="text-[13px] font-semibold text-red-500">Critical · Orders</p>
                 <p className="text-sm font-semibold text-gray-800 dark:text-white mt-1">{ord.delayAging.gt7.count} orders delayed &gt;7 days</p>
-                <p className="text-[13px] font-bold text-gray-400 mt-1">{fmtAmount(ord.delayAging.gt7.revenueAtRisk)} at risk · Escalate immediately</p>
+                <p className="text-[13px] font-bold text-[#5B6472] mt-1">{fmtAmount(ord.delayAging.gt7.revenueAtRisk)} at risk · Escalate immediately</p>
               </div>
             )}
             {(del.zeroTaskEmployees?.length || 0) > 0 && (
               <div className="bg-amber-50 dark:bg-amber-500/10 border border-amber-100 dark:border-amber-500/20 rounded-2xl p-4">
                 <p className="text-[13px] font-semibold text-amber-500">Critical · Team</p>
                 <p className="text-sm font-semibold text-gray-800 dark:text-white mt-1">{del.zeroTaskEmployees.length} members: 0 tasks MTD</p>
-                <p className="text-[13px] font-bold text-gray-400 mt-1 truncate">{del.zeroTaskEmployees.slice(0, 3).join(", ")} ...</p>
+                <p className="text-[13px] font-bold text-[#5B6472] mt-1 truncate">{del.zeroTaskEmployees.slice(0, 3).join(", ")} ...</p>
               </div>
             )}
             {(del.overdue || 0) > 0 && (
               <div 
-                className="bg-orange-50 dark:bg-orange-500/10 border border-orange-100 dark:border-orange-500/20 rounded-2xl p-4 cursor-pointer hover:bg-orange-100 dark:hover:bg-orange-500/20 transition-colors"
+                className="bg-[#F7F8FA] dark:bg-[#D97706]/10 border border-[#E5E7EB] dark:border-[#E5E7EB] rounded-2xl p-4 cursor-pointer hover:bg-[#F7F8FA] dark:hover:bg-[#D97706]/20 transition-colors"
                 onClick={() => setDrillDownModal({ isOpen: true, title: "Overdue Tasks", data: del.overdueList || [], columns: [{ key: 'id', label: 'Task ID' }, { key: 'title', label: 'Title' }, { key: 'assignedTo', label: 'Assigned To' }, { key: 'due', label: 'Due Date' }] })}
               >
-                <p className="text-[13px] font-semibold text-orange-500">Warning · Delegations</p>
+                <p className="text-[13px] font-semibold text-[#D97706]">Warning · Delegations</p>
                 <p className="text-sm font-semibold text-gray-800 dark:text-white mt-1">{del.overdue} tasks overdue</p>
-                <p className="text-[13px] font-bold text-gray-400 mt-1">{del.needRevision || 0} need revision · {del.pending || 0} pending</p>
+                <p className="text-[13px] font-bold text-[#5B6472] mt-1">{del.needRevision || 0} need revision · {del.pending || 0} pending</p>
               </div>
             )}
             {(alerts.ledgerMismatchCount || 0) > 0 && (
@@ -311,14 +301,14 @@ export default function CooReport({ data: coo, loading }: CooReportProps) {
               >
                 <p className="text-[13px] font-semibold text-fuchsia-500">Critical · Item Ledger</p>
                 <p className="text-sm font-semibold text-gray-800 dark:text-white mt-1">{alerts.ledgerMismatchCount} items with IN/OUT entry errors</p>
-                <p className="text-[13px] font-bold text-gray-400 mt-1">Negative ya bina IN ke selling — Item Ledger page par fix karein</p>
+                <p className="text-[13px] font-bold text-[#5B6472] mt-1">Sold with no matching IN entry — fix on the Item Ledger page</p>
               </div>
             )}
             {(alerts.inactiveParties?.length || 0) > 0 && (
               <div className="bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-100 dark:border-indigo-500/20 rounded-2xl p-4">
                 <p className="text-[13px] font-semibold text-indigo-500">Info · CRM</p>
                 <p className="text-sm font-semibold text-gray-800 dark:text-white mt-1">{alerts.inactiveParties.length} parties inactive &gt;60 days</p>
-                <p className="text-[13px] font-bold text-gray-400 mt-1">Assign reactivation calls to sales team</p>
+                <p className="text-[13px] font-bold text-[#5B6472] mt-1">Assign reactivation calls to sales team</p>
               </div>
             )}
           </div>
@@ -329,11 +319,11 @@ export default function CooReport({ data: coo, loading }: CooReportProps) {
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-[14px] font-semibold text-gray-900 dark:text-white">📦 Order Velocity & OTD %</h3>
             <div className="flex items-center gap-4">
-               <div className="flex items-center gap-1.5 text-[13px] font-semibold text-gray-400"><div className="w-2 h-2 bg-[#6366f1] rounded" /> Orders</div>
-               <div className="flex items-center gap-1.5 text-[13px] font-semibold text-gray-400"><div className="w-2 h-2 bg-red-500 rounded" /> OTD %</div>
+               <div className="flex items-center gap-1.5 text-[13px] font-semibold text-[#5B6472]"><div className="w-2 h-2 bg-[#6366f1] rounded" /> Orders</div>
+               <div className="flex items-center gap-1.5 text-[13px] font-semibold text-[#5B6472]"><div className="w-2 h-2 bg-red-500 rounded" /> OTD %</div>
             </div>
           </div>
-          <p className="text-[13px] text-gray-400 font-bold mb-6">Monthly dispatched volume vs on-time delivery accuracy</p>
+          <p className="text-[13px] text-[#5B6472] font-bold mb-6">Monthly dispatched volume vs on-time delivery accuracy</p>
           <div className="h-[280px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <ComposedChart data={charts.orderOtdTrend || []} margin={{ top: 20, right: 20, left: -20, bottom: 0 }}>
@@ -363,7 +353,7 @@ export default function CooReport({ data: coo, loading }: CooReportProps) {
             <h3 className="text-[14px] font-semibold text-gray-900 dark:text-white">📈 Team Performance Trend</h3>
             <span className="bg-red-50 text-red-500 text-[13px] font-semibold px-2 py-0.5 rounded-full">-34% AVG</span>
           </div>
-          <p className="text-[13px] text-gray-400 font-bold mb-6">Weekly combined score & on-time accuracy across all modules</p>
+          <p className="text-[13px] text-[#5B6472] font-bold mb-6">Weekly combined score & on-time accuracy across all modules</p>
           <div className="h-[280px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={charts.orderOtdTrend || []} margin={{ top: 20, right: 20, left: -20, bottom: 0 }}>
@@ -385,9 +375,9 @@ export default function CooReport({ data: coo, loading }: CooReportProps) {
         <div className="lg:col-span-5 bg-white dark:bg-navy-800 rounded-[2rem] p-6 shadow-xl border border-gray-100 dark:border-white/5 ring-1 ring-black/5 flex flex-col">
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-[14px] font-semibold text-gray-900 dark:text-white">💰 Revenue vs Target</h3>
-            <p className="text-[13px] text-gray-400 font-bold">{new Date().toLocaleString('default', { month: 'long', year: 'numeric' })}</p>
+            <p className="text-[13px] text-[#5B6472] font-bold">{new Date().toLocaleString('default', { month: 'long', year: 'numeric' })}</p>
           </div>
-          <p className="text-[13px] text-gray-400 font-bold mb-6">Daily actual revenue vs cumulative target pace</p>
+          <p className="text-[13px] text-[#5B6472] font-bold mb-6">Daily actual revenue vs cumulative target pace</p>
           <div className="h-[220px] w-full mb-6">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={rev.dailyChart || []} margin={{ top: 20, right: 20, left: -20, bottom: 0 }}>
@@ -406,13 +396,13 @@ export default function CooReport({ data: coo, loading }: CooReportProps) {
           <div className="grid grid-cols-4 gap-4 mt-auto">
             {[
               { label: "MTD Actual", value: fmtAmount(rev.mtdActual || 0), color: "text-emerald-500" },
-              { label: "MTD Target", value: fmtAmount(rev.proratedTarget || 0), color: "text-gray-400" },
+              { label: "MTD Target", value: fmtAmount(rev.proratedTarget || 0), color: "text-[#5B6472]" },
               { label: "Achievement", value: `${rev.achievementPct || 0}%`, color: rev.achievementPct >= 80 ? "text-emerald-500" : "text-amber-500" },
               { label: "Gap", value: fmtAmount(rev.gap || 0), color: "text-amber-500" },
             ].map((s, i) => (
               <div key={i} className="text-center">
                 <p className={`text-xl font-semibold ${s.color} tracking-tighter`}>{s.value}</p>
-                <p className="text-[12px] font-semibold text-gray-400 mt-1">{s.label}</p>
+                <p className="text-[12px] font-semibold text-[#5B6472] mt-1">{s.label}</p>
               </div>
             ))}
           </div>
@@ -422,9 +412,9 @@ export default function CooReport({ data: coo, loading }: CooReportProps) {
         <div className="lg:col-span-4 bg-white dark:bg-navy-800 rounded-[2rem] p-6 shadow-xl border border-gray-100 dark:border-white/5 ring-1 ring-black/5">
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-[14px] font-semibold text-gray-900 dark:text-white">⏱ Delay Aging Analysis</h3>
-            <p className="text-[13px] text-gray-400 font-bold">{ord.delayAging?.total || 0} TOTAL</p>
+            <p className="text-[13px] text-[#5B6472] font-bold">{ord.delayAging?.total || 0} TOTAL</p>
           </div>
-          <p className="text-[13px] text-gray-400 font-bold mb-6">Prioritize oldest delayed orders first for revenue clearance</p>
+          <p className="text-[13px] text-[#5B6472] font-bold mb-6">Prioritize oldest delayed orders first for revenue clearance</p>
           <div className="h-[180px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart layout="vertical" data={ord.delayAging?.agingChart || []} margin={{ top: 0, right: 30, left: 40, bottom: 0 }}>
@@ -455,8 +445,8 @@ export default function CooReport({ data: coo, loading }: CooReportProps) {
             ].map((b, i) => (
               <div key={i} className="text-center p-2 bg-gray-50 dark:bg-white/5 rounded-2xl">
                 <p className={`text-xl font-semibold ${b.color} tracking-tighter`}>{b.count}</p>
-                <p className="text-[12px] font-semibold text-gray-400 mt-1">{b.label}</p>
-                <p className="text-[12px] font-bold text-gray-400/60">{b.sub}</p>
+                <p className="text-[12px] font-semibold text-[#5B6472] mt-1">{b.label}</p>
+                <p className="text-[12px] font-bold text-[#5B6472]/60">{b.sub}</p>
               </div>
             ))}
           </div>
@@ -493,7 +483,7 @@ export default function CooReport({ data: coo, loading }: CooReportProps) {
               </ResponsiveContainer>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
                 <p className="text-3xl font-semibold tracking-tighter">{att.presentPct || 0}%</p>
-                <p className="text-[13px] font-semibold text-gray-400">Present</p>
+                <p className="text-[13px] font-semibold text-[#5B6472]">Present</p>
               </div>
             </div>
           </div>
@@ -523,9 +513,9 @@ export default function CooReport({ data: coo, loading }: CooReportProps) {
         <div className="lg:col-span-6 bg-white dark:bg-navy-800 rounded-[2rem] p-8 shadow-xl border border-gray-100 dark:border-white/5 ring-1 ring-black/5">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-sm font-semibold text-gray-900 dark:text-white">📋 Delegations Overview</h3>
-            <p className="text-[13px] text-gray-400 font-semibold">{del.total || 0} TOTAL TASKS</p>
+            <p className="text-[13px] text-[#5B6472] font-semibold">{del.total || 0} TOTAL TASKS</p>
           </div>
-          <p className="text-[13px] text-gray-400 font-bold mb-6">Task Pipeline Status</p>
+          <p className="text-[13px] text-[#5B6472] font-bold mb-6">Task Pipeline Status</p>
           {/* Pipeline Bar */}
           <div className="mb-8">
             <div className="flex h-3 rounded-full overflow-hidden gap-1 mb-4 bg-gray-50 dark:bg-white/5 p-0.5">
@@ -545,7 +535,7 @@ export default function CooReport({ data: coo, loading }: CooReportProps) {
               ].map((s, i) => (
                 <div key={i} className="flex items-center gap-2">
                   <div className={`w-2 h-2 rounded-full ${s.color}`} />
-                  <p className="text-[13px] font-semibold text-gray-400">{s.label} <span className="text-gray-900 dark:text-white ml-1">{s.value}</span></p>
+                  <p className="text-[13px] font-semibold text-[#5B6472]">{s.label} <span className="text-gray-900 dark:text-white ml-1">{s.value}</span></p>
                 </div>
               ))}
             </div>
@@ -566,17 +556,17 @@ export default function CooReport({ data: coo, loading }: CooReportProps) {
           </div>
 
           <div className="space-y-3">
-             <p className="text-[13px] font-semibold text-gray-400 mb-4">Overdue / Critical Tasks — Needs Your Attention</p>
+             <p className="text-[13px] font-semibold text-[#5B6472] mb-4">Overdue / Critical Tasks — Needs Your Attention</p>
              {(del.criticalTasks || []).map((t: any, i: number) => (
                <div key={i} className="group p-4 bg-gray-50 dark:bg-white/5 rounded-2xl border border-transparent hover:border-red-500/30 transition-all flex items-center gap-4">
-                  <span className="text-[13px] font-semibold text-gray-300 dark:text-white/10 group-hover:text-red-500 transition-colors">#{t.id}</span>
+                  <span className="text-[13px] font-semibold text-[#5B6472] dark:text-white/10 group-hover:text-red-500 transition-colors">#{t.id}</span>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold text-gray-800 dark:text-white truncate">{t.title}</p>
-                    <p className="text-[13px] font-bold text-gray-400 mt-0.5">{t.assignedTo} · {t.department}</p>
+                    <p className="text-[13px] font-bold text-[#5B6472] mt-0.5">{t.assignedTo} · {t.department}</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-[13px] font-semibold text-gray-400">Due: {t.dueDate}</p>
-                    <span className="text-[13px] font-semibold text-red-500 mt-1 px-2 py-0.5 bg-red-50 dark:bg-red-500/10 rounded-full inline-block">OVERDUE</span>
+                    <p className="text-[13px] font-semibold text-[#5B6472]">Due: {t.dueDate}</p>
+                    <span className="text-[13px] font-semibold text-red-500 mt-1 px-2 py-0.5 bg-red-50 dark:bg-red-500/10 rounded-full inline-block">Overdue</span>
                   </div>
                </div>
              ))}
@@ -595,7 +585,7 @@ export default function CooReport({ data: coo, loading }: CooReportProps) {
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
              <div className="bg-gray-50 dark:bg-white/5 rounded-2xl p-6 text-center border border-transparent hover:border-indigo-500/20 transition-all">
                 <p className="text-3xl font-semibold tracking-tighter">{inv.totalSKUs || 0}</p>
-                <p className="text-[13px] font-semibold text-gray-400 mt-2">Total SKUs</p>
+                <p className="text-[13px] font-semibold text-[#5B6472] mt-2">Total SKUs</p>
                 <p className="text-[13px] font-bold text-emerald-500 mt-1">↑ 12 new this month</p>
              </div>
              <div 
@@ -625,7 +615,7 @@ export default function CooReport({ data: coo, loading }: CooReportProps) {
           </div>
 
           <div className="space-y-4 mb-10">
-             <p className="text-[13px] font-semibold text-gray-400 mb-2">Inventory by Category</p>
+             <p className="text-[13px] font-semibold text-[#5B6472] mb-2">Inventory by Category</p>
              {(inv.inventoryByCategory || []).map((c: any, i: number) => (
                <div
                  key={i}
@@ -640,8 +630,8 @@ export default function CooReport({ data: coo, loading }: CooReportProps) {
                  })}
                >
                   <div className="flex justify-between text-[13px] font-semibold">
-                    <p className="text-gray-900 dark:text-white">{c.category} <span className="text-gray-400 normal-case font-bold">· click for items</span></p>
-                    <p className="text-gray-400">{c.qty.toLocaleString()} PCS</p>
+                    <p className="text-gray-900 dark:text-white">{c.category} <span className="text-[#5B6472] normal-case font-bold">· click for items</span></p>
+                    <p className="text-[#5B6472]">{c.qty.toLocaleString()} PCS</p>
                   </div>
                   <div className="h-1.5 bg-gray-100 dark:bg-white/5 rounded-full overflow-hidden">
                     <motion.div 
@@ -659,9 +649,9 @@ export default function CooReport({ data: coo, loading }: CooReportProps) {
               them beats everything else on this list. */}
           <div className="space-y-3 mb-10">
             <div className="flex items-center justify-between">
-              <p className="text-[13px] font-semibold text-gray-400">🔥 Can't Afford To Be Low — Top Movers</p>
+              <p className="text-[13px] font-semibold text-[#5B6472]">🔥 Can't Afford To Be Low — Top Movers</p>
               {(inv.criticalAtRiskCount || 0) > 0 && (
-                <span className="bg-orange-50 dark:bg-orange-500/10 text-orange-500 text-[13px] font-semibold px-3 py-1 rounded-full border border-orange-100 dark:border-orange-500/20">
+                <span className="bg-[#F7F8FA] dark:bg-[#D97706]/10 text-[#D97706] text-[13px] font-semibold px-3 py-1 rounded-full border border-[#E5E7EB] dark:border-[#E5E7EB]">
                   {inv.criticalAtRiskCount} AT RISK
                 </span>
               )}
@@ -674,9 +664,9 @@ export default function CooReport({ data: coo, loading }: CooReportProps) {
                 onClick={() => setDrillDownModal({ isOpen: true, title: "Can't Afford To Be Low — At Risk", data: inv.criticalAtRiskList || [], columns: [{ key: 'sku', label: 'SKU' }, { key: 'category', label: 'Category' }, { key: 'totalSold', label: 'Total Sold' }, { key: 'stockLeft', label: 'Stock Left' }, { key: 'status', label: 'Status' }] })}
               >
                 {(inv.criticalAtRiskList || []).slice(0, 6).map((item: any, i: number) => (
-                  <div key={i} className="grid grid-cols-12 items-center p-3 px-4 bg-orange-50/50 dark:bg-orange-500/5 rounded-xl border border-orange-100 dark:border-orange-500/10 hover:border-orange-300 transition-all">
+                  <div key={i} className="grid grid-cols-12 items-center p-3 px-4 bg-[#F7F8FA] dark:bg-[#D97706]/5 rounded-xl border border-[#E5E7EB] dark:border-[#E5E7EB] hover:border-[#E5E7EB] transition-all">
                     <div className="col-span-5 text-[14px] font-semibold text-gray-900 dark:text-white truncate">{item.sku}</div>
-                    <div className="col-span-3 text-[13px] font-bold text-gray-400">{item.category}</div>
+                    <div className="col-span-3 text-[13px] font-bold text-[#5B6472]">{item.category}</div>
                     <div className="col-span-2 text-center text-[14px] font-semibold" style={{ color: item.stockLeft <= 0 ? "#ef4444" : "#f59e0b" }}>{item.stockLeft}</div>
                     <div className="col-span-2 text-right">
                       <span className={`text-[13px] font-semibold  px-2 py-1 rounded-full border ${item.status === 'Negative' ? 'bg-fuchsia-50 text-fuchsia-500 border-fuchsia-100' : item.status === 'Out of Stock' ? 'bg-red-50 text-red-500 border-red-100' : 'bg-amber-50 text-amber-500 border-amber-100'}`}>
@@ -686,14 +676,14 @@ export default function CooReport({ data: coo, loading }: CooReportProps) {
                   </div>
                 ))}
                 {(inv.criticalAtRiskList || []).length > 6 && (
-                  <p className="text-[13px] font-bold text-gray-400 text-center pt-1">+ {(inv.criticalAtRiskList || []).length - 6} more — click to view all</p>
+                  <p className="text-[13px] font-bold text-[#5B6472] text-center pt-1">+ {(inv.criticalAtRiskList || []).length - 6} more — click to view all</p>
                 )}
               </div>
             )}
           </div>
 
           <div className="space-y-2">
-             <div className="grid grid-cols-12 text-[13px] font-semibold text-gray-400 mb-3 px-4">
+             <div className="grid grid-cols-12 text-[13px] font-semibold text-[#5B6472] mb-3 px-4">
                 <div className="col-span-4">SKU</div>
                 <div className="col-span-3">Category</div>
                 <div className="col-span-2 text-center">Stock Left</div>
@@ -703,7 +693,7 @@ export default function CooReport({ data: coo, loading }: CooReportProps) {
                 {(inv.lowStockItems || []).map((item: any, i: number) => (
                   <div key={i} className="grid grid-cols-12 items-center p-3 px-4 bg-gray-50 dark:bg-white/5 rounded-xl border border-transparent hover:border-gray-200 dark:hover:border-white/10 transition-all">
                     <div className="col-span-4 text-[14px] font-semibold text-gray-900 dark:text-white">{item.sku}</div>
-                    <div className="col-span-3 text-[13px] font-bold text-gray-400">{item.category}</div>
+                    <div className="col-span-3 text-[13px] font-bold text-[#5B6472]">{item.category}</div>
                     <div className="col-span-2 text-center text-[14px] font-semibold" style={{ color: item.stockLeft === 0 ? "#ef4444" : "#f59e0b" }}>{item.stockLeft}</div>
                     <div className="col-span-3 text-right">
                       <span className={`text-[13px] font-semibold  px-3 py-1 rounded-full border ${item.status === 'Out of Stock' ? 'bg-red-50 text-red-500 border-red-100 dark:bg-red-500/10 dark:border-red-500/20' : 'bg-amber-50 text-amber-500 border-amber-100 dark:bg-amber-500/10 dark:border-amber-500/20'}`}>
@@ -730,7 +720,7 @@ export default function CooReport({ data: coo, loading }: CooReportProps) {
                 {["GOOD", "WATCH", "ACT"].map(s => (
                   <div key={s} className="flex items-center gap-1.5">
                     <div className={`w-1.5 h-1.5 rounded-full ${s === 'GOOD' ? 'bg-emerald-500' : s === 'WATCH' ? 'bg-amber-500' : 'bg-red-500'}`} />
-                    <p className="text-[13px] font-semibold text-gray-400">{s}</p>
+                    <p className="text-[13px] font-semibold text-[#5B6472]">{s}</p>
                   </div>
                 ))}
              </div>
@@ -739,7 +729,7 @@ export default function CooReport({ data: coo, loading }: CooReportProps) {
            <div className="overflow-x-auto">
              <table className="w-full">
                <thead>
-                 <tr className="text-[13px] font-semibold text-gray-400 border-b border-gray-100 dark:border-white/5">
+                 <tr className="text-[13px] font-semibold text-[#5B6472] border-b border-gray-100 dark:border-white/5">
                    <th className="text-left pb-4 font-semibold">Member</th>
                    <th className="text-left pb-4 font-semibold">Dept</th>
                    <th className="text-center pb-4 font-semibold">Assigned</th>
@@ -762,7 +752,7 @@ export default function CooReport({ data: coo, loading }: CooReportProps) {
                         </div>
                      </td>
                      <td className="py-4">
-                        <span className="text-[13px] font-semibold text-gray-400 px-2 py-0.5 bg-gray-50 dark:bg-white/10 rounded-md">{user.dept}</span>
+                        <span className="text-[13px] font-semibold text-[#5B6472] px-2 py-0.5 bg-gray-50 dark:bg-white/10 rounded-md">{user.dept}</span>
                      </td>
                      <td className="py-4 text-center font-semibold text-gray-900 dark:text-white">{user.assigned}</td>
                      <td className="py-4 text-center">
@@ -780,7 +770,7 @@ export default function CooReport({ data: coo, loading }: CooReportProps) {
                           {user.missPct ?? 0}%
                         </span>
                      </td>
-                     <td className="py-4 text-center font-semibold text-gray-400 text-[14px]">{user.avgDelayHours}h</td>
+                     <td className="py-4 text-center font-semibold text-[#5B6472] text-[14px]">{user.avgDelayHours}h</td>
                      <td className="py-4 text-right">
                         <span className={`text-[13px] font-semibold px-4 py-1.5 rounded-full border ${getStatusColor(user.status)}`}>
                           ✓ {user.status}
@@ -802,13 +792,13 @@ export default function CooReport({ data: coo, loading }: CooReportProps) {
              </h3>
            </div>
            
-           <p className="text-[13px] font-semibold text-gray-400 mb-6">Top Parties by Orders</p>
+           <p className="text-[13px] font-semibold text-[#5B6472] mb-6">Top Parties by Orders</p>
            <div className="space-y-4 mb-10">
               {(pipe.topPartiesByOrders || []).map((p: any, i: number) => (
                 <div key={i} className="space-y-1.5">
                    <div className="flex justify-between text-[13px] font-semibold">
                      <p className="text-gray-900 dark:text-white truncate max-w-[200px]">{p.party}</p>
-                     <p className="text-gray-400">{p.count}</p>
+                     <p className="text-[#5B6472]">{p.count}</p>
                    </div>
                    <div className="h-1.5 bg-gray-100 dark:bg-white/5 rounded-full overflow-hidden">
                      <div className="h-full bg-indigo-500 rounded-full transition-all duration-1000" style={{ width: `${(p.count / (pipe.maxPartyCount || 1)) * 100}%`, opacity: 1 - (i * 0.1) }} />
@@ -817,27 +807,27 @@ export default function CooReport({ data: coo, loading }: CooReportProps) {
               ))}
            </div>
 
-           <p className="text-[13px] font-semibold text-gray-400 mb-4">NBD Pipeline</p>
+           <p className="text-[13px] font-semibold text-[#5B6472] mb-4">NBD Pipeline</p>
            <div className="grid grid-cols-2 gap-4 mb-10">
               <div className="bg-gray-50 dark:bg-white/5 rounded-2xl p-4 text-center">
                  <p className="text-2xl font-semibold text-emerald-500 tracking-tighter">{pipe.nbdIncoming || 0}</p>
-                 <p className="text-[12px] font-semibold text-gray-400 mt-1">NBD Incoming</p>
+                 <p className="text-[12px] font-semibold text-[#5B6472] mt-1">NBD Incoming</p>
               </div>
               <div className="bg-gray-50 dark:bg-white/5 rounded-2xl p-4 text-center">
                  <p className="text-2xl font-semibold text-blue-500 tracking-tighter">{pipe.nbdOutgoing || 0}</p>
-                 <p className="text-[12px] font-semibold text-gray-400 mt-1">NBD Outgoing</p>
+                 <p className="text-[12px] font-semibold text-[#5B6472] mt-1">NBD Outgoing</p>
               </div>
               <div className="bg-gray-50 dark:bg-white/5 rounded-2xl p-4 text-center">
                  <p className="text-2xl font-semibold text-amber-500 tracking-tighter">{pipe.oldParties || 0}</p>
-                 <p className="text-[12px] font-semibold text-gray-400 mt-1">Old Parties</p>
+                 <p className="text-[12px] font-semibold text-[#5B6472] mt-1">Old Parties</p>
               </div>
               <div className="bg-gray-50 dark:bg-white/5 rounded-2xl p-4 text-center">
                  <p className="text-2xl font-semibold text-red-500 tracking-tighter">{pipe.inactiveCount || 0}</p>
-                 <p className="text-[12px] font-semibold text-gray-400 mt-1">Inactive &gt;60d <span className="w-1.5 h-1.5 bg-red-500 rounded-full inline-block ml-1 animate-pulse" /></p>
+                 <p className="text-[12px] font-semibold text-[#5B6472] mt-1">Inactive &gt;60d <span className="w-1.5 h-1.5 bg-red-500 rounded-full inline-block ml-1 animate-pulse" /></p>
               </div>
            </div>
 
-           <p className="text-[13px] font-semibold text-gray-400 mb-4">Category Revenue</p>
+           <p className="text-[13px] font-semibold text-[#5B6472] mb-4">Category Revenue</p>
            <div className="space-y-4">
               {(pipe.categoryRevenue || []).map((c: any, i: number) => {
                 const maxRevenue = Math.max(...(pipe.categoryRevenue || []).map((x: any) => x.revenue)) || 1;
@@ -846,7 +836,7 @@ export default function CooReport({ data: coo, loading }: CooReportProps) {
                   <div key={i} className="space-y-1.5">
                     <div className="flex justify-between text-[13px] font-semibold">
                       <p className="text-gray-900 dark:text-white">{c.category}</p>
-                      <p className="text-gray-400">{fmtAmount(c.revenue)}</p>
+                      <p className="text-[#5B6472]">{fmtAmount(c.revenue)}</p>
                     </div>
                     <div className="h-1.5 bg-gray-100 dark:bg-white/5 rounded-full overflow-hidden">
                       <motion.div 
@@ -867,10 +857,10 @@ export default function CooReport({ data: coo, loading }: CooReportProps) {
       {/* Footer Decal */}
       <div className="pt-8 border-t border-gray-100 dark:border-white/5 flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-             <ArchiveBoxIcon className="w-5 h-5 text-gray-300" />
-             <p className="text-[13px] font-semibold text-gray-400">Robotek COO Dashboard v2.0 · O2D · Score · Attendance · IMS · Delegations · CRM</p>
+             <ArchiveBoxIcon className="w-5 h-5 text-[#5B6472]" />
+             <p className="text-[13px] font-semibold text-[#5B6472]">Robotek COO Dashboard v2.0 · O2D · Score · Attendance · IMS · Delegations · CRM</p>
           </div>
-          <p className="text-[13px] font-semibold text-gray-300">Designed for Sahil Sir · Refresh: 300s</p>
+          <p className="text-[13px] font-semibold text-[#5B6472]">Designed for Sahil Sir · Refresh: 300s</p>
       </div>
 
       {/* GAP DETAILS MODAL */}
@@ -888,7 +878,7 @@ export default function CooReport({ data: coo, loading }: CooReportProps) {
                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white tracking-tight">
                      Dispatch Gap Details
                    </h3>
-                   <p className="text-[14px] font-bold text-gray-400 mt-1">
+                   <p className="text-[14px] font-bold text-[#5B6472] mt-1">
                      Date: {selectedGapTile.date ? new Date(selectedGapTile.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: '2-digit' }) : ''} · {selectedGapTile.count} Orders · {selectedGapTile.totalHours} Working Hours Total Gap
                    </p>
                 </div>
@@ -904,7 +894,7 @@ export default function CooReport({ data: coo, loading }: CooReportProps) {
              <div className="flex-1 overflow-y-auto p-6 custom-scrollbar bg-white dark:bg-navy-900">
                 <table className="w-full text-left border-collapse">
                   <thead>
-                    <tr className="text-[13px] font-semibold text-gray-400 border-b border-gray-100 dark:border-white/5">
+                    <tr className="text-[13px] font-semibold text-[#5B6472] border-b border-gray-100 dark:border-white/5">
                        <th className="pb-3 pl-2 w-32">Order No</th>
                        <th className="pb-3 w-1/3">Party Name</th>
                        <th className="pb-3 w-1/3">Timeline</th>
@@ -945,7 +935,7 @@ export default function CooReport({ data: coo, loading }: CooReportProps) {
                            <td className="py-4 pl-2 font-semibold text-sm text-gray-800 dark:text-white align-top">{o.orderNo}</td>
                            <td className="py-4 text-[14px] font-bold text-gray-600 dark:text-gray-300 align-top">{o.party}</td>
                            <td className="py-4 text-[13px] text-gray-500 tracking-wider align-top flex flex-col gap-1">
-                             <div className="flex gap-2"><span className="w-20 font-semibold text-gray-400">Created:</span> <span className="font-bold">{formatShortDate(o.createdAt)}</span></div>
+                             <div className="flex gap-2"><span className="w-20 font-semibold text-[#5B6472]">Created:</span> <span className="font-bold">{formatShortDate(o.createdAt)}</span></div>
                              {o.isReconfirmed && <div className="flex gap-2"><span className="w-20 font-semibold text-amber-500">Reconfirmed:</span> <span className="font-bold text-gray-700 dark:text-gray-300">{formatShortDate(o.actual4)}</span></div>}
                              <div className="flex gap-2"><span className="w-20 font-semibold text-indigo-500">Dispatched:</span> <span className="font-bold text-gray-700 dark:text-gray-300">{formatShortDate(o.dispatchDate)}</span></div>
                            </td>
@@ -959,7 +949,7 @@ export default function CooReport({ data: coo, loading }: CooReportProps) {
                      })}
                      {(!selectedGapTile.orders || selectedGapTile.orders.length === 0) && (
                         <tr>
-                          <td colSpan={4} className="py-8 text-center text-[14px] font-semibold text-gray-400">
+                          <td colSpan={4} className="py-8 text-center text-[14px] font-semibold text-[#5B6472]">
                             No orders dispatched on this date
                           </td>
                         </tr>

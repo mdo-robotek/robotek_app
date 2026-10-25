@@ -254,7 +254,7 @@ export default function LeadDetailView({ lead, initialTab, onClose, onUpdate }: 
 
               <div className="space-y-1.5">
                 <label className="text-[13px] font-semibold text-[#2563EB] block">Status</label>
-                <select name="status" value={formData.status || ""} onChange={handleLeadChange} className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-2.5 py-1.5 rounded-lg border border-orange-100 dark:border-zinc-800 focus:border-[#2563EB] focus:bg-white dark:focus:bg-zinc-900 outline-none font-semibold text-sm text-gray-900 dark:text-white transition-all shadow-sm">
+                <select name="status" value={formData.status || ""} onChange={handleLeadChange} className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-2.5 py-1.5 rounded-lg border border-[#E5E7EB] dark:border-zinc-800 focus:border-[#2563EB] focus:bg-white dark:focus:bg-zinc-900 outline-none font-semibold text-sm text-gray-900 dark:text-white transition-all shadow-sm">
                   <option value="">Select Status...</option>
                   <option value="In Process">In Process</option>
                   <option value="Transfer to SS">Transfer to SS</option>
@@ -263,15 +263,15 @@ export default function LeadDetailView({ lead, initialTab, onClose, onUpdate }: 
               </div>
               <div className="space-y-1.5">
                 <label className="text-[13px] font-semibold text-[#2563EB] block">SC Remark</label>
-                <input name="sc_remark" value={formData.sc_remark || ""} onChange={handleLeadChange} className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-2.5 py-1.5 rounded-lg border border-orange-100 dark:border-zinc-800 focus:border-[#2563EB] outline-none font-semibold text-sm text-gray-900 dark:text-white transition-all" />
+                <input name="sc_remark" value={formData.sc_remark || ""} onChange={handleLeadChange} className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-2.5 py-1.5 rounded-lg border border-[#E5E7EB] dark:border-zinc-800 focus:border-[#2563EB] outline-none font-semibold text-sm text-gray-900 dark:text-white transition-all" />
               </div>
               <div className="space-y-1.5">
                 <label className="text-[13px] font-semibold text-[#2563EB] block">SS Remark</label>
-                <input name="ss_remark" value={formData.ss_remark || ""} onChange={handleLeadChange} className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-2.5 py-1.5 rounded-lg border border-orange-100 dark:border-zinc-800 focus:border-[#2563EB] outline-none font-semibold text-sm text-gray-900 dark:text-white transition-all" />
+                <input name="ss_remark" value={formData.ss_remark || ""} onChange={handleLeadChange} className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-2.5 py-1.5 rounded-lg border border-[#E5E7EB] dark:border-zinc-800 focus:border-[#2563EB] outline-none font-semibold text-sm text-gray-900 dark:text-white transition-all" />
               </div>
               <div className="space-y-1.5">
                 <label className="text-[13px] font-semibold text-[#2563EB] block">Party Remark</label>
-                <input name="party_remark" value={formData.party_remark || ""} onChange={handleLeadChange} className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-2.5 py-1.5 rounded-lg border border-orange-100 dark:border-zinc-800 focus:border-[#2563EB] outline-none font-semibold text-sm text-gray-900 dark:text-white transition-all" />
+                <input name="party_remark" value={formData.party_remark || ""} onChange={handleLeadChange} className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-2.5 py-1.5 rounded-lg border border-[#E5E7EB] dark:border-zinc-800 focus:border-[#2563EB] outline-none font-semibold text-sm text-gray-900 dark:text-white transition-all" />
               </div>
             </div>
             <button type="submit" disabled={isSubmitting} className="w-full px-3 py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white rounded-xl text-[14px] font-semibold transition-all shadow-md mt-4 disabled:opacity-50">
@@ -285,7 +285,7 @@ export default function LeadDetailView({ lead, initialTab, onClose, onUpdate }: 
             <div className="grid grid-cols-1 gap-3">
               <div className="space-y-1.5">
                 <label className="text-[13px] font-semibold text-[#2563EB] block">Qualification Status</label>
-                <select name="qualified_status" value={formData.qualified_status || ""} onChange={handleLeadChange} className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-2.5 py-1.5 rounded-lg border border-orange-100 dark:border-zinc-800 focus:border-[#2563EB] outline-none font-semibold text-sm text-gray-900 dark:text-white transition-all">
+                <select name="qualified_status" value={formData.qualified_status || ""} onChange={handleLeadChange} className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-2.5 py-1.5 rounded-lg border border-[#E5E7EB] dark:border-zinc-800 focus:border-[#2563EB] outline-none font-semibold text-sm text-gray-900 dark:text-white transition-all">
                   <option value="">Select Status...</option>
                   <option value="Qualified">Qualified</option>
                   <option value="Not Qualified">Not Qualified</option>
@@ -304,14 +304,14 @@ export default function LeadDetailView({ lead, initialTab, onClose, onUpdate }: 
                       <button type="button" onClick={() => setFormData(prev => ({ ...prev, document_link: "" }))} className="px-3 py-1.5 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg text-[14px] font-bold transition-colors">Clear</button>
                     </div>
                   ) : (
-                    <input type="file" onChange={handleFileUpload} disabled={isUploading} className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-2.5 py-1.5 rounded-lg border border-orange-100 dark:border-zinc-800 focus:border-[#2563EB] outline-none font-semibold text-sm text-gray-900 dark:text-white transition-all file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-black file:bg-[#2563EB] file:text-white hover:file:bg-[#1D4ED8] cursor-pointer" />
+                    <input type="file" onChange={handleFileUpload} disabled={isUploading} className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-2.5 py-1.5 rounded-lg border border-[#E5E7EB] dark:border-zinc-800 focus:border-[#2563EB] outline-none font-semibold text-sm text-gray-900 dark:text-white transition-all file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-black file:bg-[#2563EB] file:text-white hover:file:bg-[#1D4ED8] cursor-pointer" />
                   )}
                 </div>
                 {isUploading && <p className="text-[13px] text-blue-500 font-bold mt-1">Uploading document...</p>}
               </div>
               <div className="space-y-1.5">
                 <label className="text-[13px] font-semibold text-[#2563EB] block">Remark</label>
-                <input name="remark" value={formData.remark || ""} onChange={handleLeadChange} className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-2.5 py-1.5 rounded-lg border border-orange-100 dark:border-zinc-800 focus:border-[#2563EB] outline-none font-semibold text-sm text-gray-900 dark:text-white transition-all" placeholder="Add remark" />
+                <input name="remark" value={formData.remark || ""} onChange={handleLeadChange} className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-2.5 py-1.5 rounded-lg border border-[#E5E7EB] dark:border-zinc-800 focus:border-[#2563EB] outline-none font-semibold text-sm text-gray-900 dark:text-white transition-all" placeholder="Add remark" />
               </div>
             </div>
             <button type="submit" disabled={isSubmitting} className="w-full px-3 py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white rounded-xl text-[14px] font-semibold transition-all shadow-md mt-4 disabled:opacity-50">
@@ -325,7 +325,7 @@ export default function LeadDetailView({ lead, initialTab, onClose, onUpdate }: 
             <div className="grid grid-cols-1 gap-3">
               <div className="space-y-1.5">
                 <label className="text-[13px] font-semibold text-[#2563EB] block">Sales Coordinator Name</label>
-                <select name="sales_coordinator_name" value={formData.sales_coordinator_name || ""} onChange={handleLeadChange} className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-2.5 py-1.5 rounded-lg border border-orange-100 dark:border-zinc-800 focus:border-[#2563EB] outline-none font-semibold text-sm text-gray-900 dark:text-white transition-all">
+                <select name="sales_coordinator_name" value={formData.sales_coordinator_name || ""} onChange={handleLeadChange} className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-2.5 py-1.5 rounded-lg border border-[#E5E7EB] dark:border-zinc-800 focus:border-[#2563EB] outline-none font-semibold text-sm text-gray-900 dark:text-white transition-all">
                   <option value="">Select Coordinator...</option>
                   <option value="Self">Self</option>
                   {users.map(u => (
@@ -342,7 +342,7 @@ export default function LeadDetailView({ lead, initialTab, onClose, onUpdate }: 
                       type="button"
                       onClick={() => setFormData(prev => ({ ...prev, lead_priority_type: priority }))}
                       className={`flex-1 py-2 rounded-lg text-[14px] font-semibold   transition-all ${formData.lead_priority_type === priority
-                        ? (priority === 'High' ? 'bg-red-500 text-white shadow-md' : priority === 'Medium' ? 'bg-orange-500 text-white shadow-md' : 'bg-green-500 text-white shadow-md')
+                        ? (priority === 'High' ? 'bg-red-500 text-white shadow-md' : priority === 'Medium' ? 'bg-[#D97706] text-white shadow-md' : 'bg-green-500 text-white shadow-md')
                         : 'bg-gray-100 dark:bg-zinc-800 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-zinc-700'
                         }`}
                     >
@@ -364,11 +364,11 @@ export default function LeadDetailView({ lead, initialTab, onClose, onUpdate }: 
               <div className="grid grid-cols-1 gap-3">
                 <div className="space-y-1.5">
                   <label className="text-[13px] font-semibold text-[#2563EB] block">Lead Time (Days)</label>
-                  <input type="number" required name="lead_time" value={followUpFormData.lead_time} onChange={handleFollowUpChange} className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-2.5 py-1.5 rounded-lg border border-orange-100 dark:border-zinc-800 focus:border-[#2563EB] outline-none font-semibold text-sm text-gray-900 dark:text-white transition-all" placeholder="Enter days for next follow up" min="0" />
+                  <input type="number" required name="lead_time" value={followUpFormData.lead_time} onChange={handleFollowUpChange} className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-2.5 py-1.5 rounded-lg border border-[#E5E7EB] dark:border-zinc-800 focus:border-[#2563EB] outline-none font-semibold text-sm text-gray-900 dark:text-white transition-all" placeholder="Enter days for next follow up" min="0" />
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-[13px] font-semibold text-[#2563EB] block">Status Update</label>
-                  <select name="status" required value={followUpFormData.status} onChange={handleFollowUpChange} className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-2.5 py-1.5 rounded-lg border border-orange-100 dark:border-zinc-800 focus:border-[#2563EB] outline-none font-semibold text-sm text-gray-900 dark:text-white transition-all">
+                  <select name="status" required value={followUpFormData.status} onChange={handleFollowUpChange} className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-2.5 py-1.5 rounded-lg border border-[#E5E7EB] dark:border-zinc-800 focus:border-[#2563EB] outline-none font-semibold text-sm text-gray-900 dark:text-white transition-all">
                     <option value="">Select Status...</option>
                     <option value="Qualified">Qualified</option>
                     <option value="Lost">Lost</option>
@@ -387,18 +387,18 @@ export default function LeadDetailView({ lead, initialTab, onClose, onUpdate }: 
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-[13px] font-semibold text-[#2563EB] block">Remark</label>
-                  <textarea rows={2} required name="remark" value={followUpFormData.remark} onChange={handleFollowUpChange} className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-2.5 py-1.5 rounded-lg border border-orange-100 dark:border-zinc-800 focus:border-[#2563EB] outline-none font-semibold text-sm text-gray-900 dark:text-white transition-all resize-none" placeholder="Enter follow-up details..." />
+                  <textarea rows={2} required name="remark" value={followUpFormData.remark} onChange={handleFollowUpChange} className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-2.5 py-1.5 rounded-lg border border-[#E5E7EB] dark:border-zinc-800 focus:border-[#2563EB] outline-none font-semibold text-sm text-gray-900 dark:text-white transition-all resize-none" placeholder="Enter follow-up details..." />
                 </div>
                 
                 {(followUpFormData.status.toLowerCase().includes('billing')) && (
                   <>
                     <div className="space-y-1.5">
                       <label className="text-[13px] font-semibold text-[#2563EB] block">Billing Date</label>
-                      <input type="date" required name="billing_date" value={followUpFormData.billing_date} onChange={handleFollowUpChange} className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-2.5 py-1.5 rounded-lg border border-orange-100 dark:border-zinc-800 focus:border-[#2563EB] outline-none font-semibold text-sm text-gray-900 dark:text-white transition-all" />
+                      <input type="date" required name="billing_date" value={followUpFormData.billing_date} onChange={handleFollowUpChange} className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-2.5 py-1.5 rounded-lg border border-[#E5E7EB] dark:border-zinc-800 focus:border-[#2563EB] outline-none font-semibold text-sm text-gray-900 dark:text-white transition-all" />
                     </div>
                     <div className="space-y-1.5">
                       <label className="text-[13px] font-semibold text-[#2563EB] block">Billing Amount</label>
-                      <input required name="billing_amount" value={followUpFormData.billing_amount} onChange={handleFollowUpChange} className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-2.5 py-1.5 rounded-lg border border-orange-100 dark:border-zinc-800 focus:border-[#2563EB] outline-none font-semibold text-sm text-gray-900 dark:text-white transition-all" placeholder="Amount" />
+                      <input required name="billing_amount" value={followUpFormData.billing_amount} onChange={handleFollowUpChange} className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-2.5 py-1.5 rounded-lg border border-[#E5E7EB] dark:border-zinc-800 focus:border-[#2563EB] outline-none font-semibold text-sm text-gray-900 dark:text-white transition-all" placeholder="Amount" />
                     </div>
                   </>
                 )}
@@ -406,14 +406,14 @@ export default function LeadDetailView({ lead, initialTab, onClose, onUpdate }: 
                 {followUpFormData.status === 'Transferred to SS' && (
                   <div className="space-y-1.5">
                     <label className="text-[13px] font-semibold text-[#2563EB] block">SS Name</label>
-                    <input required name="ss_name" value={followUpFormData.ss_name} onChange={handleFollowUpChange} className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-2.5 py-1.5 rounded-lg border border-orange-100 dark:border-zinc-800 focus:border-[#2563EB] outline-none font-semibold text-sm text-gray-900 dark:text-white transition-all" placeholder="SS Name" />
+                    <input required name="ss_name" value={followUpFormData.ss_name} onChange={handleFollowUpChange} className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-2.5 py-1.5 rounded-lg border border-[#E5E7EB] dark:border-zinc-800 focus:border-[#2563EB] outline-none font-semibold text-sm text-gray-900 dark:text-white transition-all" placeholder="SS Name" />
                   </div>
                 )}
 
                 {followUpFormData.status === 'Existing Customer' && (
                   <div className="space-y-1.5">
                     <label className="text-[13px] font-semibold text-[#2563EB] block">Dealing With</label>
-                    <input required name="dealing_with" value={followUpFormData.dealing_with} onChange={handleFollowUpChange} className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-2.5 py-1.5 rounded-lg border border-orange-100 dark:border-zinc-800 focus:border-[#2563EB] outline-none font-semibold text-sm text-gray-900 dark:text-white transition-all" placeholder="SS Name or Direct Robotek" />
+                    <input required name="dealing_with" value={followUpFormData.dealing_with} onChange={handleFollowUpChange} className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-2.5 py-1.5 rounded-lg border border-[#E5E7EB] dark:border-zinc-800 focus:border-[#2563EB] outline-none font-semibold text-sm text-gray-900 dark:text-white transition-all" placeholder="SS Name or Direct Robotek" />
                   </div>
                 )}
               </div>
@@ -473,7 +473,7 @@ export default function LeadDetailView({ lead, initialTab, onClose, onUpdate }: 
                   )}
                   <button
                     onClick={() => setActiveTab('global')}
-                    className={`flex items-center gap-2 flex-1 justify-center py-2 px-3 rounded-xl font-semibold   text-[13px] transition-all whitespace-nowrap ${activeTab === 'global' ? 'bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-400 shadow-sm border border-orange-200 dark:border-orange-800/50' : 'text-gray-500 hover:bg-gray-200/50 dark:hover:bg-white/5'}`}
+                    className={`flex items-center gap-2 flex-1 justify-center py-2 px-3 rounded-xl font-semibold   text-[13px] transition-all whitespace-nowrap ${activeTab === 'global' ? 'bg-[#F7F8FA] text-[#D97706] dark:bg-[#FEF3C7] dark:text-[#D97706] shadow-sm border border-[#E5E7EB] dark:border-[#E5E7EB]' : 'text-gray-500 hover:bg-gray-200/50 dark:hover:bg-white/5'}`}
                   >
                     <GlobeAltIcon className="w-4 h-4" /> Global
                   </button>
@@ -509,16 +509,16 @@ export default function LeadDetailView({ lead, initialTab, onClose, onUpdate }: 
                   return (
                   <div key={event.id || idx} className="relative flex flex-col w-[260px] flex-shrink-0">
                     <div className="flex items-center mb-4 relative z-10">
-                      <div className={`w-8 h-8 rounded-full border-2 bg-white dark:bg-navy-900 flex items-center justify-center shrink-0 ${idx === 0 ? 'border-[#2563EB] text-yellow-600 dark:text-[#60A5FA] shadow-sm shadow-[#2563EB]/20' : 'border-orange-200 dark:border-zinc-700 text-gray-400'}`}>
+                      <div className={`w-8 h-8 rounded-full border-2 bg-white dark:bg-navy-900 flex items-center justify-center shrink-0 ${idx === 0 ? 'border-[#2563EB] text-yellow-600 dark:text-[#60A5FA] shadow-sm shadow-[#2563EB]/20' : 'border-[#E5E7EB] dark:border-zinc-700 text-[#5B6472]'}`}>
                         <span className="text-[13px] font-semibold">{count}{suffix}</span>
                       </div>
                       {idx !== followUps.length - 1 ? (
-                        <div className="flex-1 h-0.5 bg-orange-100 dark:bg-zinc-800" />
+                        <div className="flex-1 h-0.5 bg-[#F7F8FA] dark:bg-zinc-800" />
                       ) : (
                         <div className="flex-1 h-0.5 bg-transparent" />
                       )}
                     </div>
-                    <div className="bg-[#FFFFFF] dark:bg-navy-900 p-4 rounded-2xl shadow-sm border border-orange-100/50 dark:border-white/5 h-full">
+                    <div className="bg-[#FFFFFF] dark:bg-navy-900 p-4 rounded-2xl shadow-sm border border-[#E5E7EB] dark:border-white/5 h-full">
                       <div className="flex justify-between items-start mb-2">
                         <span className={`px-2 py-0.5 rounded text-[13px] font-semibold   ${event.status?.toLowerCase().includes('billing')
                           ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
@@ -530,13 +530,13 @@ export default function LeadDetailView({ lead, initialTab, onClose, onUpdate }: 
                         </span>
                         {idx === 0 && <span className="text-[12px] font-semibold text-white bg-[#2563EB]/10 px-1.5 rounded">Latest</span>}
                       </div>
-                      <p className="text-[13px] font-semibold text-gray-400 mb-3">
+                      <p className="text-[13px] font-semibold text-[#5B6472] mb-3">
                         {event.timestamp ? new Date(event.timestamp).toLocaleString("en-GB", { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }) : "—"}
                       </p>
                       <p className="text-[14px] font-medium text-gray-800 dark:text-gray-200 my-3 bg-white dark:bg-zinc-800/50 p-3 rounded-xl border border-gray-100 dark:border-white/5">
-                        {event.remark || <span className="text-gray-400 italic">No remark.</span>}
+                        {event.remark || <span className="text-[#5B6472] italic">No remark.</span>}
                       </p>
-                      <div className="flex flex-col gap-1.5 mt-3 pt-3 border-t border-orange-50 dark:border-white/5">
+                      <div className="flex flex-col gap-1.5 mt-3 pt-3 border-t border-[#E5E7EB] dark:border-white/5">
                         <span className="text-[13px] font-semibold text-gray-500">By: {event.dealing_with || event.ss_name || 'Unknown'}</span>
                         {event.next_follow_up_date && (
                           <span className="text-[13px] font-semibold text-gray-500">Next: {new Date(event.next_follow_up_date).toLocaleString("en-GB", { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', hour12: true })}</span>

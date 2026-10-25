@@ -104,7 +104,7 @@ const CompactTile = ({ label, value, icon: Icon, color, onClick, isClickable }: 
       <Icon className="w-5 h-5" />
     </div>
     <div>
-      <p className="text-[13px] font-semibold text-gray-400 leading-none mb-1">{label}</p>
+      <p className="text-[13px] font-semibold text-[#5B6472] leading-none mb-1">{label}</p>
       <h4 className="text-xl font-semibold text-gray-900 dark:text-white leading-none tracking-tight">{value}</h4>
     </div>
   </div>
@@ -119,8 +119,8 @@ const TrendTable = ({ title, data, type }: { title: string, data: any[], type: '
       <table className="w-full text-left">
         <thead className="bg-gray-50 dark:bg-white/5 sticky top-0 z-10">
           <tr>
-            <th className="px-4 py-2 text-[13px] font-semibold text-gray-400">Month</th>
-            <th className="px-4 py-2 text-[13px] font-semibold text-gray-400 text-right">{type === 'count' ? 'Orders' : 'Revenue'}</th>
+            <th className="px-4 py-2 text-[13px] font-semibold text-[#5B6472]">Month</th>
+            <th className="px-4 py-2 text-[13px] font-semibold text-[#5B6472] text-right">{type === 'count' ? 'Orders' : 'Revenue'}</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-50 dark:divide-white/5">
@@ -352,7 +352,7 @@ export default function MetrixPage() {
       />
       <div className="text-center">
         <p className="text-[13px] font-semibold text-gray-900 dark:text-white animate-pulse">Syncing Metrix Intelligence</p>
-        <p className="text-[12px] font-bold text-gray-400 mt-2">Connecting to Logistics Core...</p>
+        <p className="text-[12px] font-bold text-[#5B6472] mt-2">Connecting to Logistics Core...</p>
       </div>
     </div>
   );
@@ -374,8 +374,8 @@ export default function MetrixPage() {
               )}
             </div>
             <div>
-              <h1 className="text-xl font-semibold text-gray-900 dark:text-white tracking-tighter leading-none">O2D <span className="text-[#2563EB] dark:text-[#60A5FA] italic">ENGINE</span></h1>
-              <p className="text-gray-400 font-bold text-[12px] mt-1">Analytics Control Center</p>
+              <h1 className="text-xl font-semibold text-gray-900 dark:text-white tracking-tighter leading-none">O2D <span className="text-[#2563EB] dark:text-[#60A5FA] italic">Engine</span></h1>
+              <p className="text-[#5B6472] font-bold text-[12px] mt-1">Analytics Control Center</p>
             </div>
           </div>
 
@@ -397,7 +397,7 @@ export default function MetrixPage() {
                     activeTab === key
                       ? key === "forecast"
                         ? 'bg-gradient-to-r from-[#2563EB] to-blue-800 text-white shadow-md shadow-blue-900/20 scale-105'
-                        : 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md shadow-orange-900/20 scale-105'
+                        : 'bg-[#2563EB] text-white shadow-md scale-105'
                       : key === "forecast"
                         ? 'bg-blue-50 dark:bg-[#60A5FA]/20 text-[#2563EB] dark:text-[#60A5FA] hover:bg-blue-100 hover:scale-105'
                         : 'bg-white dark:bg-navy-800 text-gray-600 dark:text-gray-300 hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-navy-700 hover:scale-105'
@@ -433,7 +433,7 @@ export default function MetrixPage() {
                 <option value="year">Yearly</option>
                 {isManualDate && <option value="custom">Custom Range</option>}
               </select>
-              <ChevronDownIcon className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
+              <ChevronDownIcon className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#5B6472]" />
             </div>
 
             {granularity !== "all" || isManualDate ? (
@@ -465,14 +465,14 @@ export default function MetrixPage() {
             )}
 
             <div className="flex items-center gap-2 bg-gray-50 dark:bg-navy-900 p-1.5 rounded-xl border border-gray-100 dark:border-white/5">
-              <CalendarIcon className="w-3.5 h-3.5 text-gray-400" />
+              <CalendarIcon className="w-3.5 h-3.5 text-[#5B6472]" />
               <input
                 type="date"
                 value={dateRange.startDate}
                 onChange={(e) => { setDateRange(prev => ({ ...prev, startDate: e.target.value })); setIsManualDate(true); }}
                 className="bg-transparent border-none text-[13px] font-semibold text-gray-600 dark:text-gray-300 outline-none w-24"
               />
-              <span className="text-gray-300 text-[13px] font-semibold">TO</span>
+              <span className="text-[#5B6472] text-[13px] font-semibold">TO</span>
               <input
                 type="date"
                 value={dateRange.endDate}
@@ -489,7 +489,7 @@ export default function MetrixPage() {
                   }}
                   className="p-1 hover:bg-gray-200 dark:hover:bg-white/10 rounded-full"
                 >
-                  <XMarkIcon className="w-3 h-3 text-gray-400" />
+                  <XMarkIcon className="w-3 h-3 text-[#5B6472]" />
                 </button>
               )}
             </div>
@@ -675,7 +675,7 @@ export default function MetrixPage() {
               {!funnelData && funnelLoading ? (
                 <div className="flex flex-col items-center justify-center p-20 bg-white dark:bg-navy-800 rounded-3xl border border-gray-100 dark:border-white/5 shadow-xl">
                   <div className="w-8 h-8 border-4 border-gray-200 dark:border-gray-700 border-t-[#2563EB] dark:border-t-[#60A5FA] rounded-full animate-spin mb-4" />
-                  <p className="text-gray-400 font-bold text-[13px]">Analyzing Funnel...</p>
+                  <p className="text-[#5B6472] font-bold text-[13px]">Analyzing Funnel...</p>
                 </div>
               ) : funnelData ? (
                 <>
@@ -704,7 +704,7 @@ export default function MetrixPage() {
                             const colors = [
                               "from-blue-500 to-cyan-400", 
                               "from-purple-500 to-fuchsia-400", 
-                              "from-orange-500 to-amber-400", 
+                              "from-[#F7F8FA] to-amber-400", 
                               "from-emerald-500 to-teal-400"
                             ];
                             
@@ -742,8 +742,8 @@ export default function MetrixPage() {
                       <div className="flex items-center justify-between mb-6 border-b pb-4 border-gray-50 dark:border-white/5">
                         <h3 className="text-[14px] font-semibold text-gray-900 dark:text-white">Lead Velocity</h3>
                         <div className="flex items-center gap-3">
-                          <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-blue-500"/><span className="text-[12px] font-semibold text-gray-400">Generated</span></div>
-                          <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-emerald-500"/><span className="text-[12px] font-semibold text-gray-400">Won</span></div>
+                          <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-blue-500"/><span className="text-[12px] font-semibold text-[#5B6472]">Generated</span></div>
+                          <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-emerald-500"/><span className="text-[12px] font-semibold text-[#5B6472]">Won</span></div>
                         </div>
                       </div>
                       <div className="h-[250px]">
@@ -778,7 +778,7 @@ export default function MetrixPage() {
                       <h3 className="text-[14px] font-semibold text-gray-900 dark:text-white mb-4">Top Sources</h3>
                       <div className="overflow-x-auto custom-scrollbar">
                         <table className="w-full text-left min-w-[400px]">
-                          <thead className="text-[13px] font-semibold text-gray-400 border-b border-gray-50 dark:border-white/5">
+                          <thead className="text-[13px] font-semibold text-[#5B6472] border-b border-gray-50 dark:border-white/5">
                             <tr><th className="py-3 px-2">Source</th><th className="py-3 px-2 text-right">Leads</th><th className="py-3 px-2 text-right">Won</th><th className="py-3 px-2 text-right">Win Rate</th><th className="py-3 px-2 text-right">Value</th></tr>
                           </thead>
                           <tbody className="divide-y divide-gray-50 dark:divide-white/5">
@@ -801,7 +801,7 @@ export default function MetrixPage() {
                       <h3 className="text-[14px] font-semibold text-gray-900 dark:text-white mb-4">Team Performance</h3>
                       <div className="overflow-x-auto custom-scrollbar">
                         <table className="w-full text-left min-w-[400px]">
-                          <thead className="text-[13px] font-semibold text-gray-400 border-b border-gray-50 dark:border-white/5">
+                          <thead className="text-[13px] font-semibold text-[#5B6472] border-b border-gray-50 dark:border-white/5">
                             <tr><th className="py-3 px-2">Sales Person</th><th className="py-3 px-2 text-right">Assigned</th><th className="py-3 px-2 text-right">Won</th><th className="py-3 px-2 text-right">Win Rate</th><th className="py-3 px-2 text-right">Pipeline</th></tr>
                           </thead>
                           <tbody className="divide-y divide-gray-50 dark:divide-white/5">
@@ -831,7 +831,7 @@ export default function MetrixPage() {
                       
                       {/* Qualification */}
                       <div className="flex flex-col items-center">
-                        <h4 className="text-[13px] font-semibold text-gray-400 mb-2">Qualification</h4>
+                        <h4 className="text-[13px] font-semibold text-[#5B6472] mb-2">Qualification</h4>
                         <div className="h-[150px] w-full">
                           <ResponsiveContainer width="100%" height="100%">
                             <PieChart>
@@ -856,7 +856,7 @@ export default function MetrixPage() {
 
                       {/* Priority */}
                       <div className="flex flex-col items-center">
-                        <h4 className="text-[13px] font-semibold text-gray-400 mb-2">Lead Priority</h4>
+                        <h4 className="text-[13px] font-semibold text-[#5B6472] mb-2">Lead Priority</h4>
                         <div className="h-[150px] w-full">
                           <ResponsiveContainer width="100%" height="100%">
                             <PieChart>
@@ -881,7 +881,7 @@ export default function MetrixPage() {
 
                       {/* Process Stage */}
                       <div className="flex flex-col items-center col-span-1 md:col-span-2 xl:col-span-1 border-t md:border-t-0 md:border-l border-gray-50 dark:border-white/5 pt-4 md:pt-0 md:pl-4">
-                        <h4 className="text-[13px] font-semibold text-gray-400 mb-2">Process Stages</h4>
+                        <h4 className="text-[13px] font-semibold text-[#5B6472] mb-2">Process Stages</h4>
                         <div className="h-[180px] w-full">
                           <ResponsiveContainer width="100%" height="100%">
                             <BarChart data={funnelData.deepDive.process.slice(0, 5)} layout="vertical" margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
@@ -902,7 +902,7 @@ export default function MetrixPage() {
 
                       {/* Follow Up Stats */}
                       <div className="flex flex-col items-center col-span-1 md:col-span-2 xl:col-span-1 border-t xl:border-t-0 xl:border-l border-gray-50 dark:border-white/5 pt-4 xl:pt-0 xl:pl-4">
-                        <h4 className="text-[13px] font-semibold text-gray-400 mb-2">Follow-Up Outcomes</h4>
+                        <h4 className="text-[13px] font-semibold text-[#5B6472] mb-2">Follow-Up Outcomes</h4>
                         <div className="h-[180px] w-full">
                           <ResponsiveContainer width="100%" height="100%">
                             <BarChart data={funnelData.deepDive.followUp.slice(0, 5)} layout="vertical" margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
@@ -930,7 +930,7 @@ export default function MetrixPage() {
               {!deptData && deptLoading ? (
                 <div className="flex flex-col items-center justify-center p-20 bg-white dark:bg-navy-800 rounded-[2rem] border border-gray-100 dark:border-white/5 shadow-2xl">
                   <div className="w-8 h-8 border-4 border-gray-200 dark:border-gray-700 border-t-[#2563EB] dark:border-t-[#60A5FA] rounded-full animate-spin mb-4" />
-                  <p className="text-gray-400 font-bold text-[13px]">Analyzing Department Performance...</p>
+                  <p className="text-[#5B6472] font-bold text-[13px]">Analyzing Department Performance...</p>
                 </div>
               ) : deptData ? (
                 <div className="flex flex-col gap-6 w-full items-start" id="department-performance-report">
@@ -1062,7 +1062,7 @@ export default function MetrixPage() {
                                   
                                   {/* Icon + Text */}
                                   <div className="flex items-center gap-3 flex-1 min-w-0 pr-2 group/label">
-                                    <div className={`p-1.5 rounded-lg flex-shrink-0 bg-gray-50 dark:bg-navy-800 text-gray-400 group-hover:text-[#2563EB] dark:group-hover:text-[#60A5FA] group-hover:bg-blue-50 dark:group-hover:bg-blue-900/30 transition-colors`}>
+                                    <div className={`p-1.5 rounded-lg flex-shrink-0 bg-gray-50 dark:bg-navy-800 text-[#5B6472] group-hover:text-[#2563EB] dark:group-hover:text-[#60A5FA] group-hover:bg-blue-50 dark:group-hover:bg-blue-900/30 transition-colors`}>
                                       <MetricIcon className={`w-4 h-4 ${mColor}`} />
                                     </div>
                                     <div className="min-w-0 flex-1 flex items-center gap-1.5 relative">
@@ -1129,7 +1129,7 @@ export default function MetrixPage() {
                                 
                                 {/* Icon + Text */}
                                 <div className="flex items-center gap-3 flex-1 min-w-0 pr-2">
-                                  <div className={`p-1.5 rounded-lg flex-shrink-0 bg-gray-50 dark:bg-navy-800 text-gray-400 group-hover:text-[#2563EB] dark:group-hover:text-[#60A5FA] group-hover:bg-blue-50 dark:group-hover:bg-blue-900/30 transition-colors`}>
+                                  <div className={`p-1.5 rounded-lg flex-shrink-0 bg-gray-50 dark:bg-navy-800 text-[#5B6472] group-hover:text-[#2563EB] dark:group-hover:text-[#60A5FA] group-hover:bg-blue-50 dark:group-hover:bg-blue-900/30 transition-colors`}>
                                     <StepIcon className={`w-4 h-4 ${sColor}`} />
                                   </div>
                                   <div className="min-w-0 flex-1">
@@ -1177,12 +1177,12 @@ export default function MetrixPage() {
                       {data.parties.top20.map((p: any, idx: number) => (
                         <button key={idx} onClick={() => setDrillDownParty(p)} className="w-full flex items-center justify-between p-3 bg-gray-50 dark:bg-white/5 rounded-xl hover:bg-emerald-50 dark:hover:bg-emerald-500/10 transition-colors text-left group border border-transparent hover:border-emerald-200">
                           <div className="flex items-center gap-3">
-                            <span className="text-[13px] font-semibold text-gray-300 group-hover:text-emerald-500 transition-colors">#{idx + 1}</span>
+                            <span className="text-[13px] font-semibold text-[#5B6472] group-hover:text-emerald-500 transition-colors">#{idx + 1}</span>
                             <span className="text-[14px] font-semibold text-gray-900 dark:text-white truncate max-w-[200px]">{p.party}</span>
                           </div>
                           <div className="text-right">
                             <p className="text-[14px] font-semibold text-emerald-600">{p.count} Orders</p>
-                            <p className="text-[13px] font-bold text-gray-400">{(p.amount / 100000).toFixed(2)}L INR</p>
+                            <p className="text-[13px] font-bold text-[#5B6472]">{(p.amount / 100000).toFixed(2)}L INR</p>
                           </div>
                         </button>
                       ))}
@@ -1200,12 +1200,12 @@ export default function MetrixPage() {
                       {data.parties.bottom20.map((p: any, idx: number) => (
                         <button key={idx} onClick={() => setDrillDownParty(p)} className="w-full flex items-center justify-between p-3 bg-gray-50 dark:bg-white/5 rounded-xl hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-colors text-left group border border-transparent hover:border-rose-200">
                           <div className="flex items-center gap-3">
-                            <span className="text-[13px] font-semibold text-gray-300 group-hover:text-rose-500 transition-colors">#{idx + 1}</span>
+                            <span className="text-[13px] font-semibold text-[#5B6472] group-hover:text-rose-500 transition-colors">#{idx + 1}</span>
                             <span className="text-[14px] font-semibold text-gray-900 dark:text-white truncate max-w-[200px]">{p.party}</span>
                           </div>
                           <div className="text-right">
                             <p className="text-[14px] font-semibold text-rose-600">{p.count} Orders</p>
-                            <p className="text-[13px] font-bold text-gray-400">{(p.amount / 1000).toFixed(1)}k INR</p>
+                            <p className="text-[13px] font-bold text-[#5B6472]">{(p.amount / 1000).toFixed(1)}k INR</p>
                           </div>
                         </button>
                       ))}
@@ -1259,7 +1259,7 @@ export default function MetrixPage() {
                             <div key={i} className="flex items-center justify-between p-2 bg-gray-50 dark:bg-navy-800 rounded-lg border border-gray-100 dark:border-white/5">
                               <p className="text-[13px] font-semibold text-gray-900 dark:text-white truncate">{uc.category}</p>
                               <div className="text-right">
-                                <p className="text-[12px] font-bold text-gray-400">Avg Sale</p>
+                                <p className="text-[12px] font-bold text-[#5B6472]">Avg Sale</p>
                                 <p className="text-[12px] font-semibold text-rose-500">{(uc.marketAvg / 1000).toFixed(1)}k</p>
                               </div>
                             </div>
@@ -1272,7 +1272,7 @@ export default function MetrixPage() {
                     <div className="lg:col-span-8 space-y-3">
                       <div className="bg-white dark:bg-white/5 p-4 rounded-3xl h-[350px] shadow-2xl ring-1 ring-black/5">
                         <div className="flex items-center justify-between mb-4">
-                          <h4 className="text-[13px] font-semibold text-gray-400">Order & Revenue Velocity (Week Wise)</h4>
+                          <h4 className="text-[13px] font-semibold text-[#5B6472]">Order & Revenue Velocity (Week Wise)</h4>
                           <div className="flex gap-3">
                             <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#2563EB]" /><span className="text-[12px] font-semibold">Revenue</span></div>
                             <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500" /><span className="text-[12px] font-semibold">Orders</span></div>
@@ -1305,7 +1305,7 @@ export default function MetrixPage() {
                       </div>
 
                       <div className="bg-white dark:bg-white/5 p-4 rounded-3xl h-[250px] shadow-2xl ring-1 ring-black/5">
-                        <h4 className="text-[13px] font-semibold text-gray-400 mb-4">OTD% Performance Trend</h4>
+                        <h4 className="text-[13px] font-semibold text-[#5B6472] mb-4">OTD% Performance Trend</h4>
                         <ResponsiveContainer width="100%" height="100%">
                           <LineChart data={drillDownParty.history} margin={{ top: 10, right: 20, left: 40, bottom: 10 }}>
                             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={chartGridColor} />
@@ -1320,10 +1320,10 @@ export default function MetrixPage() {
                       </div>
 
                       <div className="bg-white dark:bg-navy-900/50 p-6 rounded-[2.5rem] border border-gray-100 dark:border-white/5">
-                        <h4 className="text-[13px] font-semibold mb-4 text-gray-400">Active Category Performance</h4>
+                        <h4 className="text-[13px] font-semibold mb-4 text-[#5B6472]">Active Category Performance</h4>
                         <div className="overflow-x-auto">
                           <table className="w-full text-left">
-                            <thead className="text-[13px] font-semibold text-gray-400 border-b border-gray-50 dark:border-white/5">
+                            <thead className="text-[13px] font-semibold text-[#5B6472] border-b border-gray-50 dark:border-white/5">
                               <tr><th className="py-3 px-2">Category</th><th className="py-3 px-2 text-right">Transactions</th><th className="py-3 px-2 text-right">Total Revenue</th><th className="py-3 px-2 text-right">Avg Order</th></tr>
                             </thead>
                             <tbody className="divide-y divide-gray-50 dark:divide-white/5">
@@ -1362,12 +1362,12 @@ export default function MetrixPage() {
                       {data.categories.top20.map((c: any, idx: number) => (
                         <button key={idx} onClick={() => setDrillDownCategory(c)} className="w-full flex items-center justify-between p-3 bg-gray-50 dark:bg-white/5 rounded-xl hover:bg-emerald-50 dark:hover:bg-emerald-500/10 transition-colors text-left group border border-transparent hover:border-emerald-200">
                           <div className="flex items-center gap-3">
-                            <span className="text-[13px] font-semibold text-gray-300 group-hover:text-emerald-500 transition-colors">#{idx + 1}</span>
+                            <span className="text-[13px] font-semibold text-[#5B6472] group-hover:text-emerald-500 transition-colors">#{idx + 1}</span>
                             <span className="text-[14px] font-semibold text-gray-900 dark:text-white truncate">{c.category}</span>
                           </div>
                           <div className="text-right">
                             <p className="text-[14px] font-semibold text-emerald-600">{c.count} Items</p>
-                            <p className="text-[13px] font-bold text-gray-400">{(c.amount / 100000).toFixed(2)}L INR</p>
+                            <p className="text-[13px] font-bold text-[#5B6472]">{(c.amount / 100000).toFixed(2)}L INR</p>
                           </div>
                         </button>
                       ))}
@@ -1385,12 +1385,12 @@ export default function MetrixPage() {
                       {data.categories.bottom20.map((c: any, idx: number) => (
                         <button key={idx} onClick={() => setDrillDownCategory(c)} className="w-full flex items-center justify-between p-3 bg-gray-50 dark:bg-white/5 rounded-xl hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-colors text-left group border border-transparent hover:border-rose-200">
                           <div className="flex items-center gap-3">
-                            <span className="text-[13px] font-semibold text-gray-300 group-hover:text-rose-500 transition-colors">#{idx + 1}</span>
+                            <span className="text-[13px] font-semibold text-[#5B6472] group-hover:text-rose-500 transition-colors">#{idx + 1}</span>
                             <span className="text-[14px] font-semibold text-gray-900 dark:text-white truncate">{c.category}</span>
                           </div>
                           <div className="text-right">
                             <p className="text-[14px] font-semibold text-rose-600">{c.count} Items</p>
-                            <p className="text-[13px] font-bold text-gray-400">{(c.amount / 1000).toFixed(1)}k INR</p>
+                            <p className="text-[13px] font-bold text-[#5B6472]">{(c.amount / 1000).toFixed(1)}k INR</p>
                           </div>
                         </button>
                       ))}
@@ -1418,7 +1418,7 @@ export default function MetrixPage() {
                       </div>
 
                       <div className="bg-white dark:bg-white/5 p-4 rounded-2xl shadow-2xl ring-1 ring-black/5 h-[600px] flex flex-col">
-                        <h4 className="text-[13px] font-semibold mb-4 text-gray-400">Item Performance (Top 30 / Bottom 30)</h4>
+                        <h4 className="text-[13px] font-semibold mb-4 text-[#5B6472]">Item Performance (Top 30 / Bottom 30)</h4>
                         <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-6">
                           {/* Top 30 */}
                           <div className="space-y-1">
@@ -1428,7 +1428,7 @@ export default function MetrixPage() {
                                 <p className="text-[13px] font-semibold text-gray-900 dark:text-white truncate max-w-[200px]">{item.name}</p>
                                 <div className="text-right">
                                   <p className="text-[13px] font-semibold text-emerald-600">{item.count} qty</p>
-                                  <p className="text-[12px] font-bold text-gray-400">{(item.amount / 1000).toFixed(1)}k</p>
+                                  <p className="text-[12px] font-bold text-[#5B6472]">{(item.amount / 1000).toFixed(1)}k</p>
                                 </div>
                               </div>
                             ))}
@@ -1441,7 +1441,7 @@ export default function MetrixPage() {
                                 <p className="text-[13px] font-semibold text-gray-900 dark:text-white truncate max-w-[200px]">{item.name}</p>
                                 <div className="text-right">
                                   <p className="text-[13px] font-semibold text-rose-600">{item.count} qty</p>
-                                  <p className="text-[12px] font-bold text-gray-400">{(item.amount / 1000).toFixed(1)}k</p>
+                                  <p className="text-[12px] font-bold text-[#5B6472]">{(item.amount / 1000).toFixed(1)}k</p>
                                 </div>
                               </div>
                             ))}
@@ -1454,7 +1454,7 @@ export default function MetrixPage() {
                     <div className="lg:col-span-8 space-y-3">
                       <div className="bg-white dark:bg-white/5 p-4 rounded-[2rem] h-[300px] shadow-2xl ring-1 ring-black/5">
                         <div className="flex items-center justify-between mb-8">
-                          <h4 className="text-[13px] font-semibold text-gray-400">Monthly Segment Velocity (Qty vs Revenue)</h4>
+                          <h4 className="text-[13px] font-semibold text-[#5B6472]">Monthly Segment Velocity (Qty vs Revenue)</h4>
                           <div className="flex gap-4">
                             <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-[#2563EB]" /><span className="text-[12px] font-semibold">Revenue</span></div>
                             <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-emerald-500" /><span className="text-[12px] font-semibold">Quantity</span></div>
@@ -1478,7 +1478,7 @@ export default function MetrixPage() {
                       </div>
 
                       <div className="bg-white dark:bg-white/5 p-4 rounded-[2rem] h-[250px] shadow-2xl ring-1 ring-black/5">
-                        <h4 className="text-[13px] font-semibold text-gray-400 mb-4">OTD% Performance Trend</h4>
+                        <h4 className="text-[13px] font-semibold text-[#5B6472] mb-4">OTD% Performance Trend</h4>
                         <ResponsiveContainer width="100%" height="100%">
                           <LineChart data={drillDownCategory.history} margin={{ top: 10, right: 20, left: 40, bottom: 10 }}>
                             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={chartGridColor} />
@@ -1508,17 +1508,17 @@ export default function MetrixPage() {
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="bg-white dark:bg-navy-800 p-6 rounded-[2.5rem] border border-gray-100 dark:border-white/5 shadow-2xl ring-1 ring-black/5 mt-2">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 border-b border-gray-50 dark:border-white/5 pb-4">
                 <div className="flex items-center gap-4">
-                  <div><h3 className="text-xl font-semibold text-gray-900 dark:text-white tracking-tighter">Execution Roadmap</h3><p className="text-[12px] font-semibold text-gray-400 mt-0.5">Real-time Logistics Lifecycle</p></div>
+                  <div><h3 className="text-xl font-semibold text-gray-900 dark:text-white tracking-tighter">Execution Roadmap</h3><p className="text-[12px] font-semibold text-[#5B6472] mt-0.5">Real-time Logistics Lifecycle</p></div>
                   <div className="h-10 w-px bg-gray-100 dark:bg-white/10 hidden md:block" />
                   <div className="flex flex-col">
-                    <p className="text-[13px] font-semibold text-gray-400 leading-none">{targetDate === new Date().toISOString().split('T')[0] ? "Today's Orders" : "Filtered Orders"}</p>
+                    <p className="text-[13px] font-semibold text-[#5B6472] leading-none">{targetDate === new Date().toISOString().split('T')[0] ? "Today's Orders" : "Filtered Orders"}</p>
                     <p className="text-xl font-semibold text-[#2563EB] dark:text-[#60A5FA] leading-none mt-1">{data.todayCount || 0}</p>
                   </div>
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2">
                   <div className="flex items-center gap-2 bg-gray-50 dark:bg-navy-900 px-3 py-1.5 rounded-xl ring-1 ring-black/5">
-                    <MagnifyingGlassIcon className="w-4 h-4 text-gray-400" />
+                    <MagnifyingGlassIcon className="w-4 h-4 text-[#5B6472]" />
                     <input
                       list="roadmap-orders"
                       type="text"
@@ -1550,7 +1550,7 @@ export default function MetrixPage() {
                     </datalist>
                   </div>
                   <div className="flex items-center gap-2 bg-gray-50 dark:bg-navy-900 px-3 py-1.5 rounded-xl ring-1 ring-black/5">
-                    <CalendarIcon className="w-3.5 h-3.5 text-gray-400" /><input type="date" value={targetDate} onChange={(e) => setTargetDate(e.target.value)} className="bg-transparent border-none text-[13px] font-semibold text-[#2563EB] dark:text-[#60A5FA] outline-none" />
+                    <CalendarIcon className="w-3.5 h-3.5 text-[#5B6472]" /><input type="date" value={targetDate} onChange={(e) => setTargetDate(e.target.value)} className="bg-transparent border-none text-[13px] font-semibold text-[#2563EB] dark:text-[#60A5FA] outline-none" />
                   </div>
                 </div>
               </div>
@@ -1574,7 +1574,7 @@ export default function MetrixPage() {
                               <div className="w-12 h-12 rounded-xl flex items-center justify-center text-white font-semibold text-lg shadow-md" style={{ backgroundColor: orderColor }}>{idx + 1}</div>
                               <div>
                                 <h4 className="text-base font-semibold text-gray-900 dark:text-white">#{order.orderNo}</h4>
-                                <p className="text-[14px] font-semibold text-gray-400">{order.party}</p>
+                                <p className="text-[14px] font-semibold text-[#5B6472]">{order.party}</p>
                               </div>
                             </div>
 
@@ -1617,13 +1617,13 @@ export default function MetrixPage() {
                                     {/* Icon Stage Above */}
                                     <div className={`mb-4 transition-all duration-500 ${isCurrent ? 'scale-125' : isPending ? 'opacity-50' : 'opacity-100'}`}>
                                       <div className={`p-2.5 rounded-full ${isCompleted ? 'bg-emerald-50 dark:bg-emerald-500/10' : isCurrent ? 'bg-white dark:bg-navy-900 shadow-xl ring-2' : 'bg-gray-50 dark:bg-white/5'}`} style={isCurrent ? { borderColor: orderColor } : {}}>
-                                        <StepIcon className={`w-6 h-6 ${isCompleted ? 'text-emerald-500' : isCurrent ? '' : 'text-gray-400 dark:text-gray-500'}`} style={isCurrent ? { color: orderColor } : {}} />
+                                        <StepIcon className={`w-6 h-6 ${isCompleted ? 'text-emerald-500' : isCurrent ? '' : 'text-[#5B6472] dark:text-gray-500'}`} style={isCurrent ? { color: orderColor } : {}} />
                                       </div>
                                     </div>
 
                                     {/* Numbered Progress Circle */}
                                     <div
-                                      className={`w-6 h-6 rounded-full flex items-center justify-center text-[13px] font-semibold border transition-all duration-500 ${isCompleted ? 'bg-emerald-500 border-emerald-500 text-white' : isCurrent ? 'text-white shadow-md' : 'bg-white dark:bg-navy-900 border-gray-200 text-gray-300'}`}
+                                      className={`w-6 h-6 rounded-full flex items-center justify-center text-[13px] font-semibold border transition-all duration-500 ${isCompleted ? 'bg-emerald-500 border-emerald-500 text-white' : isCurrent ? 'text-white shadow-md' : 'bg-white dark:bg-navy-900 border-gray-200 text-[#5B6472]'}`}
                                       style={isCurrent ? { backgroundColor: orderColor, borderColor: orderColor } : {}}
                                     >
                                       {sIdx + 1}
@@ -1631,8 +1631,8 @@ export default function MetrixPage() {
 
                                     {/* Label & Time Below */}
                                     <div className="absolute -bottom-12 text-center w-28">
-                                      <p className={`text-[13px] font-semibold  leading-tight tracking-tighter ${isCompleted || isCurrent ? 'text-gray-900 dark:text-white' : 'text-gray-400'}`}>{step.name}</p>
-                                      <p className={`text-[12px] font-bold mt-1  ${isCompleted ? 'text-emerald-500' : 'text-gray-400'}`}>{step.actual ? new Date(step.actual).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '—'}</p>
+                                      <p className={`text-[13px] font-semibold  leading-tight tracking-tighter ${isCompleted || isCurrent ? 'text-gray-900 dark:text-white' : 'text-[#5B6472]'}`}>{step.name}</p>
+                                      <p className={`text-[12px] font-bold mt-1  ${isCompleted ? 'text-emerald-500' : 'text-[#5B6472]'}`}>{step.actual ? new Date(step.actual).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '—'}</p>
                                     </div>
                                   </div>
                                 );

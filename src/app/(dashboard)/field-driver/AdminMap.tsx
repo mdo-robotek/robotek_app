@@ -114,10 +114,10 @@ export default function AdminMap() {
                 
                 <div className="flex-1 overflow-y-auto p-2 space-y-1">
                     {isLoading && activeUsers.length === 0 && (
-                        <div className="p-4 text-center text-[14px] font-bold text-gray-400">Loading Map Data...</div>
+                        <div className="p-4 text-center text-[14px] font-bold text-[#5B6472]">Loading Map Data...</div>
                     )}
                     {!isLoading && activeUsers.length === 0 && (
-                        <div className="p-4 text-center text-[14px] font-bold text-gray-400">No field movement recorded today.</div>
+                        <div className="p-4 text-center text-[14px] font-bold text-[#5B6472]">No field movement recorded today.</div>
                     )}
                     
                     {activeUsers.map((uid, idx) => {
@@ -156,7 +156,7 @@ export default function AdminMap() {
                 <MapContainer center={center} zoom={12} style={{ height: '100%', width: '100%' }}>
                     <TileLayer
                         url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
-                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">Carto</a>'
                     />
                     
                     {activeUsers.map((uid, idx) => {

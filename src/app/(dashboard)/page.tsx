@@ -70,9 +70,9 @@ export default function Dashboard() {
       >
         <span className={`w-2 h-2 rounded-full shrink-0 ${(busyFresh.daysOld ?? 99) >= 2 ? "bg-rose-500 animate-pulse" : (busyFresh.daysOld ?? 99) >= 1 ? "bg-amber-500" : "bg-emerald-500"}`} />
         {(busyFresh.daysOld ?? 99) >= 2
-          ? `Busy sale data ${busyFresh.daysOld} din purana hai — Busy se sale list copy karo (Transaction → Sales → List)`
+          ? `Busy sale data is ${busyFresh.daysOld} days old — copy the sale list from Busy (Transaction → Sales → List)`
           : (busyFresh.daysOld ?? 99) >= 1
-          ? `Busy sale data: kal tak ka (${busyFresh.lastSaleDate}) — aaj ki copy pending`
+          ? `Busy sale data is up to ${busyFresh.lastSaleDate} — today's copy still pending`
           : `Busy sale data up to date (${busyFresh.lastSaleDate})`}
       </div>
     </div>
@@ -201,7 +201,7 @@ export default function Dashboard() {
                 { label: 'Topic/ID', key: 'id', render: (row: any) => (
                     <div className="flex flex-col">
                         <span className="block font-semibold text-gray-900 dark:text-white leading-tight text-[14px] break-words">{row.title}</span>
-                        <span className="text-[13px] text-gray-400 font-mono italic mt-0.5">{row.id}</span>
+                        <span className="text-[13px] text-[#5B6472] font-mono italic mt-0.5">{row.id}</span>
                     </div>
                 )},
                 { label: 'Status', key: 'status', className: 'text-right', render: (row: any) => (
@@ -222,7 +222,7 @@ export default function Dashboard() {
                 { label: 'User/Reason', key: 'userName', render: (row: any) => (
                     <div className="flex flex-col">
                         <span className="text-gray-900 dark:text-white font-semibold text-[14px] leading-tight break-words">{isAdmin ? row.userName : row.reason}</span>
-                        <span className="text-[13px] text-gray-400 font-bold mt-0.5">{new Date(row.startDate).toLocaleDateString()}</span>
+                        <span className="text-[13px] text-[#5B6472] font-bold mt-0.5">{new Date(row.startDate).toLocaleDateString()}</span>
                     </div>
                 )},
                       { label: 'Involved', key: 'involved', render: (row: any) => (

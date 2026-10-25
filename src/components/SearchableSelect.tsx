@@ -82,7 +82,7 @@ export default function SearchableSelect({
   return (
     <div className="w-full" ref={triggerRef}>
       {label && (
-        <label className="text-[13px] font-semibold text-gray-400 pl-1 mb-1 block">
+        <label className="text-[13px] font-semibold text-[#5B6472] pl-1 mb-1 block">
           {label}
         </label>
       )}
@@ -91,10 +91,10 @@ export default function SearchableSelect({
         onClick={() => (isOpen ? closeDropdown() : openDropdown())}
         className={`w-full p-3 rounded-xl cursor-pointer flex justify-between items-center transition-all ${className || 'bg-gray-50 dark:bg-slate-900 border border-gray-100 dark:border-white/5'} ${isOpen ? 'border-[#2563EB] ring-1 ring-[#2563EB]/10' : ''}`}
       >
-        <span className={`text-[13px] font-bold ${selectedOption ? 'text-gray-900 dark:text-white' : 'text-gray-400'}`}>
+        <span className={`text-[13px] font-bold ${selectedOption ? 'text-gray-900 dark:text-white' : 'text-[#5B6472]'}`}>
           {selectedOption ? selectedOption.label : placeholder}
         </span>
-        <ChevronDownIcon className={`w-3.5 h-3.5 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+        <ChevronDownIcon className={`w-3.5 h-3.5 text-[#5B6472] transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </div>
 
       {isOpen && dropdownPos.width > 0 && (
@@ -108,7 +108,7 @@ export default function SearchableSelect({
           }}
         >
           <div className="p-2 border-b border-gray-100 dark:border-white/5 flex items-center gap-2 bg-gray-50/50 dark:bg-slate-800/50">
-            <MagnifyingGlassIcon className="w-3.5 h-3.5 text-gray-400 ml-1" />
+            <MagnifyingGlassIcon className="w-3.5 h-3.5 text-[#5B6472] ml-1" />
             <input
               type="text"
               className="w-full bg-transparent border-none outline-none text-[13px] font-bold p-1 text-gray-900 dark:text-white placeholder-gray-400"
@@ -119,7 +119,7 @@ export default function SearchableSelect({
             />
             {searchTerm && (
               <XMarkIcon 
-                className="w-3.5 h-3.5 text-gray-400 cursor-pointer hover:text-gray-600" 
+                className="w-3.5 h-3.5 text-[#5B6472] cursor-pointer hover:text-gray-600" 
                 onClick={() => setSearchTerm("")}
               />
             )}
@@ -144,7 +144,7 @@ export default function SearchableSelect({
                 </div>
               ))
             ) : (
-              <div className="p-4 text-center text-[13px] font-bold text-gray-400 italic">
+              <div className="p-4 text-center text-[13px] font-bold text-[#5B6472] italic">
                 No results found
               </div>
             )}

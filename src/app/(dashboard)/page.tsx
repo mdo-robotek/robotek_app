@@ -113,7 +113,7 @@ export default function Dashboard() {
       
       {/* ROW 1: MISSION CONTROL HEADER */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-12 gap-4">
-        <div className="xl:col-span-2 self-center">
+        <div className="xl:col-span-2 hidden md:block">
           <CompactWelcome firstName={firstName} role={userRole} />
         </div>
         <div className="xl:col-span-2">
@@ -162,7 +162,7 @@ export default function Dashboard() {
       {/* ROW 3: DETAILED LOGS */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <CompactTable 
-            title="Today's Logins"
+            title="Today's check-ins"
             icon={UsersIcon}
             headerTheme="emerald"
             data={data?.attendanceToday || []}
@@ -184,13 +184,13 @@ export default function Dashboard() {
         />
 
         <CompactTable 
-            title="Open/Pending Tickets"
+            title="Open tickets"
             icon={ChatBubbleLeftRightIcon}
             headerTheme="blue"
             data={data?.openTickets || []}
             linkHref="/tickets"
             columns={[
-                { label: 'Topic/ID', key: 'id', render: (row: any) => (
+                { label: 'Ticket', key: 'id', render: (row: any) => (
                     <div className="flex flex-col">
                         <span className="block font-semibold text-gray-900 dark:text-white leading-tight text-[14px] break-words">{row.title}</span>
                         <span className="text-[13px] text-[#5B6472] font-mono italic mt-0.5">{row.id}</span>
@@ -205,19 +205,19 @@ export default function Dashboard() {
         />
 
         <CompactTable 
-            title="Team Absence Power"
+            title="Leave requests"
             icon={UserMinusIcon}
             headerTheme="amber"
             data={(data?.recentLeaves || []).filter((l: any) => (l.status || '').toLowerCase() === 'pending')}
             linkHref="/leave"
             columns={[
-                { label: 'User/Reason', key: 'userName', render: (row: any) => (
+                { label: isAdmin ? 'Person' : 'Reason', key: 'userName', render: (row: any) => (
                     <div className="flex flex-col">
                         <span className="text-gray-900 dark:text-white font-semibold text-[14px] leading-tight break-words">{isAdmin ? row.userName : row.reason}</span>
                         <span className="text-[13px] text-[#5B6472] font-bold mt-0.5">{new Date(row.startDate).toLocaleDateString()}</span>
                     </div>
                 )},
-                      { label: 'Involved', key: 'involved', render: (row: any) => (
+                      { label: 'Covering', key: 'involved', render: (row: any) => (
                         <div className="text-[14px] text-gray-600">{(row.involved || []).join(', ')}</div>
                       )},
                 { label: 'Status', key: 'status', className: 'text-right', render: (row: any) => (

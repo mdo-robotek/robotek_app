@@ -73,8 +73,38 @@ const getExcelHour = (callTime: string | number | undefined): number | null => {
   return Math.floor(totalMinutes / 60); // 0 to 23
 };
 
-export function useCallAnalytics(feeders: DataFeeder[], filters: AnalyticsFilters) {
+// Normalizes a phone number to its last 10 digits so formats like "+91",
+// "091", spaces/dashes etc. all key the same way.
+const normalizeNumber = (num: string | undefined | null): string => {
+  const digits = String(num || "").replace(/\D/g, "");
+  return digits.length > 10 ? digits.slice(-10) : digits;
+};
+
+export function useCallAnalytics(
+  feeders: DataFeeder[],
+  filters: AnalyticsFilters,
+  partyNameByNumber?: Record<string, string>
+) {
   return useMemo(() => {
+    // Reverse-lookup table: real party mobile number -> real party name.
+    // Callyzer writes a literal "Unknown" (or blank) To Name whenever the
+    // customer's number isn't saved in the employee's own phone contacts —
+    // the call's real number is still captured correctly, so we can recover
+    // the real party name from our own records instead of showing "Unknown".
+    const numberLookup: Record<string, string> = {};
+    if (partyNameByNumber) {
+      Object.entries(partyNameByNumber).forEach(([name, num]) => {
+        const key = normalizeNumber(num);
+        if (key) numberLookup[key] = name;
+      });
+    }
+    const resolveName = (rawName: string | undefined, rawNumber: string | undefined): string => {
+      const name = (rawName || "").trim();
+      if (name && name.toLowerCase() !== "unknown") return name;
+      const resolved = numberLookup[normalizeNumber(rawNumber)];
+      return resolved || "Unknown";
+    };
+
     // 1. Filter Data First
     const todayStart = new Date().setHours(0,0,0,0);
     const yesterdayStart = todayStart - 86400000;
@@ -175,7 +205,8 @@ export function useCallAnalytics(feeders: DataFeeder[], filters: AnalyticsFilter
       else if (type.includes("MISSED")) missedCount++;
       else if (type.includes("REJECTED")) rejectedCount++;
 
-      if (f.toName) uniqueCustomers.add(f.toName.toLowerCase());
+      const resolvedToName = resolveName(f.toName, f.toNumber);
+      if (resolvedToName && resolvedToName.toLowerCase() !== "unknown") uniqueCustomers.add(resolvedToName.toLowerCase());
       if (f.employeeName) uniqueEmployees.add(f.employeeName);
 
       // Buckets
@@ -193,7 +224,7 @@ export function useCallAnalytics(feeders: DataFeeder[], filters: AnalyticsFilter
       if (type.includes("MISSED")) eStat.missed++;
       empStatsMap.set(emp, eStat);
 
-      const tgt = f.toName || "Unknown";
+      const tgt = resolvedToName;
       const tStat = targetMap.get(tgt) || { calls: 0, duration: 0, incoming: 0, outgoing: 0, missed: 0 };
       tStat.calls++;
       tStat.duration += durSecs;

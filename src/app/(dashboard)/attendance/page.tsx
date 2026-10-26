@@ -675,10 +675,10 @@ export default function AttendancePage() {
                 if (isHalfDay) {
                     color = 'bg-orange-500/90 text-white shadow-orange-200';
                 } else {
-                    color = record.outTime ? 'bg-green-500/90 text-white shadow-green-200' : 'bg-[#FFD500] text-[#003875] shadow-amber-300';
+                    color = record.outTime ? 'bg-green-500/90 text-white shadow-green-200' : 'bg-[#2563EB] text-white shadow-amber-300';
                 }
             } else if (dateStr < todayStr) color = 'bg-red-500/80 text-white opacity-90';
-            else if (isToday) color = 'border-2 border-[#003875] dark:border-[#FFD500] text-[#003875] dark:text-[#FFD500]';
+            else if (isToday) color = 'border-2 border-[#2563EB] dark:border-[#60A5FA] text-[#2563EB] dark:text-[#60A5FA]';
 
             // Active check-in blinking animation
             const isActiveCheckIn = record?.inTime && !record?.outTime;
@@ -688,11 +688,11 @@ export default function AttendancePage() {
                     <div className="relative">
                         {isActiveCheckIn && (
                             <>
-                                <div className="absolute inset-0 w-8 h-8 md:w-12 md:h-12 rounded-full bg-[#FFD500] animate-ping opacity-30" />
-                                <div className="absolute inset-[-4px] w-[calc(100%+8px)] h-[calc(100%+8px)] md:inset-[-6px] md:w-[calc(100%+12px)] md:h-[calc(100%+12px)] rounded-full border-2 border-[#FFD500] animate-pulse opacity-50" />
+                                <div className="absolute inset-0 w-8 h-8 md:w-12 md:h-12 rounded-full bg-[#2563EB] animate-ping opacity-30" />
+                                <div className="absolute inset-[-4px] w-[calc(100%+8px)] h-[calc(100%+8px)] md:inset-[-6px] md:w-[calc(100%+12px)] md:h-[calc(100%+12px)] rounded-full border-2 border-[#2563EB] animate-pulse opacity-50" />
                             </>
                         )}
-                        <div className={`relative z-10 w-8 h-8 md:w-12 md:h-12 rounded-full flex items-center justify-center font-black text-sm transition-all transform group-hover:scale-110 ${color}`}>
+                        <div className={`relative z-10 w-8 h-8 md:w-12 md:h-12 rounded-full flex items-center justify-center font-semibold text-sm transition-all transform group-hover:scale-110 ${color}`}>
                             {d}
                         </div>
                     </div>
@@ -708,21 +708,21 @@ export default function AttendancePage() {
         <div className="space-y-6 relative">
             {isPageLoading && (
                 <div className="fixed inset-0 z-[999] bg-white/60 dark:bg-slate-900/60 backdrop-blur-sm flex flex-col items-center justify-center">
-                    <div className="w-16 h-16 border-4 border-[#003875]/20 border-t-[#003875] dark:border-[#FFD500]/20 dark:border-t-[#FFD500] rounded-full animate-spin mb-4"></div>
-                    <div className="text-[#003875] dark:text-[#FFD500] font-black tracking-widest text-sm uppercase animate-pulse">Processing...</div>
+                    <div className="w-16 h-16 border-4 border-[#2563EB]/20 border-t-[#2563EB] dark:border-[#60A5FA]/20 dark:border-t-[#60A5FA] rounded-full animate-spin mb-4"></div>
+                    <div className="text-[#2563EB] dark:text-[#60A5FA] font-semibold text-sm animate-pulse">Processing...</div>
                 </div>
             )}
             {/* Page Header with Integrated Pill Tabs */}
             <div className="flex flex-col lg:flex-row items-center gap-4 px-1">
                 <div className="text-center lg:text-left shrink-0 min-w-0 font-serif">
-                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight truncate uppercase">Attendance & Leave</h1>
-                    <p className="text-sm font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">Operational Personnel Tracking</p>
+                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight truncate">Attendance & Leave</h1>
+                    <p className="text-sm font-medium text-gray-500 dark:text-slate-400 tracking-wider">Operational Personnel Tracking</p>
                 </div>
 
                 <div className="flex-1 w-full flex justify-center lg:justify-end">
                     <div 
                         style={{ backgroundColor: 'var(--panel-card)' }}
-                        className="rounded-full border-2 border-b-4 border-[#003875] dark:border-[#FFD500] shadow-sm transition-all p-1 overflow-x-auto no-scrollbar max-w-full flex items-center gap-1.5"
+                        className="rounded-full border-2 border-b-4 border-[#2563EB] dark:border-[#60A5FA] shadow-sm transition-all p-1 overflow-x-auto no-scrollbar max-w-full flex items-center gap-1.5"
                     >
                         {[
                             { id: 'ATTENDANCE', label: 'Dashboard', icon: CalendarBtnIcon },
@@ -734,9 +734,9 @@ export default function AttendancePage() {
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id as any)}
                                 className={`
-                                    flex items-center gap-2 px-3 md:px-6 py-2 rounded-full text-[9px] md:text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap
+                                    flex items-center gap-2 px-3 md:px-6 py-2 rounded-full text-[13px] md:text-[10px] font-semibold   transition-all whitespace-nowrap
                                     ${activeTab === tab.id 
-                                        ? 'bg-[#003875] dark:bg-[#FFD500] text-white dark:text-black shadow-sm' 
+                                        ? 'bg-[#2563EB] dark:bg-[#60A5FA] text-white dark:text-black shadow-sm' 
                                         : 'text-gray-500 hover:bg-gray-100 dark:hover:bg-white/5'}
                                 `}
                             >
@@ -757,12 +757,12 @@ export default function AttendancePage() {
                     >
                         <div className="p-6 flex justify-between items-center border-b border-white/10">
                             <button onClick={() => setCurrentDate(new Date(currentDate.setMonth(currentDate.getMonth() - 1)))} className="p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition"><ChevronLeftIcon className="w-5 h-5" /></button>
-                            <h2 className="text-lg font-bold text-[#003875] dark:text-[#FFD500] uppercase tracking-tighter">
+                            <h2 className="text-lg font-bold text-[#2563EB] dark:text-[#60A5FA] tracking-tighter">
                                 {currentDate.toLocaleString('default', { month: 'long', year: 'numeric' })}
                             </h2>
                             <button onClick={() => setCurrentDate(new Date(currentDate.setMonth(currentDate.getMonth() + 1)))} className="p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition"><ChevronRightIcon className="w-5 h-5" /></button>
                         </div>
-                        <div className="grid grid-cols-7 py-4 text-center text-[10px] font-black text-gray-400 border-b border-gray-50/5">
+                        <div className="grid grid-cols-7 py-4 text-center text-[13px] font-semibold text-gray-400 border-b border-gray-50/5">
                             {['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'].map(d => <div key={d}>{d}</div>)}
                         </div>
                         <div className="grid grid-cols-7 border-separate">
@@ -775,23 +775,23 @@ export default function AttendancePage() {
                         style={{ backgroundColor: 'var(--panel-card)' }}
                         className="lg:col-span-2 rounded-[32px] shadow-2xl p-6 border border-white/40 dark:border-white/5 relative flex flex-col xl:flex-row gap-6 overflow-hidden"
                     >
-                        <div className={`absolute top-0 left-0 w-full h-1 ${currentStatus === 'CHECKED_IN' ? 'bg-[#FFD500] animate-pulse' : 'bg-[#003875] dark:bg-[#FFD500] opacity-30'}`}></div>
+                        <div className={`absolute top-0 left-0 w-full h-1 ${currentStatus === 'CHECKED_IN' ? 'bg-[#2563EB] animate-pulse' : 'bg-[#2563EB] dark:bg-[#60A5FA] opacity-30'}`}></div>
                         
                         {/* Global Work System (Left Half) */}
                         <div className="flex-1 flex flex-col text-center items-center justify-start relative xl:border-r border-gray-200 dark:border-white/10 xl:pr-6 pb-6 xl:pb-0 border-b xl:border-b-0">
-                            <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.25em] mb-2 opacity-70">
+                            <h3 className="text-[13px] font-semibold text-gray-400 mb-2 opacity-70">
                                 {currentStatus === 'CHECKED_IN' ? 'Active Shift' : 'Global Work System'}
                             </h3>
                             {currentStatus === 'CHECKED_IN' && checkInTime && (
-                                <div className="text-[9px] font-bold text-[#003875]/50 dark:text-[#FFD500]/50 mb-2 uppercase tracking-widest">
+                                <div className="text-[13px] font-bold text-[#2563EB]/50 dark:text-[#60A5FA]/50 mb-2">
                                     Since {checkInTime.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}
                                 </div>
                             )}
-                            <div className={`text-4xl xl:text-5xl font-black mb-8 tracking-tighter font-mono ${currentStatus === 'CHECKED_IN' ? 'text-[#FFD500]' : 'text-[#003875] dark:text-white'}`}>{elapsedTime}</div>
+                            <div className={`text-4xl xl:text-5xl font-semibold mb-8 tracking-tighter font-mono ${currentStatus === 'CHECKED_IN' ? 'text-[#2563EB]' : 'text-[#2563EB] dark:text-white'}`}>{elapsedTime}</div>
                             
                             {currentStatus === 'IDLE' ? (
                                 isWeeklyOffIstToday(user?.office) ? (
-                                    <div className="w-full p-6 bg-gray-100 dark:bg-slate-900/50 rounded-3xl border border-gray-200 dark:border-white/10 text-gray-500 font-black text-sm uppercase tracking-widest">
+                                    <div className="w-full p-6 bg-gray-100 dark:bg-slate-900/50 rounded-3xl border border-gray-200 dark:border-white/10 text-gray-500 font-semibold text-sm">
                                         Check-in closed on {getWeeklyOffLabel(user?.office)} weekly off
                                     </div>
                                 ) : (
@@ -799,12 +799,12 @@ export default function AttendancePage() {
                                     <button
                                         onClick={() => setShowCameraMode('CHECK_IN')}
                                         disabled={!isInRange || isPageLoading}
-                                        className={`w-full py-5 rounded-[24px] font-black text-sm uppercase tracking-widest transition-all ${isInRange ? 'bg-[#003875] hover:bg-[#002a58] text-white shadow-xl shadow-[#003875]/20 hover:-translate-y-1' : 'bg-gray-200 text-gray-400 cursor-not-allowed opacity-50'}`}
+                                        className={`w-full py-5 rounded-[24px] font-semibold text-sm   transition-all ${isInRange ? 'bg-[#2563EB] hover:bg-[#002a58] text-white shadow-xl shadow-[#2563EB]/20 hover:-translate-y-1' : 'bg-gray-200 text-gray-400 cursor-not-allowed opacity-50'}`}
                                     >
                                         {isPageLoading ? 'Processing...' : 'Check In System'}
                                     </button>
                                     {!isInRange && (
-                                        <div className="p-3 bg-red-500/10 rounded-xl border border-red-500/20 text-[10px] font-bold text-red-500 uppercase tracking-wider">
+                                        <div className="p-3 bg-red-500/10 rounded-xl border border-red-500/20 text-[13px] font-bold text-red-500 tracking-wider">
                                             {isMobile ? 'Mobile' : 'Desktop'}: Reach {rangeThreshold}m zone to unlock
                                         </div>
                                     )}
@@ -814,12 +814,12 @@ export default function AttendancePage() {
                                 <button 
                                     onClick={() => setShowCameraMode('CHECK_OUT')} 
                                     disabled={!isInRange || isPageLoading}
-                                    className={`w-full py-5 rounded-[24px] font-black text-sm uppercase tracking-widest shadow-xl transition-all hover:-translate-y-1 text-white ${isInRange ? 'bg-red-600 hover:bg-red-700 shadow-red-600/20' : 'bg-gray-300 text-gray-500 cursor-not-allowed opacity-50 shadow-none'}`}
+                                    className={`w-full py-5 rounded-[24px] font-semibold text-sm   shadow-xl transition-all hover:-translate-y-1 text-white ${isInRange ? 'bg-red-600 hover:bg-red-700 shadow-red-600/20' : 'bg-gray-300 text-gray-500 cursor-not-allowed opacity-50 shadow-none'}`}
                                 >
                                     {isPageLoading ? 'Processing...' : '⏹ Check Out & End Shift'}
                                 </button>
                             ) : (
-                                <div className="w-full p-6 bg-green-500/10 rounded-3xl border border-green-500/20 text-green-600 font-black text-sm uppercase tracking-widest">Shift Completed ✅</div>
+                                <div className="w-full p-6 bg-green-500/10 rounded-3xl border border-green-500/20 text-green-600 font-semibold text-sm">Shift Completed ✅</div>
                             )}
 
                             <div className="w-full mt-6">
@@ -828,19 +828,19 @@ export default function AttendancePage() {
                                     <div className="p-3 bg-gray-50 dark:bg-slate-900/50 rounded-2xl border border-white/5 text-center shadow-inner mb-3">
                                         <div className="inline-flex items-center gap-2 mb-3 bg-green-500/10 px-3 py-1 rounded-full text-green-600 border border-green-500/20">
                                             <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                                            <span className="text-[10px] font-black uppercase tracking-widest">Live GPS Active</span>
+                                            <span className="text-[13px] font-semibold">Live GPS Active</span>
                                         </div>
                                         {liveAddress && (
-                                           <div className="mb-3 text-[11px] font-bold text-gray-500 dark:text-gray-400 w-full px-2 mx-auto leading-relaxed">
-                                               <MapPinIcon className="w-3 h-3 inline mr-1 text-[#003875] dark:text-[#FFD500]" />
+                                           <div className="mb-3 text-[14px] font-bold text-gray-500 dark:text-gray-400 w-full px-2 mx-auto leading-relaxed">
+                                               <MapPinIcon className="w-3 h-3 inline mr-1 text-[#2563EB] dark:text-[#60A5FA]" />
                                                {liveAddress}
                                            </div>
                                         )}
                                         <div className="flex justify-center gap-6">
-                                            <div className="text-[11px] font-mono font-bold text-gray-600 dark:text-gray-300">
+                                            <div className="text-[14px] font-mono font-bold text-gray-600 dark:text-gray-300">
                                                 <span className="text-gray-400 mr-1">LAT</span> {liveLocation.lat.toFixed(5)}
                                             </div>
-                                            <div className="text-[11px] font-mono font-bold text-gray-600 dark:text-gray-300">
+                                            <div className="text-[14px] font-mono font-bold text-gray-600 dark:text-gray-300">
                                                 <span className="text-gray-400 mr-1">LNG</span> {liveLocation.lng.toFixed(5)}
                                             </div>
                                         </div>
@@ -849,7 +849,7 @@ export default function AttendancePage() {
 
                                 {/* Action Buttons */}
                                 <div className="flex flex-col gap-3">
-                                    <button onClick={refreshLocationManual} className="w-full py-3 bg-gray-50 dark:bg-slate-900/50 hover:bg-gray-100 dark:hover:bg-slate-900 rounded-xl border border-gray-200 dark:border-white/5 text-[11px] font-black uppercase tracking-widest text-gray-600 dark:text-gray-400 flex items-center justify-center gap-2 transition-all shadow-sm">
+                                    <button onClick={refreshLocationManual} className="w-full py-3 bg-gray-50 dark:bg-slate-900/50 hover:bg-gray-100 dark:hover:bg-slate-900 rounded-xl border border-gray-200 dark:border-white/5 text-[14px] font-semibold text-gray-600 dark:text-gray-400 flex items-center justify-center gap-2 transition-all shadow-sm">
                                         <ArrowPathIcon className="w-4 h-4" />
                                         Refresh GPS
                                     </button>
@@ -859,7 +859,7 @@ export default function AttendancePage() {
                                            href={`https://www.google.com/maps/dir/?api=1&destination=${closestPoint.lat},${closestPoint.long}`} 
                                            target="_blank" 
                                            rel="noreferrer" 
-                                           className="w-full py-3 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/20 dark:hover:bg-blue-900/40 rounded-xl border border-blue-200 dark:border-blue-500/20 text-[11px] font-black uppercase tracking-widest text-blue-600 dark:text-blue-400 flex items-center justify-center gap-2 transition-all shadow-sm"
+                                           className="w-full py-3 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/20 dark:hover:bg-blue-900/40 rounded-xl border border-blue-200 dark:border-blue-500/20 text-[14px] font-semibold text-blue-600 dark:text-blue-400 flex items-center justify-center gap-2 transition-all shadow-sm"
                                        >
                                            <MapPinIcon className="w-4 h-4" />
                                            Find Gap
@@ -871,18 +871,18 @@ export default function AttendancePage() {
 
                         {/* Location Intelligence (Right Half) */}
                         <div className="flex-1 flex flex-col justify-start">
-                             <h3 className="text-[10px] font-black mb-4 flex items-center justify-center xl:justify-start gap-2 text-gray-800 dark:text-white uppercase">
-                                <MapPinIcon className="w-4 h-4 text-[#003875] dark:text-[#FFD500]" /> Location Intelligence
+                             <h3 className="text-[13px] font-semibold mb-4 flex items-center justify-center xl:justify-start gap-2 text-gray-800 dark:text-white">
+                                <MapPinIcon className="w-4 h-4 text-[#2563EB] dark:text-[#60A5FA]" /> Location Intelligence
                              </h3>
 
                              {!user.late_long ? (
-                                 <div className="flex-1 flex items-center justify-center opacity-40 italic text-xs font-bold text-gray-500">No HQ Registered</div>
+                                 <div className="flex-1 flex items-center justify-center opacity-40 italic text-[14px] font-bold text-gray-500">No HQ Registered</div>
                              ) : (
                                  <div className="flex-1 flex flex-col gap-3 overflow-y-auto no-scrollbar max-h-[450px]">
                                      {/* Registered Bases */}
                                      {registeredPoints && registeredPoints.length > 0 && (
                                          <div className="p-3 bg-gray-50 dark:bg-slate-900/50 rounded-2xl border border-white/5 space-y-2 shadow-inner">
-                                             <div className="text-[9px] font-black text-gray-400 uppercase tracking-widest flex items-center justify-between pb-1">
+                                             <div className="text-[13px] font-semibold text-gray-400 flex items-center justify-between pb-1">
                                                  <span>Registered Bases ({registeredPoints.length})</span>
                                                  {liveLocation && <span>Distance</span>}
                                              </div>
@@ -891,19 +891,19 @@ export default function AttendancePage() {
                                                  const isNearest = closestPoint && pt.lat === closestPoint.lat && pt.long === closestPoint.long;
                                                  
                                                  return (
-                                                     <div key={idx} className={`flex items-center justify-between p-3 rounded-xl border transition-all ${isNearest ? 'border-[#003875]/20 bg-[#003875]/5 dark:border-[#FFD500]/20 dark:bg-[#FFD500]/10 shadow-sm' : 'border-transparent hover:bg-white/50 dark:hover:bg-slate-800/50'}`}>
+                                                     <div key={idx} className={`flex items-center justify-between p-3 rounded-xl border transition-all ${isNearest ? 'border-[#2563EB]/20 bg-[#2563EB]/5 dark:border-[#60A5FA]/20 dark:bg-[#60A5FA]/10 shadow-sm' : 'border-transparent hover:bg-white/50 dark:hover:bg-slate-800/50'}`}>
                                                          <div className="flex items-center gap-2">
-                                                             <MapPinIcon className={`w-4 h-4 shrink-0 ${isNearest ? 'text-[#003875] dark:text-[#FFD500]' : 'text-gray-400'}`} />
+                                                             <MapPinIcon className={`w-4 h-4 shrink-0 ${isNearest ? 'text-[#2563EB] dark:text-[#60A5FA]' : 'text-gray-400'}`} />
                                                              <div>
-                                                                 <div className={`text-[11px] font-bold uppercase tracking-wider ${isNearest ? 'text-[#003875] dark:text-[#FFD500]' : 'text-gray-600 dark:text-gray-400'}`}>
+                                                                 <div className={`text-[14px] font-bold  tracking-wider ${isNearest ? 'text-[#2563EB] dark:text-[#60A5FA]' : 'text-gray-600 dark:text-gray-400'}`}>
                                                                      {pt.name || `Location ${idx + 1}`}
-                                                                     {isNearest && <span className="ml-2 text-[9px] bg-[#003875] text-white dark:bg-[#FFD500] dark:text-[#003875] px-1.5 py-0.5 rounded uppercase font-black">Closest</span>}
+                                                                     {isNearest && <span className="ml-2 text-[13px] bg-[#2563EB] text-white dark:bg-[#60A5FA] dark:text-[#60A5FA] px-1.5 py-0.5 rounded font-semibold">Closest</span>}
                                                                  </div>
                                                              </div>
                                                          </div>
                                                          
                                                          {ptDist !== null && (
-                                                             <div className={`text-xs font-black tracking-tighter ${ptDist <= rangeThreshold ? 'text-green-500' : 'text-gray-400'}`}>
+                                                             <div className={`text-[14px] font-semibold tracking-tighter ${ptDist <= rangeThreshold ? 'text-green-500' : 'text-gray-400'}`}>
                                                                  {Math.round(ptDist)}m
                                                              </div>
                                                          )}
@@ -915,12 +915,12 @@ export default function AttendancePage() {
 
                                      {/* Big Distance Display */}
                                      <div className="text-center py-2 flex flex-col items-center justify-center mt-4">
-                                         <div className="text-[8px] font-black text-gray-400 uppercase tracking-[0.2em] mb-1">Nearest Gap</div>
-                                         <div className={`text-4xl font-black tracking-tighter ${isInRange ? 'text-green-500' : 'text-red-500'} drop-shadow-sm`}>
+                                         <div className="text-[12px] font-semibold text-gray-400 mb-1">Nearest Gap</div>
+                                         <div className={`text-4xl font-semibold tracking-tighter ${isInRange ? 'text-green-500' : 'text-red-500'} drop-shadow-sm`}>
                                              {distance !== null ? `${Math.round(distance)}m` : '...'}
                                          </div>
                                          {isInRange && (
-                                             <div className="text-[9px] font-black uppercase tracking-[0.2em] mt-1 py-1 px-3 rounded-full inline-block bg-green-500/10 text-green-600 border border-green-500/20">
+                                             <div className="text-[13px] font-semibold mt-1 py-1 px-3 rounded-full inline-block bg-green-500/10 text-green-600 border border-green-500/20">
                                                  In Range ✓
                                              </div>
                                          )}
@@ -949,7 +949,7 @@ export default function AttendancePage() {
                     <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
                         <div className="flex items-center gap-4 bg-white dark:bg-slate-900 px-4 py-2 rounded-full shadow-sm border border-gray-100 dark:border-white/5">
                             <button onClick={() => setCurrentDate(new Date(currentDate.setMonth(currentDate.getMonth() - 1)))} className="p-1 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition"><ChevronLeftIcon className="w-5 h-5 text-gray-500" /></button>
-                            <span className="text-sm font-black text-[#003875] dark:text-[#FFD500] uppercase tracking-widest w-32 text-center">
+                            <span className="text-sm font-semibold text-[#2563EB] dark:text-[#60A5FA] w-32 text-center">
                                 {currentDate.toLocaleString('default', { month: 'short', year: 'numeric' })}
                             </span>
                             <button onClick={() => setCurrentDate(new Date(currentDate.setMonth(currentDate.getMonth() + 1)))} className="p-1 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition"><ChevronRightIcon className="w-5 h-5 text-gray-500" /></button>
@@ -959,15 +959,15 @@ export default function AttendancePage() {
                             placeholder="SEARCH EMPLOYEE..." 
                             value={masterSearch}
                             onChange={(e) => setMasterSearch(e.target.value)}
-                            className="w-full md:w-64 bg-white dark:bg-slate-900 border border-gray-200 dark:border-white/10 rounded-full px-4 py-2.5 text-xs font-black placeholder-gray-400 focus:outline-none focus:border-[#FFD500] transition-colors shadow-sm"
+                            className="w-full md:w-64 bg-white dark:bg-slate-900 border border-gray-200 dark:border-white/10 rounded-full px-4 py-2.5 text-[14px] font-semibold placeholder-gray-400 focus:outline-none focus:border-[#2563EB] transition-colors shadow-sm"
                         />
                     </div>
                     {!masterData ? (
-                        <div className="text-gray-400 text-sm animate-pulse font-black text-center py-20">SYNCING DATA...</div>
+                        <div className="text-gray-400 text-sm animate-pulse font-semibold text-center py-20">SYNCING DATA...</div>
                     ) : (
                         <table className="w-full text-left border-separate border-spacing-y-4 min-w-[1000px] font-serif">
                             <thead>
-                                <tr className="text-sm font-medium text-gray-500 uppercase tracking-widest text-center">
+                                <tr className="text-sm font-medium text-gray-500 text-center">
                                     <th className="px-6 py-2 text-left">Employee Details</th>
                                     <th className="px-4 py-2">Presents</th>
                                     <th className="px-4 py-2">Absents</th>
@@ -1032,7 +1032,7 @@ export default function AttendancePage() {
                                         } else if (leave) {
                                             leavesCount++;
                                             statusChar = 'L';
-                                            statusColor = 'text-[#FFD500] font-black';
+                                            statusColor = 'text-[#2563EB] font-semibold';
                                         } else if (record?.inTime) {
                                             let hours = 0;
                                             if (record.outTime) {
@@ -1044,20 +1044,20 @@ export default function AttendancePage() {
                                             if (record.outTime && hours <= 4) {
                                                 halfDays++;
                                                 statusChar = isLate ? 'HD(L)' : 'HD';
-                                                statusColor = 'text-orange-500 font-black';
+                                                statusColor = 'text-orange-500 font-semibold';
                                                 dotColor = 'bg-orange-500';
                                                 dotText = '0.5';
                                             } else {
                                                 presents++;
                                                 statusChar = isLate ? 'P(L)' : 'P';
-                                                statusColor = 'text-green-500 font-black';
+                                                statusColor = 'text-green-500 font-semibold';
                                                 dotColor = 'bg-green-500';
                                                 dotText = '1';
                                             }
                                         } else if (dateStr < todayStr) {
                                             absents++;
                                             statusChar = 'A';
-                                            statusColor = 'text-red-500 font-black';
+                                            statusColor = 'text-red-500 font-semibold';
                                             dotColor = 'bg-red-500';
                                             dotText = '-1';
                                         }
@@ -1074,37 +1074,37 @@ export default function AttendancePage() {
                                             <tr className="bg-white dark:bg-slate-900 rounded-[24px] shadow-sm relative z-10 hover:shadow-md transition-shadow">
                                                 <td className="px-6 py-4 rounded-l-[24px]">
                                                     <div className="flex items-center gap-4">
-                                                        <div className="w-10 h-10 rounded-full bg-[#FFD500] flex items-center justify-center font-black text-white shadow-sm overflow-hidden shrink-0">
+                                                        <div className="w-10 h-10 rounded-full bg-[#2563EB] flex items-center justify-center font-semibold text-white shadow-sm overflow-hidden shrink-0">
                                                             {u.image_url ? <img src={u.image_url} alt="" className="w-full h-full object-cover" /> : <UserBtnIcon className="w-5 h-5 text-white" />}
                                                         </div>
                                                         <div>
-                                                            <div className="text-sm font-black text-[#003875] dark:text-white uppercase tracking-tighter">{u.full_name || u.username}</div>
-                                                            <div className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">ID: {String(u.id).substring(0, 6)}</div>
+                                                            <div className="text-sm font-semibold text-[#2563EB] dark:text-white tracking-tighter">{u.full_name || u.username}</div>
+                                                            <div className="text-[13px] font-bold text-gray-400 mt-0.5">ID: {String(u.id).substring(0, 6)}</div>
                                                         </div>
                                                     </div>
                                                 </td>
                                                 <td className="px-4 py-4 text-center">
-                                                    <span className="bg-green-100 text-green-600 dark:bg-green-500/20 px-4 py-2 rounded-full text-sm font-black">{presents}</span>
+                                                    <span className="bg-green-100 text-green-600 dark:bg-green-500/20 px-4 py-2 rounded-full text-sm font-semibold">{presents}</span>
                                                 </td>
                                                 <td className="px-4 py-4 text-center">
-                                                    <span className="bg-red-100 text-red-600 dark:bg-red-500/20 px-4 py-2 rounded-full text-sm font-black">{absents}</span>
+                                                    <span className="bg-red-100 text-red-600 dark:bg-red-500/20 px-4 py-2 rounded-full text-sm font-semibold">{absents}</span>
                                                 </td>
                                                 <td className="px-4 py-4 text-center">
-                                                    <span className="bg-yellow-100 text-yellow-600 dark:bg-yellow-500/20 px-4 py-2 rounded-full text-sm font-black">{leavesCount}</span>
+                                                    <span className="bg-yellow-100 text-yellow-600 dark:bg-yellow-500/20 px-4 py-2 rounded-full text-sm font-semibold">{leavesCount}</span>
                                                 </td>
                                                 <td className="px-4 py-4 text-center">
-                                                    <span className="bg-orange-100 text-orange-600 dark:bg-orange-500/20 px-4 py-2 rounded-full text-sm font-black">{halfDays}</span>
+                                                    <span className="bg-orange-100 text-orange-600 dark:bg-orange-500/20 px-4 py-2 rounded-full text-sm font-semibold">{halfDays}</span>
                                                 </td>
-                                                <td className="px-4 py-4 text-center text-sm font-black text-[#FFD500]">
+                                                <td className="px-4 py-4 text-center text-sm font-semibold text-[#2563EB]">
                                                     {totalHours.toFixed(1)}h
                                                 </td>
                                                 <td className="px-4 py-4 text-center">
-                                                    <span className="bg-red-50 text-red-500 dark:bg-red-500/10 px-4 py-2 rounded-full text-sm font-black">{cumulativePercent}%</span>
+                                                    <span className="bg-red-50 text-red-500 dark:bg-red-500/10 px-4 py-2 rounded-full text-sm font-semibold">{cumulativePercent}%</span>
                                                 </td>
                                                 <td className="px-4 py-4 text-center rounded-r-[24px]">
                                                     <button 
                                                         onClick={() => setExpandedUserId(isExpanded ? null : u.id)} 
-                                                        className="w-8 h-8 rounded-[12px] bg-[#FFD500] hover:bg-[#e6c000] text-white dark:text-black flex items-center justify-center font-black text-xl transition-all mx-auto shadow-sm shadow-[#FFD500]/50 active:scale-95"
+                                                        className="w-8 h-8 rounded-[12px] bg-[#2563EB] hover:bg-[#e6c000] text-white dark:text-black flex items-center justify-center font-semibold text-xl transition-all mx-auto shadow-sm shadow-[#2563EB]/50 active:scale-95"
                                                     >
                                                         {isExpanded ? '-' : '+'}
                                                     </button>
@@ -1116,7 +1116,7 @@ export default function AttendancePage() {
                                                     <td colSpan={8} className="px-2 md:px-8 pb-8 pt-4">
                                                         <div className="bg-white dark:bg-slate-800 rounded-[32px] p-6 md:p-8 border border-gray-100 dark:border-white/5 shadow-2xl">
                                                             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
-                                                                <h4 className="text-[#FFD500] font-black flex items-center gap-3 uppercase tracking-tighter text-lg">
+                                                                <h4 className="text-[#2563EB] font-semibold flex items-center gap-3 tracking-tighter text-lg">
                                                                     <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                                                                     </svg>
@@ -1124,22 +1124,22 @@ export default function AttendancePage() {
                                                                 </h4>
                                                                 <div className="flex gap-8 text-right bg-gray-50/50 dark:bg-slate-900/50 p-4 rounded-2xl w-full md:w-auto overflow-hidden">
                                                                     <div className="flex-1 md:flex-none">
-                                                                        <div className="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em] mb-1">Monthly Points</div>
-                                                                        <div className="text-xl font-black text-[#003875] dark:text-white">{monthlyScore.toFixed(1)}</div>
+                                                                        <div className="text-[13px] font-semibold text-gray-400 mb-1">Monthly Points</div>
+                                                                        <div className="text-xl font-semibold text-[#2563EB] dark:text-white">{monthlyScore.toFixed(1)}</div>
                                                                     </div>
                                                                     <div className="w-[1px] bg-gray-200 dark:bg-white/10 shrink-0"></div>
                                                                     <div className="flex-1 md:flex-none">
-                                                                        <div className="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em] mb-1">Cumulative Score</div>
-                                                                        <div className="text-xl font-black text-[#FFD500]">{cumulativePercent}%</div>
+                                                                        <div className="text-[13px] font-semibold text-gray-400 mb-1">Cumulative Score</div>
+                                                                        <div className="text-xl font-semibold text-[#2563EB]">{cumulativePercent}%</div>
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                             <div className="grid grid-cols-5 sm:grid-cols-7 md:grid-cols-10 gap-3">
                                                                 {dayCells.map((c, idx) => (
                                                                     <div key={idx} className={`relative ${c.isLate && c.statusChar.includes('HD') ? 'bg-orange-50 dark:bg-orange-900/20 border-orange-200 dark:border-orange-500/30' : 'bg-gray-50/50 dark:bg-slate-900 border-gray-100 dark:border-white/5'} rounded-[20px] p-3 flex flex-col items-center justify-center min-h-[72px] shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)] hover:shadow-md transition-shadow group`}>
-                                                                        {c.dotColor && <div className={`absolute -top-2 -right-2 w-auto min-w-[22px] h-5 px-1.5 rounded-full ${c.dotColor} border-[3px] border-white dark:border-slate-800 text-[10px] text-white flex items-center justify-center font-black shadow-sm z-10 scale-105`}>{c.dotText}</div>}
-                                                                        <div className="text-[11px] font-black text-gray-800 dark:text-gray-200 mb-2 opacity-80">{c.d}</div>
-                                                                        <div className={`text-[11px] font-black uppercase tracking-wider ${c.statusColor}`}>{c.statusChar}</div>
+                                                                        {c.dotColor && <div className={`absolute -top-2 -right-2 w-auto min-w-[22px] h-5 px-1.5 rounded-full ${c.dotColor} border-[3px] border-white dark:border-slate-800 text-[13px] text-white flex items-center justify-center font-semibold shadow-sm z-10 scale-105`}>{c.dotText}</div>}
+                                                                        <div className="text-[14px] font-semibold text-gray-800 dark:text-gray-200 mb-2 opacity-80">{c.d}</div>
+                                                                        <div className={`text-[14px] font-semibold  tracking-wider ${c.statusColor}`}>{c.statusChar}</div>
                                                                     </div>
                                                                 ))}
                                                             </div>
@@ -1166,27 +1166,27 @@ export default function AttendancePage() {
                             placeholder="Search by name..." 
                             value={masterSearch}
                             onChange={(e) => setMasterSearch(e.target.value)}
-                            className="w-full md:w-48 bg-white dark:bg-slate-900 border border-gray-200 dark:border-white/10 rounded-full px-4 py-2 text-[10px] font-black placeholder-gray-400 focus:outline-none focus:border-[#FFD500] shadow-sm shrink-0"
+                            className="w-full md:w-48 bg-white dark:bg-slate-900 border border-gray-200 dark:border-white/10 rounded-full px-4 py-2 text-[13px] font-semibold placeholder-gray-400 focus:outline-none focus:border-[#2563EB] shadow-sm shrink-0"
                         />
                         
                         {/* Toggle Mode */}
                         <div className="flex items-center bg-white dark:bg-slate-900 rounded-full p-1 border border-gray-200 dark:border-white/10 shadow-sm shrink-0">
-                            <button onClick={() => setReportViewMode('STATUS')} className={`px-4 py-1 rounded-full text-[9px] font-black uppercase tracking-widest transition-all ${reportViewMode === 'STATUS' ? 'bg-[#FFD500] text-white shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}>Status</button>
-                            <button onClick={() => setReportViewMode('TIME')} className={`px-4 py-1 rounded-full text-[9px] font-black uppercase tracking-widest transition-all ${reportViewMode === 'TIME' ? 'bg-[#FFD500] text-white shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}>Time</button>
-                            <button onClick={() => setReportViewMode('INFO')} className={`px-4 py-1 rounded-full text-[9px] font-black uppercase tracking-widest transition-all ${reportViewMode === 'INFO' ? 'bg-[#FFD500] text-white shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}>Info</button>
+                            <button onClick={() => setReportViewMode('STATUS')} className={`px-4 py-1 rounded-full text-[13px] font-semibold   transition-all ${reportViewMode === 'STATUS' ? 'bg-[#2563EB] text-white shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}>Status</button>
+                            <button onClick={() => setReportViewMode('TIME')} className={`px-4 py-1 rounded-full text-[13px] font-semibold   transition-all ${reportViewMode === 'TIME' ? 'bg-[#2563EB] text-white shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}>Time</button>
+                            <button onClick={() => setReportViewMode('INFO')} className={`px-4 py-1 rounded-full text-[13px] font-semibold   transition-all ${reportViewMode === 'INFO' ? 'bg-[#2563EB] text-white shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}>Info</button>
                         </div>
 
                         <div className="flex items-center gap-2 bg-white dark:bg-slate-900 px-3 py-1 rounded-full shadow-sm border border-gray-100 dark:border-white/5 shrink-0">
-                            <button onClick={() => setCurrentDate(new Date(currentDate.setMonth(currentDate.getMonth() - 1)))} className="p-1 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition"><ChevronLeftIcon className="w-3 h-3 text-[#FFD500]" /></button>
-                            <span className="text-[10px] font-black text-gray-800 dark:text-white uppercase tracking-tighter w-24 text-center">
+                            <button onClick={() => setCurrentDate(new Date(currentDate.setMonth(currentDate.getMonth() - 1)))} className="p-1 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition"><ChevronLeftIcon className="w-3 h-3 text-[#2563EB]" /></button>
+                            <span className="text-[13px] font-semibold text-gray-800 dark:text-white tracking-tighter w-24 text-center">
                                 {currentDate.toLocaleString('default', { month: 'short', year: 'numeric' })}
                             </span>
-                            <button onClick={() => setCurrentDate(new Date(currentDate.setMonth(currentDate.getMonth() + 1)))} className="p-1 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition"><ChevronRightIcon className="w-3 h-3 text-[#FFD500]" /></button>
+                            <button onClick={() => setCurrentDate(new Date(currentDate.setMonth(currentDate.getMonth() + 1)))} className="p-1 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition"><ChevronRightIcon className="w-3 h-3 text-[#2563EB]" /></button>
                         </div>
 
                         <button
                             onClick={handleExportCSV}
-                            className="flex items-center gap-1.5 bg-[#003875] dark:bg-[#FFD500] text-white dark:text-black px-4 py-1.5 rounded-full font-black text-[9px] uppercase tracking-widest shadow-lg shadow-[#003875]/20 hover:-translate-y-0.5 transition-all active:scale-95 shrink-0"
+                            className="flex items-center gap-1.5 bg-[#2563EB] dark:bg-[#60A5FA] text-white dark:text-black px-4 py-1.5 rounded-full font-semibold text-[13px] shadow-lg shadow-[#2563EB]/20 hover:-translate-y-0.5 transition-all active:scale-95 shrink-0"
                         >
                             <ArrowDownTrayIcon className="w-3 h-3" />
                             Export
@@ -1203,7 +1203,7 @@ export default function AttendancePage() {
                                 />
                                 <button
                                     onClick={() => punchImportInputRef.current?.click()}
-                                    className="flex items-center gap-1.5 bg-emerald-600 text-white px-4 py-1.5 rounded-full font-black text-[9px] uppercase tracking-widest shadow-lg shadow-emerald-600/20 hover:-translate-y-0.5 transition-all active:scale-95 shrink-0"
+                                    className="flex items-center gap-1.5 bg-emerald-600 text-white px-4 py-1.5 rounded-full font-semibold text-[13px] shadow-lg shadow-emerald-600/20 hover:-translate-y-0.5 transition-all active:scale-95 shrink-0"
                                 >
                                     <ArrowUpTrayIcon className="w-3 h-3" />
                                     Import Punch Data
@@ -1213,7 +1213,7 @@ export default function AttendancePage() {
                     </div>
 
                     {!masterData ? (
-                        <div className="flex-1 flex items-center justify-center text-gray-400 text-sm animate-pulse font-black">SYNCING DATA...</div>
+                        <div className="flex-1 flex items-center justify-center text-gray-400 text-sm animate-pulse font-semibold">SYNCING DATA...</div>
                     ) : (
                         <>
                             {/* Dummy Top Scrollbar */}
@@ -1236,7 +1236,7 @@ export default function AttendancePage() {
                                     <tr>
                                         <th 
                                           style={{ backgroundColor: 'var(--background)', borderColor: 'var(--panel-border)' }}
-                                          className="sticky top-0 left-0 z-50 p-4 min-w-[200px] border-b border-r text-xs font-black text-[#003875] dark:text-[#FFD500] uppercase tracking-widest flex flex-col justify-center shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]"
+                                          className="sticky top-0 left-0 z-50 p-4 min-w-[200px] border-b border-r text-[14px] font-semibold text-[#2563EB] dark:text-[#60A5FA] flex flex-col justify-center shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]"
                                         >USER DETAILS / DAYS</th>
                                         {(() => {
                                             const year = currentDate.getFullYear();
@@ -1246,7 +1246,7 @@ export default function AttendancePage() {
                                                 <th 
                                                   key={d} 
                                                   style={{ backgroundColor: 'var(--background)', borderColor: 'var(--panel-border)' }}
-                                                  className="sticky top-0 z-40 p-3 border-b border-r text-center text-xs font-black text-gray-800 dark:text-white"
+                                                  className="sticky top-0 z-40 p-3 border-b border-r text-center text-[14px] font-semibold text-gray-800 dark:text-white"
                                                 >{d}</th>
                                             ));
                                         })()}
@@ -1304,25 +1304,25 @@ export default function AttendancePage() {
                                                 } else if (leave) {
                                                     leavesCount++;
                                                     statusChar = 'L';
-                                                    statusColor = 'text-[#FFD500] font-black';
+                                                    statusColor = 'text-[#2563EB] font-semibold';
                                                 } else if (rawIn) {
                                                     let hours = 0;
                                                     if (rawOut) hours = (new Date(rawOut).getTime() - new Date(rawIn).getTime()) / 3600000;
                                                     if (rawOut && hours <= 4) {
                                                         halfDays++;
                                                         statusChar = isLate ? 'HD(L)' : 'HD';
-                                                        statusColor = 'text-orange-500 font-black';
+                                                        statusColor = 'text-orange-500 font-semibold';
                                                         dotText = '+0.5';
                                                     } else {
                                                         presents++;
                                                         statusChar = isLate ? 'P(L)' : 'P';
-                                                        statusColor = 'text-green-500 font-black';
+                                                        statusColor = 'text-green-500 font-semibold';
                                                         dotText = '+1';
                                                     }
                                                 } else if (dateStr < todayStr) {
                                                     absents++;
                                                     statusChar = 'A';
-                                                    statusColor = 'text-red-500 font-black';
+                                                    statusColor = 'text-red-500 font-semibold';
                                                     dotText = '-1';
                                                 }
 
@@ -1341,13 +1341,13 @@ export default function AttendancePage() {
                                                         <div className="flex items-center gap-4">
                                                             <div 
                                                               style={{ borderColor: 'var(--panel-border)' }}
-                                                              className="w-10 h-10 rounded-full bg-white dark:bg-slate-900 border flex items-center justify-center font-black overflow-hidden shrink-0"
+                                                              className="w-10 h-10 rounded-full bg-white dark:bg-slate-900 border flex items-center justify-center font-semibold overflow-hidden shrink-0"
                                                             >
-                                                                {u.image_url ? <img src={u.image_url} alt="" className="w-full h-full object-cover" /> : <UserBtnIcon className="w-5 h-5 text-[#FFD500]" />}
+                                                                {u.image_url ? <img src={u.image_url} alt="" className="w-full h-full object-cover" /> : <UserBtnIcon className="w-5 h-5 text-[#2563EB]" />}
                                                             </div>
                                                             <div>
-                                                                <div className="text-[11px] font-black text-gray-800 dark:text-white uppercase tracking-tighter truncate w-32">{u.full_name || u.username}</div>
-                                                                <div className="text-[10px] font-bold text-[#FFD500] uppercase mt-0.5">{cumP}%</div>
+                                                                <div className="text-[14px] font-semibold text-gray-800 dark:text-white tracking-tighter truncate w-32">{u.full_name || u.username}</div>
+                                                                <div className="text-[13px] font-bold text-[#2563EB] mt-0.5">{cumP}%</div>
                                                             </div>
                                                         </div>
                                                     </td>
@@ -1359,9 +1359,9 @@ export default function AttendancePage() {
                                                         >
                                                             {reportViewMode === 'STATUS' ? (
                                                                 <div className="flex flex-col items-center justify-center gap-1">
-                                                                    <div className={`text-xs font-black uppercase tracking-tighter ${c.statusColor}`}>{c.statusChar}</div>
+                                                                    <div className={`text-[14px] font-semibold  tracking-tighter ${c.statusColor}`}>{c.statusChar}</div>
                                                                     {c.dotText && (
-                                                                         <div className={`text-[9px] font-black ${c.statusChar === 'P' || c.statusChar === 'P(L)' ? 'text-green-500' : c.statusChar === 'HD' || c.statusChar === 'HD(L)' ? 'text-orange-500' : 'text-red-500'}`}>
+                                                                         <div className={`text-[13px] font-semibold ${c.statusChar === 'P' || c.statusChar === 'P(L)' ? 'text-green-500' : c.statusChar === 'HD' || c.statusChar === 'HD(L)' ? 'text-orange-500' : 'text-red-500'}`}>
                                                                             {c.dotText}
                                                                          </div>
                                                                     )}
@@ -1369,10 +1369,10 @@ export default function AttendancePage() {
                                                             ) : reportViewMode === 'TIME' ? (
                                                                 <div className="flex flex-col items-center justify-center gap-0.5">
                                                                     {c.isWeeklyOff || c.statusChar === 'L' || c.statusChar === 'A' || c.statusChar === '-' ? (
-                                                                        <div className={`text-xs font-black uppercase tracking-tighter ${c.statusColor}`}>{c.statusChar}</div>
+                                                                        <div className={`text-[14px] font-semibold  tracking-tighter ${c.statusColor}`}>{c.statusChar}</div>
                                                                     ) : (
                                                                         <>
-                                                                            <div className="text-[9px] font-bold text-gray-500 dark:text-gray-400 flex items-center justify-center">
+                                                                            <div className="text-[13px] font-bold text-gray-500 dark:text-gray-400 flex items-center justify-center">
                                                                                 {c.rawIn ? (
                                                                                     c.inPhoto ? (
                                                                                         <a href={c.inPhoto.startsWith('http') ? c.inPhoto : `https://drive.google.com/file/d/${c.inPhoto}/view`} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-600 underline decoration-blue-300 hover:decoration-blue-600 transition-colors" title="View Check-in Photo">
@@ -1383,7 +1383,7 @@ export default function AttendancePage() {
                                                                                     )
                                                                                 ) : '-'}
                                                                             </div>
-                                                                            <div className="text-[9px] font-bold text-gray-500 dark:text-gray-400 flex items-center justify-center">
+                                                                            <div className="text-[13px] font-bold text-gray-500 dark:text-gray-400 flex items-center justify-center">
                                                                                 {c.rawOut ? (
                                                                                     c.outPhoto ? (
                                                                                         <a href={c.outPhoto.startsWith('http') ? c.outPhoto : `https://drive.google.com/file/d/${c.outPhoto}/view`} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-600 underline decoration-blue-300 hover:decoration-blue-600 transition-colors" title="View Check-out Photo">
@@ -1400,7 +1400,7 @@ export default function AttendancePage() {
                                                             ) : (
                                                                 <div className="flex flex-col items-center justify-center gap-1 min-w-[120px]">
                                                                     {c.isWeeklyOff || c.statusChar === 'L' || c.statusChar === 'A' || c.statusChar === '-' ? (
-                                                                        <div className={`text-xs font-black uppercase tracking-tighter ${c.statusColor}`}>{c.statusChar}</div>
+                                                                        <div className={`text-[14px] font-semibold  tracking-tighter ${c.statusColor}`}>{c.statusChar}</div>
                                                                     ) : (
                                                                         <>
                                                                             {c.rawIn && (
@@ -1410,8 +1410,8 @@ export default function AttendancePage() {
                                                                                             <img src={c.inPhoto.startsWith('http') ? c.inPhoto : `https://drive.google.com/thumbnail?id=${c.inPhoto}&sz=w200-h200`} alt="In" className="w-6 h-6 rounded object-cover border border-gray-200 dark:border-white/20 group-hover:scale-[5] transition-transform origin-left z-10 relative shadow-sm" title="View Check-in Photo" />
                                                                                         </a>
                                                                                     )}
-                                                                                    <div className="text-[9px] font-medium text-gray-600 dark:text-gray-300 leading-tight w-[130px] whitespace-normal break-words line-clamp-3" title={c.inLocation || 'Location unavailable'}>
-                                                                                        <span className="font-black text-[#003875] dark:text-[#FFD500] mr-1">(IN)</span>
+                                                                                    <div className="text-[13px] font-medium text-gray-600 dark:text-gray-300 leading-tight w-[130px] whitespace-normal break-words line-clamp-3" title={c.inLocation || 'Location unavailable'}>
+                                                                                        <span className="font-semibold text-[#2563EB] dark:text-[#60A5FA] mr-1">(IN)</span>
                                                                                         {c.inLocation || 'N/A'}
                                                                                     </div>
                                                                                 </div>
@@ -1423,8 +1423,8 @@ export default function AttendancePage() {
                                                                                             <img src={c.outPhoto.startsWith('http') ? c.outPhoto : `https://drive.google.com/thumbnail?id=${c.outPhoto}&sz=w200-h200`} alt="Out" className="w-6 h-6 rounded object-cover border border-gray-200 dark:border-white/20 group-hover:scale-[5] transition-transform origin-left z-10 relative shadow-sm" title="View Check-out Photo" />
                                                                                         </a>
                                                                                     )}
-                                                                                    <div className="text-[9px] font-medium text-gray-600 dark:text-gray-300 leading-tight w-[130px] whitespace-normal break-words line-clamp-3" title={c.outLocation || 'Location unavailable'}>
-                                                                                        <span className="font-black text-red-500 mr-1">(OUT)</span>
+                                                                                    <div className="text-[13px] font-medium text-gray-600 dark:text-gray-300 leading-tight w-[130px] whitespace-normal break-words line-clamp-3" title={c.outLocation || 'Location unavailable'}>
+                                                                                        <span className="font-semibold text-red-500 mr-1">(OUT)</span>
                                                                                         {c.outLocation || 'N/A'}
                                                                                     </div>
                                                                                 </div>
@@ -1455,18 +1455,18 @@ export default function AttendancePage() {
                     <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
                         <div className="flex items-center gap-4 bg-white dark:bg-slate-900 px-4 py-2 rounded-full shadow-sm border border-gray-100 dark:border-white/5">
                             <button onClick={() => setLatecomersDate(new Date(new Date(latecomersDate).setDate(latecomersDate.getDate() - 1)))} className="p-1 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition"><ChevronLeftIcon className="w-5 h-5 text-gray-500" /></button>
-                            <span className="text-sm font-black text-[#003875] dark:text-[#FFD500] uppercase tracking-widest w-32 text-center">
+                            <span className="text-sm font-semibold text-[#2563EB] dark:text-[#60A5FA] w-32 text-center">
                                 {latecomersDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
                             </span>
                             <button onClick={() => setLatecomersDate(new Date(new Date(latecomersDate).setDate(latecomersDate.getDate() + 1)))} className="p-1 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition"><ChevronRightIcon className="w-5 h-5 text-gray-500" /></button>
                         </div>
                     </div>
                     {!masterData ? (
-                        <div className="text-gray-400 text-sm animate-pulse font-black text-center py-20">SYNCING DATA...</div>
+                        <div className="text-gray-400 text-sm animate-pulse font-semibold text-center py-20">SYNCING DATA...</div>
                     ) : (
                         <table className="w-full text-left border-separate border-spacing-y-4 min-w-[800px] font-serif">
                             <thead>
-                                <tr className="text-sm font-medium text-gray-500 uppercase tracking-widest text-center">
+                                <tr className="text-sm font-medium text-gray-500 text-center">
                                     <th className="px-6 py-2 text-left">Employee Details</th>
                                     <th className="px-4 py-2">In Time</th>
                                     <th className="px-4 py-2">Location</th>
@@ -1490,20 +1490,20 @@ export default function AttendancePage() {
                                             <tr key={u.id} className="bg-white dark:bg-slate-900 rounded-[24px] shadow-sm relative z-10 hover:shadow-md transition-shadow">
                                                 <td className="px-6 py-4 rounded-l-[24px]">
                                                     <div className="flex items-center gap-4">
-                                                        <div className="w-10 h-10 rounded-full bg-[#FFD500] flex items-center justify-center font-black text-white shadow-sm overflow-hidden shrink-0">
+                                                        <div className="w-10 h-10 rounded-full bg-[#2563EB] flex items-center justify-center font-semibold text-white shadow-sm overflow-hidden shrink-0">
                                                             {u.image_url ? <img src={u.image_url} alt="" className="w-full h-full object-cover" /> : <UserBtnIcon className="w-5 h-5 text-white" />}
                                                         </div>
                                                         <div>
-                                                            <div className="text-sm font-black text-[#003875] dark:text-white uppercase tracking-tighter">{u.full_name || u.username}</div>
-                                                            <div className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">ID: {String(u.id).substring(0, 6)}</div>
+                                                            <div className="text-sm font-semibold text-[#2563EB] dark:text-white tracking-tighter">{u.full_name || u.username}</div>
+                                                            <div className="text-[13px] font-bold text-gray-400 mt-0.5">ID: {String(u.id).substring(0, 6)}</div>
                                                         </div>
                                                     </div>
                                                 </td>
                                                 <td className="px-4 py-4 text-center">
-                                                    <span className="bg-red-50 text-red-500 dark:bg-red-500/10 px-4 py-2 rounded-full text-sm font-black">{formatTimeIST(record.inTime)}</span>
+                                                    <span className="bg-red-50 text-red-500 dark:bg-red-500/10 px-4 py-2 rounded-full text-sm font-semibold">{formatTimeIST(record.inTime)}</span>
                                                 </td>
                                                 <td className="px-4 py-4 text-center rounded-r-[24px]">
-                                                    <div className="text-[10px] font-medium text-gray-500 dark:text-gray-400 max-w-[250px] mx-auto truncate" title={record.inLocation || 'N/A'}>
+                                                    <div className="text-[13px] font-medium text-gray-500 dark:text-gray-400 max-w-[250px] mx-auto truncate" title={record.inLocation || 'N/A'}>
                                                         {record.inLocation || 'N/A'}
                                                     </div>
                                                 </td>
@@ -1519,18 +1519,18 @@ export default function AttendancePage() {
             {importPreview && (
                 <div className="fixed inset-0 z-[220] bg-black/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
                     <div className="bg-white dark:bg-slate-900 rounded-[28px] w-full max-w-2xl max-h-[calc(100vh-1.5rem)] my-auto shadow-2xl border border-white/10 overflow-hidden flex flex-col">
-                        <div className="shrink-0 px-5 sm:px-6 py-4 border-b border-gray-100 dark:border-white/10 bg-[#003875] text-white">
+                        <div className="shrink-0 px-5 sm:px-6 py-4 border-b border-gray-100 dark:border-white/10 bg-[#2563EB] text-white">
                             <div className="flex items-center justify-between gap-4">
                                 <div>
-                                    <h3 className="text-lg font-black uppercase tracking-widest">Import Punch Data</h3>
-                                    <p className="text-[10px] font-bold uppercase tracking-widest text-white/70 mt-1">{importFileName}</p>
+                                    <h3 className="text-lg font-semibold">Import Punch Data</h3>
+                                    <p className="text-[13px] font-bold text-white/70 mt-1">{importFileName}</p>
                                 </div>
                                 {isImporting && (
                                     <div className="text-right">
-                                        <p className="text-[9px] font-black uppercase tracking-widest text-emerald-200">
+                                        <p className="text-[13px] font-semibold text-emerald-200">
                                             {importPhase === 'scanning' ? 'Scanning File' : importPhase === 'uploading' ? 'Uploading Data' : 'Completed'}
                                         </p>
-                                        <p className="text-2xl font-black text-white">{importProgress}%</p>
+                                        <p className="text-2xl font-semibold text-white">{importProgress}%</p>
                                     </div>
                                 )}
                             </div>
@@ -1541,9 +1541,9 @@ export default function AttendancePage() {
                                 <div className="px-4 py-3 border-b border-slate-800 flex items-center justify-between bg-slate-900/90">
                                     <div className="flex items-center gap-2">
                                         <DocumentTextIcon className="w-4 h-4 text-emerald-400" />
-                                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-300">File Preview</span>
+                                        <span className="text-[13px] font-semibold text-slate-300">File Preview</span>
                                     </div>
-                                    <span className="text-[9px] font-bold uppercase tracking-widest text-slate-500">XLSX</span>
+                                    <span className="text-[13px] font-bold text-slate-500">XLSX</span>
                                 </div>
 
                                 <div className="relative h-28 sm:h-32 overflow-hidden bg-[linear-gradient(180deg,#0f172a_0%,#111827_100%)]">
@@ -1558,8 +1558,8 @@ export default function AttendancePage() {
                                     </div>
 
                                     <div className="absolute inset-x-4 top-4 rounded-lg border border-emerald-500/20 bg-emerald-500/5 px-3 py-2">
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-emerald-300">Monthly Attendance Report</p>
-                                        <p className="text-[9px] font-medium text-slate-400 mt-1 truncate">{importFileName}</p>
+                                        <p className="text-[13px] font-semibold text-emerald-300">Monthly Attendance Report</p>
+                                        <p className="text-[13px] font-medium text-slate-400 mt-1 truncate">{importFileName}</p>
                                     </div>
 
                                     <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-emerald-400/10 to-transparent pointer-events-none" />
@@ -1578,7 +1578,7 @@ export default function AttendancePage() {
 
                             {isImporting && (
                                 <div className="space-y-2">
-                                    <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-slate-500">
+                                    <div className="flex items-center justify-between text-[13px] font-semibold text-slate-500">
                                         <span>{importPhase === 'scanning' ? 'Scanning punch rows' : importPhase === 'uploading' ? 'Saving to attendance sheet' : 'Import complete'}</span>
                                         <span>{importProgress}%</span>
                                     </div>
@@ -1594,16 +1594,16 @@ export default function AttendancePage() {
                             {!isImporting && (
                                 <div className="grid grid-cols-3 gap-2 sm:gap-3">
                                     <div className="rounded-2xl bg-emerald-50 dark:bg-emerald-900/20 p-3 sm:p-4 text-center">
-                                        <p className="text-[9px] font-black uppercase tracking-widest text-emerald-700 dark:text-emerald-300">Employees</p>
-                                        <p className="text-2xl font-black text-emerald-800 dark:text-emerald-200">{importPreview.employeeCount}</p>
+                                        <p className="text-[13px] font-semibold text-emerald-700 dark:text-emerald-300">Employees</p>
+                                        <p className="text-2xl font-semibold text-emerald-800 dark:text-emerald-200">{importPreview.employeeCount}</p>
                                     </div>
                                     <div className="rounded-2xl bg-blue-50 dark:bg-blue-900/20 p-3 sm:p-4 text-center">
-                                        <p className="text-[9px] font-black uppercase tracking-widest text-blue-700 dark:text-blue-300">Records</p>
-                                        <p className="text-2xl font-black text-blue-800 dark:text-blue-200">{importPreview.records.length}</p>
+                                        <p className="text-[13px] font-semibold text-blue-700 dark:text-blue-300">Records</p>
+                                        <p className="text-2xl font-semibold text-blue-800 dark:text-blue-200">{importPreview.records.length}</p>
                                     </div>
                                     <div className="rounded-2xl bg-amber-50 dark:bg-amber-900/20 p-3 sm:p-4 text-center">
-                                        <p className="text-[9px] font-black uppercase tracking-widest text-amber-700 dark:text-amber-300">Month</p>
-                                        <p className="text-sm font-black text-amber-800 dark:text-amber-200 mt-2">{importPreview.monthHint || 'N/A'}</p>
+                                        <p className="text-[13px] font-semibold text-amber-700 dark:text-amber-300">Month</p>
+                                        <p className="text-sm font-semibold text-amber-800 dark:text-amber-200 mt-2">{importPreview.monthHint || 'N/A'}</p>
                                     </div>
                                 </div>
                             )}
@@ -1615,11 +1615,11 @@ export default function AttendancePage() {
                                         <span className="w-2.5 h-2.5 rounded-full bg-amber-400/80" />
                                         <span className="w-2.5 h-2.5 rounded-full bg-emerald-400/80" />
                                     </div>
-                                    <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">Import Console</span>
+                                    <span className="text-[13px] font-semibold text-slate-400">Import Console</span>
                                 </div>
                                 <div
                                     ref={importLogRef}
-                                    className="h-28 sm:h-32 overflow-y-auto p-3 font-mono text-[10px] leading-5 text-emerald-300 bg-[#020617]"
+                                    className="h-28 sm:h-32 overflow-y-auto p-3 font-mono text-[13px] leading-5 text-emerald-300 bg-[#020617]"
                                 >
                                     {importLogs.length === 0 ? (
                                         <p className="text-slate-500">Waiting to start import...</p>
@@ -1639,8 +1639,8 @@ export default function AttendancePage() {
 
                             {!isImporting && importPreview.warnings.length > 0 && (
                                 <div className="rounded-2xl border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/20 p-4 max-h-32 overflow-y-auto">
-                                    <p className="text-[10px] font-black uppercase tracking-widest text-amber-700 dark:text-amber-300 mb-2">Warnings</p>
-                                    <ul className="space-y-1 text-[11px] font-medium text-amber-800 dark:text-amber-200">
+                                    <p className="text-[13px] font-semibold text-amber-700 dark:text-amber-300 mb-2">Warnings</p>
+                                    <ul className="space-y-1 text-[14px] font-medium text-amber-800 dark:text-amber-200">
                                         {importPreview.warnings.slice(0, 8).map((warning, index) => (
                                             <li key={index}>• {warning}</li>
                                         ))}
@@ -1652,7 +1652,7 @@ export default function AttendancePage() {
                             )}
 
                             {!isImporting && (
-                                <p className="text-[11px] font-medium text-gray-500 dark:text-gray-400">
+                                <p className="text-[14px] font-medium text-gray-500 dark:text-gray-400">
                                     Existing attendance for the same user and date will be overwritten with punch machine in/out times.
                                 </p>
                             )}
@@ -1662,14 +1662,14 @@ export default function AttendancePage() {
                             <button
                                 onClick={resetImportModal}
                                 disabled={isImporting}
-                                className="px-5 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest text-gray-500 hover:bg-gray-100 dark:hover:bg-slate-800 transition disabled:opacity-50"
+                                className="px-5 py-2.5 rounded-full text-[13px] font-semibold text-gray-500 hover:bg-gray-100 dark:hover:bg-slate-800 transition disabled:opacity-50"
                             >
                                 Cancel
                             </button>
                             <button
                                 onClick={handleConfirmPunchImport}
                                 disabled={isImporting || importPreview.records.length === 0}
-                                className="px-5 py-2.5 rounded-full bg-emerald-600 text-white text-[10px] font-black uppercase tracking-widest shadow-lg disabled:opacity-50 flex items-center gap-2"
+                                className="px-5 py-2.5 rounded-full bg-emerald-600 text-white text-[13px] font-semibold shadow-lg disabled:opacity-50 flex items-center gap-2"
                             >
                                 {isImporting ? <ArrowPathIcon className="w-4 h-4 animate-spin" /> : <ArrowUpTrayIcon className="w-4 h-4" />}
                                 {isImporting ? 'Processing...' : 'Confirm Import'}
@@ -1683,7 +1683,7 @@ export default function AttendancePage() {
             {showCameraMode && (
                 <div className="fixed inset-0 z-[200] bg-black/80 backdrop-blur-sm flex flex-col items-center justify-center p-4">
                     <div className="bg-white dark:bg-slate-800 p-6 rounded-[32px] w-full max-w-sm flex flex-col items-center relative shadow-2xl animate-in zoom-in duration-200">
-                        <h3 className="text-lg font-black uppercase text-[#003875] dark:text-[#FFD500] mb-4">
+                        <h3 className="text-lg font-semibold text-[#2563EB] dark:text-[#60A5FA] mb-4">
                             Selfie Verification Required
                         </h3>
                         <div className="relative w-full aspect-[3/4] bg-black rounded-2xl overflow-hidden mb-6 shadow-inner border border-gray-100 dark:border-white/10">
@@ -1694,13 +1694,13 @@ export default function AttendancePage() {
                         <div className="flex gap-4 w-full">
                             <button 
                                 onClick={() => setShowCameraMode(null)} 
-                                className="flex-1 py-4 bg-gray-200 dark:bg-slate-700 text-gray-600 dark:text-white rounded-2xl font-black text-xs uppercase tracking-widest transition hover:bg-gray-300 dark:hover:bg-slate-600"
+                                className="flex-1 py-4 bg-gray-200 dark:bg-slate-700 text-gray-600 dark:text-white rounded-2xl font-semibold text-[14px] transition hover:bg-gray-300 dark:hover:bg-slate-600"
                             >
                                 Cancel
                             </button>
                             <button 
                                 onClick={capturePhotoAndSubmit} 
-                                className="flex-[2] py-4 bg-[#003875] dark:bg-[#FFD500] text-white dark:text-black rounded-2xl font-black text-xs uppercase tracking-widest transition shadow-lg hover:-translate-y-1"
+                                className="flex-[2] py-4 bg-[#2563EB] dark:bg-[#60A5FA] text-white dark:text-black rounded-2xl font-semibold text-[14px] transition shadow-lg hover:-translate-y-1"
                             >
                                 📸 Capture
                             </button>

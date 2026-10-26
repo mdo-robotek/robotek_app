@@ -79,8 +79,8 @@ export default function LiveMap({
               key={t}
               type="button"
               onClick={() => setMapTab(t)}
-              className={`px-2.5 py-1 text-[10px] font-black uppercase rounded-md ${
-                mapTab === t ? 'bg-[#062B6F] text-white' : 'text-gray-500'
+              className={`px-2.5 py-1 text-[13px] font-semibold  rounded-md ${
+                mapTab === t ? 'bg-[#1D4ED8] text-white' : 'text-gray-500'
               }`}
             >
               {t === 'live' ? 'Live Route' : "Today's Path"}
@@ -91,7 +91,7 @@ export default function LiveMap({
     >
       <div className={`${tall ? 'h-[260px] xl:h-[280px]' : 'h-[220px] md:h-[240px]'} rounded-lg overflow-hidden border border-gray-100 dark:border-white/10 relative`}>
         {loading && !liveLocation && (
-          <div className="absolute inset-0 z-10 flex items-center justify-center bg-gray-50 dark:bg-slate-800 text-xs font-bold text-gray-400">
+          <div className="absolute inset-0 z-10 flex items-center justify-center bg-gray-50 dark:bg-slate-800 text-[14px] font-bold text-gray-400">
             Loading map...
           </div>
         )}

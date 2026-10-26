@@ -43,6 +43,11 @@ export async function POST(req: NextRequest) {
       ticketData.voice_note = fileId || "";
     }
 
+    // Suggestion 1 is mandatory for every new help slip (2 & 3 optional)
+    if (!String(ticketData.suggestion_1 || "").trim()) {
+      return NextResponse.json({ error: "Suggestion 1 is required" }, { status: 400 });
+    }
+
     const now = new Date().toISOString();
     ticketData.created_at = ticketData.created_at || now;
     ticketData.updated_at = now;
@@ -56,7 +61,11 @@ export async function POST(req: NextRequest) {
       if (solver && solver.phone) {
         const formattedDate = formatDate(ticketData.created_at);
         const dueDate = ticketData.planned_resolution ? formatDate(ticketData.planned_resolution) : "Not Set";
-        const message = `🎫 *New Help Ticket Raised*\n━━━━━━━━━━━━━━━━━\n🔖 *Ticket ID:* ${ticketData.id}\n📌 *Title:* ${ticketData.title}\n🏷️ *Category:* ${ticketData.category}\n🎯 *Priority:* ${ticketData.priority}\n👤 *Raised By:* ${ticketData.raised_by}\n👨‍🔧 *Assigned To:* ${ticketData.solver_person || 'Unassigned'}\n⏳ *Due Date:* ${dueDate}\n⏱️ *Created At:* ${formattedDate}\n\n📝 *Description:* _${ticketData.description}_`;
+        const suggestions = [ticketData.suggestion_1, ticketData.suggestion_2, ticketData.suggestion_3].filter(Boolean);
+        const suggestionBlock = suggestions.length
+          ? `\n\n💡 *Suggestions by ${ticketData.raised_by}:*\n${suggestions.map((s: string, i: number) => `${i + 1}. ${s}`).join("\n")}`
+          : "";
+        const message = `🎫 *New Help Ticket Raised*\n━━━━━━━━━━━━━━━━━\n🔖 *Ticket ID:* ${ticketData.id}\n📌 *Title:* ${ticketData.title}\n🏷️ *Category:* ${ticketData.category}\n🎯 *Priority:* ${ticketData.priority}\n👤 *Raised By:* ${ticketData.raised_by}\n👨‍🔧 *Assigned To:* ${ticketData.solver_person || 'Unassigned'}\n⏳ *Due Date:* ${dueDate}\n⏱️ *Created At:* ${formattedDate}\n\n📝 *Description:* _${ticketData.description}_${suggestionBlock}`;
         await sendWhatsAppMessage(solver.phone, message);
       }
     } catch (err) {

@@ -33,21 +33,21 @@ export function CompactWelcome({ firstName, role }: any) {
     <motion.div 
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
-      className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-[#003875] to-[#011a35] p-5 text-white shadow-xl min-h-[140px] flex flex-col justify-center border-b-4 border-[#FFD500]/20"
+      className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-[#2563EB] to-[#011a35] p-5 text-white shadow-xl min-h-[140px] flex flex-col justify-center border-b-4 border-[#2563EB]/20"
     >
-      <div className="absolute top-0 right-0 -mt-10 -mr-10 w-48 h-48 bg-[#FFD500]/10 rounded-full blur-3xl" />
+      <div className="absolute top-0 right-0 -mt-10 -mr-10 w-48 h-48 bg-[#2563EB]/10 rounded-full blur-3xl" />
       <div className="relative z-10">
         <div className="flex items-center gap-2 mb-2">
-          <span className="bg-[#FFD500] text-[#003875] px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest flex items-center gap-1">
+          <span className="bg-[#2563EB] text-white px-2 py-0.5 rounded-full text-[12px] font-semibold flex items-center gap-1">
             <SparklesIcon className="w-2 h-2" /> System Active
           </span>
-          <span className="text-[8px] font-bold text-blue-200/60 uppercase tracking-widest">Robotek ERP</span>
+          <span className="text-[12px] font-bold text-blue-200/60">Robotek ERP</span>
         </div>
-        <h1 className="text-2xl font-black tracking-tighter leading-none mb-1 uppercase">
+        <h1 className="text-2xl font-semibold tracking-tighter leading-none mb-1">
           WELCOME,<br/>
-          <span className="text-[#FFD500]">{firstName}</span>
+          <span className="text-[#2563EB]">{firstName}</span>
         </h1>
-        <p className="text-[10px] font-extrabold text-[#FFD500] uppercase tracking-widest opacity-80 mt-1">{role} MODE</p>
+        <p className="text-[13px] font-extrabold text-[#2563EB] opacity-80 mt-1">{role} MODE</p>
       </div>
     </motion.div>
   );
@@ -59,7 +59,7 @@ export function CompactScore({ score, total, label, isNegative = false }: any) {
     
     return (
         <div className="bg-white dark:bg-navy-800 p-2 rounded-[2rem] border border-gray-100 dark:border-white/5 shadow-sm flex flex-col items-center justify-center min-h-[140px] overflow-hidden">
-            <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1 text-center whitespace-nowrap">{label}</p>
+            <p className="text-[13px] font-semibold text-gray-400 mb-1 text-center whitespace-nowrap">{label}</p>
             <div className="w-full h-24 mt-[-10px]">
                 <SemiCircleGauge value={score} isNegative={isNegative} total={total} label="" />
             </div>
@@ -78,26 +78,26 @@ export function CompactOccasionCard({ birthdays = [], anniversaries = [] }: any)
         <CakeIcon className="w-16 h-16" />
       </div>
       <div className="relative z-10">
-        <p className="text-[8px] font-black text-white/50 uppercase tracking-widest mb-3">Today's Occasions</p>
+        <p className="text-[12px] font-semibold text-white/50 mb-3">Today's Occasions</p>
         
         {totalCount > 0 ? (
           <div className="flex flex-col items-center gap-2">
             <div className="flex -space-x-3 overflow-hidden cursor-pointer" onClick={() => setShowAll(true)}>
               {[...(birthdays || []), ...(anniversaries || [])].slice(0, 3).map((b: any, i: number) => (
-                <div key={i} className="inline-block h-10 w-10 rounded-full ring-2 ring-white/20 bg-indigo-500 flex items-center justify-center text-sm font-black overflow-hidden bg-cover bg-center" style={b.image ? {backgroundImage: `url(${b.image})`} : {}}>
+                <div key={i} className="inline-block h-10 w-10 rounded-full ring-2 ring-white/20 bg-indigo-500 flex items-center justify-center text-sm font-semibold overflow-hidden bg-cover bg-center" style={b.image ? {backgroundImage: `url(${b.image})`} : {}}>
                   {!b.image && b.username.charAt(0)}
                 </div>
               ))}
               {totalCount > 3 && (
-                <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-white/20 bg-gray-800 text-[10px] font-black text-white">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-white/20 bg-gray-800 text-[13px] font-semibold text-white">
                   +{totalCount - 3}
                 </div>
               )}
             </div>
-            <button onClick={() => setShowAll(true)} className="text-[8px] font-black text-[#FFD500] uppercase tracking-widest hover:underline animate-pulse">Celebration List ({totalCount})</button>
+            <button onClick={() => setShowAll(true)} className="text-[12px] font-semibold text-[#2563EB] hover:underline animate-pulse">Celebration List ({totalCount})</button>
           </div>
         ) : (
-          <p className="text-[10px] font-bold text-white/70 uppercase">No occasions today</p>
+          <p className="text-[13px] font-bold text-white/70">No occasions today</p>
         )}
       </div>
 
@@ -117,7 +117,7 @@ export function CompactOccasionCard({ birthdays = [], anniversaries = [] }: any)
                 <div className="bg-gradient-to-r from-purple-600 to-indigo-700 p-6 flex justify-between items-center text-white">
                     <div className="flex items-center gap-3">
                         <SparklesIcon className="w-8 h-8 animate-bounce" />
-                        <h3 className="text-xl font-black uppercase tracking-tighter">Celebrants Today!</h3>
+                        <h3 className="text-xl font-semibold tracking-tighter">Celebrants Today!</h3>
                     </div>
                     <button onClick={() => setShowAll(false)} className="p-2 hover:bg-white/10 rounded-full transition-colors">
                         <XMarkIcon className="w-6 h-6" />
@@ -126,12 +126,12 @@ export function CompactOccasionCard({ birthdays = [], anniversaries = [] }: any)
                 <div className="p-6 max-h-[400px] overflow-y-auto space-y-4">
                     {birthdays.map((b: any, i: number) => (
                         <div key={`b-${i}`} className="flex items-center gap-4 p-3 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/5 shadow-sm">
-                            <div className="w-12 h-12 rounded-xl bg-indigo-500 flex items-center justify-center text-white text-xl font-black overflow-hidden bg-cover bg-center ring-4 ring-[#FFD500]/20" style={b.image ? {backgroundImage: `url(${b.image})`} : {}}>
+                            <div className="w-12 h-12 rounded-xl bg-indigo-500 flex items-center justify-center text-white text-xl font-semibold overflow-hidden bg-cover bg-center ring-4 ring-[#2563EB]/20" style={b.image ? {backgroundImage: `url(${b.image})`} : {}}>
                                 {!b.image && b.username.charAt(0)}
                             </div>
                             <div>
-                                <p className="font-black text-gray-900 dark:text-white uppercase leading-none">{b.username}</p>
-                                <p className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mt-1">{b.role}</p>
+                                <p className="font-semibold text-gray-900 dark:text-white leading-none">{b.username}</p>
+                                <p className="text-[13px] font-semibold text-gray-400 dark:text-gray-500 mt-1">{b.role}</p>
                             </div>
                             <div className="ml-auto">
                                 <span className="p-2 bg-pink-50 dark:bg-pink-950/30 text-pink-500 rounded-full flex items-center justify-center" title="Birthday">🎂</span>
@@ -140,12 +140,12 @@ export function CompactOccasionCard({ birthdays = [], anniversaries = [] }: any)
                     ))}
                     {anniversaries.map((b: any, i: number) => (
                         <div key={`a-${i}`} className="flex items-center gap-4 p-3 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/5 shadow-sm">
-                            <div className="w-12 h-12 rounded-xl bg-rose-500 flex items-center justify-center text-white text-xl font-black overflow-hidden bg-cover bg-center ring-4 ring-[#FFD500]/20" style={b.image ? {backgroundImage: `url(${b.image})`} : {}}>
+                            <div className="w-12 h-12 rounded-xl bg-rose-500 flex items-center justify-center text-white text-xl font-semibold overflow-hidden bg-cover bg-center ring-4 ring-[#2563EB]/20" style={b.image ? {backgroundImage: `url(${b.image})`} : {}}>
                                 {!b.image && b.username.charAt(0)}
                             </div>
                             <div>
-                                <p className="font-black text-gray-900 dark:text-white uppercase leading-none">{b.username}</p>
-                                <p className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mt-1">{b.role}</p>
+                                <p className="font-semibold text-gray-900 dark:text-white leading-none">{b.username}</p>
+                                <p className="text-[13px] font-semibold text-gray-400 dark:text-gray-500 mt-1">{b.role}</p>
                             </div>
                             <div className="ml-auto">
                                 <span className="p-2 bg-rose-50 dark:bg-rose-950/30 text-rose-500 rounded-full flex items-center justify-center" title="Work Anniversary">💍</span>
@@ -154,7 +154,7 @@ export function CompactOccasionCard({ birthdays = [], anniversaries = [] }: any)
                     ))}
                 </div>
                 <div className="p-4 bg-gray-50 dark:bg-navy-950/50 text-center border-t border-gray-100 dark:border-white/5">
-                   <p className="text-[10px] font-black text-[#003875] dark:text-[#FFD500] uppercase tracking-widest animate-pulse">Team Robotek Wishes You A Great Day!</p>
+                   <p className="text-[13px] font-semibold text-[#2563EB] dark:text-[#60A5FA] animate-pulse">Team Robotek Wishes You A Great Day!</p>
                 </div>
             </motion.div>
           </motion.div>
@@ -174,26 +174,26 @@ export function CompactPartyCelebrationCard({ partyBirthdays = [], partyAnnivers
         <SparklesIcon className="w-16 h-16" />
       </div>
       <div className="relative z-10">
-        <p className="text-[8px] font-black text-white/50 uppercase tracking-widest mb-3">Party Celebrations</p>
+        <p className="text-[12px] font-semibold text-white/50 mb-3">Party Celebrations</p>
         
         {totalCount > 0 ? (
           <div className="flex flex-col items-center gap-2">
             <div className="flex -space-x-3 overflow-hidden cursor-pointer" onClick={() => setShowAll(true)}>
               {[...(partyBirthdays || []), ...(partyAnniversaries || [])].slice(0, 3).map((b: any, i: number) => (
-                <div key={i} className={`inline-block h-10 w-10 rounded-full ring-2 ring-white/20 flex items-center justify-center text-sm font-black overflow-hidden bg-cover bg-center text-white ${partyAnniversaries.some((pa: any) => pa.partyName === b.partyName) ? 'bg-rose-400' : 'bg-orange-400'}`}>
+                <div key={i} className={`inline-block h-10 w-10 rounded-full ring-2 ring-white/20 flex items-center justify-center text-sm font-semibold overflow-hidden bg-cover bg-center text-white ${partyAnniversaries.some((pa: any) => pa.partyName === b.partyName) ? 'bg-rose-400' : 'bg-orange-400'}`}>
                   {b.partyName.charAt(0)}
                 </div>
               ))}
               {totalCount > 3 && (
-                <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-white/20 bg-gray-800 text-[10px] font-black text-white">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-white/20 bg-gray-800 text-[13px] font-semibold text-white">
                   +{totalCount - 3}
                 </div>
               )}
             </div>
-            <button onClick={() => setShowAll(true)} className="text-[8px] font-black text-[#003875] uppercase tracking-widest hover:underline animate-pulse">Celebration List ({totalCount})</button>
+            <button onClick={() => setShowAll(true)} className="text-[12px] font-semibold text-[#2563EB] hover:underline animate-pulse">Celebration List ({totalCount})</button>
           </div>
         ) : (
-          <p className="text-[10px] font-bold text-white/70 uppercase">No occasions today</p>
+          <p className="text-[13px] font-bold text-white/70">No occasions today</p>
         )}
       </div>
 
@@ -213,7 +213,7 @@ export function CompactPartyCelebrationCard({ partyBirthdays = [], partyAnnivers
                 <div className="bg-gradient-to-r from-amber-500 to-orange-600 p-6 flex justify-between items-center text-white">
                     <div className="flex items-center gap-3">
                         <SparklesIcon className="w-8 h-8 animate-bounce" />
-                        <h3 className="text-xl font-black uppercase tracking-tighter">Party Celebrants!</h3>
+                        <h3 className="text-xl font-semibold tracking-tighter">Party Celebrants!</h3>
                     </div>
                     <button onClick={() => setShowAll(false)} className="p-2 hover:bg-white/10 rounded-full transition-colors">
                         <XMarkIcon className="w-6 h-6" />
@@ -222,12 +222,12 @@ export function CompactPartyCelebrationCard({ partyBirthdays = [], partyAnnivers
                 <div className="p-6 max-h-[400px] overflow-y-auto space-y-4">
                     {partyBirthdays.map((b: any, i: number) => (
                         <div key={`pb-${i}`} className="flex items-center gap-4 p-3 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/5 shadow-sm">
-                            <div className="w-12 h-12 rounded-xl bg-orange-400 flex items-center justify-center text-white text-xl font-black overflow-hidden bg-cover bg-center ring-4 ring-[#003875]/20">
+                            <div className="w-12 h-12 rounded-xl bg-orange-400 flex items-center justify-center text-white text-xl font-semibold overflow-hidden bg-cover bg-center ring-4 ring-[#2563EB]/20">
                                 {b.partyName.charAt(0)}
                             </div>
                             <div>
-                                <p className="font-black text-gray-900 dark:text-white uppercase leading-none">{b.partyName}</p>
-                                <p className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mt-1">{b.partyType}</p>
+                                <p className="font-semibold text-gray-900 dark:text-white leading-none">{b.partyName}</p>
+                                <p className="text-[13px] font-semibold text-gray-400 dark:text-gray-500 mt-1">{b.partyType}</p>
                             </div>
                             <div className="ml-auto">
                                 <span className="p-2 bg-amber-50 dark:bg-amber-950/30 text-amber-500 rounded-full flex items-center justify-center" title="Party Birthday">🎂</span>
@@ -236,12 +236,12 @@ export function CompactPartyCelebrationCard({ partyBirthdays = [], partyAnnivers
                     ))}
                     {partyAnniversaries.map((b: any, i: number) => (
                         <div key={`pa-${i}`} className="flex items-center gap-4 p-3 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/5 shadow-sm">
-                            <div className="w-12 h-12 rounded-xl bg-rose-400 flex items-center justify-center text-white text-xl font-black overflow-hidden bg-cover bg-center ring-4 ring-[#003875]/20">
+                            <div className="w-12 h-12 rounded-xl bg-rose-400 flex items-center justify-center text-white text-xl font-semibold overflow-hidden bg-cover bg-center ring-4 ring-[#2563EB]/20">
                                 {b.partyName.charAt(0)}
                             </div>
                             <div>
-                                <p className="font-black text-gray-900 dark:text-white uppercase leading-none">{b.partyName}</p>
-                                <p className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mt-1">{b.partyType}</p>
+                                <p className="font-semibold text-gray-900 dark:text-white leading-none">{b.partyName}</p>
+                                <p className="text-[13px] font-semibold text-gray-400 dark:text-gray-500 mt-1">{b.partyType}</p>
                             </div>
                             <div className="ml-auto">
                                 <span className="p-2 bg-rose-50 dark:bg-rose-950/30 text-rose-500 rounded-full flex items-center justify-center" title="Party Anniversary">💍</span>
@@ -250,7 +250,7 @@ export function CompactPartyCelebrationCard({ partyBirthdays = [], partyAnnivers
                     ))}
                 </div>
                 <div className="p-4 bg-gray-50 dark:bg-navy-950/50 text-center border-t border-gray-100 dark:border-white/5">
-                   <p className="text-[10px] font-black text-[#003875] dark:text-[#FFD500] uppercase tracking-widest animate-pulse">Team Robotek Wishes A Happy Day!</p>
+                   <p className="text-[13px] font-semibold text-[#2563EB] dark:text-[#60A5FA] animate-pulse">Team Robotek Wishes A Happy Day!</p>
                 </div>
             </motion.div>
           </motion.div>
@@ -266,8 +266,8 @@ export function StatusTile({ label, value, icon: Icon, color, bg }: any) {
     return (
         <div className="bg-white dark:bg-navy-800 p-4 rounded-[1.5rem] border border-gray-100 dark:border-white/5 shadow-sm flex items-center justify-between group hover:shadow-md transition-all h-[90px]">
             <div>
-                <p className="text-[8px] font-black text-gray-400 uppercase tracking-[0.2em] mb-0.5">{label}</p>
-                <h3 className="text-2xl font-black text-gray-900 dark:text-white tabular-nums tracking-tighter">{value}</h3>
+                <p className="text-[12px] font-semibold text-gray-400 mb-0.5">{label}</p>
+                <h3 className="text-2xl font-semibold text-gray-900 dark:text-white tabular-nums tracking-tighter">{value}</h3>
             </div>
             <div className={`${bg} ${color} p-2 rounded-xl group-hover:scale-110 transition-transform`}>
                 <Icon className="w-5 h-5" />
@@ -278,11 +278,11 @@ export function StatusTile({ label, value, icon: Icon, color, bg }: any) {
 
 export function QuickActionSquare({ label, href, icon: Icon, color }: any) {
     return (
-        <Link href={href} className="group flex flex-col items-center justify-center bg-white dark:bg-navy-800 p-3 rounded-[1.5rem] border border-gray-100 dark:border-white/5 hover:border-[#003875] dark:hover:border-[#FFD500] transition-all hover:shadow-md h-[90px]">
+        <Link href={href} className="group flex flex-col items-center justify-center bg-white dark:bg-navy-800 p-3 rounded-[1.5rem] border border-gray-100 dark:border-white/5 hover:border-[#2563EB] dark:hover:border-[#60A5FA] transition-all hover:shadow-md h-[90px]">
             <div className={`${color} p-2.5 rounded-xl text-white mb-1.5 group-hover:scale-110 transition-transform shadow-lg`}>
                 <Icon className="w-5 h-5" />
             </div>
-            <span className="text-[9px] font-black text-gray-900 dark:text-white uppercase tracking-tight text-center leading-none">{label}</span>
+            <span className="text-[13px] font-semibold text-gray-900 dark:text-white tracking-tight text-center leading-none">{label}</span>
         </Link>
     );
 }
@@ -306,14 +306,14 @@ export function HighightedCalendar({ history, leaveDates = [], avgIn, avgOut }: 
       <div className="flex-1">
           <div className="flex items-center justify-between mb-6">
             <div>
-                <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-1">Personal Presence</h3>
-                <span className="text-xs font-black text-[#003875] dark:text-[#FFD500] uppercase">{today.toLocaleString('default', { month: 'long', year: 'numeric' })}</span>
+                <h3 className="text-[13px] font-semibold text-gray-400 mb-1">Personal Presence</h3>
+                <span className="text-[14px] font-semibold text-[#2563EB] dark:text-[#60A5FA]">{today.toLocaleString('default', { month: 'long', year: 'numeric' })}</span>
             </div>
           </div>
 
           <div className="grid grid-cols-7 gap-y-1 gap-x-1">
             {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((d, i) => (
-              <div key={i} className="flex justify-center items-center h-7 w-7 text-[9px] font-black text-gray-300">{d}</div>
+              <div key={i} className="flex justify-center items-center h-7 w-7 text-[13px] font-semibold text-gray-300">{d}</div>
             ))}
             {Array.from({ length: 42 }).map((_, i) => {
               const day = i - startDay + 1;
@@ -340,12 +340,12 @@ export function HighightedCalendar({ history, leaveDates = [], avgIn, avgOut }: 
               }
 
               if (isToday && !record?.inTime && !isOnLeave) {
-                 bgColor = 'border-2 border-[#003875] dark:border-[#FFD500] text-[#003875] dark:text-[#FFD500]';
+                 bgColor = 'border-2 border-[#2563EB] dark:border-[#60A5FA] text-[#2563EB] dark:text-[#60A5FA]';
               }
 
               return (
                 <div key={i} className="flex justify-center items-center h-7 w-7">
-                    <div className={`w-6 h-6 rounded-lg flex items-center justify-center text-[9px] font-black transition-all ${bgColor} ${textColor}`}>
+                    <div className={`w-6 h-6 rounded-lg flex items-center justify-center text-[13px] font-semibold transition-all ${bgColor} ${textColor}`}>
                       {day}
                     </div>
                 </div>
@@ -356,16 +356,16 @@ export function HighightedCalendar({ history, leaveDates = [], avgIn, avgOut }: 
 
       <div className="lg:w-32 flex flex-col justify-center border-t lg:border-t-0 lg:border-l border-gray-100 dark:border-white/5 pt-4 lg:pt-0 lg:pl-6 space-y-4">
             <div className="text-center lg:text-left">
-                <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest mb-1 opacity-60">Success Rates</p>
+                <p className="text-[12px] font-semibold text-gray-400 mb-1 opacity-60">Success Rates</p>
                 <div>
-                   <p className="text-[7px] font-black text-emerald-500 uppercase tracking-widest mb-0.5">Avg In</p>
-                   <p className="text-lg font-black text-emerald-500 tracking-tighter leading-none">{avgIn || '--:--'}</p>
+                   <p className="text-[12px] font-semibold text-emerald-500 mb-0.5">Avg In</p>
+                   <p className="text-lg font-semibold text-emerald-500 tracking-tighter leading-none">{avgIn || '--:--'}</p>
                 </div>
             </div>
             <div className="text-center lg:text-left">
                 <div>
-                   <p className="text-[7px] font-black text-rose-500 uppercase tracking-widest mb-0.5">Avg Out</p>
-                   <p className="text-lg font-black text-rose-500 tracking-tighter leading-none">{avgOut || '--:--'}</p>
+                   <p className="text-[12px] font-semibold text-rose-500 mb-0.5">Avg Out</p>
+                   <p className="text-lg font-semibold text-rose-500 tracking-tighter leading-none">{avgOut || '--:--'}</p>
                 </div>
             </div>
             <div className="flex gap-2 justify-center lg:justify-start pt-2 border-t border-gray-50 dark:border-white/5">
@@ -411,10 +411,10 @@ export function UserAssetsPanel({ username }: { username?: string }) {
                     key: "asset_name",
                     render: (row: AssetItem) => (
                         <div className="flex flex-col">
-                            <span className="block font-black text-gray-900 dark:text-white uppercase leading-tight text-[11px] break-words">
+                            <span className="block font-semibold text-gray-900 dark:text-white leading-tight text-[14px] break-words">
                                 {row.asset_name || "Unnamed Asset"}
                             </span>
-                            <span className="text-[9px] text-gray-400 font-mono italic mt-0.5">
+                            <span className="text-[13px] text-gray-400 font-mono italic mt-0.5">
                                 {row.asset_id || "—"}
                             </span>
                         </div>
@@ -424,7 +424,7 @@ export function UserAssetsPanel({ username }: { username?: string }) {
                     label: "Category",
                     key: "category",
                     render: (row: AssetItem) => (
-                        <span className="text-[11px] font-bold text-gray-600 dark:text-gray-300 uppercase">
+                        <span className="text-[14px] font-bold text-gray-600 dark:text-gray-300">
                             {row.category || "—"}
                         </span>
                     ),
@@ -435,11 +435,11 @@ export function UserAssetsPanel({ username }: { username?: string }) {
                     className: "text-right",
                     render: (row: AssetItem) => (
                         <span
-                            className={`px-2 py-0.5 rounded-full text-[9px] uppercase font-black ${
+                            className={`px-2 py-0.5 rounded-full text-[13px]  font-semibold ${
                                 row.status === "Available"
                                     ? "bg-emerald-500/10 text-emerald-500"
                                     : row.status === "In Use"
-                                    ? "bg-[#003875]/10 text-[#003875] dark:bg-blue-500/10 dark:text-blue-400"
+                                    ? "bg-[#2563EB]/10 text-white dark:bg-blue-500/10 dark:text-blue-400"
                                     : row.status === "Maintenance"
                                     ? "bg-amber-500/10 text-amber-500"
                                     : "bg-gray-500/10 text-gray-500"
@@ -470,14 +470,14 @@ const COMPACT_TABLE_THEMES = {
   },
   blue: {
     cardHeader:
-      "bg-gradient-to-r from-[#002855] via-[#003875] to-[#0066cc] border-[#FFD500]/30 shadow-inner",
-    thead: "bg-gradient-to-r from-[#001a33] via-[#003875] to-[#0055aa]",
-    thText: "text-[#FFD500] drop-shadow-sm",
-    rowBorder: "border-[#FFD500]/25",
-    icon: "text-[#FFD500]",
+      "bg-gradient-to-r from-[#1D4ED8] via-[#2563EB] to-[#0066cc] border-[#2563EB]/30 shadow-inner",
+    thead: "bg-gradient-to-r from-[#1D4ED8] via-[#2563EB] to-[#0055aa]",
+    thText: "text-[#2563EB] drop-shadow-sm",
+    rowBorder: "border-[#2563EB]/25",
+    icon: "text-[#2563EB]",
     title: "text-white drop-shadow-sm",
     link: "text-white/60",
-    linkHover: "hover:text-[#FFD500]",
+    linkHover: "hover:text-[#2563EB]",
   },
   amber: {
     cardHeader:
@@ -519,12 +519,12 @@ export function CompactTable({
     return (
       <div className={`bg-white dark:bg-navy-800 rounded-[2rem] border border-gray-100 dark:border-white/5 shadow-lg overflow-hidden flex flex-col ${heightClass}`}>
             <div className={`p-4 border-b flex items-center justify-between ${theme.cardHeader}`}>
-                <h3 className={`text-sm font-black uppercase tracking-widest flex items-center gap-2 ${theme.title}`}>
+                <h3 className={`text-sm font-semibold   flex items-center gap-2 ${theme.title}`}>
                     <Icon className={`w-5 h-5 ${theme.icon}`} />
                     {title}
                 </h3>
                 {linkHref && (
-                    <Link href={linkHref} className={`text-[11px] font-black uppercase tracking-widest transition-colors ${theme.link} ${theme.linkHover}`}>Master View</Link>
+                    <Link href={linkHref} className={`text-[14px] font-semibold   transition-colors ${theme.link} ${theme.linkHover}`}>Master View</Link>
                 )}
             </div>
             <div className="flex-1 overflow-y-auto no-scrollbar scroll-smooth">
@@ -532,19 +532,19 @@ export function CompactTable({
                     <thead className={`sticky top-0 z-10 shadow-sm ${theme.thead}`}>
                         <tr className={`border-b ${theme.rowBorder}`}>
                             {columns.map((col: any, i: number) => (
-                                <th key={i} className={`px-3 py-3.5 text-xs font-black uppercase tracking-wider ${theme.thText} ${col.className || ""}`}>{col.label}</th>
+                                <th key={i} className={`px-3 py-3.5 text-[14px] font-semibold  tracking-wider ${theme.thText} ${col.className || ""}`}>{col.label}</th>
                             ))}
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-50 dark:divide-white/5">
                         {rows.length === 0 ? (
                             <tr>
-                                <td colSpan={columns.length} className="p-8 text-center text-xs font-bold text-gray-300 uppercase italic">{emptyLabel}</td>
+                                <td colSpan={columns.length} className="p-8 text-center text-[14px] font-bold text-gray-300 italic">{emptyLabel}</td>
                             </tr>
                         ) : rows.map((row: any, i: number) => (
                           <tr key={i} className="hover:bg-gray-50 dark:hover:bg-white/1 transition-colors group">
                             {columns.map((col: any, j: number) => (
-                              <td key={j} className={`p-4 align-top text-xs font-bold text-gray-700 dark:text-gray-300 whitespace-normal ${col.className}`}>
+                              <td key={j} className={`p-4 align-top text-[14px] font-bold text-gray-700 dark:text-gray-300 whitespace-normal ${col.className}`}>
                                 {col.render ? col.render(row) : row[col.key]}
                               </td>
                             ))}
@@ -638,19 +638,19 @@ export function BirthdayCelebrationModal({ birthdays = [], anniversaries = [], p
                       animate={{ y: [0, -5, 0] }}
                       transition={{ duration: 3, repeat: Infinity, delay: i * 0.2, ease: "easeInOut" }}
                     >
-                       <div className="absolute inset-0 bg-[#FFD500] blur-3xl opacity-20 rounded-full"></div>
+                       <div className="absolute inset-0 bg-[#2563EB] blur-3xl opacity-20 rounded-full"></div>
                        {/* Avatar: orange tint for party, indigo for users, rose for anniversary */}
                        <div 
-                         className={`w-24 h-24 md:w-36 md:h-36 rounded-full border-[3px] border-[#FFD500] shadow-[0_0_40px_rgba(255,213,0,0.4)] flex items-center justify-center text-white text-4xl md:text-5xl font-black overflow-hidden bg-cover bg-center z-10 ${b.type === 'party' ? 'bg-orange-500' : (b.subType === 'anniversary' ? 'bg-rose-500' : 'bg-indigo-500')}`}
+                         className={`w-24 h-24 md:w-36 md:h-36 rounded-full border-[3px] border-[#2563EB] shadow-[0_0_40px_rgba(255,213,0,0.4)] flex items-center justify-center text-white text-4xl md:text-5xl font-semibold overflow-hidden bg-cover bg-center z-10 ${b.type === 'party' ? 'bg-orange-500' : (b.subType === 'anniversary' ? 'bg-rose-500' : 'bg-indigo-500')}`}
                          style={b.image ? {backgroundImage: `url(${b.image})`} : {}}
                        >
                             {!b.image && b.username.charAt(0)}
                        </div>
-                       <div className="mt-3 text-xs md:text-sm font-black text-[#FFD500] uppercase tracking-widest px-4 py-1.5 bg-black/40 backdrop-blur-md rounded-full shadow-xl border border-[#FFD500]/30 z-10 w-full truncate max-w-[140px]">
+                       <div className="mt-3 text-[14px] md:text-sm font-semibold text-[#2563EB] px-4 py-1.5 bg-black/40 backdrop-blur-md rounded-full shadow-xl border border-[#2563EB]/30 z-10 w-full truncate max-w-[140px]">
                            {b.username}
                        </div>
                        {/* Badge */}
-                       <div className={`mt-1 text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full border ${
+                       <div className={`mt-1 text-[12px] font-semibold   px-2 py-0.5 rounded-full border ${
                          b.type === 'party' 
                            ? 'text-orange-300 bg-orange-500/20 border-orange-400/30' 
                            : (b.subType === 'anniversary' 
@@ -663,13 +663,13 @@ export function BirthdayCelebrationModal({ birthdays = [], anniversaries = [], p
                  ))}
               </div>
 
-              <h2 className="text-3xl md:text-5xl font-black text-white uppercase tracking-tighter mb-3 drop-shadow-[0_4px_10px_rgba(0,0,0,0.8)] whitespace-pre-line leading-tight">
+              <h2 className="text-3xl md:text-5xl font-semibold text-white tracking-tighter mb-3 drop-shadow-[0_4px_10px_rgba(0,0,0,0.8)] whitespace-pre-line leading-tight">
                  {isMyBirthday || isMyAnniversary
                     ? (allCelebrants.length > 1 ? `CONGRATULATIONS,\n${currentUser} & TEAM!` : `CONGRATULATIONS,\n${currentUser}!`)
                     : "LET'S CELEBRATE! 🎉"}
               </h2>
               
-              <p className="text-[#FFD500] font-black text-sm md:text-xl uppercase tracking-widest mb-8 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] leading-relaxed max-w-lg mx-auto px-4 whitespace-pre-line">
+              <p className="text-[#2563EB] font-semibold text-sm md:text-xl mb-8 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] leading-relaxed max-w-lg mx-auto px-4 whitespace-pre-line">
                  {isMyBirthday || isMyAnniversary
                    ? (allCelebrants.length > 1 
                       ? "Wishing you an amazing day ahead! 🎈💥\n\nAlso, don't forget to wish the other celebrants a great day too! ✨🎊" 
@@ -679,7 +679,7 @@ export function BirthdayCelebrationModal({ birthdays = [], anniversaries = [], p
 
               <button 
                 onClick={handleClose}
-                className="px-12 py-5 bg-[#FFD500] text-[#003875] rounded-full font-black uppercase tracking-[0.25em] text-sm md:text-base hover:scale-110 transition-all shadow-[0_0_30px_rgba(255,213,0,0.4)] hover:shadow-[0_0_50px_rgba(255,213,0,0.6)] relative z-10 active:scale-95 border-2 border-transparent hover:border-white"
+                className="px-12 py-5 bg-[#2563EB] text-white rounded-full font-semibold text-sm md:text-base hover:scale-110 transition-all shadow-[0_0_30px_rgba(255,213,0,0.4)] hover:shadow-[0_0_50px_rgba(255,213,0,0.6)] relative z-10 active:scale-95 border-2 border-transparent hover:border-white"
               >
                 Let's Go!
               </button>

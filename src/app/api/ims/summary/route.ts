@@ -4,6 +4,8 @@ import { getFloorIMSItems } from "@/lib/ims-floor-sheets";
 import { getGRNItems } from "@/lib/grn-sheets";
 import { getOutFormData } from "@/lib/o2d-sheets";
 import { buildIMSMovementMaps, summarizeIMSMovement } from "@/lib/ims-enrich";
+import { getBusySales } from "@/lib/busy-sale-sheets";
+import { getItemLedgerEntries } from "@/lib/item-ledger-sheets";
 import { isGrnUnpacked } from "@/lib/grn-packed";
 
 export const dynamic = "force-dynamic";
@@ -25,16 +27,20 @@ function summarizeFloor(items: { in_qty?: string; out_qty?: string }[]) {
 export async function GET() {
   try {
     // Single parallel sheet fetch — avoids duplicate Out Form / floor reads
-    const [items, grns, outForm, gFloorLedger, firstFloorLedger, sfgFloorLedger] = await Promise.all([
+    const [items, grns, outForm, gFloorLedger, firstFloorLedger, sfgFloorLedger, busySales, ledgerEntries] = await Promise.all([
       getIMSItems(),
       getGRNItems(),
       getOutFormData(),
       getFloorIMSItems("g"),
       getFloorIMSItems("1st"),
       getFloorIMSItems("sfg"),
+      getBusySales(),
+      getItemLedgerEntries(),
     ]);
 
-    const maps = buildIMSMovementMaps(grns, outForm, gFloorLedger, firstFloorLedger);
+    // Item Ledger (Module A) IN entries (Locally Packed / Assembled) included
+    // so the summary tiles agree with the IMS page and Item Ledger page.
+    const maps = buildIMSMovementMaps(grns, outForm, gFloorLedger, firstFloorLedger, busySales, ledgerEntries);
     const main = summarizeIMSMovement(items, maps);
 
     const gSummary = summarizeFloor(gFloorLedger);

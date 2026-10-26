@@ -38,14 +38,14 @@ export default function CustomDateTimePicker({
 
     return (
         <div className="flex flex-col gap-1.5 w-full">
-            <label className="text-[10px] font-black uppercase tracking-widest text-[#003875]/60 dark:text-[#FFD500]/60 pl-1">
+            <label className="text-[13px] font-semibold text-[#2563EB]/60 dark:text-[#60A5FA]/60 pl-1">
                 {label} {required && <span className="text-red-500">*</span>}
             </label>
             <div 
                 onClick={handleContainerClick}
-                className="relative group/input flex items-center bg-white dark:bg-slate-900 border-2 border-[#003875]/5 dark:border-white/5 rounded-2xl p-1.5 focus-within:border-[#003875] dark:focus-within:border-[#FFD500] transition-all duration-300 shadow-sm cursor-pointer"
+                className="relative group/input flex items-center bg-white dark:bg-slate-900 border-2 border-[#2563EB]/5 dark:border-white/5 rounded-2xl p-1.5 focus-within:border-[#2563EB] dark:focus-within:border-[#60A5FA] transition-all duration-300 shadow-sm cursor-pointer"
             >
-                <div className="shrink-0 w-10 h-10 flex items-center justify-center bg-gray-50 dark:bg-slate-800 rounded-xl group-focus-within/input:bg-[#003875] group-focus-within/input:text-white dark:group-focus-within/input:bg-[#FFD500] dark:group-focus-within/input:text-black transition-colors">
+                <div className="shrink-0 w-10 h-10 flex items-center justify-center bg-gray-50 dark:bg-slate-800 rounded-xl group-focus-within/input:bg-[#2563EB] group-focus-within/input:text-white dark:group-focus-within/input:bg-[#60A5FA] dark:group-focus-within/input:text-black transition-colors">
                     {dateOnly ? <CalendarIcon className="w-5 h-5" /> : <ClockIcon className="w-5 h-5" />}
                 </div>
                 <input

@@ -41,7 +41,7 @@ export async function getUsers(): Promise<User[]> {
     const sheets = await getSheetsClient();
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId: GOOGLE_SHEET_ID,
-      range: `${SHEET_NAME}!A:P`,
+      range: `${SHEET_NAME}!A:Q`,
     });
 
     const rows = response.data.values;
@@ -75,6 +75,9 @@ export async function getUsers(): Promise<User[]> {
         department: row[11] || "",
         last_active: "", // Placeholder or remove if not needed
         isActive: row[14] === "TRUE" || row[14] === true || row[14] === undefined || row[14] === "", // Now O column (index 14)
+        // Q column (index 16): "Track Attendance". Defaults to true (tracked) unless explicitly "No" —
+        // so existing/new rows that never set this keep showing up in attendance widgets as before.
+        trackAttendance: String(row[16] ?? "").trim().toLowerCase() !== "no",
         permissions: permissions,
       };
     });
@@ -92,7 +95,7 @@ export async function addUser(user: User): Promise<boolean> {
     const sheets = await getSheetsClient();
     await sheets.spreadsheets.values.append({
       spreadsheetId: GOOGLE_SHEET_ID,
-      range: `${SHEET_NAME}!A:P`,
+      range: `${SHEET_NAME}!A:Q`,
       valueInputOption: "USER_ENTERED",
       requestBody: {
         values: [[
@@ -111,7 +114,8 @@ export async function addUser(user: User): Promise<boolean> {
           user.anniversary_date || "",
           user.doj || "",
           user.isActive !== false ? "TRUE" : "FALSE", // Index 14 (O)
-          JSON.stringify(user.permissions || []) // Index 15 (P)
+          JSON.stringify(user.permissions || []), // Index 15 (P)
+          user.trackAttendance === false ? "No" : "Yes" // Index 16 (Q)
         ]],
       },
     });
@@ -139,7 +143,7 @@ export async function updateUser(id: string, user: User): Promise<boolean> {
 
     await sheets.spreadsheets.values.update({
       spreadsheetId: GOOGLE_SHEET_ID,
-      range: `${SHEET_NAME}!A${rowIndex + 1}:P${rowIndex + 1}`,
+      range: `${SHEET_NAME}!A${rowIndex + 1}:Q${rowIndex + 1}`,
       valueInputOption: "USER_ENTERED",
       requestBody: {
         values: [[
@@ -158,7 +162,8 @@ export async function updateUser(id: string, user: User): Promise<boolean> {
           user.anniversary_date || "",
           user.doj || "",
           user.isActive !== false ? "TRUE" : "FALSE", // Index 14 (O)
-          JSON.stringify(user.permissions || []) // Index 15 (P)
+          JSON.stringify(user.permissions || []), // Index 15 (P)
+          user.trackAttendance === false ? "No" : "Yes" // Index 16 (Q)
         ]],
       },
     });

@@ -4,8 +4,17 @@ import { getDelegations } from "@/lib/delegation-sheets";
 import { getChecklistsPaginated } from "@/lib/checklist-sheets";
 import { ChecklistOccurrence } from "@/types/checklist";
 import { getUsers } from "@/lib/google-sheets";
-import { getAllO2DsForAnalytics } from "@/lib/o2d-sheets";
+import { getAllO2DsForAnalytics, getOutFormData, getPendingStepIdx } from "@/lib/o2d-sheets";
+import { O2D_STEPS } from "@/types/o2d";
+import { getOrderFollowupRemarks, latestRemarkByOrder } from "@/lib/o2d-remarks-sheets";
 import { getIMSItems } from "@/lib/ims-sheets";
+import { getGRNItems } from "@/lib/grn-sheets";
+import { getFloorIMSItems } from "@/lib/ims-floor-sheets";
+import { buildIMSMovementMaps, enrichIMSItems } from "@/lib/ims-enrich";
+import { getIMSMasterItems, indexMasterByName, overlayFromMaster, masterItemKey } from "@/lib/ims-master-sheets";
+import { rollupCategory } from "@/lib/category-rollup";
+import { getBusySales } from "@/lib/busy-sale-sheets";
+import { getItemLedgerEntries } from "@/lib/item-ledger-sheets";
 import { auth } from "@/auth";
 import { getWorkingHoursGapMs } from "@/lib/workingHours";
 
@@ -54,7 +63,7 @@ export async function GET(request: Request) {
     const now = new Date();
 
     // ── Parallel fetch all data sources ──
-    const [allO2Ds, allLeaves, allDelegations, checklistPage, allUsers, allAttendance, allIMS] = await Promise.all([
+    const [allO2Ds, allLeaves, allDelegations, checklistPage, allUsers, allAttendance, allIMS, allRemarks] = await Promise.all([
       getAllO2DsForAnalytics(),
       getLeaveRequests(),
       getDelegations(),
@@ -65,9 +74,28 @@ export async function GET(request: Request) {
       ),
       getUsers(),
       getAttendanceRecords(),
-      getIMSItems(),
+      (async () => {
+        // Live stock + category come from the same pipeline as the IMS page (Master sheet overlay)
+        const [items, grns, outForm, gFloor, firstFloor, masterRows, busySales, ledgerEntries] = await Promise.all([
+          getIMSItems(),
+          getGRNItems(),
+          getOutFormData(),
+          getFloorIMSItems("g"),
+          getFloorIMSItems("1st"),
+          getIMSMasterItems(),
+          getBusySales(),
+          getItemLedgerEntries(),
+        ]);
+        const masterByName = indexMasterByName(masterRows);
+        // Item Ledger (Module A) IN entries included so dashboard stock
+        // matches the IMS and Item Ledger pages.
+        return enrichIMSItems(items, buildIMSMovementMaps(grns, outForm, gFloor, firstFloor, busySales, ledgerEntries))
+          .map((item) => overlayFromMaster(item, masterByName.get(masterItemKey(item.item_name))));
+      })(),
+      getOrderFollowupRemarks().catch(() => []),
     ]);
     const allChecklists = (checklistPage.data || []) as ChecklistOccurrence[];
+    const remarkByOrder = latestRemarkByOrder(allRemarks as any[]);
 
     // Process O2D rows into orders (same as metrix route)
     const groupedByOrder: Record<string, any[]> = {};
@@ -101,17 +129,78 @@ export async function GET(request: Request) {
 
       const isDispatched = !!firstItem.actual_7 && firstItem.status_7 !== "No";
       const totalAmount = items.reduce((sum: number, i: any) => sum + (parseFloat(i.est_amount) || 0), 0);
-      
+
       const isReconfirmed = false;
       const actual4 = firstItem.actual_4 ? new Date(firstItem.actual_4) : null;
-      
-      return { orderNo, party: firstItem.party_name, createdAt, actual7, targetDateForOTD, isOTD, isDelayed, isDispatched, totalAmount, isReconfirmed, actual4 };
+
+      // Pending = EXACTLY the O2D page's definition (shared getPendingStepIdx):
+      // not hold, not cancelled, and some planned step still without an
+      // actual. This keeps the COO "Pending Orders" list identical to what
+      // the team sees on the O2D page (Sahil's team, 2026-10-23 — the COO
+      // list was showing closed/junk orders O2D doesn't count as pending).
+      const pendingStepIdx = getPendingStepIdx(items as any);
+      const isHold = !!firstItem.hold;
+      const isCancelled = !!firstItem.cancelled;
+      const isArchived = !!(firstItem as any).is_archived;
+      // Dispatch-pending (steps 1-7) is what the business means by a
+      // "pending/delayed order". Orders already dispatched but stuck on
+      // post-dispatch paperwork (8. Bill Update / 9. Bilty / 10. Delivery
+      // Doc / 11. Clear Payment) are counted separately — mixing them in
+      // made the tile show ~2x what the team expects (Sahil, 2026-10-23).
+      const hasOpenStep = !isHold && !isCancelled && !isArchived && pendingStepIdx !== -1;
+      const isPending = hasOpenStep && pendingStepIdx <= 7;
+      const isPostDispatchPending = hasOpenStep && pendingStepIdx >= 8;
+      const pendingStepName = pendingStepIdx >= 1 ? `${pendingStepIdx}. ${O2D_STEPS[pendingStepIdx - 1] || ""}` : "";
+
+      return { orderNo, party: firstItem.party_name, createdAt, actual7, targetDateForOTD, isOTD, isDelayed, isDispatched, totalAmount, isReconfirmed, actual4, isPending, isPostDispatchPending, pendingStepIdx, pendingStepName, firstItem };
     });
 
-    const totalUsers = (allUsers as any[]).filter((u: any) => u.status !== "Inactive").length;
+    // ── STEP PERFORMANCE (Sahil, 2026-10-23): OTD sirf dispatch tak hai;
+    // har step ka apna on-time% / delay alag dikhao, kyunki bilty jaise
+    // steps ka delay overall number mein chhup jata hai. planned_i vs
+    // actual_i per step, plus kitne orders abhi us step par atke hain.
+    const stepPerformance = Array.from({ length: 11 }, (_, idx) => {
+      const i = idx + 1;
+      let completed = 0, onTime = 0, late = 0, pending = 0, delaySumHrs = 0;
+      allOrders.forEach((o: any) => {
+        const fi = o.firstItem;
+        if (!fi || fi.cancelled || fi.hold || (fi as any).is_archived) return;
+        const planned = String(fi[`planned_${i}`] || "").trim();
+        if (!planned || planned === "-") return;
+        const actual = String(fi[`actual_${i}`] || "").trim();
+        if (actual && actual !== "-") {
+          const pTs = Date.parse(planned);
+          const aTs = Date.parse(actual);
+          if (!isNaN(pTs) && !isNaN(aTs)) {
+            completed++;
+            if (aTs <= pTs) onTime++;
+            else { late++; delaySumHrs += (aTs - pTs) / (1000 * 60 * 60); }
+          }
+        } else if (o.pendingStepIdx === i) {
+          pending++;
+        }
+      });
+      return {
+        step: i,
+        name: O2D_STEPS[i - 1] || `Step ${i}`,
+        completed,
+        onTimePct: completed > 0 ? Math.round((onTime / completed) * 100) : 0,
+        late,
+        pending,
+        avgDelayHours: late > 0 ? Math.round(delaySumHrs / late) : 0,
+      };
+    });
+
+    // Attendance counts only the people whose attendance HO actually
+    // maintains on the ERP (Track Attendance = Yes in the Users sheet) —
+    // factory-tracked staff (Akhilesh, Vineet etc.) and left employees are
+    // excluded, same rule as the home dashboard (Sahil, 2026-10-23).
+    const trackedUsers = (allUsers as any[]).filter((u: any) => u.status !== "Inactive" && (u as any).trackAttendance !== false);
+    const trackedIds = new Set(trackedUsers.map((u: any) => String(u.id)));
+    const totalUsers = trackedUsers.length;
 
     // ── 1. ATTENDANCE SUMMARY ──
-    const todayAttendance = allAttendance.filter(r => normalizeDate(r.date) === todayStr);
+    const todayAttendance = allAttendance.filter(r => normalizeDate(r.date) === todayStr && trackedIds.has(String(r.userId)));
     const checkedInUserIds = new Set(todayAttendance.map(r => String(r.userId)));
 
     // Calculate average check-in time (in minutes from midnight IST)
@@ -135,9 +224,10 @@ export async function GET(request: Request) {
     // Late = checked in after 9:30 AM (9*60+30 = 570 mins)
     const lateArrivals = checkInTimes.filter(m => m > 570).length;
 
-    // Approved leaves covering today
+    // Approved leaves covering today (tracked users only)
     const onLeaveToday = allLeaves.filter(l => {
       if (l.status !== "Approved") return false;
+      if (!trackedIds.has(String(l.userId))) return false;
       const start = normalizeDate(l.startDate);
       const end = normalizeDate(l.endDate);
       return start <= todayStr && end >= todayStr;
@@ -150,7 +240,8 @@ export async function GET(request: Request) {
 
     // ── 2. DELEGATION PIPELINE ──
     // Use filter params if provided, otherwise default to all time ('1970-01-01')
-    const mtdStart = startDateParam || "1970-01-01";
+    // Home dashboard (no explicit dates, monthly view) defaults to the current month
+    const mtdStart = startDateParam || (granularity === "month" ? `${todayStr.slice(0, 7)}-01` : "1970-01-01");
     const mtdEnd = endDateParam || todayStr;
     const mtdDelegations = allDelegations.filter(d => {
       const created = normalizeDate(d.created_at);
@@ -201,15 +292,23 @@ export async function GET(request: Request) {
     const mtdOTD = mtdOrders.filter((o: any) => o.isOTD).length;
     const otdRate = mtdDispatched > 0 ? Math.round((mtdOTD / mtdDispatched) * 100) : 0;
 
-    // Delay Aging — all un-dispatched orders
-    const undispatched = allOrders.filter((o: any) => !o.isDispatched);
+    // Delay Aging — pending orders only (O2D-page definition, not merely
+    // "no dispatch actual": hold/cancelled/terminated orders are excluded).
+    const undispatched = allOrders.filter((o: any) => o.isPending);
     const delayAging = { gt7: [] as any[], d4to7: [] as any[], d1to3: [] as any[], sameDay: [] as any[] };
     let revenueAtRisk = 0;
 
     undispatched.forEach((o: any) => {
       const created = new Date(normalizeDate(o.createdAt?.toISOString?.() || o.createdAt || ""));
       const diffDays = Math.floor((today.getTime() - created.getTime()) / (1000 * 60 * 60 * 24));
-      const entry = { orderNo: o.orderNo, party: o.party, days: diffDays, amount: o.totalAmount || 0 };
+      const entry = {
+        orderNo: o.orderNo,
+        party: o.party,
+        days: diffDays,
+        amount: o.totalAmount || 0,
+        step: o.pendingStepName || "",
+        remark: remarkByOrder[String(o.orderNo || "").toLowerCase()]?.remark || "",
+      };
       if (diffDays > 7) { delayAging.gt7.push(entry); revenueAtRisk += entry.amount; }
       else if (diffDays >= 4) delayAging.d4to7.push(entry);
       else if (diffDays >= 1) delayAging.d1to3.push(entry);
@@ -341,14 +440,14 @@ export async function GET(request: Request) {
     // ── 5. PARTY PIPELINE & CATEGORY REVENUE ──
     const itemToCategory: Record<string, string> = {};
     allIMS.forEach((i: any) => {
-      if (i.item_name && i.category) itemToCategory[i.item_name.trim()] = i.category;
+      if (i.item_name && i.category) itemToCategory[i.item_name.trim().toLowerCase()] = i.category;
     });
 
     const categoryRevenueMap: Record<string, number> = {};
     allO2Ds.forEach((item: any) => {
       const created = normalizeDate(item.created_at);
       if (created >= mtdStart && created <= mtdEnd) {
-        const cat = itemToCategory[item.item_name?.trim()] || "Other";
+        const cat = rollupCategory(itemToCategory[item.item_name?.trim().toLowerCase()]);
         const rev = parseFloat(item.est_amount) || 0;
         categoryRevenueMap[cat] = (categoryRevenueMap[cat] || 0) + rev;
       }
@@ -356,8 +455,7 @@ export async function GET(request: Request) {
 
     const categoryRevenue = Object.entries(categoryRevenueMap)
       .map(([category, revenue]) => ({ category, revenue }))
-      .sort((a, b) => b.revenue - a.revenue)
-      .slice(0, 5);
+      .sort((a, b) => b.revenue - a.revenue);
 
     const partyOrderCount: Record<string, number> = {};
     allOrders.forEach((o: any) => {
@@ -379,26 +477,112 @@ export async function GET(request: Request) {
 
     // ── 6. IMS INVENTORY ──
 
-    const outOfStock = allIMS.filter((i: any) => (parseFloat(i.stock_qty) || 0) === 0);
-    const lowStock = allIMS.filter((i: any) => {
-      const qty = parseFloat(i.stock_qty) || 0;
-      const reorder = parseFloat(i.reorder_point) || 5;
+    const stockOf = (i: any) => Number(i.live_stock ?? 0);
+    const activeIMS = allIMS.filter((i: any) => String(i.active_status || "").toLowerCase() !== "inactive");
+
+    // "Touch" category items are third-party: Robotek doesn't stock or reorder
+    // them — the party re-orders directly. Exclude them from every
+    // stock/restock-facing widget (but not from allItemsList, which is a plain
+    // inventory browse view, not a reorder surface).
+    const isTouchCategory = (i: any) => String(i.category || "").trim().toLowerCase() === "touch";
+
+    // Permanent staleness rule: an item not traded (no GRN/Busy/OutForm/floor
+    // movement) in the last 6 months should never be suggested for restock,
+    // counted in Total SKUs, or flagged as negative stock, even if it is
+    // still marked Active in the master sheet — this is the safeguard
+    // against stale/dead items cluttering the live-stock widgets. Sahil
+    // asked (2026-10-23) to tighten this from 8 months to 6 months, and to
+    // also drop stale items out of the Total SKUs count and Negative Stock
+    // list (previously only Out of Stock / Low Stock honored this).
+    const STALE_MS = 6 * 30 * 24 * 60 * 60 * 1000; // ~6 months
+    const isStale = (i: any) => {
+      const lastStr = i.last_activity_date;
+      if (!lastStr) return true; // never traded at all → stale
+      const ts = Date.parse(lastStr);
+      if (isNaN(ts)) return true;
+      return Date.now() - ts > STALE_MS;
+    };
+
+    const restockEligible = (i: any) => !isTouchCategory(i) && !isStale(i);
+
+    // Non-stale items = the universe the dashboard should actually be
+    // counting/showing as "live" SKUs. Touch items ARE kept here (they're
+    // still real SKUs moving through Robotek's books, just not restocked
+    // by us) — only dead/no-movement-6-months items are dropped.
+    const liveIMS = activeIMS.filter((i: any) => !isStale(i));
+
+    const outOfStock = activeIMS.filter((i: any) => stockOf(i) <= 0 && restockEligible(i));
+    const lowStock = activeIMS.filter((i: any) => {
+      if (!restockEligible(i)) return false;
+      const qty = stockOf(i);
+      const avg = Number(i.avg_daily_con || 0);
+      const reorder = Math.max(5, avg * 7); // under 7 days of cover
       return qty > 0 && qty <= reorder;
     });
+    // Negative stock = ledger entry errors (more OUT than IN recorded).
+    // Touch items are excluded here too — Robotek never maintains their
+    // stock, so a "negative" reading for them is not a real entry error.
+    // Stale (no movement in 6 months) items are excluded too — a negative
+    // reading on a dead item is not worth chasing as an active ledger error.
+    const negativeStock = activeIMS
+      .filter((i: any) => stockOf(i) < 0 && !isTouchCategory(i) && !isStale(i))
+      .sort((a: any, b: any) => stockOf(a) - stockOf(b));
+
+    // Item Ledger (Module A) mismatches: net negative OR selling with zero
+    // recorded IN — the MAGLOCK/TRUMP/NOIR punching-error pattern. Surfaced
+    // in Action Required so they get fixed without opening the ledger page.
+    const ledgerMismatches = activeIMS
+      .filter((i: any) => !isTouchCategory(i) && !isStale(i) &&
+        (stockOf(i) < 0 || (Number(i.in_qty || 0) === 0 && Number(i.out_qty || 0) > 0)))
+      .sort((a: any, b: any) => stockOf(a) - stockOf(b))
+      .map((i: any) => ({
+        sku: i.item_name,
+        category: i.category,
+        totalIn: Math.round(Number(i.in_qty || 0)),
+        totalOut: Math.round(Number(i.out_qty || 0)),
+        stockLeft: Math.round(stockOf(i)),
+      }));
     const categoryStockMap: Record<string, number> = {};
-    allIMS.forEach((i: any) => {
-      const cat = i.category || "Other";
-      categoryStockMap[cat] = (categoryStockMap[cat] || 0) + (parseFloat(i.stock_qty) || 0);
+    activeIMS.forEach((i: any) => {
+      const cat = rollupCategory(i.category);
+      categoryStockMap[cat] = (categoryStockMap[cat] || 0) + Math.max(0, stockOf(i));
     });
     const inventoryByCategory = Object.entries(categoryStockMap)
-      .sort((a, b) => b[1] - a[1]).slice(0, 6)
-      .map(([category, qty]) => ({ category, qty }));
+      .sort((a, b) => b[1] - a[1])
+      .map(([category, qty]) => ({ category, qty: Math.round(qty) }));
     const lowStockItems = [...outOfStock, ...lowStock].slice(0, 8).map((i: any) => ({
       sku: i.item_name,
       category: i.category,
-      stockLeft: parseFloat(i.stock_qty) || 0,
-      status: (parseFloat(i.stock_qty) || 0) === 0 ? "Out of Stock" : "Low",
+      stockLeft: Math.round(stockOf(i)),
+      status: stockOf(i) <= 0 ? "Out of Stock" : "Low",
     }));
+
+    // "Can't Afford To Be Low" — Sahil's top revenue/volume movers (2026-10-23
+    // request): the items that actually keep the company's sales running.
+    // Ranked by cumulative sold quantity (out_qty) among live (non-stale,
+    // non-Touch) items; the top 15% by volume, or at least the top 10 items,
+    // become the "critical" watchlist. Any of those sitting at zero/negative
+    // or under its own reorder line is surfaced first so restocking priority
+    // goes to what's actually moving the business, not just whatever
+    // happens to hit zero.
+    const sellableForCritical = liveIMS.filter((i: any) => !isTouchCategory(i) && Number(i.out_qty || 0) > 0);
+    const rankedBySales = [...sellableForCritical].sort((a: any, b: any) => Number(b.out_qty || 0) - Number(a.out_qty || 0));
+    const criticalCount = Math.max(10, Math.ceil(rankedBySales.length * 0.15));
+    const criticalItemsSet = new Set(rankedBySales.slice(0, criticalCount).map((i: any) => i.item_name));
+    const criticalItems = rankedBySales.slice(0, criticalCount).map((i: any) => {
+      const qty = stockOf(i);
+      const avg = Number(i.avg_daily_con || 0);
+      const reorder = Math.max(5, avg * 7);
+      const status = qty < 0 ? "Negative" : qty <= 0 ? "Out of Stock" : qty <= reorder ? "Low" : "Healthy";
+      return {
+        sku: i.item_name,
+        category: i.category,
+        stockLeft: Math.round(qty),
+        totalSold: Math.round(Number(i.out_qty || 0)),
+        status,
+      };
+    });
+    const criticalAtRisk = criticalItems.filter((i: any) => i.status !== "Healthy");
 
     // ── 7. TEAM SCORE SCORECARD ──
     const scorecard = (allUsers as any[]).filter((u: any) => u.status !== "Inactive").map((u: any) => {
@@ -426,20 +610,37 @@ export async function GET(request: Request) {
         }, 0) / overdueUser.length)
         : 0;
       
-      // On-time % is (On-Time / Total Assigned) to penalize pending/overdue tasks
+      // Science of missing: the scorecard counts what is MISSED, target is zero.
+      // Not Done counts only tasks whose due date has passed — a task not yet due is not a miss.
+      const overdueChecklists = userChecklists.filter(c => {
+        const due = normalizeDate(c.occurrence_due_date || c.due_date);
+        return due && due < todayStr && c.display_status !== "Completed";
+      }).length;
+      const notDone = overdueUser.length + overdueChecklists;
+      const notOnTime = Math.max(0, completedCount - onTimeCount);
+      // Weighted miss score, Not Done 70 : Not On-Time 30, scaled so that
+      // "everything overdue and nothing done" = -100%. A late task weighs 3/7 of an undone one.
+      const notDonePct = totalAssigned > 0 ? (notDone / totalAssigned) * 100 : 0;
+      const notOnTimePct = totalAssigned > 0 ? (notOnTime / totalAssigned) * 100 : 0;
+      const missPct = Math.max(-100, -Math.round((0.7 * notDonePct + 0.3 * notOnTimePct) / 0.7));
+      const status = missPct === 0 ? "GOOD" : missPct >= -10 ? "WATCH" : "ACT";
       const onTimePct = totalAssigned > 0 ? Math.round((onTimeCount / totalAssigned) * 100) : 0;
-      const status = onTimePct >= 80 ? "GOOD" : onTimePct >= 50 ? "WATCH" : "ACT";
 
       return {
         name: u.username,
         dept: u.department || u.role_name || "",
         assigned: totalAssigned,
         completed: completedCount,
+        notDone,
+        notOnTime,
+        missPct,
         onTimePct,
         avgDelayHours,
         status,
       };
-    }).filter(u => u.assigned > 0).sort((a, b) => b.assigned - a.assigned).slice(0, 10);
+    }).filter(u => u.assigned > 0)
+      .sort((a, b) => a.missPct - b.missPct || b.assigned - a.assigned)
+      .slice(0, 10);
 
     return NextResponse.json({
       generatedAt: now.toISOString(),
@@ -454,7 +655,7 @@ export async function GET(request: Request) {
         presentPct: totalUsers > 0 ? Math.round((presentCount / totalUsers) * 100) : 0,
         presentList: Array.from(checkedInUserIds).map(id => ({ id, name: (allUsers as any[]).find((u: any) => String(u.id) === String(id))?.username || id })),
         onLeaveList: onLeaveToday.map((l: any) => ({ id: l.id, name: (allUsers as any[]).find((u: any) => String(u.id) === String(l.userId))?.username || l.userId, type: l.leaveType })),
-        absentList: (allUsers as any[]).filter((u: any) => u.status !== "Inactive" && !checkedInUserIds.has(String(u.id)) && !onLeaveUserIds.has(String(u.id))).map((u: any) => ({ id: u.id, name: u.username }))
+        absentList: trackedUsers.filter((u: any) => !checkedInUserIds.has(String(u.id)) && !onLeaveUserIds.has(String(u.id))).map((u: any) => ({ id: u.id, name: u.username }))
       },
       delegations: {
         total,
@@ -490,11 +691,23 @@ export async function GET(request: Request) {
             id: o.orderNo,
             party: o.party,
             amount: o.totalAmount,
-            date: o.createdAt.toISOString().split('T')[0]
+            date: o.createdAt.toISOString().split('T')[0],
+            step: o.pendingStepName || "",
+            remark: remarkByOrder[String(o.orderNo || "").toLowerCase()]?.remark || "",
+          })),
+          postDispatchCount: allOrders.filter((o: any) => o.isPostDispatchPending).length,
+          postDispatchList: allOrders.filter((o: any) => o.isPostDispatchPending).map((o: any) => ({
+            id: o.orderNo,
+            party: o.party,
+            amount: o.totalAmount,
+            date: o.createdAt.toISOString().split('T')[0],
+            step: o.pendingStepName || "",
+            remark: remarkByOrder[String(o.orderNo || "").toLowerCase()]?.remark || "",
           }))
         },
         topDelayedOrders: delayAging.gt7.slice(0, 5),
         gapAnalysis,
+        stepPerformance,
       },
       revenue: {
         mtdActual: mtdRevenue,
@@ -509,6 +722,8 @@ export async function GET(request: Request) {
         zeroTaskEmployees,
         overdueTaskCount: overdue.length,
         criticalDelayCount: delayAging.gt7.length,
+        ledgerMismatchCount: ledgerMismatches.length,
+        ledgerMismatchList: ledgerMismatches,
       },
       charts: {
         orderOtdTrend,
@@ -524,13 +739,21 @@ export async function GET(request: Request) {
       },
 
       inventory: {
-        totalSKUs: allIMS.length,
+        totalSKUs: liveIMS.length,
         outOfStockCount: outOfStock.length,
         lowStockCount: lowStock.length,
         inventoryByCategory,
         lowStockItems,
-        outOfStockList: outOfStock.map((i: any) => ({ sku: i.item_name, category: i.category, stockLeft: parseFloat(i.stock_qty) || 0 })),
-        lowStockList: lowStock.map((i: any) => ({ sku: i.item_name, category: i.category, stockLeft: parseFloat(i.stock_qty) || 0 }))
+        allItemsList: liveIMS.map((i: any) => ({ sku: i.item_name, category: rollupCategory(i.category), rawCategory: (i.category || "").trim() || "—", stockLeft: Math.round(stockOf(i)) })),
+        negativeCount: negativeStock.length,
+        negativeList: negativeStock.map((i: any) => ({ sku: i.item_name, category: i.category, stockLeft: Math.round(stockOf(i)) })),
+        outOfStockList: outOfStock.map((i: any) => ({ sku: i.item_name, category: i.category, stockLeft: Math.round(stockOf(i)) })),
+        lowStockList: lowStock.map((i: any) => ({ sku: i.item_name, category: i.category, stockLeft: Math.round(stockOf(i)) })),
+        // "Can't Afford To Be Low" — top sellers by volume; restocking these
+        // takes priority since they're what actually keeps revenue moving.
+        criticalItems,
+        criticalAtRiskCount: criticalAtRisk.length,
+        criticalAtRiskList: criticalAtRisk,
       },
       scorecard,
     });

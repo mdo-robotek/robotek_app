@@ -134,12 +134,23 @@ export async function GET(req: NextRequest) {
     ]);
     const checklists = (checklistPage.data || []) as ChecklistOccurrence[];
 
-    const attendanceToday = attendance.filter((r: any) => normalizeDateStr(r.date) === todayStrRaw);
-    const totalUsersCount = users.length;
+    // Attendance widgets only cover staff whose attendance Robotek actually
+    // maintains on the ERP. Users with trackAttendance=false (e.g. factory-floor
+    // staff tracked via a scanner elsewhere, or users marked Inactive) are
+    // excluded from this count so "present / total" reflects the real roster.
+    const trackedUsers = (users as any[]).filter((u: any) => u.isActive !== false && u.trackAttendance !== false);
+    const trackedUsernames = new Set(trackedUsers.map((u: any) => String(u.username || "").trim().toLowerCase()));
+
+    const attendanceToday = attendance.filter((r: any) =>
+      normalizeDateStr(r.date) === todayStrRaw &&
+      trackedUsernames.has(String(r.userName || r.username || "").trim().toLowerCase())
+    );
+    const totalUsersCount = trackedUsers.length;
     const inTodayCount = attendanceToday.length;
-    
+
     const onLeaveToday = leaves.filter((l: any) => {
         if (!l.status || l.status.toLowerCase() !== 'approved') return false;
+        if (!trackedUsernames.has(String(l.userName || "").trim().toLowerCase())) return false;
         const start = new Date(normalizeDateStr(l.startDate));
         const end = new Date(normalizeDateStr(l.endDate));
         const today = new Date(todayStrRaw);

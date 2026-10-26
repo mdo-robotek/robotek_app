@@ -93,7 +93,7 @@ export async function POST(
       console.error('Notification Error:', err);
     }
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, history: newHistory });
   } catch (error: any) {
     console.error(`POST Ticket History Error:`, error);
     return NextResponse.json({ error: error.message || "Failed to add ticket history" }, { status: 400 });

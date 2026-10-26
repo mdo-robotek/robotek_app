@@ -62,13 +62,13 @@ export default function FieldDriverPage() {
       {locationError && activeTab === 'TRACKING' && (
         <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <p className="text-sm font-black text-red-600">GPS Error</p>
-            <p className="text-xs text-red-500 mt-1">{locationError}</p>
+            <p className="text-sm font-semibold text-red-600">GPS Error</p>
+            <p className="text-[14px] text-red-500 mt-1">{locationError}</p>
           </div>
           <button
             type="button"
             onClick={retryLocation}
-            className="px-4 py-2 bg-red-600 text-white rounded-lg text-xs font-black uppercase"
+            className="px-4 py-2 bg-red-600 text-white rounded-lg text-[14px] font-semibold"
           >
             Retry
           </button>

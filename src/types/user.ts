@@ -21,6 +21,10 @@ export interface User {
   department?: string;
   last_active?: string;
   isActive?: boolean;
+  /** Whether this user's attendance is maintained on the ERP (daily attendance widgets).
+   * Factory-floor staff whose attendance is tracked elsewhere (face scanner, etc.)
+   * are kept Active for ERP access but excluded here. Defaults to true unless "No". */
+  trackAttendance?: boolean;
   permissions?: string[];
   locations?: LocationEntry[]; // Added for UI convenience
 }

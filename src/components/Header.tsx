@@ -17,7 +17,6 @@ import {
 } from "@heroicons/react/24/outline";
 
 import ThemeToggle from "./ThemeToggle";
-import HeaderThemeBackground from "./HeaderThemeBackground";
 
 interface HeaderProps {
   onMenuClick?: () => void;
@@ -69,26 +68,28 @@ export default function Header({ onMenuClick }: HeaderProps) {
   const chatUnreadCount = 0;
 
   return (
-    <header className="relative h-14 flex items-center justify-between px-2 md:px-6 sticky top-0 z-40 overflow-visible transition-all duration-700">
-      <HeaderThemeBackground />
+    <header className="relative h-14 flex items-center justify-between px-2 md:px-6 sticky top-0 z-40 overflow-visible bg-white dark:bg-navy-900 border-b border-[#E5E7EB] dark:border-navy-800">
 
       {/* Content */}
       <div className="relative z-10 flex items-center gap-3">
         <button
           onClick={onMenuClick}
-          className="p-2 md:hidden text-[#3a2a00]/80 hover:text-[#3a2a00] hover:bg-black/10 dark:text-white/80 dark:hover:text-white dark:hover:bg-white/10 rounded-lg transition-colors"
+          aria-label="Open menu"
+          className="w-11 h-11 flex items-center justify-center md:hidden text-[#1A1D21] hover:bg-gray-100 dark:text-white dark:hover:bg-white/10 rounded-lg transition-colors"
         >
           <Bars3Icon className="w-6 h-6" />
         </button>
 
-        <div className="flex flex-col hidden md:flex">
-          <h1 className="text-2xl font-bold text-[#2d1f00] dark:text-white leading-none drop-shadow-sm">
-            HI, {(session?.user as any)?.username?.toUpperCase() || session?.user?.name?.toUpperCase() || session?.user?.email?.split("@")[0].toUpperCase() || "USER"}
-          </h1>
-          <p className="font-serif text-[10px] font-medium text-[#92400e] dark:text-[#FFD500] uppercase tracking-wider mt-1 opacity-90">
-            {/* @ts-ignore */}
-            {session?.user?.role || "SYSTEM ACCESS"} — WELCOME BACK
-          </p>
+        <div className="flex flex-col">
+          <span className="text-[17px] font-semibold text-[#1A1D21] dark:text-white leading-tight">
+            Hi, {(() => {
+              const raw = String((session?.user as any)?.username || session?.user?.name || session?.user?.email?.split("@")[0] || "there");
+              return raw.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase());
+            })()}
+          </span>
+          <span className="text-[13px] text-[#5B6472] dark:text-slate-400 leading-tight hidden sm:block">
+            {new Date().toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long" })}
+          </span>
         </div>
       </div>
 
@@ -98,7 +99,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
       <div className="relative z-10 flex items-center gap-1 md:gap-2 flex-shrink-0">
         {/* Search Input - Hidden on mobile */}
         <div ref={searchRef} className="relative z-50 group hidden lg:block flex-shrink-1">
-          <MagnifyingGlassIcon className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-[#3a2a00]/50 dark:text-white/50 group-focus-within:text-[#3a2a00] dark:group-focus-within:text-white transition-colors z-10 pointer-events-none" />
+          <MagnifyingGlassIcon className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-[#5B6472] dark:text-white/50 z-20 pointer-events-none" />
           <input
             suppressHydrationWarning
             type="text"
@@ -109,7 +110,8 @@ export default function Header({ onMenuClick }: HeaderProps) {
               setIsSearchOpen(true);
             }}
             onFocus={() => setIsSearchOpen(true)}
-            className="relative z-10 w-32 lg:w-52 pl-11 pr-4 py-1.5 bg-black/10 dark:bg-white/10 border border-[#3a2a00]/15 dark:border-white/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#3a2a00]/20 dark:focus:ring-white/30 focus:border-[#3a2a00]/30 dark:focus:border-white/50 focus:bg-black/15 dark:focus:bg-white/20 transition-all text-xs font-bold placeholder:text-[#3a2a00]/40 dark:placeholder:text-white/40 text-[#2d1f00] dark:text-white"
+            aria-label="Search pages"
+            className="relative z-10 w-56 lg:w-64 h-10 pl-10 pr-4 bg-[#F7F8FA] dark:bg-white/10 border border-[#E5E7EB] dark:border-white/20 rounded-[10px] focus:outline-none focus:ring-2 focus:ring-[#2563EB]/25 focus:border-[#2563EB] focus:bg-white dark:focus:bg-white/15 transition-colors text-[15px] placeholder:text-[#5B6472] dark:placeholder:text-white/40 text-[#1A1D21] dark:text-white"
           />
           
           {/* Search Dropdown */}
@@ -127,12 +129,12 @@ export default function Header({ onMenuClick }: HeaderProps) {
                       }}
                       className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 dark:hover:bg-white/5 rounded-lg transition-colors flex items-center gap-3 group/item"
                     >
-                      <div className="flex items-center justify-center w-6 h-6 rounded-md bg-gray-100 dark:bg-navy-900 group-hover/item:bg-[#003875]/10 dark:group-hover/item:bg-[#FFD500]/10 transition-colors">
-                        <item.icon className="w-4 h-4 text-gray-500 dark:text-gray-400 group-hover/item:text-[#003875] dark:group-hover/item:text-[#FFD500]" />
+                      <div className="flex items-center justify-center w-7 h-7 rounded-md bg-gray-100 dark:bg-navy-900 group-hover/item:bg-[#EFF4FF] transition-colors">
+                        <item.icon className="w-4 h-4 text-[#5B6472] dark:text-gray-400 group-hover/item:text-[#2563EB]" />
                       </div>
                       <div className="min-w-0">
-                        <div className="font-semibold text-gray-900 dark:text-white truncate">{item.name}</div>
-                        <div className="text-[10px] text-gray-500 font-medium tracking-wider uppercase">{item.section}</div>
+                        <div className="font-medium text-[15px] text-[#1A1D21] dark:text-white truncate">{item.name}</div>
+                        <div className="text-[13px] text-[#5B6472]">{item.section}</div>
                       </div>
                     </button>
                   ))}
@@ -152,22 +154,23 @@ export default function Header({ onMenuClick }: HeaderProps) {
         {/* Chat Notification Icon */}
         <Link
           href="/chat"
-          className="relative p-2 text-[#3a2a00]/70 hover:text-[#3a2a00] hover:bg-black/10 dark:text-white/70 dark:hover:text-white dark:hover:bg-white/10 dark:hover:bg-navy-800 rounded-lg transition-colors ml-0.5 md:ml-1"
-          title="Chat Messages"
+          className="relative w-11 h-11 flex items-center justify-center text-[#5B6472] hover:text-[#1A1D21] hover:bg-gray-100 dark:text-white/70 dark:hover:text-white dark:hover:bg-white/10 rounded-lg transition-colors"
+          title="Chat"
+          aria-label="Chat"
         >
           <ChatBubbleLeftRightIcon className="w-5 h-5" />
           {chatUnreadCount > 0 && (
-            <span className="absolute top-1 right-1 inline-flex items-center justify-center px-1 py-0.5 text-[9px] font-black leading-none text-white transform translate-x-1/4 -translate-y-1/4 bg-[#CE2029] rounded-full shadow-sm ring-2 ring-amber-200 dark:ring-[#003875]">
+            <span className="absolute top-1 right-1 inline-flex items-center justify-center px-1 py-0.5 text-[13px] font-semibold leading-none text-white transform translate-x-1/4 -translate-y-1/4 bg-[#DC2626] rounded-full shadow-sm ring-2 ring-amber-200 dark:ring-[#60A5FA]">
               {chatUnreadCount}
             </span>
           )}
         </Link>
 
-        <div className="h-5 w-[1px] bg-[#3a2a00]/20 dark:bg-navy-800 mx-1 md:mx-2" />
+        <div className="h-6 w-px bg-[#E5E7EB] dark:bg-navy-800 mx-1 md:mx-2" />
 
         {/* User Profile & Logout */}
         <div className="flex items-center gap-1 flex-shrink-0">
-          <div className="w-7 h-7 md:w-8.5 md:h-8.5 rounded-xl overflow-hidden shadow-sm border border-orange-100 ring-2 ring-[#FFD500]/20 flex-shrink-0">
+          <div className="w-9 h-9 rounded-full overflow-hidden border border-[#E5E7EB] dark:border-navy-700 flex-shrink-0">
             {session?.user?.image ? (
               <img
                 src={getNormalizedImageUrl(session.user.image)}
@@ -176,7 +179,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
                 referrerPolicy="no-referrer"
               />
             ) : (
-              <div className="w-full h-full bg-[#FFD500] flex items-center justify-center text-[#CE2029] font-black text-[10px] md:text-xs uppercase">
+              <div className="w-full h-full bg-[#EFF4FF] flex items-center justify-center text-[#2563EB] font-semibold text-[13px]">
                 {session?.user?.name?.substring(0, 2) || session?.user?.email?.substring(0, 2) || "UR"}
               </div>
             )}
@@ -185,10 +188,11 @@ export default function Header({ onMenuClick }: HeaderProps) {
           <button
             suppressHydrationWarning
             onClick={() => signOut()}
-            className="p-1 text-[#3a2a00]/60 hover:text-[#3a2a00] hover:bg-black/10 dark:text-white/60 dark:hover:text-white dark:hover:bg-white/10 rounded-lg md:rounded-xl transition-all group"
-            title="Sign Out"
+            className="w-11 h-11 flex items-center justify-center text-[#5B6472] hover:text-[#B91C1C] hover:bg-red-50 dark:text-white/60 dark:hover:text-white dark:hover:bg-white/10 rounded-lg transition-colors"
+            title="Sign out"
+            aria-label="Sign out"
           >
-            <ArrowRightOnRectangleIcon className="w-5 h-5 md:w-5.5 md:h-5.5 group-hover:translate-x-0.5 transition-transform" />
+            <ArrowRightOnRectangleIcon className="w-5 h-5" />
           </button>
         </div>
       </div>

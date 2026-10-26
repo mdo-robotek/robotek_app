@@ -82,8 +82,8 @@ export default function SchedulerHeader({
           <CalendarIcon className="w-6 h-6 text-blue-500" />
         </div>
         <div>
-          <h1 className="text-xl font-black text-slate-900 dark:text-white leading-tight">Robotek Scheduler</h1>
-          <p className="text-xs font-bold text-slate-500 dark:text-slate-400 capitalize">{view} View</p>
+          <h1 className="text-xl font-semibold text-slate-900 dark:text-white leading-tight">Robotek Scheduler</h1>
+          <p className="text-[14px] font-bold text-slate-500 dark:text-slate-400 capitalize">{view} View</p>
         </div>
       </div>
 
@@ -92,21 +92,21 @@ export default function SchedulerHeader({
         <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-2xl mr-2">
           <button
             onClick={() => setView('month')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 ${view === 'month' ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
+            className={`px-3 py-1.5 rounded-xl text-[14px] font-semibold transition-all flex items-center gap-1.5 ${view === 'month' ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
           >
             <TableCellsIcon className="w-4 h-4" />
             Month
           </button>
           <button
             onClick={() => setView('week')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 ${view === 'week' ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
+            className={`px-3 py-1.5 rounded-xl text-[14px] font-semibold transition-all flex items-center gap-1.5 ${view === 'week' ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
           >
             <ViewColumnsIcon className="w-4 h-4" />
             Week
           </button>
           <button
             onClick={() => setView('day')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 ${view === 'day' ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
+            className={`px-3 py-1.5 rounded-xl text-[14px] font-semibold transition-all flex items-center gap-1.5 ${view === 'day' ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
           >
             <Bars3BottomLeftIcon className="w-4 h-4" />
             Day
@@ -117,14 +117,14 @@ export default function SchedulerHeader({
         <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-2xl mr-2">
           <button
             onClick={() => setLayout('calendar')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 ${layout === 'calendar' ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
+            className={`px-3 py-1.5 rounded-xl text-[14px] font-semibold transition-all flex items-center gap-1.5 ${layout === 'calendar' ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
           >
             <CalendarIcon className="w-4 h-4" />
             Grid
           </button>
           <button
             onClick={() => setLayout('list')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 ${layout === 'list' ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
+            className={`px-3 py-1.5 rounded-xl text-[14px] font-semibold transition-all flex items-center gap-1.5 ${layout === 'list' ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
           >
             <QueueListIcon className="w-4 h-4" />
             List
@@ -135,7 +135,7 @@ export default function SchedulerHeader({
         <div className="relative" ref={dropdownRef}>
           <button
             onClick={() => setShowTypeDropdown(!showTypeDropdown)}
-            className={`flex items-center gap-2.5 px-4 py-2 rounded-2xl text-xs font-black transition-all border shadow-sm hover:shadow-md ${typeOptions.find(o => o.value === typeFilter)?.colorClass}`}
+            className={`flex items-center gap-2.5 px-4 py-2 rounded-2xl text-[14px] font-semibold transition-all border shadow-sm hover:shadow-md ${typeOptions.find(o => o.value === typeFilter)?.colorClass}`}
           >
              <div className={`w-2.5 h-2.5 rounded shadow-sm ${bgMap[typeFilter]}`}></div>
              {typeOptions.find(o => o.value === typeFilter)?.label}
@@ -144,7 +144,7 @@ export default function SchedulerHeader({
           
           {showTypeDropdown && (
             <div className="absolute top-[calc(100%+8px)] mt-0 right-0 md:left-0 md:right-auto w-48 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 p-2 z-50 overflow-hidden flex flex-col gap-1">
-               <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1 px-3 mt-1">Filter & Legend</div>
+               <div className="text-[13px] font-semibold text-slate-400 mb-1 px-3 mt-1">Filter & Legend</div>
                {typeOptions.map(option => (
                  <button
                    key={option.value}
@@ -168,14 +168,14 @@ export default function SchedulerHeader({
               placeholder="Filter by user..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9 pr-4 py-2 bg-slate-100 dark:bg-slate-800 border-none rounded-2xl text-xs font-bold text-slate-900 dark:text-white placeholder:text-slate-500 focus:ring-2 focus:ring-blue-500 w-40 md:w-56 transition-all"
+              className="pl-9 pr-4 py-2 bg-slate-100 dark:bg-slate-800 border-none rounded-2xl text-[14px] font-bold text-slate-900 dark:text-white placeholder:text-slate-500 focus:ring-2 focus:ring-blue-500 w-40 md:w-56 transition-all"
             />
           </div>
         )}
 
         <button
           onClick={onAddMeeting}
-          className="bg-[#FFD500] hover:bg-[#FFE55C] text-[#003875] px-4 py-2 rounded-2xl text-xs font-black shadow-lg shadow-yellow-500/20 active:scale-95 transition-all flex items-center gap-2"
+          className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white px-4 py-2 rounded-2xl text-[14px] font-semibold shadow-lg shadow-yellow-500/20 active:scale-95 transition-all flex items-center gap-2"
         >
           <PlusIcon className="w-4 h-4 stroke-[3]" />
           Add Meeting

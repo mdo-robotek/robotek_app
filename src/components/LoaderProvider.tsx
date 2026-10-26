@@ -22,15 +22,15 @@ export function LoaderProvider({ children }: { children: ReactNode }) {
                 <div className="fixed inset-0 z-[10000] flex flex-col items-center justify-center bg-[#070B14]/80 backdrop-blur-md animate-in fade-in duration-300">
                     <div className="relative w-24 h-24">
                         {/* Outer Ring */}
-                        <div className="absolute inset-0 border-4 border-[#003875]/20 rounded-full"></div>
+                        <div className="absolute inset-0 border-4 border-[#2563EB]/20 rounded-full"></div>
                         {/* Animated Ring */}
-                        <div className="absolute inset-0 border-4 border-t-[#FFD500] border-r-[#FFD500] rounded-full animate-spin"></div>
+                        <div className="absolute inset-0 border-4 border-t-[#2563EB] border-r-[#2563EB] rounded-full animate-spin"></div>
                         {/* Inner Pulse */}
-                        <div className="absolute inset-4 bg-[#003875] rounded-full animate-pulse flex items-center justify-center shadow-lg shadow-[#FFD500]/20">
+                        <div className="absolute inset-4 bg-[#2563EB] rounded-full animate-pulse flex items-center justify-center shadow-lg shadow-[#2563EB]/20">
                            <img src="/logo_compact.png" alt="R" className="w-8 h-8 object-contain opacity-50" />
                         </div>
                     </div>
-                    <div className="mt-8 text-white font-black tracking-widest text-xs uppercase animate-pulse">
+                    <div className="mt-8 text-white font-semibold text-[14px] animate-pulse">
                         Synchronizing System...
                     </div>
                 </div>

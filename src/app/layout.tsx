@@ -1,12 +1,7 @@
 import type { Metadata } from "next";
-import { Playfair_Display, Inter } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import Providers from "@/components/Providers";
-
-const playfair = Playfair_Display({
-  variable: "--font-playfair",
-  subsets: ["latin"],
-});
 
 const inter = Inter({
   variable: "--font-inter",
@@ -15,7 +10,7 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: "Robotek ERP",
-  description: "Next-generation ERP solution for Robotek",
+  description: "Robotek internal ERP",
   icons: {
     icon: "/logo_compact.png",
   },
@@ -29,7 +24,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${playfair.variable} ${inter.variable} antialiased`}
+        className={`${inter.variable} antialiased`}
         suppressHydrationWarning
       >
         <Providers>{children}</Providers>

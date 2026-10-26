@@ -101,19 +101,30 @@ export async function GET(req: NextRequest) {
       callsData = Array.from(uniqueParties.values());
 
     } else {
-      const [scotFeederResult, followUpResult, allO2DsResult, activePartyResult] = await Promise.all([
+      const [scotFeederResult, followUpResult, allO2DsResult, activePartyResult, targetSheetResult] = await Promise.all([
         getScotData(),
         getFollowUpData("scot"),
         getAllO2DsForAnalytics(),
         getActivePartyData("scot"),
+        getCallData(), // "Target"/"Calls" sheet — holds the real, verified party mobile numbers
       ]);
       scotFeeder = scotFeederResult;
       followUpData = followUpResult;
       allO2Ds = allO2DsResult;
 
-      const activePartySet = new Set(
+      // Real party mobile numbers (as kept by the team), keyed by party name.
+      const targetMobileByName: Record<string, string> = {};
+      targetSheetResult.forEach((t) => {
+        const n = (t.partyName || "").trim().toLowerCase();
+        if (n && t.mobileNum && !targetMobileByName[n]) targetMobileByName[n] = String(t.mobileNum);
+      });
+
+      // Default = every party is active/callable. Only a party explicitly
+      // marked Inactive (unchecked in the Scot table) is excluded — from
+      // both the calling list and the Follow-up Score calculation below.
+      const inactivePartySet = new Set(
         activePartyResult
-          .filter((record) => record.active)
+          .filter((record) => record.active === false)
           .map((record) => record.partyName.toLowerCase().trim())
       );
 
@@ -123,7 +134,9 @@ export async function GET(req: NextRequest) {
       allO2Ds.forEach(o => {
         const name = (o.party_name || "").trim();
         if (name && !uniqueParties.has(name.toLowerCase())) {
-          uniqueParties.set(name.toLowerCase(), { partyName: name, mobileNum: (o as any).party_number || "", salesCoordinator: "UZEFA" });
+          const key = name.toLowerCase();
+          const mobileNum = (o as any).party_number || targetMobileByName[key] || "";
+          uniqueParties.set(key, { partyName: name, mobileNum, salesCoordinator: "UZEFA" });
         }
       });
       
@@ -148,12 +161,27 @@ export async function GET(req: NextRequest) {
 
       callsData = Array.from(uniqueParties.values());
 
-      if (activeOnly) {
-        callsData = callsData.filter((party) =>
-          activePartySet.has((party.partyName || "").toLowerCase().trim())
-        );
-      }
+      // Always drop inactive-marked parties — they should never be part of
+      // the calling list or count toward anyone's Follow-up Score.
+      callsData = callsData.filter((party) =>
+        !inactivePartySet.has((party.partyName || "").toLowerCase().trim())
+      );
     }
+
+    // Fallback only: for any party still missing a mobile number (not on the
+    // Target/Calls sheet and no party_number on O2D), guess it from whichever
+    // number last called under that exact party name in the Callyzer feeder.
+    const numberByName: Record<string, string> = {};
+    (scotFeeder as any[]).forEach((f: any) => {
+      const n = (f.toName || "").trim().toLowerCase();
+      if (n && f.toNumber && !numberByName[n]) numberByName[n] = String(f.toNumber);
+    });
+    (callsData as any[]).forEach((c: any) => {
+      if (!c.mobileNum) {
+        const n = (c.partyName || "").trim().toLowerCase();
+        if (numberByName[n]) c.mobileNum = numberByName[n];
+      }
+    });
 
     // 1. Filter calls & follow-ups in the requested date range
     const rangeCalls = scotFeeder.filter(call => {
@@ -292,10 +320,12 @@ export async function GET(req: NextRequest) {
           fu.partyName && fu.partyName.trim().toLowerCase() === partyKey
         );
 
-        // Call attempts in data feeder in last week matching either employee name or party phone number
-        const partyWeekFeederCalls = rangeCalls.filter(c => 
-          matchSalesCoordinator(salesCoordinatorName, c.employeeName) && 
-          matchPartyNumber(c.toNumber, party.mobileNum)
+        // Call attempts in data feeder in last week — match by party NAME first
+        // (feeder toName == party name), phone number as fallback.
+        const partyWeekFeederCalls = rangeCalls.filter(c =>
+          matchSalesCoordinator(salesCoordinatorName, c.employeeName) &&
+          (((c.toName || "").trim().toLowerCase() === partyKey) ||
+            matchPartyNumber(c.toNumber, party.mobileNum))
         );
 
         const latestStatus = latestFollowUps[partyKey]?.status || "Pending";

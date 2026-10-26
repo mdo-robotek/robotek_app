@@ -62,7 +62,7 @@ function getWeekOptionLabel(weekKey: string) {
   return `Week ${weekNum} · ${getWeekRangeLabel(weekKey)}`;
 }
 
-export default function AnalyticsDashboard({ feeders, scotRows = [], defaultEmployeeName = "UZEFA (SC)" }: { feeders: DataFeeder[], scotRows?: any[], defaultEmployeeName?: string }) {
+export default function AnalyticsDashboard({ feeders, scotRows = [], defaultEmployeeName = "UZEFA (SC)", partyNameByNumber }: { feeders: DataFeeder[], scotRows?: any[], defaultEmployeeName?: string, partyNameByNumber?: Record<string, string> }) {
   const [filters, setFilters] = useState<AnalyticsFilters>({
     dateRange: 'all',
     customStart: '',
@@ -86,7 +86,7 @@ export default function AnalyticsDashboard({ feeders, scotRows = [], defaultEmpl
     );
   }, [feeders, searchQuery]);
 
-  const { kpi, leaderboard, charts, heatMap, insights } = useCallAnalytics(filteredFeeders, filters);
+  const { kpi, leaderboard, charts, heatMap, insights } = useCallAnalytics(filteredFeeders, filters, partyNameByNumber);
 
   const uniqueEmployees = useMemo(() => Array.from(new Set(filteredFeeders.map(f => f.employeeName).filter(Boolean))), [filteredFeeders]);
   
@@ -259,7 +259,7 @@ export default function AnalyticsDashboard({ feeders, scotRows = [], defaultEmpl
       
       {/* 1. Filters Sidebar */}
       <div className="w-full xl:w-72 flex-shrink-0 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2rem] p-6 shadow-sm sticky top-6">
-        <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-widest flex items-center gap-2 mb-6">
+        <h3 className="text-sm font-semibold text-slate-900 dark:text-white flex items-center gap-2 mb-6">
           <FunnelIcon className="w-5 h-5 text-blue-500" />
           Filters
         </h3>
@@ -273,13 +273,13 @@ export default function AnalyticsDashboard({ feeders, scotRows = [], defaultEmpl
               placeholder="SEARCH DASHBOARD..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9 pr-4 py-2.5 w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-[11px] font-black uppercase tracking-wider outline-none focus:ring-2 focus:ring-blue-500 dark:text-white transition-all shadow-sm"
+              className="pl-9 pr-4 py-2.5 w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-[14px] font-semibold tracking-wider outline-none focus:ring-2 focus:ring-blue-500 dark:text-white transition-all shadow-sm"
             />
           </div>
 
           {/* Date Range */}
           <div>
-            <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3">Date Range</label>
+            <label className="block text-[13px] font-bold text-slate-500 mb-3">Date Range</label>
             <div className="flex flex-col gap-2">
               {[
                 { id: 'today', label: 'Today' },
@@ -292,7 +292,7 @@ export default function AnalyticsDashboard({ feeders, scotRows = [], defaultEmpl
                 <button
                   key={opt.id}
                   onClick={() => setFilters(f => ({ ...f, dateRange: opt.id as any }))}
-                  className={`text-left px-4 py-2 rounded-xl text-xs font-bold transition-all ${filters.dateRange === opt.id ? 'bg-blue-600 text-white shadow-md' : 'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'}`}
+                  className={`text-left px-4 py-2 rounded-xl text-[14px] font-bold transition-all ${filters.dateRange === opt.id ? 'bg-blue-600 text-white shadow-md' : 'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'}`}
                 >
                   {opt.label}
                 </button>
@@ -300,8 +300,8 @@ export default function AnalyticsDashboard({ feeders, scotRows = [], defaultEmpl
             </div>
             {filters.dateRange === 'custom' && (
               <div className="mt-3 flex flex-col gap-2">
-                <input type="date" value={filters.customStart || ''} onChange={e => setFilters(f => ({...f, customStart: e.target.value}))} className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-bold text-slate-700 dark:text-slate-200 outline-none focus:ring-2 focus:ring-blue-500" />
-                <input type="date" value={filters.customEnd || ''} onChange={e => setFilters(f => ({...f, customEnd: e.target.value}))} className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-bold text-slate-700 dark:text-slate-200 outline-none focus:ring-2 focus:ring-blue-500" />
+                <input type="date" value={filters.customStart || ''} onChange={e => setFilters(f => ({...f, customStart: e.target.value}))} className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-[14px] font-bold text-slate-700 dark:text-slate-200 outline-none focus:ring-2 focus:ring-blue-500" />
+                <input type="date" value={filters.customEnd || ''} onChange={e => setFilters(f => ({...f, customEnd: e.target.value}))} className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-[14px] font-bold text-slate-700 dark:text-slate-200 outline-none focus:ring-2 focus:ring-blue-500" />
               </div>
             )}
           </div>
@@ -312,7 +312,7 @@ export default function AnalyticsDashboard({ feeders, scotRows = [], defaultEmpl
             <select 
               value={filters.month}
               onChange={(e) => setFilters(f => ({ ...f, month: e.target.value, week: 'all' }))}
-              className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-xs font-bold text-slate-700 dark:text-slate-200 outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+              className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-[14px] font-bold text-slate-700 dark:text-slate-200 outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
             >
               <option value="all">All Months</option>
               {uniqueMonths.map((m, i) => <option key={i} value={m}>{m}</option>)}
@@ -325,7 +325,7 @@ export default function AnalyticsDashboard({ feeders, scotRows = [], defaultEmpl
             <select 
               value={filters.week}
               onChange={(e) => setFilters(f => ({ ...f, week: e.target.value }))}
-              className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-xs font-bold text-slate-700 dark:text-slate-200 outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-[14px] font-bold text-slate-700 dark:text-slate-200 outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="all">All Weeks</option>
               {uniqueWeeks.map((w, i) => (
@@ -339,7 +339,7 @@ export default function AnalyticsDashboard({ feeders, scotRows = [], defaultEmpl
             <select 
               value={filters.employee}
               onChange={(e) => setFilters(f => ({ ...f, employee: e.target.value }))}
-              className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-xs font-bold text-slate-700 dark:text-slate-200 outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-[14px] font-bold text-slate-700 dark:text-slate-200 outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="all">All Employees</option>
               {uniqueEmployees.map((e, i) => <option key={i} value={e}>{e}</option>)}
@@ -351,7 +351,7 @@ export default function AnalyticsDashboard({ feeders, scotRows = [], defaultEmpl
             <select 
               value={filters.callType}
               onChange={(e) => setFilters(f => ({ ...f, callType: e.target.value }))}
-              className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-xs font-bold text-slate-700 dark:text-slate-200 outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-[14px] font-bold text-slate-700 dark:text-slate-200 outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="all">All Types</option>
               <option value="Incoming">Incoming</option>
@@ -371,7 +371,7 @@ export default function AnalyticsDashboard({ feeders, scotRows = [], defaultEmpl
             <div className="absolute top-0 right-0 p-8 opacity-10">
               <SparklesIcon className="w-32 h-32" />
             </div>
-            <h3 className="text-sm font-black uppercase tracking-widest flex items-center gap-2 mb-4 relative z-10 text-blue-100">
+            <h3 className="text-sm font-semibold flex items-center gap-2 mb-4 relative z-10 text-blue-100">
               <SparklesIcon className="w-5 h-5 text-yellow-300" />
               AI Insights
             </h3>
@@ -396,24 +396,24 @@ export default function AnalyticsDashboard({ feeders, scotRows = [], defaultEmpl
 
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
           <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-center shadow-sm">
-            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Incoming</p>
-            <h4 className="text-xl font-black text-slate-900 dark:text-white mt-1">{kpi.incomingPct}%</h4>
+            <p className="text-[13px] font-bold text-slate-500">Incoming</p>
+            <h4 className="text-xl font-semibold text-slate-900 dark:text-white mt-1">{kpi.incomingPct}%</h4>
           </div>
           <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-center shadow-sm">
-            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Outgoing</p>
-            <h4 className="text-xl font-black text-slate-900 dark:text-white mt-1">{kpi.outgoingPct}%</h4>
+            <p className="text-[13px] font-bold text-slate-500">Outgoing</p>
+            <h4 className="text-xl font-semibold text-slate-900 dark:text-white mt-1">{kpi.outgoingPct}%</h4>
           </div>
           <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-center shadow-sm">
-            <p className="text-[10px] font-bold text-rose-500 uppercase tracking-widest">Missed</p>
-            <h4 className="text-xl font-black text-rose-600 mt-1">{kpi.missedPct}%</h4>
+            <p className="text-[13px] font-bold text-rose-500">Missed</p>
+            <h4 className="text-xl font-semibold text-rose-600 mt-1">{kpi.missedPct}%</h4>
           </div>
           <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-center shadow-sm">
-            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Calls Today</p>
-            <h4 className="text-xl font-black text-slate-900 dark:text-white mt-1">{kpi.callsToday}</h4>
+            <p className="text-[13px] font-bold text-slate-500">Calls Today</p>
+            <h4 className="text-xl font-semibold text-slate-900 dark:text-white mt-1">{kpi.callsToday}</h4>
           </div>
           <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-center shadow-sm bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-indigo-900/20 dark:to-blue-900/20">
-            <p className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-widest">Peak Hour</p>
-            <h4 className="text-xl font-black text-indigo-700 dark:text-indigo-300 mt-1">{kpi.peakHour}</h4>
+            <p className="text-[13px] font-bold text-indigo-600 dark:text-indigo-400">Peak Hour</p>
+            <h4 className="text-xl font-semibold text-indigo-700 dark:text-indigo-300 mt-1">{kpi.peakHour}</h4>
           </div>
         </div>
 
@@ -421,7 +421,7 @@ export default function AnalyticsDashboard({ feeders, scotRows = [], defaultEmpl
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="relative lg:col-span-2 p-6 rounded-[2rem] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden z-0">
             <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 dark:bg-blue-500/10 rounded-full blur-3xl -mr-20 -mt-20 z-[-1]"></div>
-            <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-widest flex items-center gap-2 mb-6">
+            <h3 className="text-sm font-semibold text-slate-900 dark:text-white flex items-center gap-2 mb-6">
               <CalendarDaysIcon className="w-5 h-5 text-blue-500" />
               Daily Trend Analysis
             </h3>
@@ -452,7 +452,7 @@ export default function AnalyticsDashboard({ feeders, scotRows = [], defaultEmpl
 
           <div className="relative p-6 rounded-[2rem] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden z-0">
             <div className="absolute bottom-0 left-0 w-48 h-48 bg-purple-500/5 dark:bg-purple-500/10 rounded-full blur-3xl -ml-16 -mb-16 z-[-1]"></div>
-            <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-widest flex items-center gap-2 mb-2">
+            <h3 className="text-sm font-semibold text-slate-900 dark:text-white flex items-center gap-2 mb-2">
               <PieChartIcon className="w-5 h-5 text-purple-500" />
               Call Type Analysis
             </h3>
@@ -468,8 +468,8 @@ export default function AnalyticsDashboard({ feeders, scotRows = [], defaultEmpl
               </ResponsiveContainer>
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none pb-8">
                 <div className="text-center">
-                  <p className="text-2xl font-black text-slate-900 dark:text-white leading-none">{kpi.totalCalls}</p>
-                  <p className="text-[8px] font-bold text-slate-500 uppercase tracking-widest mt-1">Total</p>
+                  <p className="text-2xl font-semibold text-slate-900 dark:text-white leading-none">{kpi.totalCalls}</p>
+                  <p className="text-[12px] font-bold text-slate-500 mt-1">Total</p>
                 </div>
               </div>
             </div>
@@ -480,25 +480,25 @@ export default function AnalyticsDashboard({ feeders, scotRows = [], defaultEmpl
         <div className="col-span-12 xl:col-span-8">
           <div className="p-6 rounded-[2rem] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden h-full flex flex-col">
             <div className="flex justify-between items-center mb-6 relative z-10 flex-wrap gap-4">
-              <h3 className="font-black text-slate-900 dark:text-white text-sm uppercase tracking-widest flex items-center gap-2">
+              <h3 className="font-semibold text-slate-900 dark:text-white text-sm flex items-center gap-2">
                 <ShoppingBagIcon className="w-5 h-5 text-blue-500" />
                 Order Behaviour Content
               </h3>
               <div className="flex gap-3 flex-wrap items-center">
                 <div className="flex gap-2 mr-2">
                   <div className="bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 px-3 py-1.5 rounded-lg border border-emerald-200 dark:border-emerald-800/50 flex items-center gap-2 shadow-sm">
-                    <span className="text-[10px] font-bold uppercase tracking-widest">Total Month:</span>
-                    <span className="text-sm font-black">{totalMonthOrders}</span>
+                    <span className="text-[13px] font-bold">Total Month:</span>
+                    <span className="text-sm font-semibold">{totalMonthOrders}</span>
                   </div>
                   <div className="bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 px-3 py-1.5 rounded-lg border border-blue-200 dark:border-blue-800/50 flex items-center gap-2 shadow-sm">
-                    <span className="text-[10px] font-bold uppercase tracking-widest">Total Week:</span>
-                    <span className="text-sm font-black">{totalWeekOrders}</span>
+                    <span className="text-[13px] font-bold">Total Week:</span>
+                    <span className="text-sm font-semibold">{totalWeekOrders}</span>
                   </div>
                 </div>
                 <select 
                   value={filters.month}
                   onChange={(e) => setFilters(f => ({ ...f, month: e.target.value, week: 'all' }))}
-                  className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-1.5 text-xs font-bold text-slate-700 dark:text-slate-200 outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+                  className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-1.5 text-[14px] font-bold text-slate-700 dark:text-slate-200 outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
                 >
                   <option value="all">All Months</option>
                   {uniqueMonths.map((m, i) => <option key={i} value={m}>{m}</option>)}
@@ -506,7 +506,7 @@ export default function AnalyticsDashboard({ feeders, scotRows = [], defaultEmpl
                 <select 
                   value={filters.week}
                   onChange={(e) => setFilters(f => ({ ...f, week: e.target.value }))}
-                  className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-1.5 text-xs font-bold text-slate-700 dark:text-slate-200 outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+                  className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-1.5 text-[14px] font-bold text-slate-700 dark:text-slate-200 outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
                 >
                   <option value="all">All Weeks</option>
                   {uniqueWeeks.map((w, i) => (
@@ -519,49 +519,49 @@ export default function AnalyticsDashboard({ feeders, scotRows = [], defaultEmpl
               <table className="w-full text-left border-collapse table-auto relative min-w-[1000px]">
                 <thead className="sticky top-0 z-30 shadow-md ring-1 ring-slate-800">
                   <tr className="bg-slate-900 text-white">
-                    <th rowSpan={2} className="px-6 py-4 text-[11px] font-black uppercase tracking-widest whitespace-nowrap border-r border-slate-700 w-[250px] sticky left-0 z-40 bg-slate-900">Client Name</th>
-                    <th colSpan={3} className="px-6 py-2 text-[11px] font-black uppercase tracking-widest text-center text-amber-400 border-b border-r border-slate-700 bg-slate-900">Month <span className="text-[10px] text-amber-200 bg-amber-500/20 px-2 py-0.5 rounded ml-1 font-bold">({monthRangeStr})</span></th>
-                    <th colSpan={3} className="px-6 py-2 text-[11px] font-black uppercase tracking-widest text-center text-amber-400 border-b border-slate-700 bg-slate-900">Week <span className="text-[10px] text-amber-200 bg-amber-500/20 px-2 py-0.5 rounded ml-1 font-bold">({weekRangeStr})</span></th>
+                    <th rowSpan={2} className="px-6 py-4 text-[14px] font-semibold whitespace-nowrap border-r border-slate-700 w-[250px] sticky left-0 z-40 bg-slate-900">Client Name</th>
+                    <th colSpan={3} className="px-6 py-2 text-[14px] font-semibold text-center text-amber-400 border-b border-r border-slate-700 bg-slate-900">Month <span className="text-[13px] text-amber-200 bg-amber-500/20 px-2 py-0.5 rounded ml-1 font-bold">({monthRangeStr})</span></th>
+                    <th colSpan={3} className="px-6 py-2 text-[14px] font-semibold text-center text-amber-400 border-b border-slate-700 bg-slate-900">Week <span className="text-[13px] text-amber-200 bg-amber-500/20 px-2 py-0.5 rounded ml-1 font-bold">({weekRangeStr})</span></th>
                   </tr>
                   <tr className="bg-slate-900 text-white">
-                    <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-center border-r border-slate-700 bg-slate-900">No. of Orders / Month</th>
-                    <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-center border-r border-slate-700 bg-slate-900">Actual Orders Received</th>
-                    <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-center border-r border-slate-700 bg-slate-900">Remaining Orders</th>
-                    <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-center border-r border-slate-700 bg-slate-900">Weekly Order Planned</th>
-                    <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-center border-r border-slate-700 bg-slate-900">Actual Order Received This Week</th>
-                    <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-center bg-slate-900">Remaining Order</th>
+                    <th className="px-4 py-3 text-[13px] font-bold text-center border-r border-slate-700 bg-slate-900">No. of Orders / Month</th>
+                    <th className="px-4 py-3 text-[13px] font-bold text-center border-r border-slate-700 bg-slate-900">Actual Orders Received</th>
+                    <th className="px-4 py-3 text-[13px] font-bold text-center border-r border-slate-700 bg-slate-900">Remaining Orders</th>
+                    <th className="px-4 py-3 text-[13px] font-bold text-center border-r border-slate-700 bg-slate-900">Weekly Order Planned</th>
+                    <th className="px-4 py-3 text-[13px] font-bold text-center border-r border-slate-700 bg-slate-900">Actual Order Received This Week</th>
+                    <th className="px-4 py-3 text-[13px] font-bold text-center bg-slate-900">Remaining Order</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                   {computedOrderRows.length === 0 ? (
-                    <tr><td colSpan={7} className="px-6 py-10 text-center text-xs font-bold text-slate-400 uppercase tracking-widest">No target data available</td></tr>
+                    <tr><td colSpan={7} className="px-6 py-10 text-center text-[14px] font-bold text-slate-400">No target data available</td></tr>
                   ) : (
                     <>
                       <tr className="bg-slate-100/50 dark:bg-slate-800/80 border-b-2 border-slate-200 dark:border-slate-700">
                         <td className="px-6 py-4 sticky left-0 z-10 bg-slate-100/50 dark:bg-slate-800/80 border-r border-slate-200 dark:border-slate-700">
-                          <p className="text-[11px] font-black text-slate-900 dark:text-white uppercase">Overall Totals</p>
-                          <p className="text-[9px] font-bold text-slate-500 italic mt-0.5">All Clients Combined</p>
+                          <p className="text-[14px] font-semibold text-slate-900 dark:text-white">Overall Totals</p>
+                          <p className="text-[13px] font-bold text-slate-500 italic mt-0.5">All Clients Combined</p>
                         </td>
                         <td className="px-4 py-4 text-center border-r border-slate-200 dark:border-slate-700">
-                          <span className="text-sm font-black text-blue-900 dark:text-blue-400">{totalMonthlyTarget}</span>
+                          <span className="text-sm font-semibold text-blue-900 dark:text-blue-400">{totalMonthlyTarget}</span>
                         </td>
                         <td className="px-4 py-4 text-center border-r border-slate-200 dark:border-slate-700">
-                          <span className="text-sm font-black text-emerald-600 dark:text-emerald-400">{totalMonthOrders}</span>
+                          <span className="text-sm font-semibold text-emerald-600 dark:text-emerald-400">{totalMonthOrders}</span>
                         </td>
                         <td className="px-4 py-4 text-center border-r border-slate-200 dark:border-slate-700">
-                          <span className={`inline-flex items-center gap-1 px-3 py-1.5 text-[11px] font-black rounded-full ${totalRemainingMonth <= 0 ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30' : 'bg-red-100 text-red-600 dark:bg-red-900/30'}`}>
+                          <span className={`inline-flex items-center gap-1 px-3 py-1.5 text-[14px] font-semibold rounded-full ${totalRemainingMonth <= 0 ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30' : 'bg-red-100 text-red-600 dark:bg-red-900/30'}`}>
                             {totalRemainingMonth <= 0 ? <ArrowTrendingUpIcon className="w-3.5 h-3.5" /> : <ArrowTrendingDownIcon className="w-3.5 h-3.5" />}
                             {totalRemainingMonth <= 0 ? `+${Math.abs(totalRemainingMonth)}` : `-${totalRemainingMonth}`}
                           </span>
                         </td>
                         <td className="px-4 py-4 text-center border-r border-slate-200 dark:border-slate-700">
-                          <span className="text-sm font-black text-blue-900 dark:text-blue-400">{totalWeeklyTarget}</span>
+                          <span className="text-sm font-semibold text-blue-900 dark:text-blue-400">{totalWeeklyTarget}</span>
                         </td>
                         <td className="px-4 py-4 text-center border-r border-slate-200 dark:border-slate-700">
-                          <span className="text-sm font-black text-emerald-600 dark:text-emerald-400">{totalWeekOrders}</span>
+                          <span className="text-sm font-semibold text-emerald-600 dark:text-emerald-400">{totalWeekOrders}</span>
                         </td>
                         <td className="px-4 py-4 text-center">
-                          <span className={`inline-flex items-center gap-1 px-3 py-1.5 text-[11px] font-black rounded-full ${totalRemainingWeek <= 0 ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30' : 'bg-red-100 text-red-600 dark:bg-red-900/30'}`}>
+                          <span className={`inline-flex items-center gap-1 px-3 py-1.5 text-[14px] font-semibold rounded-full ${totalRemainingWeek <= 0 ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30' : 'bg-red-100 text-red-600 dark:bg-red-900/30'}`}>
                             {totalRemainingWeek <= 0 ? <ArrowTrendingUpIcon className="w-3.5 h-3.5" /> : <ArrowTrendingDownIcon className="w-3.5 h-3.5" />}
                             {totalRemainingWeek <= 0 ? `+${Math.abs(totalRemainingWeek)}` : `-${totalRemainingWeek}`}
                           </span>
@@ -576,50 +576,50 @@ export default function AnalyticsDashboard({ feeders, scotRows = [], defaultEmpl
                         <tr key={idx} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                           <td className="px-6 py-4 sticky left-0 z-10 bg-white dark:bg-slate-900 border-r border-slate-100 dark:border-slate-800 group-hover:bg-slate-50 dark:group-hover:bg-slate-800/50 transition-colors">
                             <div className="flex flex-col gap-1">
-                              <span className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-widest">{row.toName}</span>
-                              <p className="text-[10px] font-bold text-slate-500 italic mt-0.5">
+                              <span className="text-[14px] font-semibold text-slate-900 dark:text-white">{row.toName}</span>
+                              <p className="text-[13px] font-bold text-slate-500 italic mt-0.5">
                                 {row.employeeName || defaultEmployeeName}
                               </p>
                             </div>
                           </td>
                           <td className="px-4 py-4 text-center border-r border-slate-100 dark:border-slate-800">
                             {hasTarget ? (
-                              <span className="text-xs font-black text-blue-900 dark:text-blue-400">{row.monthlyTarget}</span>
+                              <span className="text-[14px] font-semibold text-blue-900 dark:text-blue-400">{row.monthlyTarget}</span>
                             ) : (
-                              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">N/A</span>
+                              <span className="text-[13px] font-bold text-slate-400">N/A</span>
                             )}
                           </td>
                           <td className="px-4 py-4 text-center border-r border-slate-100 dark:border-slate-800">
-                            <span className="text-xs font-black text-emerald-600 dark:text-emerald-400">{row.actualMonth}</span>
+                            <span className="text-[14px] font-semibold text-emerald-600 dark:text-emerald-400">{row.actualMonth}</span>
                           </td>
                           <td className="px-4 py-4 text-center border-r border-slate-100 dark:border-slate-800">
                             {hasTarget ? (
-                              <span className={`inline-flex items-center gap-1 px-2.5 py-1 text-[10px] font-black rounded-full ${(remainingMonth as number) <= 0 ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30' : 'bg-red-100 text-red-600 dark:bg-red-900/30'}`}>
+                              <span className={`inline-flex items-center gap-1 px-2.5 py-1 text-[13px] font-semibold rounded-full ${(remainingMonth as number) <= 0 ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30' : 'bg-red-100 text-red-600 dark:bg-red-900/30'}`}>
                                 {(remainingMonth as number) <= 0 ? <ArrowTrendingUpIcon className="w-3 h-3" /> : <ArrowTrendingDownIcon className="w-3 h-3" />}
                                 {(remainingMonth as number) <= 0 ? `+${Math.abs(remainingMonth as number)}` : `-${remainingMonth}`}
                               </span>
                             ) : (
-                              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">N/A</span>
+                              <span className="text-[13px] font-bold text-slate-400">N/A</span>
                             )}
                           </td>
                           <td className="px-4 py-4 text-center border-r border-slate-100 dark:border-slate-800">
                             {hasTarget ? (
-                              <span className="text-xs font-black text-blue-900 dark:text-blue-400">{row.weeklyTarget}</span>
+                              <span className="text-[14px] font-semibold text-blue-900 dark:text-blue-400">{row.weeklyTarget}</span>
                             ) : (
-                              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">N/A</span>
+                              <span className="text-[13px] font-bold text-slate-400">N/A</span>
                             )}
                           </td>
                           <td className="px-4 py-4 text-center border-r border-slate-100 dark:border-slate-800">
-                            <span className="text-xs font-black text-emerald-600 dark:text-emerald-400">{row.actualWeek}</span>
+                            <span className="text-[14px] font-semibold text-emerald-600 dark:text-emerald-400">{row.actualWeek}</span>
                           </td>
                           <td className="px-4 py-4 text-center">
                             {hasTarget ? (
-                              <span className={`inline-flex items-center gap-1 px-2.5 py-1 text-[10px] font-black rounded-full ${(remainingWeek as number) <= 0 ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30' : 'bg-red-100 text-red-600 dark:bg-red-900/30'}`}>
+                              <span className={`inline-flex items-center gap-1 px-2.5 py-1 text-[13px] font-semibold rounded-full ${(remainingWeek as number) <= 0 ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30' : 'bg-red-100 text-red-600 dark:bg-red-900/30'}`}>
                                 {(remainingWeek as number) <= 0 ? <ArrowTrendingUpIcon className="w-3 h-3" /> : <ArrowTrendingDownIcon className="w-3 h-3" />}
                                 {(remainingWeek as number) <= 0 ? `+${Math.abs(remainingWeek as number)}` : `-${remainingWeek}`}
                               </span>
                             ) : (
-                              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">N/A</span>
+                              <span className="text-[13px] font-bold text-slate-400">N/A</span>
                             )}
                           </td>
                         </tr>
@@ -636,7 +636,7 @@ export default function AnalyticsDashboard({ feeders, scotRows = [], defaultEmpl
         {/* 4. Time Intelligence Analysis (Hourly Heatmap) */}
         <div className="relative p-6 rounded-[2rem] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden z-0">
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] bg-orange-500/5 dark:bg-orange-500/10 rounded-full blur-[100px] z-[-1]"></div>
-          <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-widest flex items-center gap-2 mb-6 relative z-10">
+          <h3 className="text-sm font-semibold text-slate-900 dark:text-white flex items-center gap-2 mb-6 relative z-10">
             <ClockIcon className="w-5 h-5 text-orange-500" />
             Time Intelligence Analysis (Hourly Heatmap)
           </h3>
@@ -644,9 +644,9 @@ export default function AnalyticsDashboard({ feeders, scotRows = [], defaultEmpl
             <div className="min-w-[600px]">
               {/* Header Days */}
               <div className="grid grid-cols-8 gap-1 mb-2">
-                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right pr-4">Hour</div>
+                <div className="text-[13px] font-bold text-slate-400 text-right pr-4">Hour</div>
                 {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-                  <div key={day} className="text-[10px] font-bold text-slate-500 uppercase tracking-widest text-center">{day}</div>
+                  <div key={day} className="text-[13px] font-bold text-slate-500 text-center">{day}</div>
                 ))}
               </div>
               {/* Grid Body */}
@@ -662,7 +662,7 @@ export default function AnalyticsDashboard({ feeders, scotRows = [], defaultEmpl
 
                   return (
                     <div key={hourIndex} className="grid grid-cols-8 gap-1 items-center">
-                      <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right pr-4">{formatHr}</div>
+                      <div className="text-[13px] font-bold text-slate-400 text-right pr-4">{formatHr}</div>
                       {dayArray.map((val, dIdx) => {
                         const intensity = val / maxVal;
                         let bgClass = "bg-slate-100 dark:bg-slate-800";
@@ -673,7 +673,7 @@ export default function AnalyticsDashboard({ feeders, scotRows = [], defaultEmpl
                         
                         return (
                           <div key={dIdx} className={`h-8 rounded-md flex items-center justify-center transition-all hover:scale-105 cursor-pointer ${bgClass}`} title={`${val} calls`}>
-                            {val > 0 && <span className={`text-[9px] font-black ${intensity > 0.5 ? 'text-white' : 'text-amber-900 dark:text-amber-200'}`}>{val}</span>}
+                            {val > 0 && <span className={`text-[13px] font-semibold ${intensity > 0.5 ? 'text-white' : 'text-amber-900 dark:text-amber-200'}`}>{val}</span>}
                           </div>
                         );
                       })}
@@ -688,7 +688,7 @@ export default function AnalyticsDashboard({ feeders, scotRows = [], defaultEmpl
         {/* 5. Employee Performance Leaderboard */}
         <div className="relative p-6 rounded-[2rem] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden z-0">
           <div className="absolute top-0 right-0 w-72 h-72 bg-yellow-500/5 dark:bg-yellow-500/10 rounded-full blur-3xl -mr-32 -mt-32 z-[-1]"></div>
-          <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-widest flex items-center gap-2 mb-6 relative z-10">
+          <h3 className="text-sm font-semibold text-slate-900 dark:text-white flex items-center gap-2 mb-6 relative z-10">
             <StarIcon className="w-5 h-5 text-yellow-500" />
             Employee Performance Leaderboard
           </h3>
@@ -696,29 +696,29 @@ export default function AnalyticsDashboard({ feeders, scotRows = [], defaultEmpl
             <table className="w-full text-left border-collapse table-auto">
               <thead>
                 <tr className="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400">
-                  <th className="px-4 py-3 text-[10px] font-black uppercase tracking-widest rounded-l-xl">Rank</th>
-                  <th className="px-4 py-3 text-[10px] font-black uppercase tracking-widest">Employee</th>
-                  <th className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-right">Calls</th>
-                  <th className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-right">Talk Time</th>
-                  <th className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-right">Avg Duration</th>
-                  <th className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-right text-rose-500">Missed</th>
-                  <th className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-right rounded-r-xl">Score</th>
+                  <th className="px-4 py-3 text-[13px] font-semibold rounded-l-xl">Rank</th>
+                  <th className="px-4 py-3 text-[13px] font-semibold">Employee</th>
+                  <th className="px-4 py-3 text-[13px] font-semibold text-right">Calls</th>
+                  <th className="px-4 py-3 text-[13px] font-semibold text-right">Talk Time</th>
+                  <th className="px-4 py-3 text-[13px] font-semibold text-right">Avg Duration</th>
+                  <th className="px-4 py-3 text-[13px] font-semibold text-right text-rose-500">Missed</th>
+                  <th className="px-4 py-3 text-[13px] font-semibold text-right rounded-r-xl">Score</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                 {leaderboard.map((emp, idx) => (
                   <tr key={idx} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
-                    <td className="px-4 py-3 text-xs font-black text-slate-400">#{idx + 1}</td>
+                    <td className="px-4 py-3 text-[14px] font-semibold text-slate-400">#{idx + 1}</td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-[10px] font-black">{emp.name.charAt(0)}</div>
-                        <span className="text-xs font-black text-slate-900 dark:text-white">{emp.name}</span>
+                        <div className="w-6 h-6 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-[13px] font-semibold">{emp.name.charAt(0)}</div>
+                        <span className="text-[14px] font-semibold text-slate-900 dark:text-white">{emp.name}</span>
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-right text-xs font-bold text-slate-700 dark:text-slate-300">{emp.calls}</td>
-                    <td className="px-4 py-3 text-right text-xs font-bold text-slate-700 dark:text-slate-300">{Math.round(emp.duration/3600)} hrs</td>
-                    <td className="px-4 py-3 text-right text-xs font-bold text-slate-700 dark:text-slate-300">{emp.avgDurStr}</td>
-                    <td className="px-4 py-3 text-right text-xs font-bold text-rose-500">{emp.missed}</td>
+                    <td className="px-4 py-3 text-right text-[14px] font-bold text-slate-700 dark:text-slate-300">{emp.calls}</td>
+                    <td className="px-4 py-3 text-right text-[14px] font-bold text-slate-700 dark:text-slate-300">{Math.round(emp.duration/3600)} hrs</td>
+                    <td className="px-4 py-3 text-right text-[14px] font-bold text-slate-700 dark:text-slate-300">{emp.avgDurStr}</td>
+                    <td className="px-4 py-3 text-right text-[14px] font-bold text-rose-500">{emp.missed}</td>
                     <td className="px-4 py-3 text-right">
                       <div className="flex flex-col items-end">
                         <div className="flex gap-0.5 text-yellow-400">
@@ -726,7 +726,7 @@ export default function AnalyticsDashboard({ feeders, scotRows = [], defaultEmpl
                             <StarIcon key={i} className={`w-3 h-3 ${i < emp.stars ? 'fill-current' : 'text-slate-200 dark:text-slate-700'}`} />
                           ))}
                         </div>
-                        <span className="text-[9px] font-black text-slate-500 mt-0.5">{emp.score} PTS</span>
+                        <span className="text-[13px] font-semibold text-slate-500 mt-0.5">{emp.score} PTS</span>
                       </div>
                     </td>
                   </tr>
@@ -739,7 +739,7 @@ export default function AnalyticsDashboard({ feeders, scotRows = [], defaultEmpl
         {/* 5.5 Customer / Target Performance Table */}
         <div className="relative p-6 rounded-[2rem] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden z-0">
           <div className="absolute top-0 right-0 w-72 h-72 bg-emerald-500/5 dark:bg-emerald-500/10 rounded-full blur-3xl -mr-32 -mt-32 z-[-1]"></div>
-          <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-widest flex items-center gap-2 mb-6 relative z-10">
+          <h3 className="text-sm font-semibold text-slate-900 dark:text-white flex items-center gap-2 mb-6 relative z-10">
             <MapPinIcon className="w-5 h-5 text-emerald-500" />
             Target Customer Analysis
           </h3>
@@ -747,25 +747,25 @@ export default function AnalyticsDashboard({ feeders, scotRows = [], defaultEmpl
             <table className="w-full text-left border-collapse table-auto">
               <thead>
                 <tr className="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400">
-                  <th className="px-4 py-3 text-[10px] font-black uppercase tracking-widest rounded-l-xl">Rank</th>
-                  <th className="px-4 py-3 text-[10px] font-black uppercase tracking-widest">Customer / Target</th>
-                  <th className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-right">Total Calls</th>
-                  <th className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-right">Talk Time</th>
-                  <th className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-center text-blue-500">Incoming</th>
-                  <th className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-center text-emerald-500">Outgoing</th>
-                  <th className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-center text-rose-500 rounded-r-xl">Missed</th>
+                  <th className="px-4 py-3 text-[13px] font-semibold rounded-l-xl">Rank</th>
+                  <th className="px-4 py-3 text-[13px] font-semibold">Customer / Target</th>
+                  <th className="px-4 py-3 text-[13px] font-semibold text-right">Total Calls</th>
+                  <th className="px-4 py-3 text-[13px] font-semibold text-right">Talk Time</th>
+                  <th className="px-4 py-3 text-[13px] font-semibold text-center text-blue-500">Incoming</th>
+                  <th className="px-4 py-3 text-[13px] font-semibold text-center text-emerald-500">Outgoing</th>
+                  <th className="px-4 py-3 text-[13px] font-semibold text-center text-rose-500 rounded-r-xl">Missed</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                 {charts.topCustomers.map((tgt, idx) => (
                   <tr key={idx} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
-                    <td className="px-4 py-3 text-xs font-black text-slate-400">#{idx + 1}</td>
-                    <td className="px-4 py-3 text-xs font-black text-slate-900 dark:text-white">{tgt.name}</td>
-                    <td className="px-4 py-3 text-right text-xs font-bold text-slate-700 dark:text-slate-300">{tgt.calls}</td>
-                    <td className="px-4 py-3 text-right text-xs font-bold text-slate-700 dark:text-slate-300">{tgt.durationStr}</td>
-                    <td className="px-4 py-3 text-center text-xs font-bold text-blue-500">{tgt.incoming}</td>
-                    <td className="px-4 py-3 text-center text-xs font-bold text-emerald-500">{tgt.outgoing}</td>
-                    <td className="px-4 py-3 text-center text-xs font-bold text-rose-500">{tgt.missed}</td>
+                    <td className="px-4 py-3 text-[14px] font-semibold text-slate-400">#{idx + 1}</td>
+                    <td className="px-4 py-3 text-[14px] font-semibold text-slate-900 dark:text-white">{tgt.name}</td>
+                    <td className="px-4 py-3 text-right text-[14px] font-bold text-slate-700 dark:text-slate-300">{tgt.calls}</td>
+                    <td className="px-4 py-3 text-right text-[14px] font-bold text-slate-700 dark:text-slate-300">{tgt.durationStr}</td>
+                    <td className="px-4 py-3 text-center text-[14px] font-bold text-blue-500">{tgt.incoming}</td>
+                    <td className="px-4 py-3 text-center text-[14px] font-bold text-emerald-500">{tgt.outgoing}</td>
+                    <td className="px-4 py-3 text-center text-[14px] font-bold text-rose-500">{tgt.missed}</td>
                   </tr>
                 ))}
               </tbody>
@@ -777,7 +777,7 @@ export default function AnalyticsDashboard({ feeders, scotRows = [], defaultEmpl
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="relative p-6 rounded-[2rem] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden z-0">
             <div className="absolute bottom-0 right-0 w-48 h-48 bg-indigo-500/5 dark:bg-indigo-500/10 rounded-full blur-3xl -mr-16 -mb-16 z-[-1]"></div>
-            <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-widest flex items-center gap-2 mb-6 relative z-10">
+            <h3 className="text-sm font-semibold text-slate-900 dark:text-white flex items-center gap-2 mb-6 relative z-10">
               <ClockIcon className="w-5 h-5 text-indigo-500" />
               Call Duration Intelligence
             </h3>
@@ -792,14 +792,14 @@ export default function AnalyticsDashboard({ feeders, scotRows = [], defaultEmpl
                 </BarChart>
               </ResponsiveContainer>
             </div>
-            <p className="text-[10px] font-bold text-slate-500 mt-4 text-center">
+            <p className="text-[13px] font-bold text-slate-500 mt-4 text-center">
               Short calls (&lt;30s) may indicate wrong numbers. Long calls (15m+) indicate deep engagement.
             </p>
           </div>
 
           <div className="relative p-6 rounded-[2rem] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden z-0">
             <div className="absolute top-0 left-0 w-48 h-48 bg-emerald-500/5 dark:bg-emerald-500/10 rounded-full blur-3xl -ml-16 -mt-16 z-[-1]"></div>
-            <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-widest flex items-center gap-2 mb-6 relative z-10">
+            <h3 className="text-sm font-semibold text-slate-900 dark:text-white flex items-center gap-2 mb-6 relative z-10">
               <MapPinIcon className="w-5 h-5 text-emerald-500" />
               Top Customers & Regions
             </h3>
@@ -807,15 +807,15 @@ export default function AnalyticsDashboard({ feeders, scotRows = [], defaultEmpl
             <div className="space-y-6 relative z-10">
               {/* Country Map */}
               <div>
-                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3">Country Distribution</p>
+                <p className="text-[13px] font-bold text-slate-500 mb-3">Country Distribution</p>
                 <div className="space-y-2">
                   {charts.countryDistribution.slice(0, 4).map((c, i) => (
                     <div key={i} className="flex items-center gap-3">
-                      <span className="text-xs font-bold text-slate-700 dark:text-slate-300 w-12">{c.code}</span>
+                      <span className="text-[14px] font-bold text-slate-700 dark:text-slate-300 w-12">{c.code}</span>
                       <div className="flex-1 h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                         <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${c.percent}%` }}></div>
                       </div>
-                      <span className="text-xs font-black text-slate-900 dark:text-white w-8 text-right">{c.percent}%</span>
+                      <span className="text-[14px] font-semibold text-slate-900 dark:text-white w-8 text-right">{c.percent}%</span>
                     </div>
                   ))}
                 </div>
@@ -823,14 +823,14 @@ export default function AnalyticsDashboard({ feeders, scotRows = [], defaultEmpl
 
               {/* Top Customers */}
               <div>
-                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3">Most Contacted</p>
+                <p className="text-[13px] font-bold text-slate-500 mb-3">Most Contacted</p>
                 <div className="space-y-3">
                   {charts.topCustomers.slice(0, 4).map((c, i) => (
                     <div key={i} className="flex justify-between items-center p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
-                      <span className="text-xs font-bold text-slate-900 dark:text-white truncate pr-2">{c.name}</span>
+                      <span className="text-[14px] font-bold text-slate-900 dark:text-white truncate pr-2">{c.name}</span>
                       <div className="flex gap-4 text-right">
-                        <span className="text-[10px] font-black text-blue-600 dark:text-blue-400">{c.calls} calls</span>
-                        <span className="text-[10px] font-bold text-slate-500 w-16">{c.durationStr}</span>
+                        <span className="text-[13px] font-semibold text-blue-600 dark:text-blue-400">{c.calls} calls</span>
+                        <span className="text-[13px] font-bold text-slate-500 w-16">{c.durationStr}</span>
                       </div>
                     </div>
                   ))}
@@ -857,8 +857,8 @@ function KPICard({ title, value, icon, color, bg, glowColor }: { title: string, 
           <div className="w-5 h-5">{icon}</div>
         </div>
       </div>
-      <h4 className="text-2xl font-black text-slate-900 dark:text-white leading-tight relative z-10">{value}</h4>
-      <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mt-1 relative z-10">{title}</p>
+      <h4 className="text-2xl font-semibold text-slate-900 dark:text-white leading-tight relative z-10">{value}</h4>
+      <p className="text-[13px] font-bold text-slate-500 mt-1 relative z-10">{title}</p>
     </div>
   );
 }

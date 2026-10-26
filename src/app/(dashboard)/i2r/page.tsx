@@ -47,6 +47,23 @@ import IMSFormModal from "@/components/IMSFormModal";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
+// "Name not decided yet" flow (Sahil, 2026-10-23): an indent can be raised
+// before the final item name is chosen — the name is stored with a "TBD - "
+// prefix. The final name must be decided within 5 days of raising the
+// indent; until then the row carries a NAME PENDING badge (task owner:
+// HIMANSHI), turning red once the 5-day window is crossed.
+const TBD_PREFIX = "TBD - ";
+const NAME_DECIDE_DAYS = 5;
+function isTbdName(name?: string): boolean {
+  return String(name || "").trim().toUpperCase().startsWith("TBD");
+}
+function tbdDaysLeft(createdAt?: string): number {
+  const ts = Date.parse(createdAt || "");
+  if (isNaN(ts)) return 0;
+  const deadline = ts + NAME_DECIDE_DAYS * 24 * 60 * 60 * 1000;
+  return Math.ceil((deadline - Date.now()) / (24 * 60 * 60 * 1000));
+}
+
 function fileLinkUrl(val?: string): string {
   if (!val || !String(val).trim()) return "";
   const s = String(val).trim();
@@ -136,7 +153,7 @@ function UserMultiCombobox({
         {selected.map((u) => (
           <span
             key={u}
-            className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-[#003875] text-[#FFD500] rounded-md text-[10px] font-black"
+            className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-[#2563EB] text-white rounded-md text-[13px] font-semibold"
           >
             {u}
             <button
@@ -158,7 +175,7 @@ function UserMultiCombobox({
             setOpen(true);
           }}
           onFocus={() => setOpen(true)}
-          className="flex-1 min-w-[80px] bg-transparent outline-none text-[12px] font-bold text-gray-800 dark:text-white placeholder:text-gray-300 dark:placeholder:text-navy-600"
+          className="flex-1 min-w-[80px] bg-transparent outline-none text-[14px] font-bold text-gray-800 dark:text-white placeholder:text-gray-300 dark:placeholder:text-navy-600"
         />
         <ChevronDownIcon className="w-4 h-4 text-slate-300 ml-auto" />
       </div>
@@ -171,7 +188,7 @@ function UserMultiCombobox({
                 e.preventDefault();
                 toggle(u);
               }}
-              className="px-4 py-2 text-[12px] font-black cursor-pointer hover:bg-slate-50 dark:hover:bg-navy-800 text-[#003875] dark:text-[#FFD500] rounded-lg transition-all"
+              className="px-4 py-2 text-[14px] font-semibold cursor-pointer hover:bg-slate-50 dark:hover:bg-navy-800 text-[#2563EB] dark:text-[#60A5FA] rounded-lg transition-all"
             >
               {u}
             </li>
@@ -199,7 +216,7 @@ export default function I2RPage() {
   } | null>({ key: "id", direction: "desc" });
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
-  const [selectedStepFilter, setSelectedStepFilter] = useState<number | "all" | "completed">("all");
+  const [selectedStepFilter, setSelectedStepFilter] = useState<number | "all" | "completed" | "tbd">("all");
   const [formData, setFormData] = useState<Partial<I2R>>({ ...EMPTY_FORM });
   const [actionStatus, setActionStatus] = useState<"loading" | "success" | "error">("loading");
   const [actionMessage, setActionMessage] = useState("");
@@ -290,12 +307,21 @@ export default function I2RPage() {
   };
 
   const { data: imsData } = useSWR<{ item_name: string; category: string }[]>("/api/ims", fetcher);
+  // Canonical names: Busy sale register (last 6 months — the "perfect"
+  // spellings) + Master catalog, via /api/item-names. These head the
+  // dropdown so I2R indents use the exact same names as sales OUT.
+  const { data: canonicalData } = useSWR<{ names: string[] }>("/api/item-names", fetcher, { revalidateOnFocus: false });
   const imsItems = useMemo(() => {
-    if (!imsData) return [];
     const unique = new Map<string, string>();
-    imsData.forEach(i => { if (i.item_name) unique.set(i.item_name, i.category || ""); });
+    (imsData || []).forEach(i => { if (i.item_name) unique.set(i.item_name, i.category || ""); });
+    const catByKey = new Map<string, string>();
+    unique.forEach((cat, name) => catByKey.set(name.trim().toLowerCase(), cat));
+    (canonicalData?.names || []).forEach(n => {
+      if (n && !catByKey.has(n.trim().toLowerCase())) unique.set(n, "");
+    });
     return Array.from(unique.entries()).map(([name, cat]) => ({ item_name: name, category: cat })).sort((a,b) => a.item_name.localeCompare(b.item_name));
-  }, [imsData]);
+  }, [imsData, canonicalData]);
+  const canonicalNameSet = useMemo(() => new Set((canonicalData?.names || []).map(n => n.trim().toLowerCase())), [canonicalData]);
 
   const existingIMSCategories = useMemo(() => {
     if (!imsData) return [];
@@ -371,6 +397,7 @@ export default function I2RPage() {
 
     if (selectedStepFilter !== "all") {
       if (selectedStepFilter === "completed") list = list.filter(it => getActiveStep(it) === 0);
+      else if (selectedStepFilter === "tbd") list = list.filter(it => isTbdName(it.item_name) && !it.cancelled);
       else list = list.filter(it => getActiveStep(it) === selectedStepFilter);
     }
 
@@ -771,47 +798,76 @@ export default function I2RPage() {
       {/* ─── Header ─── */}
       <div className="flex items-center justify-between px-2 py-0.5 shrink-0">
         <div>
-          <h1 className="text-xl font-black text-[#003875] dark:text-white tracking-tight">I2R Management</h1>
-          <p className="text-[10px] font-bold text-gray-400 dark:text-slate-400 uppercase tracking-widest">INDENT TO REQUEST — ITEM REQUISITIONS</p>
+          <h1 className="text-xl font-semibold text-[#2563EB] dark:text-white tracking-tight">I2R Management</h1>
+          <p className="text-[13px] font-bold text-gray-400 dark:text-slate-400">INDENT TO REQUEST — ITEM REQUISITIONS</p>
         </div>
 
         {/* Central Pill Actions */}
-        <div className="flex items-center gap-1 rounded-full border-2 border-[#003875] dark:border-[#FFD500] bg-white dark:bg-navy-900 shadow-xl p-0.5">
-          <button onClick={handleExport} className="flex items-center gap-2 px-4 py-1 font-black uppercase tracking-widest text-[10px] text-[#003875] dark:text-[#FFD500] hover:bg-slate-50 dark:hover:bg-navy-800 transition-all rounded-full">
+        <div className="flex items-center gap-1 rounded-full border-2 border-[#2563EB] dark:border-[#60A5FA] bg-white dark:bg-navy-900 shadow-xl p-0.5">
+          <button onClick={handleExport} className="flex items-center gap-2 px-4 py-1 font-semibold text-[13px] text-[#2563EB] dark:text-[#60A5FA] hover:bg-slate-50 dark:hover:bg-navy-800 transition-all rounded-full">
             <ArrowDownTrayIcon className="w-3.5 h-3.5" /> <span>EXPORT</span>
           </button>
-          <button onClick={openConfigModal} className="flex items-center gap-2 px-4 py-1 font-black uppercase tracking-widest text-[10px] text-[#003875] dark:text-[#FFD500] hover:bg-slate-50 dark:hover:bg-navy-800 transition-all rounded-full">
+          <button onClick={openConfigModal} className="flex items-center gap-2 px-4 py-1 font-semibold text-[13px] text-[#2563EB] dark:text-[#60A5FA] hover:bg-slate-50 dark:hover:bg-navy-800 transition-all rounded-full">
             <Cog6ToothIcon className="w-3.5 h-3.5" /> <span>CONFIG</span>
           </button>
-          <button onClick={openAddModal} className="px-3 py-1 text-[#003875] dark:text-[#FFD500] hover:bg-slate-50 dark:hover:bg-navy-800 transition-all rounded-full">
+          <button onClick={openAddModal} className="px-3 py-1 text-[#2563EB] dark:text-[#60A5FA] hover:bg-slate-50 dark:hover:bg-navy-800 transition-all rounded-full">
             <PlusIcon className="w-4 h-4 stroke-[2.5]" />
           </button>
           <div className="w-[1px] h-5 bg-slate-200 dark:bg-navy-700 mx-1" />
-          <button onClick={() => setViewMode(viewMode==='cancelled'?'active':'cancelled')} className={`flex items-center gap-2 px-4 py-1 font-black uppercase tracking-widest text-[10px] transition-all rounded-full ${viewMode==='cancelled'?'bg-red-500 text-white shadow-md':'text-[#003875] dark:text-[#FFD500] hover:bg-slate-50 dark:hover:bg-navy-800'}`}>
+          <button onClick={() => setViewMode(viewMode==='cancelled'?'active':'cancelled')} className={`flex items-center gap-2 px-4 py-1 font-semibold   text-[13px] transition-all rounded-full ${viewMode==='cancelled'?'bg-red-500 text-white shadow-md':'text-[#2563EB] dark:text-[#60A5FA] hover:bg-slate-50 dark:hover:bg-navy-800'}`}>
             <NoSymbolIcon className="w-3.5 h-3.5" /> <span>CANCELLED ({items.filter(i => !!(i.cancelled || "").trim()).length})</span>
           </button>
         </div>
 
         {/* Layout Toggles */}
         <div className="flex items-center gap-0.5 bg-slate-100 dark:bg-navy-900 rounded-full p-0.5 border border-slate-200 dark:border-navy-800 shadow-inner">
-          <button onClick={() => setLayoutMode("standard")} className={`px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${layoutMode === "standard" ? "bg-white dark:bg-navy-800 text-[#003875] dark:text-[#FFD500] shadow-md" : "text-gray-400 dark:text-navy-600"}`}>STANDARD</button>
-          <button onClick={() => setLayoutMode("smart")} className={`px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${layoutMode === "smart" ? "bg-white dark:bg-navy-800 text-[#003875] dark:text-[#FFD500] shadow-md" : "text-gray-400 dark:text-navy-600"}`}>SMART VIEW</button>
+          <button onClick={() => setLayoutMode("standard")} className={`px-4 py-1 rounded-full text-[13px] font-semibold   transition-all ${layoutMode === "standard" ? "bg-white dark:bg-navy-800 text-[#2563EB] dark:text-[#60A5FA] shadow-md" : "text-gray-400 dark:text-navy-600"}`}>STANDARD</button>
+          <button onClick={() => setLayoutMode("smart")} className={`px-4 py-1 rounded-full text-[13px] font-semibold   transition-all ${layoutMode === "smart" ? "bg-white dark:bg-navy-800 text-[#2563EB] dark:text-[#60A5FA] shadow-md" : "text-gray-400 dark:text-navy-600"}`}>SMART VIEW</button>
         </div>
       </div>
 
       <div className="flex gap-4 flex-1 overflow-hidden mt-1 px-1">
         {/* ─── Sidebar ─── */}
         <div className="w-60 flex flex-col shrink-0 h-full overflow-y-auto custom-scrollbar border-r border-slate-100 dark:border-navy-800 pr-3 py-0.5">
-          <p className="text-[10px] font-black text-slate-400 dark:text-navy-500 uppercase tracking-[0.3em] mb-1.5 px-2">FILTERS</p>
+          <p className="text-[13px] font-semibold text-slate-400 dark:text-navy-500 mb-1.5 px-2">FILTERS</p>
           <div className="space-y-1.5 pb-10">
             <button
               onClick={() => setSelectedStepFilter("all")}
               className={`w-full flex items-center justify-between px-5 py-2.5 rounded-full transition-all border-b-4 ${
-                selectedStepFilter === "all" ? "bg-[#e6dcc5] dark:bg-[#cbbca0]/20 border-[#cbbca0] text-[#003875] dark:text-[#FFD500] shadow-md" : "bg-white dark:bg-navy-900 border-slate-100 dark:border-navy-800 text-slate-500 dark:text-navy-400 hover:bg-slate-50 dark:hover:bg-navy-800"
+                selectedStepFilter === "all" ? "bg-[#EFF4FF] dark:bg-[#D1D5DB]/20 border-[#D1D5DB] text-[#2563EB] dark:text-[#60A5FA] shadow-md" : "bg-white dark:bg-navy-900 border-slate-100 dark:border-navy-800 text-slate-500 dark:text-navy-400 hover:bg-slate-50 dark:hover:bg-navy-800"
               }`}
             >
-              <span className="font-black text-[11px] uppercase tracking-widest">ALL INDENTS</span>
+              <span className="font-semibold text-[14px]">ALL INDENTS</span>
             </button>
+            {/* Naam-decide step (Sahil, 2026-10-23): indent raise hone ke 5 din
+                ke andar final naam aana hai — ye permanent sidebar entry hai
+                taaki step flow ka hissa dikhe, count ke saath. */}
+            {(() => {
+              const tbdRows = items.filter(it => !it.cancelled && isTbdName(it.item_name));
+              // Sahil (2026-10-23): ye entry sirf tab dikhe jab koi TBD
+              // (to-be-decided) naam wala indent ho — zero par chhupi rahe.
+              if (tbdRows.length === 0) return null;
+              const overdue = tbdRows.filter(it => tbdDaysLeft(it.created_at) < 0).length;
+              const active = selectedStepFilter === "tbd";
+              return (
+                <button
+                  onClick={() => setSelectedStepFilter("tbd")}
+                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-all border ${
+                    active
+                      ? "bg-amber-50 dark:bg-amber-900/20 border-amber-400 shadow-md"
+                      : overdue > 0
+                      ? "bg-white dark:bg-navy-900 border-red-200 dark:border-red-900/50 hover:border-red-400"
+                      : "bg-white dark:bg-navy-900 border-amber-100 dark:border-navy-800 hover:border-amber-300"
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <ClockIcon className={`w-4 h-4 ${overdue > 0 ? "text-red-500" : "text-amber-500"}`} />
+                    <span className={`text-[13px] font-semibold  tracking-tight ${active ? "text-amber-700 dark:text-amber-400" : "text-slate-600 dark:text-navy-300"}`}>Decide Name — 5D TAT</span>
+                  </div>
+                  <span className={`min-w-5 h-5 px-1 flex items-center justify-center rounded-full text-[13px] font-semibold ${overdue > 0 ? "bg-red-500 text-white" : tbdRows.length > 0 ? "bg-amber-500 text-white" : "bg-slate-100 dark:bg-navy-800 text-slate-400"}`}>{tbdRows.length}</span>
+                </button>
+              );
+            })()}
             <div className="space-y-1">
               {I2R_STEP_SHORT.map((name, i) => {
                 const n = i + 1; const active = selectedStepFilter === n;
@@ -821,16 +877,16 @@ export default function I2RPage() {
                   <div key={n} className="px-1">
                     <button
                       onClick={() => setSelectedStepFilter(n)}
-                      className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-all border border-slate-50 dark:border-navy-800 bg-white dark:bg-navy-900 hover:border-[#003875]/20 dark:hover:border-[#FFD500]/20 ${
-                        active ? "bg-[#e6dcc5] dark:bg-[#cbbca0]/20 border-[#cbbca0] shadow-md z-10" : "text-slate-500 dark:text-navy-400"
+                      className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-all border border-slate-50 dark:border-navy-800 bg-white dark:bg-navy-900 hover:border-[#2563EB]/20 dark:hover:border-[#60A5FA]/20 ${
+                        active ? "bg-[#EFF4FF] dark:bg-[#D1D5DB]/20 border-[#D1D5DB] shadow-md z-10" : "text-slate-500 dark:text-navy-400"
                       }`}
                     >
                       <div className="flex items-center gap-3">
-                        <Icon className={`w-4 h-4 ${active ? "text-[#003875] dark:text-[#FFD500]" : "text-[#003875] dark:text-blue-400"}`} />
-                        <span className={`text-[10px] font-black uppercase tracking-tight ${active ? "text-[#003875] dark:text-[#FFD500]" : "text-slate-600 dark:text-navy-300"}`}>Step {n} — {name}</span>
+                        <Icon className={`w-4 h-4 ${active ? "text-[#2563EB] dark:text-[#60A5FA]" : "text-[#2563EB] dark:text-blue-400"}`} />
+                        <span className={`text-[13px] font-semibold  tracking-tight ${active ? "text-[#2563EB] dark:text-[#60A5FA]" : "text-slate-600 dark:text-navy-300"}`}>Step {n} — {name}</span>
                       </div>
                       {stepCounts[n] > 0 && (
-                        <span className={`w-5 h-5 flex items-center justify-center rounded-full text-[10px] font-black transition-all ${active ? "bg-[#003875] text-[#FFD500]" : "bg-blue-500 text-white shadow-sm"}`}>{stepCounts[n]}</span>
+                        <span className={`w-5 h-5 flex items-center justify-center rounded-full text-[13px] font-semibold transition-all ${active ? "bg-[#2563EB] text-white" : "bg-blue-500 text-white shadow-sm"}`}>{stepCounts[n]}</span>
                       )}
                     </button>
                   </div>
@@ -845,10 +901,10 @@ export default function I2RPage() {
             >
               <div className="flex items-center gap-3">
                 <CheckCircleIcon className={`w-4 h-4 ${selectedStepFilter === "completed" ? "text-emerald-500" : "text-emerald-600 dark:text-emerald-400"}`} />
-                <span className={`font-black text-[11px] uppercase tracking-widest ${selectedStepFilter === "completed" ? "text-emerald-700 dark:text-emerald-400" : "text-emerald-600 dark:text-emerald-500"}`}>COMPLETED</span>
+                <span className={`font-semibold text-[14px]   ${selectedStepFilter === "completed" ? "text-emerald-700 dark:text-emerald-400" : "text-emerald-600 dark:text-emerald-500"}`}>COMPLETED</span>
               </div>
               {stepCounts.completed > 0 && (
-                <span className={`w-5 h-5 flex items-center justify-center rounded-full text-[10px] font-black transition-all ${selectedStepFilter === "completed" ? "bg-emerald-500 text-white" : "bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400"}`}>{stepCounts.completed}</span>
+                <span className={`w-5 h-5 flex items-center justify-center rounded-full text-[13px] font-semibold transition-all ${selectedStepFilter === "completed" ? "bg-emerald-500 text-white" : "bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400"}`}>{stepCounts.completed}</span>
               )}
             </button>
           </div>
@@ -860,22 +916,32 @@ export default function I2RPage() {
           <div className="flex items-center gap-3 mb-3 shrink-0 px-1">
             <div className="relative group flex-1 max-w-xs">
               <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-300 dark:text-navy-600" />
-              <input type="text" placeholder="Search..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="w-full pl-9 pr-3 py-1.5 bg-white dark:bg-navy-900 border border-slate-200 dark:border-navy-800 rounded-xl text-[12px] font-bold text-gray-700 dark:text-white outline-none focus:border-[#003875] dark:focus:border-[#FFD500] transition-all shadow-sm" />
+              <input type="text" placeholder="Search..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="w-full pl-9 pr-3 py-1.5 bg-white dark:bg-navy-900 border border-slate-200 dark:border-navy-800 rounded-xl text-[14px] font-bold text-gray-700 dark:text-white outline-none focus:border-[#2563EB] dark:focus:border-[#60A5FA] transition-all shadow-sm" />
             </div>
             <div className="flex items-center gap-1.5">
-              <button onClick={() => setDateFilter(dateFilter==='Yesterday'?null:'Yesterday')} className={`px-4 py-1 rounded-full text-[10px] font-black uppercase border-2 transition-all ${dateFilter==='Yesterday'?'bg-[#003875] dark:bg-[#FFD500] text-white dark:text-navy-950 border-[#003875] dark:border-[#FFD500] shadow-md':'bg-white dark:bg-navy-900 border-blue-50 dark:border-navy-800 text-blue-400 dark:text-blue-600 hover:border-blue-200 dark:hover:border-blue-800'}`}>YESTERDAY <span className="ml-1 opacity-50">{getDateFilterCount('Yesterday')}</span></button>
-              <button onClick={() => setDateFilter(dateFilter==='Today'?null:'Today')} className={`px-4 py-1 rounded-full text-[10px] font-black uppercase border-2 transition-all ${dateFilter==='Today'?'bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400 border-orange-100 dark:border-orange-900/50 shadow-sm':'bg-white dark:bg-navy-900 border-orange-50 dark:border-navy-800 text-orange-400 dark:text-orange-600 hover:border-orange-200 dark:hover:border-orange-800'}`}>TODAY <span className="ml-1 opacity-50">{getDateFilterCount('Today')}</span></button>
-              <button onClick={() => setDateFilter(dateFilter==='Tomorrow'?null:'Tomorrow')} className={`px-4 py-1 rounded-full text-[10px] font-black uppercase border-2 transition-all ${dateFilter==='Tomorrow'?'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 border-blue-100 dark:border-blue-900/50 shadow-sm':'bg-white dark:bg-navy-900 border-blue-50 dark:border-navy-800 text-blue-400 dark:text-blue-600 hover:border-blue-200 dark:hover:border-blue-800'}`}>TOMORROW <span className="ml-1 opacity-50">{getDateFilterCount('Tomorrow')}</span></button>
+              <button onClick={() => setDateFilter(dateFilter==='Yesterday'?null:'Yesterday')} className={`px-4 py-1 rounded-full text-[13px] font-semibold  border-2 transition-all ${dateFilter==='Yesterday'?'bg-[#2563EB] dark:bg-[#60A5FA] text-white dark:text-navy-950 border-[#2563EB] dark:border-[#60A5FA] shadow-md':'bg-white dark:bg-navy-900 border-blue-50 dark:border-navy-800 text-blue-400 dark:text-blue-600 hover:border-blue-200 dark:hover:border-blue-800'}`}>YESTERDAY <span className="ml-1 opacity-50">{getDateFilterCount('Yesterday')}</span></button>
+              <button onClick={() => setDateFilter(dateFilter==='Today'?null:'Today')} className={`px-4 py-1 rounded-full text-[13px] font-semibold  border-2 transition-all ${dateFilter==='Today'?'bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400 border-orange-100 dark:border-orange-900/50 shadow-sm':'bg-white dark:bg-navy-900 border-orange-50 dark:border-navy-800 text-orange-400 dark:text-orange-600 hover:border-orange-200 dark:hover:border-orange-800'}`}>TODAY <span className="ml-1 opacity-50">{getDateFilterCount('Today')}</span></button>
+              <button onClick={() => setDateFilter(dateFilter==='Tomorrow'?null:'Tomorrow')} className={`px-4 py-1 rounded-full text-[13px] font-semibold  border-2 transition-all ${dateFilter==='Tomorrow'?'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 border-blue-100 dark:border-blue-900/50 shadow-sm':'bg-white dark:bg-navy-900 border-blue-50 dark:border-navy-800 text-blue-400 dark:text-blue-600 hover:border-blue-200 dark:hover:border-blue-800'}`}>TOMORROW <span className="ml-1 opacity-50">{getDateFilterCount('Tomorrow')}</span></button>
+              {(() => {
+                const tbdRows = items.filter(it => !it.cancelled && isTbdName(it.item_name));
+                if (tbdRows.length === 0) return null;
+                const overdue = tbdRows.filter(it => tbdDaysLeft(it.created_at) < 0).length;
+                return (
+                  <button onClick={() => setSearchTerm("TBD")} title="Naam decide karke update karna hai (HIMANSHI)" className={`px-4 py-1 rounded-full text-[13px] font-semibold  border-2 transition-all ${overdue > 0 ? 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border-red-200 dark:border-red-900/50' : 'bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-900/50'}`}>
+                    NAME PENDING <span className="ml-1 opacity-70">{tbdRows.length}</span>{overdue > 0 && <span className="ml-1">({overdue} OVERDUE)</span>}
+                  </button>
+                );
+              })()}
             </div>
             <div className="ml-auto flex items-center gap-3">
-              <p className="text-[10px] font-black text-slate-400 dark:text-navy-500 uppercase tracking-widest whitespace-nowrap">PAGE <span className="text-[#003875] dark:text-[#FFD500]">{currentPage}</span> OF {totalPages||1}</p>
+              <p className="text-[13px] font-semibold text-slate-400 dark:text-navy-500 whitespace-nowrap">PAGE <span className="text-[#2563EB] dark:text-[#60A5FA]">{currentPage}</span> OF {totalPages||1}</p>
               <div className="flex items-center gap-1">
                 <button onClick={() => setCurrentPage(Math.max(1, currentPage-1))} className="p-1 text-slate-300 dark:text-navy-700 hover:text-slate-800 dark:hover:text-white transition-colors"><ChevronLeftIcon className="w-3.5 h-3.5" /></button>
                 <button onClick={() => setCurrentPage(Math.min(totalPages, currentPage+1))} className="p-1 text-slate-300 dark:text-navy-700 hover:text-slate-800 dark:hover:text-white transition-colors"><ChevronRightIcon className="w-3.5 h-3.5" /></button>
               </div>
               <div className="flex items-center gap-1 ml-1">
-                <p className="text-[10px] font-black text-slate-300 dark:text-navy-700 uppercase">SHOW</p>
-                <select value={itemsPerPage} onChange={e => setItemsPerPage(Number(e.target.value))} className="bg-transparent border-none text-[10px] font-black text-[#003875] dark:text-[#FFD500] outline-none cursor-pointer">
+                <p className="text-[13px] font-semibold text-slate-300 dark:text-navy-700">SHOW</p>
+                <select value={itemsPerPage} onChange={e => setItemsPerPage(Number(e.target.value))} className="bg-transparent border-none text-[13px] font-semibold text-[#2563EB] dark:text-[#60A5FA] outline-none cursor-pointer">
                   {[10, 20, 50].map(v => <option key={v} value={v} className="dark:bg-navy-900">{v}</option>)}
                 </select>
               </div>
@@ -885,70 +951,75 @@ export default function I2RPage() {
           {/* Cards Area */}
           <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 space-y-3 pb-20 py-0.5">
             {isLoading ? (
-              <div className="flex flex-col items-center justify-center p-10 animate-pulse text-slate-200 dark:text-navy-800"><ArrowPathIcon className="w-8 h-8 animate-spin mb-4" /><p className="text-[10px] font-black uppercase tracking-[0.3em]">SYNCHRONIZING...</p></div>
+              <div className="flex flex-col items-center justify-center p-10 animate-pulse text-slate-200 dark:text-navy-800"><ArrowPathIcon className="w-8 h-8 animate-spin mb-4" /><p className="text-[13px] font-semibold">SYNCHRONIZING...</p></div>
             ) : paginatedItems.length === 0 ? (
-              <div className="flex flex-col items-center justify-center p-10 text-slate-100 dark:text-navy-900"><MagnifyingGlassIcon className="w-12 h-12 mb-4" /><p className="text-[10px] font-black uppercase tracking-[0.3em]">NO DATA FOUND</p></div>
+              <div className="flex flex-col items-center justify-center p-10 text-slate-100 dark:text-navy-900"><MagnifyingGlassIcon className="w-12 h-12 mb-4" /><p className="text-[13px] font-semibold">NO DATA FOUND</p></div>
             ) : layoutMode === "smart" ? (
               paginatedItems.map(item => {
                 const sel = selectedIds.has(item.id); const step = getActiveStep(item); const exp = expandedTiles[item.id];
                 return (
                   <div key={item.id} className="px-1">
-                    <div onClick={() => { const n = new Set(selectedIds); if (n.has(item.id)) n.delete(item.id); else n.add(item.id); setSelectedIds(n); }} className={`bg-white dark:bg-navy-800 rounded-2xl border transition-all cursor-pointer overflow-hidden ${sel ? "border-[#003875] dark:border-[#FFD500] border-2 shadow-lg" : "border-slate-100 dark:border-navy-700 shadow-sm hover:border-slate-200 dark:hover:border-navy-600"}`}>
+                    <div onClick={() => { const n = new Set(selectedIds); if (n.has(item.id)) n.delete(item.id); else n.add(item.id); setSelectedIds(n); }} className={`bg-white dark:bg-navy-800 rounded-2xl border transition-all cursor-pointer overflow-hidden ${sel ? "border-[#2563EB] dark:border-[#60A5FA] border-2 shadow-lg" : "border-slate-100 dark:border-navy-700 shadow-sm hover:border-slate-200 dark:hover:border-navy-600"}`}>
                       <div className="p-3">
                         <div className="flex items-start justify-between mb-2">
                           <div className="flex items-start gap-3">
-                            <input type="checkbox" checked={sel} readOnly className="w-4 h-4 mt-1 rounded border-slate-300 dark:border-navy-700 text-[#003875] dark:text-[#FFD500] focus:ring-[#003875] dark:focus:ring-[#FFD500] dark:bg-navy-900" />
+                            <input type="checkbox" checked={sel} readOnly className="w-4 h-4 mt-1 rounded border-slate-300 dark:border-navy-700 text-[#2563EB] dark:text-[#60A5FA] focus:ring-[#2563EB] dark:focus:ring-[#60A5FA] dark:bg-navy-900" />
                             <div>
                               <div className="flex items-center gap-2">
-                                <span className="px-2 py-0.5 bg-blue-50 dark:bg-blue-900/20 text-[#003875] dark:text-blue-400 rounded text-[10px] font-black uppercase tracking-widest border border-blue-100 dark:border-blue-900/50">INDT - {item.id}</span>
-                                <h3 className="text-base font-black text-slate-800 dark:text-white tracking-tight uppercase leading-none">{item.item_name}</h3>
+                                <span className="px-2 py-0.5 bg-blue-50 dark:bg-blue-900/20 text-[#2563EB] dark:text-blue-400 rounded text-[13px] font-semibold border border-blue-100 dark:border-blue-900/50">INDT - {item.id}</span>
+                                <h3 className="text-base font-semibold text-slate-800 dark:text-white tracking-tight leading-none">{item.item_name}</h3>
+                                {isTbdName(item.item_name) && (
+                                  <span className={`inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded-full text-[13px] font-semibold   border ${tbdDaysLeft(item.created_at) < 0 ? "bg-red-50 text-red-600 border-red-200 dark:bg-red-500/10 dark:border-red-500/30" : "bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-500/10 dark:border-amber-500/30"}`}>
+                                    {tbdDaysLeft(item.created_at) < 0 ? `NAME PENDING — HIMANSHI — OVERDUE ${Math.abs(tbdDaysLeft(item.created_at))}d` : `NAME PENDING — HIMANSHI — ${tbdDaysLeft(item.created_at)}d left`}
+                                  </span>
+                                )}
                               </div>
                               <div className="flex flex-wrap items-center gap-4 mt-1.5">
-                                <span className="flex items-center gap-1.5 text-[10px] font-black text-blue-500 dark:text-blue-400 uppercase"><CubeIcon className="w-3.5 h-3.5" /> Qty: {item.quantity}</span>
-                                <span className="flex items-center gap-1.5 text-[10px] font-black text-purple-500 dark:text-purple-400 uppercase"><TagIcon className="w-3.5 h-3.5" /> {item.category}</span>
-                                <span className="flex items-center gap-1.5 text-[10px] font-black text-slate-400 dark:text-navy-500 uppercase"><UserIcon className="w-3.5 h-3.5" /> {item.filled_by}</span>
-                                <span className="flex items-center gap-1.5 text-[10px] font-black text-slate-400 dark:text-navy-500 uppercase"><CalendarIcon className="w-3.5 h-3.5" /> {fmtDt(item.created_at)}</span>
+                                <span className="flex items-center gap-1.5 text-[13px] font-semibold text-blue-500 dark:text-blue-400"><CubeIcon className="w-3.5 h-3.5" /> Qty: {item.quantity}</span>
+                                <span className="flex items-center gap-1.5 text-[13px] font-semibold text-purple-500 dark:text-purple-400"><TagIcon className="w-3.5 h-3.5" /> {item.category}</span>
+                                <span className="flex items-center gap-1.5 text-[13px] font-semibold text-slate-400 dark:text-navy-500"><UserIcon className="w-3.5 h-3.5" /> {item.filled_by}</span>
+                                <span className="flex items-center gap-1.5 text-[13px] font-semibold text-slate-400 dark:text-navy-500"><CalendarIcon className="w-3.5 h-3.5" /> {fmtDt(item.created_at)}</span>
                               </div>
                             </div>
                           </div>
                           
                           <div className="flex items-center gap-2">
                             {!item.cancelled && step > 0 && (
-                              <div className="flex items-center bg-white dark:bg-navy-800 border border-[#FFD500] rounded-full shadow-sm overflow-hidden divide-x divide-[#FFD500]/30 mr-1">
+                              <div className="flex items-center bg-white dark:bg-navy-800 border border-[#2563EB] rounded-full shadow-sm overflow-hidden divide-x divide-[#2563EB]/30 mr-1">
                                 <div className="flex flex-col items-center justify-center px-3 py-1.5 min-w-[120px]">
-                                  <p className="text-[9px] font-black text-[#003875] dark:text-[#FFD500] uppercase tracking-tighter leading-none whitespace-nowrap">
+                                  <p className="text-[13px] font-semibold text-[#2563EB] dark:text-[#60A5FA] tracking-tighter leading-none whitespace-nowrap">
                                     {fmtDt((item as any)[`planned_${step}`])} {fmtTm((item as any)[`planned_${step}`])}
                                   </p>
-                                  <p className={`text-[8px] font-black uppercase tracking-widest mt-0.5 ${getDelayInfo((item as any)[`planned_${step}`], null, now)?.color || "text-slate-400"}`}>
+                                  <p className={`text-[12px] font-semibold   mt-0.5 ${getDelayInfo((item as any)[`planned_${step}`], null, now)?.color || "text-slate-400"}`}>
                                     {getDelayInfo((item as any)[`planned_${step}`], null, now)?.text}
                                   </p>
                                 </div>
-                                <div className="flex items-center gap-1.5 px-4 py-1.5 bg-[#FFD500]/5 dark:bg-[#FFD500]/10">
-                                  <ClockIcon className="w-3.5 h-3.5 text-[#FFD500] stroke-[3]" />
-                                  <span className="text-[11px] font-black text-[#003875] dark:text-[#FFD500] uppercase tracking-widest whitespace-nowrap">
+                                <div className="flex items-center gap-1.5 px-4 py-1.5 bg-[#2563EB]/5 dark:bg-[#60A5FA]/10">
+                                  <ClockIcon className="w-3.5 h-3.5 text-[#2563EB] stroke-[3]" />
+                                  <span className="text-[14px] font-semibold text-[#2563EB] dark:text-[#60A5FA] whitespace-nowrap">
                                     STEP {step} PENDING
                                   </span>
                                 </div>
                               </div>
                             )}
                             {item.cancelled ? (
-                              <div className="flex items-center gap-2 px-4 py-1.5 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-900/50 text-red-600 dark:text-red-400 rounded-full text-[11px] font-black uppercase tracking-widest shadow-sm">
+                              <div className="flex items-center gap-2 px-4 py-1.5 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-900/50 text-red-600 dark:text-red-400 rounded-full text-[14px] font-semibold shadow-sm">
                                 <NoSymbolIcon className="w-3.5 h-3.5 text-red-500 stroke-[3]" />
                                 CANCELLED {fmtDt(item.cancelled)} {fmtTm(item.cancelled)}
                               </div>
                             ) : (
                               step === 0 && (
-                                <button className="flex items-center gap-2 px-4 py-1.5 bg-white dark:bg-navy-800 border border-[#FFD500] text-[#003875] dark:text-[#FFD500] rounded-full text-[11px] font-black uppercase tracking-widest shadow-sm hover:bg-[#FFD500]/5 transition-all">
-                                  <ClockIcon className="w-3.5 h-3.5 text-[#FFD500] stroke-[3]" />
+                                <button className="flex items-center gap-2 px-4 py-1.5 bg-white dark:bg-navy-800 border border-[#2563EB] text-white dark:text-[#60A5FA] rounded-full text-[14px] font-semibold shadow-sm hover:bg-[#2563EB]/5 transition-all">
+                                  <ClockIcon className="w-3.5 h-3.5 text-[#2563EB] stroke-[3]" />
                                   DONE
                                 </button>
                               )
                             )}
                             <div className="flex items-center gap-1 px-2 py-1 bg-white dark:bg-navy-800 rounded-full border border-slate-100 dark:border-navy-700 shadow-lg ring-1 ring-slate-100/50 dark:ring-navy-700/50">
-                              <button onClick={e => { e.stopPropagation(); setExpandedTiles(p => ({ ...p, [item.id]: !exp })); }} className={`p-1.5 rounded-full transition-all active:scale-90 ${exp ? "bg-[#003875] text-[#FFD500]" : "text-[#003875] dark:text-[#FFD500] hover:bg-yellow-50 dark:hover:bg-yellow-900/20"}`} title={exp ? "Hide Pipeline" : "Show Pipeline"}><ChevronDownIcon className={`w-3.5 h-3.5 stroke-[3] transition-transform ${exp ? "rotate-180" : ""}`} /></button>
+                              <button onClick={e => { e.stopPropagation(); setExpandedTiles(p => ({ ...p, [item.id]: !exp })); }} className={`p-1.5 rounded-full transition-all active:scale-90 ${exp ? "bg-[#2563EB] text-white" : "text-white dark:text-[#60A5FA] hover:bg-yellow-50 dark:hover:bg-yellow-900/20"}`} title={exp ? "Hide Pipeline" : "Show Pipeline"}><ChevronDownIcon className={`w-3.5 h-3.5 stroke-[3] transition-transform ${exp ? "rotate-180" : ""}`} /></button>
                               {(isAdmin || step > 0) && (
                                 <>
-                                  <button onClick={e => { e.stopPropagation(); openPOModal(item); }} className="p-1.5 text-[#003875] dark:text-[#FFD500] hover:bg-yellow-50 dark:hover:bg-yellow-900/20 rounded-full transition-all active:scale-90" title="Make PO"><PlusIcon className="w-3.5 h-3.5 stroke-[3]" /></button>
+                                  <button onClick={e => { e.stopPropagation(); openPOModal(item); }} className="p-1.5 text-[#2563EB] dark:text-[#60A5FA] hover:bg-yellow-50 dark:hover:bg-yellow-900/20 rounded-full transition-all active:scale-90" title="Make PO"><PlusIcon className="w-3.5 h-3.5 stroke-[3]" /></button>
                                   <button onClick={e => { e.stopPropagation(); openEditModal(item); }} className="p-1.5 text-blue-500 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-full transition-all active:scale-90"><PencilSquareIcon className="w-3.5 h-3.5" /></button>
                                   <button onClick={e => { e.stopPropagation(); openRemoveFollowUpModal(item); }} className="p-1.5 text-purple-500 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-full transition-all active:scale-90" title="Remove Follow Up"><ArrowUturnLeftIcon className="w-3.5 h-3.5" /></button>
                                   <button onClick={e => { e.stopPropagation(); handleDeleteClick(item.id); }} className="p-1.5 text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-full transition-all active:scale-90"><TrashIcon className="w-3.5 h-3.5" /></button>
@@ -964,75 +1035,75 @@ export default function I2RPage() {
                           <div className="flex items-start gap-x-3 gap-y-2 py-2 border-t border-slate-50 dark:border-navy-700 mt-1.5 min-w-max pr-1">
                             <div className="flex items-start gap-3 shrink-0">
                               <div className="min-w-[72px] shrink-0 space-y-0.5">
-                                <div className="flex items-center gap-1 text-emerald-500 dark:text-emerald-400"><BuildingOfficeIcon className="w-3.5 h-3.5 shrink-0" /><p className="text-[9px] font-black uppercase tracking-widest">SUPPLIER</p></div>
-                                <p className="text-[12px] font-black text-slate-800 dark:text-white ml-4 whitespace-normal break-words leading-tight">{item.supplier_name_3 || "—"}</p>
+                                <div className="flex items-center gap-1 text-emerald-500 dark:text-emerald-400"><BuildingOfficeIcon className="w-3.5 h-3.5 shrink-0" /><p className="text-[13px] font-semibold">SUPPLIER</p></div>
+                                <p className="text-[14px] font-semibold text-slate-800 dark:text-white ml-4 whitespace-normal break-words leading-tight">{item.supplier_name_3 || "—"}</p>
                               </div>
                               <div className="w-[76px] shrink-0 space-y-0.5">
-                                <div className="flex items-center gap-1 text-orange-400 dark:text-orange-300"><ClockIcon className="w-3.5 h-3.5 shrink-0" /><p className="text-[9px] font-black uppercase tracking-widest whitespace-nowrap">LEAD TIME</p></div>
-                                <p className="text-[12px] font-black text-slate-800 dark:text-white truncate">{item.lead_time_acc_to_vendor_4 || "—"}</p>
+                                <div className="flex items-center gap-1 text-orange-400 dark:text-orange-300"><ClockIcon className="w-3.5 h-3.5 shrink-0" /><p className="text-[13px] font-semibold whitespace-nowrap">LEAD TIME</p></div>
+                                <p className="text-[14px] font-semibold text-slate-800 dark:text-white truncate">{item.lead_time_acc_to_vendor_4 || "—"}</p>
                               </div>
                             </div>
                             <div className="w-[112px] shrink-0 space-y-0.5">
-                              <div className="flex items-center gap-1 text-blue-400 dark:text-blue-300"><PhotoIcon className="w-3.5 h-3.5 shrink-0" /><p className="text-[9px] font-black uppercase tracking-widest">SAMPLE</p></div>
+                              <div className="flex items-center gap-1 text-blue-400 dark:text-blue-300"><PhotoIcon className="w-3.5 h-3.5 shrink-0" /><p className="text-[13px] font-semibold">SAMPLE</p></div>
                             {item.sample_pic_5 ? (
                               <div className="flex items-center gap-1.5 ml-4">
-                                <a href={item.sample_pic_5} target="_blank" className="text-[11px] font-black text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 uppercase whitespace-nowrap">
+                                <a href={item.sample_pic_5} target="_blank" className="text-[14px] font-semibold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 whitespace-nowrap">
                                   <LinkIcon className="w-3 h-3" /> View Pic
                                 </a>
-                                <span className="text-[10px] font-black text-slate-400 dark:text-navy-500 uppercase tracking-tighter">Q:{item.sample_qty_5 || "—"}</span>
+                                <span className="text-[13px] font-semibold text-slate-400 dark:text-navy-500 tracking-tighter">Q:{item.sample_qty_5 || "—"}</span>
                               </div>
                             ) : (
-                              <p className="text-[11px] font-black text-slate-300 dark:text-navy-600 ml-4">Pending</p>
+                              <p className="text-[14px] font-semibold text-slate-300 dark:text-navy-600 ml-4">Pending</p>
                             )}
                           </div>
                           <div className="w-[118px] shrink-0 space-y-0.5">
-                            <div className="flex items-center gap-1 text-violet-500 dark:text-violet-400"><PhotoIcon className="w-3.5 h-3.5 shrink-0" /><p className="text-[9px] font-black uppercase tracking-widest leading-tight">READY STOCK</p></div>
+                            <div className="flex items-center gap-1 text-violet-500 dark:text-violet-400"><PhotoIcon className="w-3.5 h-3.5 shrink-0" /><p className="text-[13px] font-semibold leading-tight">READY STOCK</p></div>
                             {item.photo_video_8 ? (
                               <div className="ml-4">
-                                <a href={fileLinkUrl(item.photo_video_8)} target="_blank" rel="noopener noreferrer" className="text-[11px] font-black text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 uppercase whitespace-nowrap">
+                                <a href={fileLinkUrl(item.photo_video_8)} target="_blank" rel="noopener noreferrer" className="text-[14px] font-semibold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 whitespace-nowrap">
                                   <LinkIcon className="w-3 h-3" /> View Media
                                 </a>
                               </div>
                             ) : (
-                              <p className="text-[11px] font-black text-slate-300 dark:text-navy-600 ml-4">Pending</p>
+                              <p className="text-[14px] font-semibold text-slate-300 dark:text-navy-600 ml-4">Pending</p>
                             )}
                           </div>
                           <div className="w-[58px] shrink-0 space-y-0.5">
-                            <div className="flex items-center gap-1 text-blue-500 dark:text-blue-400"><GlobeAltIcon className="w-3.5 h-3.5 shrink-0" /><p className="text-[9px] font-black uppercase tracking-widest">COUNTRY</p></div>
+                            <div className="flex items-center gap-1 text-blue-500 dark:text-blue-400"><GlobeAltIcon className="w-3.5 h-3.5 shrink-0" /><p className="text-[13px] font-semibold">COUNTRY</p></div>
                             <div className="ml-4">
                               {(() => {
                                 const stats = getGRNStats(item.po_number_6 || "");
-                                return <p className="text-[12px] font-black text-slate-800 dark:text-white truncate uppercase">{stats?.country || "—"}</p>;
+                                return <p className="text-[14px] font-semibold text-slate-800 dark:text-white truncate">{stats?.country || "—"}</p>;
                               })()}
                             </div>
                           </div>
 
                           <div className="w-[68px] shrink-0 space-y-0.5">
-                            <div className="flex items-center gap-1 text-rose-500 dark:text-rose-400"><DocumentTextIcon className="w-3.5 h-3.5 shrink-0" /><p className="text-[9px] font-black uppercase tracking-widest">PO NO</p></div>
-                            <p className="text-[12px] font-black text-slate-800 dark:text-white ml-4 truncate">{item.po_number_6 || "—"}</p>
+                            <div className="flex items-center gap-1 text-rose-500 dark:text-rose-400"><DocumentTextIcon className="w-3.5 h-3.5 shrink-0" /><p className="text-[13px] font-semibold">PO NO</p></div>
+                            <p className="text-[14px] font-semibold text-slate-800 dark:text-white ml-4 truncate">{item.po_number_6 || "—"}</p>
                           </div>
 
                           <div className="w-[58px] shrink-0 space-y-0.5">
-                            <div className="flex items-center gap-1 text-indigo-500 dark:text-indigo-400"><CubeIcon className="w-3.5 h-3.5 shrink-0" /><p className="text-[9px] font-black uppercase tracking-widest">CARGO</p></div>
-                            <p className="text-[12px] font-black text-slate-800 dark:text-white ml-4 truncate">{(item as any).cargo_9 || "—"}</p>
+                            <div className="flex items-center gap-1 text-indigo-500 dark:text-indigo-400"><CubeIcon className="w-3.5 h-3.5 shrink-0" /><p className="text-[13px] font-semibold">CARGO</p></div>
+                            <p className="text-[14px] font-semibold text-slate-800 dark:text-white ml-4 truncate">{(item as any).cargo_9 || "—"}</p>
                           </div>
 
                           <div className="w-[68px] shrink-0 space-y-0.5">
-                            <div className="flex items-center gap-1 text-emerald-500 dark:text-emerald-400"><HashtagIcon className="w-3.5 h-3.5 shrink-0" /><p className="text-[9px] font-black uppercase tracking-widest">REC QTY</p></div>
-                            <p className="text-[12px] font-black text-slate-800 dark:text-white ml-4 truncate">{(item as any).received_qty_10 || "—"}</p>
+                            <div className="flex items-center gap-1 text-emerald-500 dark:text-emerald-400"><HashtagIcon className="w-3.5 h-3.5 shrink-0" /><p className="text-[13px] font-semibold">REC QTY</p></div>
+                            <p className="text-[14px] font-semibold text-slate-800 dark:text-white ml-4 truncate">{(item as any).received_qty_10 || "—"}</p>
                           </div>
 
                           <div className="shrink-0 space-y-0.5 min-w-[96px]">
-                            <div className="flex items-center gap-1 text-emerald-500 dark:text-emerald-400"><SparklesIcon className="w-3.5 h-3.5 shrink-0" /><p className="text-[9px] font-black uppercase tracking-widest">BALANCE</p></div>
+                            <div className="flex items-center gap-1 text-emerald-500 dark:text-emerald-400"><SparklesIcon className="w-3.5 h-3.5 shrink-0" /><p className="text-[13px] font-semibold">BALANCE</p></div>
                             <div className="ml-4">
                               {item.po_number_6 ? (
                                 <div className="animate-in fade-in slide-in-from-left-1 duration-500">
                                   {(() => {
                                     const stats = getGRNStats(item.po_number_6);
-                                    if (!stats) return <p className="text-[9px] font-black text-slate-400 dark:text-navy-600 uppercase tracking-tighter">No GRN yet</p>;
+                                    if (!stats) return <p className="text-[13px] font-semibold text-slate-400 dark:text-navy-600 tracking-tighter">No GRN yet</p>;
                                     const rem = (parseFloat(item.quantity) || 0) - stats.totalRec;
                                     return (
-                                      <div className="flex items-center gap-1.5 font-black text-[10px] uppercase tracking-tighter whitespace-nowrap">
+                                      <div className="flex items-center gap-1.5 font-semibold text-[13px] tracking-tighter whitespace-nowrap">
                                         <span className="text-emerald-600 dark:text-emerald-400">R: {stats.totalRec}</span>
                                         <span className="text-slate-300 dark:text-navy-800">|</span>
                                         <span className={rem > 0 ? "text-rose-600" : "text-emerald-600"}>B: {rem}</span>
@@ -1040,7 +1111,7 @@ export default function I2RPage() {
                                     );
                                   })()}
                                 </div>
-                              ) : <p className="text-[11px] font-black text-slate-300 dark:text-navy-700">—</p>}
+                              ) : <p className="text-[14px] font-semibold text-slate-300 dark:text-navy-700">—</p>}
                             </div>
                           </div>
                         </div>
@@ -1063,23 +1134,23 @@ export default function I2RPage() {
                               return (
                                 <div key={n} className={`p-1.5 rounded-lg border transition-all ${statusClasses}`}>
                                   <div className="flex items-center justify-between mb-0.5">
-                                    <p className={`text-[10px] font-black uppercase tracking-widest ${done ? "text-emerald-600 dark:text-emerald-400" : isPending ? "text-orange-600 dark:text-orange-400" : "text-slate-400 dark:text-navy-600"}`}>ST {n}</p>
+                                    <p className={`text-[13px] font-semibold   ${done ? "text-emerald-600 dark:text-emerald-400" : isPending ? "text-orange-600 dark:text-orange-400" : "text-slate-400 dark:text-navy-600"}`}>ST {n}</p>
                                     {done && <CheckCircleIcon className="w-2.5 h-2.5 text-emerald-600 dark:text-emerald-400" />}
                                     {isPending && <ClockIcon className="w-2.5 h-2.5 text-orange-500 animate-pulse" />}
                                   </div>
-                                  <p className={`text-[11px] font-black leading-tight line-clamp-1 ${done ? "text-emerald-900 dark:text-emerald-200" : isPending ? "text-orange-900 dark:text-orange-200" : "text-slate-600 dark:text-navy-400"}`}>{I2R_STEP_SHORT[i]}</p>
+                                  <p className={`text-[14px] font-semibold leading-tight line-clamp-1 ${done ? "text-emerald-900 dark:text-emerald-200" : isPending ? "text-orange-900 dark:text-orange-200" : "text-slate-600 dark:text-navy-400"}`}>{I2R_STEP_SHORT[i]}</p>
                                   
                                   <div className={`mt-0.5 space-y-0 pt-0.5 border-t ${done ? "border-emerald-100 dark:border-emerald-900/50" : isPending ? "border-orange-100 dark:border-orange-900/50" : "border-slate-100 dark:border-navy-700"}`}>
-                                    <div className="flex justify-between items-center text-[10px] font-black uppercase">
+                                    <div className="flex justify-between items-center text-[13px] font-semibold">
                                       <span className="opacity-50">Planned</span>
                                       <span className="dark:text-white/60">{fmtDt(pl)}</span>
                                     </div>
-                                    <div className="flex justify-between items-center text-[10px] font-black uppercase">
+                                    <div className="flex justify-between items-center text-[13px] font-semibold">
                                       <span className="opacity-50">Actual</span>
                                       <span className={done ? "text-emerald-700 dark:text-emerald-400" : "opacity-30"}>{act ? fmtDt(act) : "—"}</span>
                                     </div>
                                     {delayInfo && (
-                                      <div className={`text-[10px] font-black uppercase text-right leading-none mt-0.5 ${delayInfo.color}`}>
+                                      <div className={`text-[13px] font-semibold  text-right leading-none mt-0.5 ${delayInfo.color}`}>
                                         {delayInfo.text}
                                       </div>
                                     )}
@@ -1098,10 +1169,10 @@ export default function I2RPage() {
               <div className="overflow-x-auto rounded-xl border border-slate-100 dark:border-navy-800 bg-white dark:bg-navy-800 shadow-sm custom-scrollbar">
                 <table className="w-full text-left border-collapse">
                   <thead>
-                    <tr className="bg-[#003875] dark:bg-navy-950 text-white text-[10px] font-black uppercase tracking-widest">
-                      <th className="p-3 w-10 text-center sticky left-0 z-10 bg-[#003875] dark:bg-navy-950"><input type="checkbox" checked={selectedIds.size === paginatedItems.length && paginatedItems.length > 0} onChange={() => { if (selectedIds.size === paginatedItems.length) setSelectedIds(new Set()); else setSelectedIds(new Set(paginatedItems.map(i => i.id))); }} className="rounded border-white/20 bg-transparent text-[#FFD500] focus:ring-[#FFD500] dark:border-navy-700" /></th>
-                      <th className="p-3 whitespace-nowrap sticky left-10 z-10 bg-[#003875] dark:bg-navy-950">ACTIONS</th>
-                      <th className="p-3 whitespace-nowrap sticky left-24 z-10 bg-[#003875] dark:bg-navy-950">INDENT NO.</th>
+                    <tr className="bg-[#2563EB] dark:bg-navy-950 text-white text-[13px] font-semibold">
+                      <th className="p-3 w-10 text-center sticky left-0 z-10 bg-[#2563EB] dark:bg-navy-950"><input type="checkbox" checked={selectedIds.size === paginatedItems.length && paginatedItems.length > 0} onChange={() => { if (selectedIds.size === paginatedItems.length) setSelectedIds(new Set()); else setSelectedIds(new Set(paginatedItems.map(i => i.id))); }} className="rounded border-white/20 bg-transparent text-[#2563EB] focus:ring-[#2563EB] dark:border-navy-700" /></th>
+                      <th className="p-3 whitespace-nowrap sticky left-10 z-10 bg-[#2563EB] dark:bg-navy-950">ACTIONS</th>
+                      <th className="p-3 whitespace-nowrap sticky left-24 z-10 bg-[#2563EB] dark:bg-navy-950">INDENT NO.</th>
                       <th className="p-3 whitespace-nowrap">ITEM NAME</th>
                       <th className="p-3 whitespace-nowrap">QUANTITY</th>
                       <th className="p-3 whitespace-nowrap">CATEGORY</th>
@@ -1122,64 +1193,71 @@ export default function I2RPage() {
                   </thead>
                   <tbody className="divide-y divide-slate-100 dark:divide-navy-700">
                     {paginatedItems.map(it => (
-                      <tr key={it.id} className="hover:bg-slate-50/50 dark:hover:bg-navy-900/30 transition-all text-[11px] group">
-                        <td className="p-3 text-center sticky left-0 z-10 bg-white dark:bg-navy-800 group-hover:bg-slate-50 dark:group-hover:bg-navy-900/30 transition-all"><input type="checkbox" checked={selectedIds.has(it.id)} onChange={() => { const n = new Set(selectedIds); if (n.has(it.id)) n.delete(it.id); else n.add(it.id); setSelectedIds(n); }} className="rounded border-slate-300 dark:border-navy-700 text-[#003875] dark:text-[#FFD500] focus:ring-[#003875] dark:focus:ring-[#FFD500] dark:bg-navy-900" /></td>
+                      <tr key={it.id} className="hover:bg-slate-50/50 dark:hover:bg-navy-900/30 transition-all text-[14px] group">
+                        <td className="p-3 text-center sticky left-0 z-10 bg-white dark:bg-navy-800 group-hover:bg-slate-50 dark:group-hover:bg-navy-900/30 transition-all"><input type="checkbox" checked={selectedIds.has(it.id)} onChange={() => { const n = new Set(selectedIds); if (n.has(it.id)) n.delete(it.id); else n.add(it.id); setSelectedIds(n); }} className="rounded border-slate-300 dark:border-navy-700 text-[#2563EB] dark:text-[#60A5FA] focus:ring-[#2563EB] dark:focus:ring-[#60A5FA] dark:bg-navy-900" /></td>
                         <td className="p-3 sticky left-10 z-10 bg-white dark:bg-navy-800 group-hover:bg-slate-50 dark:group-hover:bg-navy-900/30 transition-all">
                           {(isAdmin || getActiveStep(it) > 0) ? (
                             <div className="flex items-center gap-2">
-                              <button onClick={() => openPOModal(it)} className="p-1.5 text-[#003875] dark:text-[#FFD500] hover:bg-yellow-50 dark:hover:bg-yellow-900/20 rounded-md transition-all" title="Make PO"><PlusIcon className="w-4 h-4 stroke-[3]" /></button>
+                              <button onClick={() => openPOModal(it)} className="p-1.5 text-[#2563EB] dark:text-[#60A5FA] hover:bg-yellow-50 dark:hover:bg-yellow-900/20 rounded-md transition-all" title="Make PO"><PlusIcon className="w-4 h-4 stroke-[3]" /></button>
                               <button onClick={() => openEditModal(it)} className="p-1.5 text-blue-500 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-md transition-all"><PencilSquareIcon className="w-4 h-4" /></button>
                               <button onClick={() => openRemoveFollowUpModal(it)} className="p-1.5 text-purple-500 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-md transition-all" title="Remove Follow Up"><ArrowUturnLeftIcon className="w-4 h-4" /></button>
                               <button onClick={() => handleDeleteClick(it.id)} className="p-1.5 text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-all"><TrashIcon className="w-4 h-4" /></button>
                             </div>
                           ) : (
-                            <span className="text-[9px] font-black text-slate-300 dark:text-navy-600 uppercase">View only</span>
+                            <span className="text-[13px] font-semibold text-slate-300 dark:text-navy-600">View only</span>
                           )}
                         </td>
                         <td className="p-3 sticky left-24 z-10 bg-white dark:bg-navy-800 group-hover:bg-slate-50 dark:group-hover:bg-navy-900/30 transition-all">
                           <div className="flex flex-col gap-1">
-                            <span className="px-3 py-1 bg-blue-50 dark:bg-blue-900/20 text-[#003875] dark:text-blue-400 rounded-full font-black text-[10px] border border-blue-100 dark:border-blue-900/50 whitespace-nowrap">INDT- {it.id}</span>
-                            {it.cancelled && <span className="px-2 py-0.5 bg-red-50 dark:bg-red-900/10 text-red-600 dark:text-red-400 rounded text-[8px] font-black uppercase border border-red-100 dark:border-red-900/30 text-center">CANCELLED {fmtDt(it.cancelled)} {fmtTm(it.cancelled)}</span>}
+                            <span className="px-3 py-1 bg-blue-50 dark:bg-blue-900/20 text-[#2563EB] dark:text-blue-400 rounded-full font-semibold text-[13px] border border-blue-100 dark:border-blue-900/50 whitespace-nowrap">INDT- {it.id}</span>
+                            {it.cancelled && <span className="px-2 py-0.5 bg-red-50 dark:bg-red-900/10 text-red-600 dark:text-red-400 rounded text-[12px] font-semibold border border-red-100 dark:border-red-900/30 text-center">CANCELLED {fmtDt(it.cancelled)} {fmtTm(it.cancelled)}</span>}
                           </div>
                         </td>
-                        <td className="p-3 font-black text-slate-800 dark:text-white uppercase max-w-[200px] truncate">{it.item_name}</td>
+                        <td className="p-3 font-semibold text-slate-800 dark:text-white max-w-[200px] truncate">
+                          {it.item_name}
+                          {isTbdName(it.item_name) && (
+                            <span className={`ml-1.5 px-1.5 py-0.5 rounded-full text-[12px] font-semibold  ${tbdDaysLeft(it.created_at) < 0 ? "bg-red-50 text-red-600" : "bg-amber-50 text-amber-600"}`}>
+                              {tbdDaysLeft(it.created_at) < 0 ? "NAME OVERDUE" : `NAME ${tbdDaysLeft(it.created_at)}d`}
+                            </span>
+                          )}
+                        </td>
                         <td className="p-3 font-bold text-slate-500 dark:text-navy-400">{it.quantity}</td>
                         <td className="p-3 font-bold text-slate-400 dark:text-navy-500">{it.category}</td>
                         <td className="p-3 font-bold text-slate-500 dark:text-navy-400">{it.filled_by}</td>
                         <td className="p-3 whitespace-nowrap">
-                          <p className="font-black text-slate-800 dark:text-white">{fmtDt(it.created_at)}</p>
-                          <p className="text-[9px] text-slate-400 dark:text-navy-600 uppercase">{fmtTm(it.created_at)}</p>
+                          <p className="font-semibold text-slate-800 dark:text-white">{fmtDt(it.created_at)}</p>
+                          <p className="text-[13px] text-slate-400 dark:text-navy-600">{fmtTm(it.created_at)}</p>
                         </td>
-                        <td className="p-3 font-black text-[#003875] dark:text-blue-400 uppercase">{it.supplier_name_3 || "—"}</td>
-                        <td className="p-3 font-black text-orange-600 dark:text-orange-400 uppercase">{it.lead_time_acc_to_vendor_4 || "—"}</td>
+                        <td className="p-3 font-semibold text-[#2563EB] dark:text-blue-400">{it.supplier_name_3 || "—"}</td>
+                        <td className="p-3 font-semibold text-orange-600 dark:text-orange-400">{it.lead_time_acc_to_vendor_4 || "—"}</td>
                         <td className="p-3">
                           {it.sample_pic_5 ? (
                             <div className="flex flex-col gap-1">
-                              <a href={it.sample_pic_5} target="_blank" className="text-blue-500 dark:text-blue-400 hover:underline font-black uppercase text-[9px] flex items-center gap-1"><PhotoIcon className="w-3 h-3" /> VIEW PIC</a>
-                              <span className="text-[8px] font-black text-slate-400 dark:text-navy-600 uppercase tracking-tighter">QTY: {it.sample_qty_5 || "—"}</span>
+                              <a href={it.sample_pic_5} target="_blank" className="text-blue-500 dark:text-blue-400 hover:underline font-semibold text-[13px] flex items-center gap-1"><PhotoIcon className="w-3 h-3" /> VIEW PIC</a>
+                              <span className="text-[12px] font-semibold text-slate-400 dark:text-navy-600 tracking-tighter">QTY: {it.sample_qty_5 || "—"}</span>
                             </div>
-                          ) : <span className="text-slate-300 dark:text-navy-700 font-bold uppercase text-[9px]">NO PIC</span>}
+                          ) : <span className="text-slate-300 dark:text-navy-700 font-bold text-[13px]">NO PIC</span>}
                         </td>
-                        <td className="p-3 font-black text-rose-600 dark:text-rose-400 uppercase">{it.po_number_6 || "—"}</td>
+                        <td className="p-3 font-semibold text-rose-600 dark:text-rose-400">{it.po_number_6 || "—"}</td>
                         <td className="p-3">
                           {it.photo_video_8 ? (
-                            <a href={fileLinkUrl(it.photo_video_8)} target="_blank" rel="noopener noreferrer" className="text-blue-500 dark:text-blue-400 hover:underline font-black uppercase text-[9px] flex items-center gap-1">
+                            <a href={fileLinkUrl(it.photo_video_8)} target="_blank" rel="noopener noreferrer" className="text-blue-500 dark:text-blue-400 hover:underline font-semibold text-[13px] flex items-center gap-1">
                               <LinkIcon className="w-3 h-3" /> VIEW MEDIA
                             </a>
                           ) : (
-                            <span className="text-slate-300 dark:text-navy-700 font-bold uppercase text-[9px]">NO MEDIA</span>
+                            <span className="text-slate-300 dark:text-navy-700 font-bold text-[13px]">NO MEDIA</span>
                           )}
                         </td>
-                        <td className="p-3 font-black text-indigo-600 dark:text-indigo-400 uppercase">{(it as any).cargo_9 || "—"}</td>
-                        <td className="p-3 font-black text-emerald-600 dark:text-emerald-400 uppercase">{(it as any).received_qty_10 || "—"}</td>
+                        <td className="p-3 font-semibold text-indigo-600 dark:text-indigo-400">{(it as any).cargo_9 || "—"}</td>
+                        <td className="p-3 font-semibold text-emerald-600 dark:text-emerald-400">{(it as any).received_qty_10 || "—"}</td>
                         {(() => {
                           const stats = getGRNStats(it.po_number_6 || "");
                           const rem = (parseFloat(it.quantity) || 0) - (stats?.totalRec || 0);
                           return (
                             <>
-                              <td className="p-3 font-bold text-slate-500 dark:text-navy-400 uppercase text-[10px]">{stats?.country || "—"}</td>
-                              <td className="p-3 font-black text-emerald-500 text-center text-xs">{stats?.totalRec || 0}</td>
-                              <td className={`p-3 font-black text-center text-xs ${rem > 0 ? "text-rose-500" : "text-emerald-500"}`}>{rem}</td>
+                              <td className="p-3 font-bold text-slate-500 dark:text-navy-400 text-[13px]">{stats?.country || "—"}</td>
+                              <td className="p-3 font-semibold text-emerald-500 text-center text-[14px]">{stats?.totalRec || 0}</td>
+                              <td className={`p-3 font-semibold text-center text-[14px] ${rem > 0 ? "text-rose-500" : "text-emerald-500"}`}>{rem}</td>
                             </>
                           );
                         })()}
@@ -1191,9 +1269,9 @@ export default function I2RPage() {
                             <td key={i} className={`p-3 border-l border-slate-50 dark:border-navy-800 ${isPending ? 'bg-orange-50/30 dark:bg-orange-900/10' : ''}`}>
                               {pl ? (
                                 <div className="space-y-1">
-                                  <div className="flex justify-between gap-4 text-[9px] uppercase whitespace-nowrap"><span className="text-slate-400 dark:text-navy-600 font-bold">PLANNED</span><span className="font-black text-slate-600 dark:text-white/70">{fmtDt(pl)}, {fmtTm(pl)}</span></div>
-                                  <div className="flex justify-between gap-4 text-[9px] uppercase whitespace-nowrap"><span className="text-slate-400 dark:text-navy-600 font-bold">ACTUAL</span><span className={`font-black ${done ? 'text-emerald-500 dark:text-emerald-400' : isPending ? 'text-orange-500' : 'text-slate-300'}`}>{act ? `${fmtDt(act)}, ${fmtTm(act)}` : isPending ? 'Pending >' : '—'}</span></div>
-                                  {dly && <div className="flex justify-between gap-4 text-[9px] uppercase whitespace-nowrap"><span className="text-slate-400 dark:text-navy-600 font-bold">DELAY</span><span className={`font-black ${dly.color}`}>{dly.text}</span></div>}
+                                  <div className="flex justify-between gap-4 text-[13px] whitespace-nowrap"><span className="text-slate-400 dark:text-navy-600 font-bold">PLANNED</span><span className="font-semibold text-slate-600 dark:text-white/70">{fmtDt(pl)}, {fmtTm(pl)}</span></div>
+                                  <div className="flex justify-between gap-4 text-[13px] whitespace-nowrap"><span className="text-slate-400 dark:text-navy-600 font-bold">ACTUAL</span><span className={`font-semibold ${done ? 'text-emerald-500 dark:text-emerald-400' : isPending ? 'text-orange-500' : 'text-slate-300'}`}>{act ? `${fmtDt(act)}, ${fmtTm(act)}` : isPending ? 'Pending >' : '—'}</span></div>
+                                  {dly && <div className="flex justify-between gap-4 text-[13px] whitespace-nowrap"><span className="text-slate-400 dark:text-navy-600 font-bold">DELAY</span><span className={`font-semibold ${dly.color}`}>{dly.text}</span></div>}
                                 </div>
                               ) : <span className="text-slate-100 dark:text-navy-950">—</span>}
                             </td>
@@ -1211,28 +1289,28 @@ export default function I2RPage() {
 
       {/* ─── Floating Bulk Bar ─── */}
       {selectedIds.size > 0 && (
-        <div className="fixed bottom-10 left-1/2 -translate-x-1/2 bg-[#FEFBF0] dark:bg-navy-800 px-1.5 py-1.5 rounded-full shadow-[0_15px_40px_rgba(0,0,0,0.15)] flex items-center gap-4 border border-[#e6dcc5] dark:border-navy-700 z-[100] animate-in slide-in-from-bottom-12 duration-500 ring-4 ring-[#FEFBF0] dark:ring-navy-950">
+        <div className="fixed bottom-10 left-1/2 -translate-x-1/2 bg-[#FFFFFF] dark:bg-navy-800 px-1.5 py-1.5 rounded-full shadow-[0_15px_40px_rgba(0,0,0,0.15)] flex items-center gap-4 border border-[#EFF4FF] dark:border-navy-700 z-[100] animate-in slide-in-from-bottom-12 duration-500 ring-4 ring-[#FFFFFF] dark:ring-navy-950">
           <div className="flex items-center gap-2.5 pl-3">
-            <div className="w-8 h-8 bg-[#FFD500] text-[#003875] rounded-full flex items-center justify-center font-black text-sm shadow-sm">{selectedIds.size}</div>
-            <p className="text-[10px] font-black uppercase tracking-[0.1em] text-[#003875] dark:text-[#FFD500]">SELECTED</p>
+            <div className="w-8 h-8 bg-[#2563EB] text-white rounded-full flex items-center justify-center font-semibold text-sm shadow-sm">{selectedIds.size}</div>
+            <p className="text-[13px] font-semibold text-[#2563EB] dark:text-[#60A5FA]">SELECTED</p>
           </div>
-          <button onClick={openBulkModal} className="flex items-center gap-2 bg-[#FFD500] text-[#003875] px-6 py-2.5 rounded-full font-black text-[10px] uppercase tracking-[0.1em] hover:scale-[1.03] active:scale-95 transition-all shadow-md border-b-2 border-[#ccaa00]">
+          <button onClick={openBulkModal} className="flex items-center gap-2 bg-[#2563EB] text-white px-6 py-2.5 rounded-full font-semibold text-[13px] hover:scale-[1.03] active:scale-95 transition-all shadow-md border-b-2 border-[#ccaa00]">
             <SparklesIcon className="w-3.5 h-3.5 stroke-[2.5]" /> BULK PROCESS
           </button>
-          <button onClick={() => setSelectedIds(new Set())} className="pr-5 text-slate-400 dark:text-navy-500 hover:text-[#003875] dark:hover:text-[#FFD500] text-[9px] font-black uppercase tracking-[0.1em] transition-colors">CLEAR</button>
+          <button onClick={() => setSelectedIds(new Set())} className="pr-5 text-slate-400 dark:text-navy-500 hover:text-[#2563EB] dark:hover:text-[#60A5FA] text-[13px] font-semibold transition-colors">CLEAR</button>
         </div>
       )}
 
       {/* New/Edit Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-[1200] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-[#001a33]/40 backdrop-blur-sm" onClick={closeModal} />
+          <div className="absolute inset-0 bg-[#1D4ED8]/40 backdrop-blur-sm" onClick={closeModal} />
           <div className="relative bg-white dark:bg-navy-900 w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-300 border border-slate-200 dark:border-white/10">
             {/* Cream Header */}
-            <div className="p-6 pb-4 bg-[#FFFBF0] dark:bg-navy-950 border-b border-orange-100/50 dark:border-zinc-800 flex items-start justify-between">
+            <div className="p-6 pb-4 bg-[#FFFFFF] dark:bg-navy-950 border-b border-orange-100/50 dark:border-zinc-800 flex items-start justify-between">
               <div>
-                <h2 className="text-2xl font-black text-[#003875] dark:text-white uppercase leading-none">{editingItem ? "Edit Indent Request" : "New Indent Request"}</h2>
-                <p className="text-[12px] font-black text-blue-600 dark:text-[#FFD500] mt-2 uppercase tracking-widest flex items-center gap-2">
+                <h2 className="text-2xl font-semibold text-[#2563EB] dark:text-white leading-none">{editingItem ? "Edit Indent Request" : "New Indent Request"}</h2>
+                <p className="text-[14px] font-semibold text-blue-600 dark:text-[#60A5FA] mt-2 flex items-center gap-2">
                   <HashtagIcon className="w-3.5 h-3.5" />
                   INDT- {editingItem?.id || (items.length + 1)}
                 </p>
@@ -1243,13 +1321,13 @@ export default function I2RPage() {
             {/* White Body */}
             <div className="p-6 pt-6 space-y-5 bg-white dark:bg-navy-900">
               <div ref={comboRef} className="relative">
-                <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-2 mb-1.5">
-                  <CubeIcon className="w-3.5 h-3.5 text-[#FFD500]" />
+                <label className="text-[14px] font-semibold text-gray-400 flex items-center gap-2 mb-1.5">
+                  <CubeIcon className="w-3.5 h-3.5 text-[#2563EB]" />
                   Item Name <span className="text-red-500 ml-0.5">*</span>
                 </label>
                 <div className="flex gap-2">
                   <div className="relative flex-1">
-                    <input type="text" value={formData.item_name || ""} placeholder="Type or select item name" onFocus={() => setItemNameOpen(true)} onChange={e => { setFormData({ ...formData, item_name: e.target.value }); setItemNameOpen(true); }} className="w-full px-4 py-3 bg-[#FFFBF0] dark:bg-navy-900 border border-orange-100/50 dark:border-navy-800 rounded-xl font-bold text-sm text-gray-900 dark:text-white outline-none focus:border-[#003875] dark:focus:border-[#FFD500] transition-all shadow-sm" />
+                    <input type="text" value={formData.item_name || ""} placeholder="Type or select item name" onFocus={() => setItemNameOpen(true)} onChange={e => { setFormData({ ...formData, item_name: e.target.value }); setItemNameOpen(true); }} className="w-full px-4 py-3 bg-[#FFFFFF] dark:bg-navy-900 border border-orange-100/50 dark:border-navy-800 rounded-xl font-bold text-sm text-gray-900 dark:text-white outline-none focus:border-[#2563EB] dark:focus:border-[#60A5FA] transition-all shadow-sm" />
                     {itemNameOpen && (
                       <ul className="absolute z-[1001] w-full mt-1 bg-white dark:bg-navy-900 border border-slate-100 dark:border-navy-800 rounded-xl shadow-2xl max-h-40 overflow-y-auto p-1.5">
                         {imsItems.filter(i => i.item_name.toLowerCase().includes((formData.item_name||"").toLowerCase())).map(i => (
@@ -1258,42 +1336,64 @@ export default function I2RPage() {
                       </ul>
                     )}
                   </div>
-                  <button 
+                  <button
                     onClick={() => setIsIMSModalOpen(true)}
-                    className="p-3 bg-[#003875] dark:bg-[#FFD500] text-white dark:text-navy-950 rounded-xl hover:bg-[#002855] dark:hover:bg-[#FFE600] transition-all shadow-md active:scale-95 flex items-center justify-center shrink-0"
+                    className="p-3 bg-[#2563EB] dark:bg-[#60A5FA] text-white dark:text-navy-950 rounded-xl hover:bg-[#1D4ED8] dark:hover:bg-[#1D4ED8] transition-all shadow-md active:scale-95 flex items-center justify-center shrink-0"
                     title="Add new item to IMS"
                   >
                     <PlusIcon className="w-5 h-5 stroke-[2.5]" />
                   </button>
                 </div>
+                {/* Name-not-decided (TBD) + official-list warning */}
+                <div className="mt-2 space-y-1">
+                  <label className="flex items-center gap-2 cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={isTbdName(formData.item_name)}
+                      onChange={e => {
+                        const raw = String(formData.item_name || "");
+                        if (e.target.checked) {
+                          if (!isTbdName(raw)) setFormData({ ...formData, item_name: TBD_PREFIX + raw });
+                        } else {
+                          setFormData({ ...formData, item_name: raw.replace(/^\s*TBD\s*-?\s*/i, "") });
+                        }
+                      }}
+                      className="w-4 h-4 accent-[#2563EB]"
+                    />
+                    <span className="text-[13px] font-semibold text-gray-500">Naam abhi decide nahi hua (TBD — {NAME_DECIDE_DAYS} din mein final karna hai)</span>
+                  </label>
+                  {!isTbdName(formData.item_name) && String(formData.item_name || "").trim() !== "" && !canonicalNameSet.has(String(formData.item_name || "").trim().toLowerCase()) && (
+                    <p className="text-[13px] font-semibold text-amber-600 tracking-wide">⚠ Ye naam official (Busy/Master) list mein nahi hai — spelling check karein ya TBD tick karein</p>
+                  )}
+                </div>
               </div>
               <div>
-                <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-2 mb-1.5">
-                  <QueueListIcon className="w-3.5 h-3.5 text-[#FFD500]" />
+                <label className="text-[14px] font-semibold text-gray-400 flex items-center gap-2 mb-1.5">
+                  <QueueListIcon className="w-3.5 h-3.5 text-[#2563EB]" />
                   Quantity <span className="text-red-500 ml-0.5">*</span>
                 </label>
-                <input type="text" value={formData.quantity || ""} placeholder="Enter quantity" onChange={e => setFormData({ ...formData, quantity: e.target.value })} className="w-full px-4 py-3 bg-[#FFFBF0] dark:bg-navy-900 border border-orange-100/50 dark:border-navy-800 rounded-xl font-bold text-sm text-gray-900 dark:text-white outline-none focus:border-[#003875] dark:focus:border-[#FFD500] transition-all shadow-sm" />
+                <input type="text" value={formData.quantity || ""} placeholder="Enter quantity" onChange={e => setFormData({ ...formData, quantity: e.target.value })} className="w-full px-4 py-3 bg-[#FFFFFF] dark:bg-navy-900 border border-orange-100/50 dark:border-navy-800 rounded-xl font-bold text-sm text-gray-900 dark:text-white outline-none focus:border-[#2563EB] dark:focus:border-[#60A5FA] transition-all shadow-sm" />
               </div>
               <div>
-                <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-2 mb-1.5">
-                  <TagIcon className="w-3.5 h-3.5 text-[#FFD500]" />
+                <label className="text-[14px] font-semibold text-gray-400 flex items-center gap-2 mb-1.5">
+                  <TagIcon className="w-3.5 h-3.5 text-[#2563EB]" />
                   Category <span className="text-red-500 ml-0.5">*</span>
                 </label>
-                <input type="text" value={formData.category || ""} placeholder="Enter category" onChange={e => setFormData({ ...formData, category: e.target.value })} className="w-full px-4 py-3 bg-[#FFFBF0] dark:bg-navy-900 border border-orange-100/50 dark:border-navy-800 rounded-xl font-bold text-sm text-gray-900 dark:text-white outline-none focus:border-[#003875] dark:focus:border-[#FFD500] transition-all shadow-sm" />
+                <input type="text" value={formData.category || ""} placeholder="Enter category" onChange={e => setFormData({ ...formData, category: e.target.value })} className="w-full px-4 py-3 bg-[#FFFFFF] dark:bg-navy-900 border border-orange-100/50 dark:border-navy-800 rounded-xl font-bold text-sm text-gray-900 dark:text-white outline-none focus:border-[#2563EB] dark:focus:border-[#60A5FA] transition-all shadow-sm" />
               </div>
               <div>
-                <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-2 mb-1.5">
-                  <UserIcon className="w-3.5 h-3.5 text-[#FFD500]" />
+                <label className="text-[14px] font-semibold text-gray-400 flex items-center gap-2 mb-1.5">
+                  <UserIcon className="w-3.5 h-3.5 text-[#2563EB]" />
                   Filled By
                 </label>
-                <input type="text" value={formData.filled_by || ""} readOnly className="w-full px-4 py-3 bg-[#FFFBF0] dark:bg-navy-900/50 border border-orange-100/50 dark:border-navy-800 rounded-xl font-bold text-sm text-slate-500 dark:text-navy-600 cursor-not-allowed outline-none shadow-sm" />
+                <input type="text" value={formData.filled_by || ""} readOnly className="w-full px-4 py-3 bg-[#FFFFFF] dark:bg-navy-900/50 border border-orange-100/50 dark:border-navy-800 rounded-xl font-bold text-sm text-slate-500 dark:text-navy-600 cursor-not-allowed outline-none shadow-sm" />
               </div>
             </div>
 
             {/* Cream Footer */}
-            <div className="p-6 py-4 bg-[#FFFBF0] dark:bg-navy-950 border-t border-orange-100/50 dark:border-zinc-800 flex gap-4">
-              <button onClick={closeModal} className="flex-1 py-3.5 bg-white dark:bg-navy-800 border border-slate-200 dark:border-navy-700 text-slate-500 dark:text-navy-400 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-slate-50 dark:hover:bg-navy-700 transition-all">Cancel</button>
-              <button onClick={handleSave} className="flex-1 py-3.5 bg-[#003875] dark:bg-[#FFD500] text-white dark:text-navy-950 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-[#002855] dark:hover:bg-[#FFE600] transition-all shadow-lg active:scale-95">
+            <div className="p-6 py-4 bg-[#FFFFFF] dark:bg-navy-950 border-t border-orange-100/50 dark:border-zinc-800 flex gap-4">
+              <button onClick={closeModal} className="flex-1 py-3.5 bg-white dark:bg-navy-800 border border-slate-200 dark:border-navy-700 text-slate-500 dark:text-navy-400 rounded-xl font-semibold text-[14px] hover:bg-slate-50 dark:hover:bg-navy-700 transition-all">Cancel</button>
+              <button onClick={handleSave} className="flex-1 py-3.5 bg-[#2563EB] dark:bg-[#60A5FA] text-white dark:text-navy-950 rounded-xl font-semibold text-[14px] hover:bg-[#1D4ED8] dark:hover:bg-[#1D4ED8] transition-all shadow-lg active:scale-95">
                 {editingItem ? "Update Indent" : "Create Indent"}
               </button>
             </div>
@@ -1304,29 +1404,29 @@ export default function I2RPage() {
       {/* Bulk Processor Modal */}
       {isBulkModalOpen && (
         <div className="fixed inset-0 z-[1200] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-[#001a33]/60 backdrop-blur-md" onClick={() => setIsBulkModalOpen(false)} />
-          <div className="relative bg-[#FEFBF0] dark:bg-navy-800 w-full max-w-5xl rounded-[3.5rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-500">
-            <div className="px-10 pt-6 pb-3 bg-[#FEFBF0] dark:bg-navy-800 flex items-start justify-between relative shrink-0 border-b border-slate-100 dark:border-navy-700">
-              <div><h2 className="text-[26px] font-black italic uppercase tracking-tighter text-[#003875] dark:text-white leading-none">Bulk Processor</h2><p className="text-[10px] font-black uppercase tracking-[0.2em] mt-1 text-slate-400 dark:text-navy-600">Processing {Array.from(selectedIds).length} selected indents</p></div>
+          <div className="absolute inset-0 bg-[#1D4ED8]/60 backdrop-blur-md" onClick={() => setIsBulkModalOpen(false)} />
+          <div className="relative bg-[#FFFFFF] dark:bg-navy-800 w-full max-w-5xl rounded-[3.5rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-500">
+            <div className="px-10 pt-6 pb-3 bg-[#FFFFFF] dark:bg-navy-800 flex items-start justify-between relative shrink-0 border-b border-slate-100 dark:border-navy-700">
+              <div><h2 className="text-[26px] font-semibold italic tracking-tighter text-[#2563EB] dark:text-white leading-none">Bulk Processor</h2><p className="text-[13px] font-semibold mt-1 text-slate-400 dark:text-navy-600">Processing {Array.from(selectedIds).length} selected indents</p></div>
               <button onClick={() => setIsBulkModalOpen(false)} className="p-2 hover:bg-slate-100 dark:hover:bg-navy-700 rounded-full transition-all text-slate-400 hover:text-slate-900 dark:hover:text-white absolute top-5 right-8"><XMarkIcon className="w-6 h-6" /></button>
             </div>
             <div className="flex-1 overflow-y-auto px-10 pb-24 pt-4 space-y-3 custom-scrollbar">
               {Array.from(selectedIds).map(id => {
                 const it = items.find(r => r.id === id); if (!it) return null; const n = getActiveStep(it); const t = bulkToggles[id] ?? true;
                 return (
-                  <div key={id} className={`p-5 bg-white dark:bg-navy-900 rounded-3xl border transition-all ${t ? "border-[#003875]/20 dark:border-[#FFD500]/20 shadow-sm" : "border-slate-100 dark:border-navy-800 opacity-40 shadow-none grayscale"}`}>
+                  <div key={id} className={`p-5 bg-white dark:bg-navy-900 rounded-3xl border transition-all ${t ? "border-[#2563EB]/20 dark:border-[#60A5FA]/20 shadow-sm" : "border-slate-100 dark:border-navy-800 opacity-40 shadow-none grayscale"}`}>
                     <div className="grid grid-cols-[1fr_2fr_auto] items-center gap-8">
-                      <div className="space-y-1"><div className="flex items-center gap-2"><span className="px-2 py-0.5 bg-blue-50 dark:bg-blue-900/20 text-[#003875] dark:text-blue-400 rounded text-[9px] font-black uppercase border border-blue-100 dark:border-blue-900/50">ID- {it.id}</span><span className="px-2 py-0.5 bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400 rounded text-[9px] font-black uppercase border border-orange-100 dark:border-orange-900/50">ST- {n}</span></div><h3 className="text-[13px] font-black uppercase text-[#003875] dark:text-white tracking-tight leading-tight truncate max-w-[200px]">{it.item_name}</h3></div>
-                      <div className="flex-1">{t && (<div className="animate-in fade-in slide-in-from-left-2 duration-300">{n === 3 && (<div className="space-y-1"><label className="text-[9px] font-black uppercase text-slate-400 dark:text-navy-600 tracking-widest px-1">Supplier Name</label><input type="text" value={bulkSupplierInputs[id]||""} onChange={e => setBulkSupplierInputs(p=>({...p,[id]:e.target.value}))} className="w-full px-4 py-2 bg-slate-50 dark:bg-navy-900 border border-slate-100 dark:border-navy-800 rounded-xl font-bold text-xs text-gray-900 dark:text-white outline-none focus:border-[#003875] dark:focus:border-[#FFD500]" placeholder="Enter supplier..." /></div>)}{n === 4 && (<div className="space-y-1"><label className="text-[9px] font-black uppercase text-slate-400 dark:text-navy-600 tracking-widest px-1">Lead Time</label><input type="text" value={bulkLeadTimeInputs[id]||""} onChange={e => setBulkLeadTimeInputs(p=>({...p,[id]:e.target.value}))} className="w-full px-4 py-2 bg-slate-50 dark:bg-navy-900 border border-slate-100 dark:border-navy-800 rounded-xl font-bold text-xs text-gray-900 dark:text-white outline-none focus:border-[#003875] dark:focus:border-[#FFD500]" placeholder="Enter days/hrs..." /></div>)}{n === 5 && (
+                      <div className="space-y-1"><div className="flex items-center gap-2"><span className="px-2 py-0.5 bg-blue-50 dark:bg-blue-900/20 text-[#2563EB] dark:text-blue-400 rounded text-[13px] font-semibold border border-blue-100 dark:border-blue-900/50">ID- {it.id}</span><span className="px-2 py-0.5 bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400 rounded text-[13px] font-semibold border border-orange-100 dark:border-orange-900/50">ST- {n}</span></div><h3 className="text-[13px] font-semibold text-[#2563EB] dark:text-white tracking-tight leading-tight truncate max-w-[200px]">{it.item_name}</h3></div>
+                      <div className="flex-1">{t && (<div className="animate-in fade-in slide-in-from-left-2 duration-300">{n === 3 && (<div className="space-y-1"><label className="text-[13px] font-semibold text-slate-400 dark:text-navy-600 px-1">Supplier Name</label><input type="text" value={bulkSupplierInputs[id]||""} onChange={e => setBulkSupplierInputs(p=>({...p,[id]:e.target.value}))} className="w-full px-4 py-2 bg-slate-50 dark:bg-navy-900 border border-slate-100 dark:border-navy-800 rounded-xl font-bold text-[14px] text-gray-900 dark:text-white outline-none focus:border-[#2563EB] dark:focus:border-[#60A5FA]" placeholder="Enter supplier..." /></div>)}{n === 4 && (<div className="space-y-1"><label className="text-[13px] font-semibold text-slate-400 dark:text-navy-600 px-1">Lead Time</label><input type="text" value={bulkLeadTimeInputs[id]||""} onChange={e => setBulkLeadTimeInputs(p=>({...p,[id]:e.target.value}))} className="w-full px-4 py-2 bg-slate-50 dark:bg-navy-900 border border-slate-100 dark:border-navy-800 rounded-xl font-bold text-[14px] text-gray-900 dark:text-white outline-none focus:border-[#2563EB] dark:focus:border-[#60A5FA]" placeholder="Enter days/hrs..." /></div>)}{n === 5 && (
                         <div className="grid grid-cols-[1fr_120px] gap-3">
                           <div className="space-y-1">
-                            <label className="text-[9px] font-black uppercase text-slate-400 dark:text-navy-600 tracking-widest px-1">Sample Pic / Link</label>
+                            <label className="text-[13px] font-semibold text-slate-400 dark:text-navy-600 px-1">Sample Pic / Link</label>
                             <div 
-                              onDragOver={e => { e.preventDefault(); e.currentTarget.classList.add('border-[#FFD500]', 'bg-yellow-50/30'); }}
-                              onDragLeave={e => { e.currentTarget.classList.remove('border-[#FFD500]', 'bg-yellow-50/30'); }}
+                              onDragOver={e => { e.preventDefault(); e.currentTarget.classList.add('border-[#2563EB]', 'bg-yellow-50/30'); }}
+                              onDragLeave={e => { e.currentTarget.classList.remove('border-[#2563EB]', 'bg-yellow-50/30'); }}
                               onDrop={e => {
                                 e.preventDefault();
-                                e.currentTarget.classList.remove('border-[#FFD500]', 'bg-yellow-50/30');
+                                e.currentTarget.classList.remove('border-[#2563EB]', 'bg-yellow-50/30');
                                 const f = e.dataTransfer.files?.[0];
                                 if (f) setBulkSampleFiles(p => ({ ...p, [id]: f }));
                               }}
@@ -1334,9 +1434,9 @@ export default function I2RPage() {
                             >
                               <div className="flex-1 min-w-0">
                                 {bulkSampleFiles[id] ? (
-                                  <p className="text-[11px] font-black text-emerald-600 truncate flex items-center gap-1.5"><CheckCircleIcon className="w-3.5 h-3.5" /> {bulkSampleFiles[id].name}</p>
+                                  <p className="text-[14px] font-semibold text-emerald-600 truncate flex items-center gap-1.5"><CheckCircleIcon className="w-3.5 h-3.5" /> {bulkSampleFiles[id].name}</p>
                                 ) : (
-                                  <input type="text" value={bulkSamplePicInputs[id]||""} onChange={e => setBulkSamplePicInputs(p=>({...p,[id]:e.target.value}))} className="w-full bg-transparent border-none p-0 font-bold text-xs text-gray-900 dark:text-white outline-none placeholder:text-slate-300" placeholder="Paste URL or Drag Photo here..." />
+                                  <input type="text" value={bulkSamplePicInputs[id]||""} onChange={e => setBulkSamplePicInputs(p=>({...p,[id]:e.target.value}))} className="w-full bg-transparent border-none p-0 font-bold text-[14px] text-gray-900 dark:text-white outline-none placeholder:text-slate-300" placeholder="Paste URL or Drag Photo here..." />
                                 )}
                               </div>
                               <div className="flex items-center gap-1.5 shrink-0">
@@ -1351,21 +1451,21 @@ export default function I2RPage() {
                             </div>
                           </div>
                           <div className="space-y-1">
-                            <label className="text-[9px] font-black uppercase text-slate-400 dark:text-navy-600 tracking-widest px-1">Sample Qty</label>
-                            <input type="text" value={bulkSampleQtyInputs[id]||""} onChange={e => setBulkSampleQtyInputs(p=>({...p,[id]:e.target.value}))} className="w-full px-4 py-2 bg-slate-50 dark:bg-navy-900 border border-slate-100 dark:border-navy-800 rounded-xl font-bold text-xs text-gray-900 dark:text-white outline-none focus:border-[#003875] dark:focus:border-[#FFD500]" placeholder="Qty..." />
+                            <label className="text-[13px] font-semibold text-slate-400 dark:text-navy-600 px-1">Sample Qty</label>
+                            <input type="text" value={bulkSampleQtyInputs[id]||""} onChange={e => setBulkSampleQtyInputs(p=>({...p,[id]:e.target.value}))} className="w-full px-4 py-2 bg-slate-50 dark:bg-navy-900 border border-slate-100 dark:border-navy-800 rounded-xl font-bold text-[14px] text-gray-900 dark:text-white outline-none focus:border-[#2563EB] dark:focus:border-[#60A5FA]" placeholder="Qty..." />
                           </div>
                         </div>
-                      )}{n === 6 && (<div className="space-y-1"><label className="text-[9px] font-black uppercase text-slate-400 dark:text-navy-600 tracking-widest px-1">PO Number</label><input type="text" value={bulkPOInputs[id]||""} onChange={e => setBulkPOInputs(p=>({...p,[id]:e.target.value}))} className="w-full px-4 py-2 bg-slate-50 dark:bg-navy-900 border border-slate-100 dark:border-navy-800 rounded-xl font-bold text-xs text-gray-900 dark:text-white outline-none focus:border-[#003875] dark:focus:border-[#FFD500]" placeholder="Enter PO#..." /></div>)}
+                      )}{n === 6 && (<div className="space-y-1"><label className="text-[13px] font-semibold text-slate-400 dark:text-navy-600 px-1">PO Number</label><input type="text" value={bulkPOInputs[id]||""} onChange={e => setBulkPOInputs(p=>({...p,[id]:e.target.value}))} className="w-full px-4 py-2 bg-slate-50 dark:bg-navy-900 border border-slate-100 dark:border-navy-800 rounded-xl font-bold text-[14px] text-gray-900 dark:text-white outline-none focus:border-[#2563EB] dark:focus:border-[#60A5FA]" placeholder="Enter PO#..." /></div>)}
                       {n === 8 && (
                         <div className="grid grid-cols-[1fr_120px] gap-3">
                           <div className="space-y-1">
-                            <label className="text-[9px] font-black uppercase text-slate-400 dark:text-navy-600 tracking-widest px-1">Photo / Video</label>
+                            <label className="text-[13px] font-semibold text-slate-400 dark:text-navy-600 px-1">Photo / Video</label>
                             <div
-                              onDragOver={e => { e.preventDefault(); e.currentTarget.classList.add('border-[#FFD500]', 'bg-yellow-50/30'); }}
-                              onDragLeave={e => { e.currentTarget.classList.remove('border-[#FFD500]', 'bg-yellow-50/30'); }}
+                              onDragOver={e => { e.preventDefault(); e.currentTarget.classList.add('border-[#2563EB]', 'bg-yellow-50/30'); }}
+                              onDragLeave={e => { e.currentTarget.classList.remove('border-[#2563EB]', 'bg-yellow-50/30'); }}
                               onDrop={e => {
                                 e.preventDefault();
-                                e.currentTarget.classList.remove('border-[#FFD500]', 'bg-yellow-50/30');
+                                e.currentTarget.classList.remove('border-[#2563EB]', 'bg-yellow-50/30');
                                 const f = e.dataTransfer.files?.[0];
                                 if (f) setBulkPhotoFiles(p => ({ ...p, [id]: f }));
                               }}
@@ -1373,9 +1473,9 @@ export default function I2RPage() {
                             >
                               <div className="flex-1 min-w-0">
                                 {bulkPhotoFiles[id] ? (
-                                  <p className="text-[11px] font-black text-emerald-600 truncate flex items-center gap-1.5"><CheckCircleIcon className="w-3.5 h-3.5" /> {bulkPhotoFiles[id].name}</p>
+                                  <p className="text-[14px] font-semibold text-emerald-600 truncate flex items-center gap-1.5"><CheckCircleIcon className="w-3.5 h-3.5" /> {bulkPhotoFiles[id].name}</p>
                                 ) : (
-                                  <input type="text" value={bulkPhotoPicInputs[id] || ""} onChange={e => setBulkPhotoPicInputs(p => ({ ...p, [id]: e.target.value }))} className="w-full bg-transparent border-none p-0 font-bold text-xs text-gray-900 dark:text-white outline-none placeholder:text-slate-300" placeholder="Paste URL or Drag Photo/Video here..." />
+                                  <input type="text" value={bulkPhotoPicInputs[id] || ""} onChange={e => setBulkPhotoPicInputs(p => ({ ...p, [id]: e.target.value }))} className="w-full bg-transparent border-none p-0 font-bold text-[14px] text-gray-900 dark:text-white outline-none placeholder:text-slate-300" placeholder="Paste URL or Drag Photo/Video here..." />
                                 )}
                               </div>
                               <div className="flex items-center gap-1.5 shrink-0">
@@ -1391,18 +1491,18 @@ export default function I2RPage() {
                           </div>
                         </div>
                       )}
-                      {n === 9 && (<div className="space-y-1"><label className="text-[9px] font-black uppercase text-slate-400 dark:text-navy-600 tracking-widest px-1">Cargo</label><select value={bulkCargoInputs[id]||""} onChange={e => setBulkCargoInputs(p=>({...p,[id]:e.target.value}))} className="w-full px-4 py-2 bg-slate-50 dark:bg-navy-900 border border-slate-100 dark:border-navy-800 rounded-xl font-bold text-xs text-gray-900 dark:text-white outline-none focus:border-[#003875] dark:focus:border-[#FFD500]"><option value="">Select Cargo</option><option value="Navy">Navy</option><option value="By Air">By Air</option><option value="Neelkanth">Neelkanth</option><option value="Self">Self</option></select></div>)}
-                      {n === 10 && (<div className="space-y-1"><label className="text-[9px] font-black uppercase text-slate-400 dark:text-navy-600 tracking-widest px-1">Received Qty</label><input type="text" value={bulkReceivedQtyInputs[id]||""} onChange={e => setBulkReceivedQtyInputs(p=>({...p,[id]:e.target.value}))} className="w-full px-4 py-2 bg-slate-50 dark:bg-navy-900 border border-slate-100 dark:border-navy-800 rounded-xl font-bold text-xs text-gray-900 dark:text-white outline-none focus:border-[#003875] dark:focus:border-[#FFD500]" placeholder="Enter qty..." /></div>)}
-                      {![3,4,5,6,8,9,10].includes(n) && (<p className="text-[10px] font-black text-slate-300 dark:text-navy-700 uppercase tracking-widest italic">Standard status update only</p>)}</div>)}</div>
-                      <div className="flex items-center gap-3 pr-2"><p className={`text-[9px] font-black uppercase tracking-widest ${t ? 'text-[#003875] dark:text-[#FFD500]' : 'text-slate-300 dark:text-navy-800'}`}>{t ? 'INCLUDE' : 'SKIP'}</p><button onClick={() => setBulkToggles(p => ({...p, [id]: !t}))} className={`w-10 h-5 rounded-full relative p-0.5 transition-all shadow-inner ${t ? "bg-[#003875] dark:bg-[#FFD500]" : "bg-slate-200 dark:bg-navy-700"}`}><div className={`w-4 h-4 bg-white dark:bg-navy-900 rounded-full shadow-md transition-all transform duration-300 ${t ? "translate-x-5" : "translate-x-0"}`} /></button></div>
+                      {n === 9 && (<div className="space-y-1"><label className="text-[13px] font-semibold text-slate-400 dark:text-navy-600 px-1">Cargo</label><select value={bulkCargoInputs[id]||""} onChange={e => setBulkCargoInputs(p=>({...p,[id]:e.target.value}))} className="w-full px-4 py-2 bg-slate-50 dark:bg-navy-900 border border-slate-100 dark:border-navy-800 rounded-xl font-bold text-[14px] text-gray-900 dark:text-white outline-none focus:border-[#2563EB] dark:focus:border-[#60A5FA]"><option value="">Select Cargo</option><option value="Navy">Navy</option><option value="By Air">By Air</option><option value="Neelkanth">Neelkanth</option><option value="Self">Self</option></select></div>)}
+                      {n === 10 && (<div className="space-y-1"><label className="text-[13px] font-semibold text-slate-400 dark:text-navy-600 px-1">Received Qty</label><input type="text" value={bulkReceivedQtyInputs[id]||""} onChange={e => setBulkReceivedQtyInputs(p=>({...p,[id]:e.target.value}))} className="w-full px-4 py-2 bg-slate-50 dark:bg-navy-900 border border-slate-100 dark:border-navy-800 rounded-xl font-bold text-[14px] text-gray-900 dark:text-white outline-none focus:border-[#2563EB] dark:focus:border-[#60A5FA]" placeholder="Enter qty..." /></div>)}
+                      {![3,4,5,6,8,9,10].includes(n) && (<p className="text-[13px] font-semibold text-slate-300 dark:text-navy-700 italic">Standard status update only</p>)}</div>)}</div>
+                      <div className="flex items-center gap-3 pr-2"><p className={`text-[13px] font-semibold   ${t ? 'text-[#2563EB] dark:text-[#60A5FA]' : 'text-slate-300 dark:text-navy-800'}`}>{t ? 'INCLUDE' : 'SKIP'}</p><button onClick={() => setBulkToggles(p => ({...p, [id]: !t}))} className={`w-10 h-5 rounded-full relative p-0.5 transition-all shadow-inner ${t ? "bg-[#2563EB] dark:bg-[#60A5FA]" : "bg-slate-200 dark:bg-navy-700"}`}><div className={`w-4 h-4 bg-white dark:bg-navy-900 rounded-full shadow-md transition-all transform duration-300 ${t ? "translate-x-5" : "translate-x-0"}`} /></button></div>
                     </div>
                   </div>
                 );
               })}
             </div>
-            <div className="absolute bottom-0 left-0 right-0 py-3.5 px-10 bg-[#FEFBF0] dark:bg-navy-800 border-t border-slate-100 dark:border-navy-700 flex items-center justify-between shadow-[0_-10px_30px_rgba(0,0,0,0.05)]">
-              <button onClick={() => setIsBulkModalOpen(false)} className="px-6 py-3 text-[11px] font-black uppercase text-slate-400 dark:text-navy-600 hover:text-slate-800 dark:hover:text-white transition-all">Cancel</button>
-              <button onClick={handleBulkStepSave} className="flex items-center gap-2.5 bg-[#003875] dark:bg-[#FFD500] text-[#FFD500] dark:text-navy-950 px-10 py-3.5 rounded-2xl font-black text-xs uppercase tracking-[0.1em] shadow-lg hover:scale-[1.02] active:scale-95 transition-all border-b-4 border-[#001a33] dark:border-navy-950"><SparklesIcon className="w-4 h-4" /> Execute Bulk Update</button>
+            <div className="absolute bottom-0 left-0 right-0 py-3.5 px-10 bg-[#FFFFFF] dark:bg-navy-800 border-t border-slate-100 dark:border-navy-700 flex items-center justify-between shadow-[0_-10px_30px_rgba(0,0,0,0.05)]">
+              <button onClick={() => setIsBulkModalOpen(false)} className="px-6 py-3 text-[14px] font-semibold text-slate-400 dark:text-navy-600 hover:text-slate-800 dark:hover:text-white transition-all">Cancel</button>
+              <button onClick={handleBulkStepSave} className="flex items-center gap-2.5 bg-[#2563EB] dark:bg-[#60A5FA] text-white dark:text-navy-950 px-10 py-3.5 rounded-2xl font-semibold text-[14px] shadow-lg hover:scale-[1.02] active:scale-95 transition-all border-b-4 border-[#1D4ED8] dark:border-navy-950"><SparklesIcon className="w-4 h-4" /> Execute Bulk Update</button>
             </div>
           </div>
         </div>
@@ -1411,26 +1511,26 @@ export default function I2RPage() {
       {/* Config Modal */}
       {isConfigModalOpen && (
         <div className="fixed inset-0 z-[1200] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-[#001a33]/60 backdrop-blur-md" onClick={() => setIsConfigModalOpen(false)} />
-          <div className="relative bg-[#FEFBF0] dark:bg-navy-800 w-full max-w-4xl rounded-[3.5rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-500">
-            <div className="px-10 pt-6 pb-3 bg-[#FEFBF0] dark:bg-navy-800 flex items-start justify-between relative shrink-0">
-              <div><h2 className="text-[26px] font-black italic uppercase tracking-tighter text-[#003875] dark:text-white leading-none">System Configuration</h2><p className="text-[10px] font-black uppercase tracking-[0.2em] mt-1 text-slate-400 dark:text-navy-600">Define TAT and Operators</p></div>
+          <div className="absolute inset-0 bg-[#1D4ED8]/60 backdrop-blur-md" onClick={() => setIsConfigModalOpen(false)} />
+          <div className="relative bg-[#FFFFFF] dark:bg-navy-800 w-full max-w-4xl rounded-[3.5rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-500">
+            <div className="px-10 pt-6 pb-3 bg-[#FFFFFF] dark:bg-navy-800 flex items-start justify-between relative shrink-0">
+              <div><h2 className="text-[26px] font-semibold italic tracking-tighter text-[#2563EB] dark:text-white leading-none">System Configuration</h2><p className="text-[13px] font-semibold mt-1 text-slate-400 dark:text-navy-600">Define TAT and Operators</p></div>
               <button onClick={() => setIsConfigModalOpen(false)} className="p-2 hover:bg-slate-100 dark:hover:bg-navy-800 rounded-full transition-all text-slate-400 hover:text-slate-900 dark:hover:text-white absolute top-5 right-8"><XMarkIcon className="w-6 h-6" /></button>
             </div>
             <div className="flex-1 overflow-y-auto px-10 pb-24 space-y-3 custom-scrollbar">
               {stepConfigs.map((cfg, i) => (
                 <div key={i} className="p-5 bg-white dark:bg-navy-900 rounded-3xl border border-slate-100 dark:border-navy-700 shadow-sm hover:shadow-md transition-all group">
                   <div className="grid grid-cols-[1fr_200px_350px] items-center gap-8">
-                    <div className="space-y-0.5"><p className="text-[9px] font-black uppercase text-slate-400 dark:text-navy-600 tracking-widest">Step {i+1}</p><h3 className="text-[13px] font-black uppercase text-[#003875] dark:text-white tracking-tight leading-tight">{cfg.step_name}</h3></div>
-                    <div className="flex flex-col gap-1.5"><div className="flex items-center gap-1.5 text-slate-400 dark:text-navy-600"><ClockIcon className="w-3 h-3" /><p className="text-[9px] font-black uppercase tracking-widest">TAT</p></div><div className="flex items-center gap-2"><div className="bg-slate-100 dark:bg-navy-900 p-0.5 rounded-full flex items-center border border-slate-200 dark:border-navy-800"><button onClick={() => { const n = [...stepConfigs]; n[i].tat = n[i].tat.replace("Days", "Hrs"); setStepConfigs(n); }} className={`px-3 py-1 rounded-full text-[8px] font-black uppercase transition-all ${cfg.tat.includes("Hrs") ? "bg-[#FFD500] text-[#003875] shadow-md" : "text-slate-400 dark:text-navy-600"}`}>HRS</button><button onClick={() => { const n = [...stepConfigs]; n[i].tat = n[i].tat.replace("Hrs", "Days"); setStepConfigs(n); }} className={`px-3 py-1 rounded-full text-[8px] font-black uppercase transition-all ${cfg.tat.includes("Days") ? "bg-[#FFD500] text-[#003875] shadow-md" : "text-slate-400"}`}>DAYS</button></div><input type="text" value={parseFloat(cfg.tat)} onChange={e => { const n = [...stepConfigs]; const unit = cfg.tat.includes("Days") ? "Days" : "Hrs"; n[i].tat = `${e.target.value} ${unit}`; setStepConfigs(n); }} className="w-12 h-8 bg-slate-50 dark:bg-navy-800 border-none rounded-lg text-center font-black text-xs text-[#003875] dark:text-[#FFD500] outline-none" /></div></div>
-                    <div className="flex flex-col gap-1.5"><div className="flex items-center gap-1.5 text-slate-400 dark:text-navy-600"><UserIcon className="w-3 h-3" /><p className="text-[9px] font-black uppercase tracking-widest">Responsible Operator</p></div><UserMultiCombobox value={cfg.responsible_person} isSimple onChange={val => { const n = [...stepConfigs]; n[i].responsible_person = val; setStepConfigs(n); }} users={usersList} /></div>
+                    <div className="space-y-0.5"><p className="text-[13px] font-semibold text-slate-400 dark:text-navy-600">Step {i+1}</p><h3 className="text-[13px] font-semibold text-[#2563EB] dark:text-white tracking-tight leading-tight">{cfg.step_name}</h3></div>
+                    <div className="flex flex-col gap-1.5"><div className="flex items-center gap-1.5 text-slate-400 dark:text-navy-600"><ClockIcon className="w-3 h-3" /><p className="text-[13px] font-semibold">TAT</p></div><div className="flex items-center gap-2"><div className="bg-slate-100 dark:bg-navy-900 p-0.5 rounded-full flex items-center border border-slate-200 dark:border-navy-800"><button onClick={() => { const n = [...stepConfigs]; n[i].tat = n[i].tat.replace("Days", "Hrs"); setStepConfigs(n); }} className={`px-3 py-1 rounded-full text-[12px] font-semibold  transition-all ${cfg.tat.includes("Hrs") ? "bg-[#2563EB] text-white shadow-md" : "text-slate-400 dark:text-navy-600"}`}>HRS</button><button onClick={() => { const n = [...stepConfigs]; n[i].tat = n[i].tat.replace("Hrs", "Days"); setStepConfigs(n); }} className={`px-3 py-1 rounded-full text-[12px] font-semibold  transition-all ${cfg.tat.includes("Days") ? "bg-[#2563EB] text-white shadow-md" : "text-slate-400"}`}>DAYS</button></div><input type="text" value={parseFloat(cfg.tat)} onChange={e => { const n = [...stepConfigs]; const unit = cfg.tat.includes("Days") ? "Days" : "Hrs"; n[i].tat = `${e.target.value} ${unit}`; setStepConfigs(n); }} className="w-12 h-8 bg-slate-50 dark:bg-navy-800 border-none rounded-lg text-center font-semibold text-[14px] text-[#2563EB] dark:text-[#60A5FA] outline-none" /></div></div>
+                    <div className="flex flex-col gap-1.5"><div className="flex items-center gap-1.5 text-slate-400 dark:text-navy-600"><UserIcon className="w-3 h-3" /><p className="text-[13px] font-semibold">Responsible Operator</p></div><UserMultiCombobox value={cfg.responsible_person} isSimple onChange={val => { const n = [...stepConfigs]; n[i].responsible_person = val; setStepConfigs(n); }} users={usersList} /></div>
                   </div>
                 </div>
               ))}
             </div>
-            <div className="absolute bottom-0 left-0 right-0 py-3.5 px-10 bg-[#FEFBF0] dark:bg-navy-800 border-t border-slate-100 dark:border-navy-700 flex items-center justify-between shadow-[0_-10px_30px_rgba(0,0,0,0.05)]">
-              <button onClick={() => setIsConfigModalOpen(false)} className="px-6 py-3 text-[11px] font-black uppercase text-slate-400 dark:text-navy-600 hover:text-slate-800 dark:hover:text-white transition-all">Cancel</button>
-              <button onClick={handleSaveConfig} className="flex items-center gap-2.5 bg-[#003875] dark:bg-[#FFD500] text-[#FFD500] dark:text-navy-950 px-10 py-3.5 rounded-2xl font-black text-xs uppercase tracking-[0.1em] shadow-lg hover:scale-[1.02] active:scale-95 transition-all border-b-4 border-[#001a33] dark:border-navy-950"><Cog6ToothIcon className="w-4 h-4" /> Save Configuration</button>
+            <div className="absolute bottom-0 left-0 right-0 py-3.5 px-10 bg-[#FFFFFF] dark:bg-navy-800 border-t border-slate-100 dark:border-navy-700 flex items-center justify-between shadow-[0_-10px_30px_rgba(0,0,0,0.05)]">
+              <button onClick={() => setIsConfigModalOpen(false)} className="px-6 py-3 text-[14px] font-semibold text-slate-400 dark:text-navy-600 hover:text-slate-800 dark:hover:text-white transition-all">Cancel</button>
+              <button onClick={handleSaveConfig} className="flex items-center gap-2.5 bg-[#2563EB] dark:bg-[#60A5FA] text-white dark:text-navy-950 px-10 py-3.5 rounded-2xl font-semibold text-[14px] shadow-lg hover:scale-[1.02] active:scale-95 transition-all border-b-4 border-[#1D4ED8] dark:border-navy-950"><Cog6ToothIcon className="w-4 h-4" /> Save Configuration</button>
             </div>
           </div>
         </div>
@@ -1440,25 +1540,25 @@ export default function I2RPage() {
       {/* Remove Follow Up Modal */}
       {isRemoveFollowUpModalOpen && (
         <div className="fixed inset-0 z-[1300] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-[#001a33]/60 backdrop-blur-md" onClick={() => setIsRemoveFollowUpModalOpen(false)} />
+          <div className="absolute inset-0 bg-[#1D4ED8]/60 backdrop-blur-md" onClick={() => setIsRemoveFollowUpModalOpen(false)} />
           <div className="relative bg-white dark:bg-navy-800 w-full max-w-md rounded-3xl shadow-2xl overflow-hidden flex flex-col p-8 animate-in zoom-in-95 duration-300">
             <div className="flex items-start justify-between mb-6">
               <div>
-                <h2 className="text-xl font-black text-[#003875] dark:text-white uppercase leading-none">Remove Follow Up</h2>
-                <p className="text-[10px] font-black text-purple-600 dark:text-purple-400 mt-2 uppercase">ID: {targetItemForRemoveFollowUp?.id}</p>
+                <h2 className="text-xl font-semibold text-[#2563EB] dark:text-white leading-none">Remove Follow Up</h2>
+                <p className="text-[13px] font-semibold text-purple-600 dark:text-purple-400 mt-2">ID: {targetItemForRemoveFollowUp?.id}</p>
               </div>
               <button onClick={() => setIsRemoveFollowUpModalOpen(false)} className="text-slate-300 dark:text-navy-700 hover:text-slate-900 dark:hover:text-white transition-colors"><XMarkIcon className="w-6 h-6" /></button>
             </div>
 
             <div className="space-y-6">
               <div>
-                <label className="text-[11px] font-black text-slate-800 dark:text-white/80 uppercase block mb-3">Select Step to Reset</label>
+                <label className="text-[14px] font-semibold text-slate-800 dark:text-white/80 block mb-3">Select Step to Reset</label>
                 <div className="grid grid-cols-5 gap-2">
                   {Array.from({ length: I2R_STEP_SHORT.length }, (_, i) => i + 1).map(s => (
                     <button
                       key={s}
                       onClick={() => setRemoveFollowUpStep(s)}
-                      className={`py-2 rounded-xl text-[10px] font-black transition-all border-2 ${
+                      className={`py-2 rounded-xl text-[13px] font-semibold transition-all border-2 ${
                         removeFollowUpStep === s 
                           ? "bg-purple-500 border-purple-500 text-white shadow-lg scale-110 z-10" 
                           : "bg-slate-50 dark:bg-navy-900 border-slate-100 dark:border-navy-700 text-slate-400 dark:text-navy-600 hover:border-purple-200 dark:hover:border-purple-900"
@@ -1468,13 +1568,13 @@ export default function I2RPage() {
                     </button>
                   ))}
                 </div>
-                <p className="mt-2 text-[10px] font-bold text-slate-400 dark:text-navy-600 italic">
+                <p className="mt-2 text-[13px] font-bold text-slate-400 dark:text-navy-600 italic">
                   {I2R_STEP_SHORT[removeFollowUpStep-1]}
                 </p>
               </div>
 
               <div className="space-y-3">
-                <label className="text-[11px] font-black text-slate-800 dark:text-white/80 uppercase block">Removal Logic</label>
+                <label className="text-[14px] font-semibold text-slate-800 dark:text-white/80 block">Removal Logic</label>
                 <div className="flex gap-3">
                   <button
                     onClick={() => setRemoveFollowUpType('particular')}
@@ -1486,9 +1586,9 @@ export default function I2RPage() {
                   >
                     <div className="flex items-center gap-2 mb-1">
                       <div className={`w-3 h-3 rounded-full border-2 ${removeFollowUpType === 'particular' ? "border-purple-500 bg-purple-500" : "border-slate-300 dark:border-navy-700"}`} />
-                      <span className={`text-[11px] font-black uppercase ${removeFollowUpType === 'particular' ? "text-purple-600 dark:text-purple-400" : "text-slate-500 dark:text-navy-400"}`}>Particular Step</span>
+                      <span className={`text-[14px] font-semibold  ${removeFollowUpType === 'particular' ? "text-purple-600 dark:text-purple-400" : "text-slate-500 dark:text-navy-400"}`}>Particular Step</span>
                     </div>
-                    <p className="text-[9px] font-bold text-slate-400 dark:text-navy-600 leading-tight">Only reset the selected step. Keeps planned time.</p>
+                    <p className="text-[13px] font-bold text-slate-400 dark:text-navy-600 leading-tight">Only reset the selected step. Keeps planned time.</p>
                   </button>
                   <button
                     onClick={() => setRemoveFollowUpType('onwards')}
@@ -1500,24 +1600,24 @@ export default function I2RPage() {
                   >
                     <div className="flex items-center gap-2 mb-1">
                       <div className={`w-3 h-3 rounded-full border-2 ${removeFollowUpType === 'onwards' ? "border-purple-500 bg-purple-500" : "border-slate-300 dark:border-navy-700"}`} />
-                      <span className={`text-[11px] font-black uppercase ${removeFollowUpType === 'onwards' ? "text-purple-600 dark:text-purple-400" : "text-slate-500 dark:text-navy-400"}`}>Step Onwards</span>
+                      <span className={`text-[14px] font-semibold  ${removeFollowUpType === 'onwards' ? "text-purple-600 dark:text-purple-400" : "text-slate-500 dark:text-navy-400"}`}>Step Onwards</span>
                     </div>
-                    <p className="text-[9px] font-bold text-slate-400 dark:text-navy-600 leading-tight">Reset selected step & remove all future steps.</p>
+                    <p className="text-[13px] font-bold text-slate-400 dark:text-navy-600 leading-tight">Reset selected step & remove all future steps.</p>
                   </button>
                 </div>
               </div>
 
               <div className="p-4 bg-orange-50 dark:bg-orange-900/10 rounded-2xl border border-orange-100 dark:border-orange-900/20 flex gap-3">
                 <ExclamationCircleIcon className="w-5 h-5 text-orange-500 shrink-0" />
-                <p className="text-[10px] font-bold text-orange-700 dark:text-orange-400 leading-relaxed">
+                <p className="text-[13px] font-bold text-orange-700 dark:text-orange-400 leading-relaxed">
                   This action will clear "Actual" dates and extra details (Supplier, PO, etc) for selected steps. Planned time for Step {removeFollowUpStep} will be preserved.
                 </p>
               </div>
             </div>
 
             <div className="flex gap-4 mt-8">
-              <button onClick={() => setIsRemoveFollowUpModalOpen(false)} className="flex-1 py-3.5 bg-white dark:bg-navy-800 border border-slate-200 dark:border-navy-700 text-slate-500 dark:text-navy-400 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-slate-50 dark:hover:bg-navy-700 transition-all">Cancel</button>
-              <button onClick={handleRemoveFollowUp} className="flex-1 py-3.5 bg-purple-600 dark:bg-purple-500 text-white rounded-xl font-black text-xs uppercase tracking-widest hover:bg-purple-700 dark:hover:bg-purple-400 transition-all shadow-lg active:scale-95">Reset Step</button>
+              <button onClick={() => setIsRemoveFollowUpModalOpen(false)} className="flex-1 py-3.5 bg-white dark:bg-navy-800 border border-slate-200 dark:border-navy-700 text-slate-500 dark:text-navy-400 rounded-xl font-semibold text-[14px] hover:bg-slate-50 dark:hover:bg-navy-700 transition-all">Cancel</button>
+              <button onClick={handleRemoveFollowUp} className="flex-1 py-3.5 bg-purple-600 dark:bg-purple-500 text-white rounded-xl font-semibold text-[14px] hover:bg-purple-700 dark:hover:bg-purple-400 transition-all shadow-lg active:scale-95">Reset Step</button>
             </div>
           </div>
         </div>
@@ -1526,13 +1626,13 @@ export default function I2RPage() {
       {/* Make PO Modal */}
       {isPOModalOpen && (
         <div className="fixed inset-0 z-[1200] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-[#001a33]/40 backdrop-blur-sm" onClick={() => setIsPOModalOpen(false)} />
+          <div className="absolute inset-0 bg-[#1D4ED8]/40 backdrop-blur-sm" onClick={() => setIsPOModalOpen(false)} />
           <div className="relative bg-white dark:bg-navy-900 w-full max-w-xl rounded-3xl shadow-2xl border border-slate-200 dark:border-white/10 overflow-hidden flex flex-col animate-in zoom-in-95 duration-300">
             {/* Cream Header */}
-            <div className="p-6 pb-4 bg-[#FFFBF0] dark:bg-navy-950 border-b border-orange-100/50 dark:border-zinc-800 flex items-start justify-between">
+            <div className="p-6 pb-4 bg-[#FFFFFF] dark:bg-navy-950 border-b border-orange-100/50 dark:border-zinc-800 flex items-start justify-between">
               <div>
-                <h2 className="text-2xl font-black text-[#003875] dark:text-white uppercase leading-none">Make PO / GRN Entry</h2>
-                <p className="text-[12px] font-black text-blue-600 dark:text-[#FFD500] mt-2 uppercase tracking-widest flex items-center gap-2">
+                <h2 className="text-2xl font-semibold text-[#2563EB] dark:text-white leading-none">Make PO / GRN Entry</h2>
+                <p className="text-[14px] font-semibold text-blue-600 dark:text-[#60A5FA] mt-2 flex items-center gap-2">
                    <HashtagIcon className="w-3.5 h-3.5" />
                    INDT- {poFormData.indent_id}
                 </p>
@@ -1545,92 +1645,92 @@ export default function I2RPage() {
               <div className="col-span-2 space-y-6">
                 {/* Section: Basic Info */}
                 <div className="space-y-4">
-                  <p className="text-[10px] font-black text-[#FFD500] uppercase tracking-[0.2em] mb-1">Source Information</p>
-                  <div className="h-0.5 w-10 bg-[#FFD500] rounded-full"></div>
+                  <p className="text-[13px] font-semibold text-[#2563EB] mb-1">Source Information</p>
+                  <div className="h-0.5 w-10 bg-[#2563EB] rounded-full"></div>
                   
                   <div className="grid grid-cols-3 gap-4">
                     <div className="space-y-1">
-                      <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
+                      <label className="text-[13px] font-semibold text-gray-400 flex items-center gap-1.5">
                         <CubeIcon className="w-3 h-3" />
                         Item Name
                       </label>
-                      <input type="text" value={poFormData.Item_Name} onChange={e => setPoFormData({...poFormData, Item_Name: e.target.value})} placeholder="Enter Item Name" className="w-full px-4 py-2.5 bg-[#FFFBF0] dark:bg-zinc-900 border border-orange-100/50 dark:border-zinc-800 rounded-xl font-bold text-xs text-gray-900 dark:text-white outline-none focus:border-[#FFD500] focus:bg-[#FFFBF0] dark:focus:bg-zinc-900 transition-all shadow-sm" />
+                      <input type="text" value={poFormData.Item_Name} onChange={e => setPoFormData({...poFormData, Item_Name: e.target.value})} placeholder="Enter Item Name" className="w-full px-4 py-2.5 bg-[#FFFFFF] dark:bg-zinc-900 border border-orange-100/50 dark:border-zinc-800 rounded-xl font-bold text-[14px] text-gray-900 dark:text-white outline-none focus:border-[#2563EB] focus:bg-[#FFFFFF] dark:focus:bg-zinc-900 transition-all shadow-sm" />
                     </div>
                     <div className="space-y-1">
-                      <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
+                      <label className="text-[13px] font-semibold text-gray-400 flex items-center gap-1.5">
                         <TagIcon className="w-3 h-3" />
                         Category
                       </label>
-                      <input type="text" value={poFormData.Category} readOnly className="w-full px-4 py-2.5 bg-[#FFFBF0] dark:bg-zinc-900 border border-orange-100/50 dark:border-zinc-800 rounded-xl font-bold text-xs text-slate-500 cursor-not-allowed outline-none" />
+                      <input type="text" value={poFormData.Category} readOnly className="w-full px-4 py-2.5 bg-[#FFFFFF] dark:bg-zinc-900 border border-orange-100/50 dark:border-zinc-800 rounded-xl font-bold text-[14px] text-slate-500 cursor-not-allowed outline-none" />
                     </div>
                     <div className="space-y-1">
-                      <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
+                      <label className="text-[13px] font-semibold text-gray-400 flex items-center gap-1.5">
                         <UserIcon className="w-3 h-3" />
                         Filled By
                       </label>
-                      <input type="text" value={poFormData.filled_by} readOnly className="w-full px-4 py-2.5 bg-[#FFFBF0] dark:bg-zinc-900 border border-orange-100/50 dark:border-zinc-800 rounded-xl font-bold text-xs text-slate-500 cursor-not-allowed outline-none" />
+                      <input type="text" value={poFormData.filled_by} readOnly className="w-full px-4 py-2.5 bg-[#FFFFFF] dark:bg-zinc-900 border border-orange-100/50 dark:border-zinc-800 rounded-xl font-bold text-[14px] text-slate-500 cursor-not-allowed outline-none" />
                     </div>
                   </div>
                 </div>
 
                 {/* Section: PO Details */}
                 <div className="space-y-4 pt-2">
-                  <p className="text-[10px] font-black text-[#FFD500] uppercase tracking-[0.2em] mb-1">PO / GRN Details</p>
-                  <div className="h-0.5 w-10 bg-[#FFD500] rounded-full"></div>
+                  <p className="text-[13px] font-semibold text-[#2563EB] mb-1">PO / GRN Details</p>
+                  <div className="h-0.5 w-10 bg-[#2563EB] rounded-full"></div>
 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
+                      <label className="text-[13px] font-semibold text-gray-400 flex items-center gap-1.5">
                         <HashtagIcon className="w-3 h-3" />
                         PO Number <span className="text-red-500 ml-0.5">*</span>
                       </label>
-                      <input type="text" value={poFormData.PO_Number} onChange={e => setPoFormData({...poFormData, PO_Number: e.target.value})} placeholder="Enter PO Number" className="w-full px-4 py-3 bg-[#FFFBF0] dark:bg-zinc-900 border border-orange-100/50 dark:border-zinc-800 rounded-xl font-bold text-sm text-gray-900 dark:text-white outline-none focus:border-[#FFD500] focus:bg-[#FFFBF0] dark:focus:bg-zinc-900 transition-all shadow-sm" />
+                      <input type="text" value={poFormData.PO_Number} onChange={e => setPoFormData({...poFormData, PO_Number: e.target.value})} placeholder="Enter PO Number" className="w-full px-4 py-3 bg-[#FFFFFF] dark:bg-zinc-900 border border-orange-100/50 dark:border-zinc-800 rounded-xl font-bold text-sm text-gray-900 dark:text-white outline-none focus:border-[#2563EB] focus:bg-[#FFFFFF] dark:focus:bg-zinc-900 transition-all shadow-sm" />
                     </div>
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
+                      <label className="text-[13px] font-semibold text-gray-400 flex items-center gap-1.5">
                         <QueueListIcon className="w-3 h-3" />
                         Quantity <span className="text-red-500 ml-0.5">*</span>
                       </label>
-                      <input type="text" value={poFormData.Qty} onChange={e => setPoFormData({...poFormData, Qty: e.target.value})} placeholder="Enter Quantity" className="w-full px-4 py-3 bg-[#FFFBF0] dark:bg-zinc-900 border border-orange-100/50 dark:border-zinc-800 rounded-xl font-bold text-sm text-gray-900 dark:text-white outline-none focus:border-[#FFD500] focus:bg-[#FFFBF0] dark:focus:bg-zinc-900 transition-all shadow-sm" />
+                      <input type="text" value={poFormData.Qty} onChange={e => setPoFormData({...poFormData, Qty: e.target.value})} placeholder="Enter Quantity" className="w-full px-4 py-3 bg-[#FFFFFF] dark:bg-zinc-900 border border-orange-100/50 dark:border-zinc-800 rounded-xl font-bold text-sm text-gray-900 dark:text-white outline-none focus:border-[#2563EB] focus:bg-[#FFFFFF] dark:focus:bg-zinc-900 transition-all shadow-sm" />
                     </div>
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
+                      <label className="text-[13px] font-semibold text-gray-400 flex items-center gap-1.5">
                         <GlobeAltIcon className="w-3 h-3" />
                         Country
                       </label>
-                      <select value={poFormData.Country} onChange={e => setPoFormData({...poFormData, Country: e.target.value})} className="w-full px-4 py-3 bg-[#FFFBF0] dark:bg-zinc-900 border border-orange-100/50 dark:border-zinc-800 rounded-xl font-bold text-sm text-gray-900 dark:text-white outline-none focus:border-[#FFD500] focus:bg-[#FFFBF0] dark:focus:bg-zinc-900 transition-all shadow-sm cursor-pointer">
+                      <select value={poFormData.Country} onChange={e => setPoFormData({...poFormData, Country: e.target.value})} className="w-full px-4 py-3 bg-[#FFFFFF] dark:bg-zinc-900 border border-orange-100/50 dark:border-zinc-800 rounded-xl font-bold text-sm text-gray-900 dark:text-white outline-none focus:border-[#2563EB] focus:bg-[#FFFFFF] dark:focus:bg-zinc-900 transition-all shadow-sm cursor-pointer">
                         <option value="">Select Country</option>
                         <option value="India">India</option>
                         <option value="China">China</option>
                       </select>
                     </div>
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
+                      <label className="text-[13px] font-semibold text-gray-400 flex items-center gap-1.5">
                         <CalendarIcon className="w-3 h-3" />
                         Payment Terms (Days)
                       </label>
-                      <input type="text" value={poFormData.Payment_Terms_In_days} onChange={e => setPoFormData({...poFormData, Payment_Terms_In_days: e.target.value})} placeholder="Enter Days" className="w-full px-4 py-3 bg-[#FFFBF0] dark:bg-zinc-900 border border-orange-100/50 dark:border-zinc-800 rounded-xl font-bold text-sm text-gray-900 dark:text-white outline-none focus:border-[#FFD500] focus:bg-[#FFFBF0] dark:focus:bg-zinc-900 transition-all shadow-sm" />
+                      <input type="text" value={poFormData.Payment_Terms_In_days} onChange={e => setPoFormData({...poFormData, Payment_Terms_In_days: e.target.value})} placeholder="Enter Days" className="w-full px-4 py-3 bg-[#FFFFFF] dark:bg-zinc-900 border border-orange-100/50 dark:border-zinc-800 rounded-xl font-bold text-sm text-gray-900 dark:text-white outline-none focus:border-[#2563EB] focus:bg-[#FFFFFF] dark:focus:bg-zinc-900 transition-all shadow-sm" />
                     </div>
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
+                      <label className="text-[13px] font-semibold text-gray-400 flex items-center gap-1.5">
                         <CheckBadgeIcon className="w-3 h-3" />
                         Payment Completed
                       </label>
-                      <select value={poFormData.Payment_Completed} onChange={e => setPoFormData({...poFormData, Payment_Completed: e.target.value})} className="w-full px-4 py-3 bg-[#FFFBF0] dark:bg-zinc-900 border border-orange-100/50 dark:border-zinc-800 rounded-xl font-bold text-sm text-gray-900 dark:text-white outline-none focus:border-[#FFD500] focus:bg-[#FFFBF0] dark:focus:bg-zinc-900 transition-all shadow-sm cursor-pointer">
+                      <select value={poFormData.Payment_Completed} onChange={e => setPoFormData({...poFormData, Payment_Completed: e.target.value})} className="w-full px-4 py-3 bg-[#FFFFFF] dark:bg-zinc-900 border border-orange-100/50 dark:border-zinc-800 rounded-xl font-bold text-sm text-gray-900 dark:text-white outline-none focus:border-[#2563EB] focus:bg-[#FFFFFF] dark:focus:bg-zinc-900 transition-all shadow-sm cursor-pointer">
                         <option value="No">No</option>
                         <option value="Yes">Yes</option>
                         <option value="Partial">Partial</option>
                       </select>
                     </div>
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
+                      <label className="text-[13px] font-semibold text-gray-400 flex items-center gap-1.5">
                         <ArchiveBoxIcon className="w-3 h-3" />
                         Packed / Unpacked
                       </label>
-                      <select value={poFormData.Packed_Unpacked} onChange={e => setPoFormData({...poFormData, Packed_Unpacked: e.target.value})} className="w-full px-4 py-3 bg-[#FFFBF0] dark:bg-zinc-900 border border-orange-100/50 dark:border-zinc-800 rounded-xl font-bold text-sm text-gray-900 dark:text-white outline-none focus:border-[#FFD500] focus:bg-[#FFFBF0] dark:focus:bg-zinc-900 transition-all shadow-sm cursor-pointer">
+                      <select value={poFormData.Packed_Unpacked} onChange={e => setPoFormData({...poFormData, Packed_Unpacked: e.target.value})} className="w-full px-4 py-3 bg-[#FFFFFF] dark:bg-zinc-900 border border-orange-100/50 dark:border-zinc-800 rounded-xl font-bold text-sm text-gray-900 dark:text-white outline-none focus:border-[#2563EB] focus:bg-[#FFFFFF] dark:focus:bg-zinc-900 transition-all shadow-sm cursor-pointer">
                         <option value="">Select</option>
                         <option value="Packed">Packed</option>
                         <option value="Unpacked">Unpacked</option>
@@ -1639,15 +1739,15 @@ export default function I2RPage() {
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
+                    <label className="text-[13px] font-semibold text-gray-400 flex items-center gap-1.5">
                       <PaperClipIcon className="w-3 h-3" />
                       Attach Bill
                     </label>
                     <div className="relative group">
                       <input type="file" id="po-bill" hidden onChange={e => setPoFile(e.target.files?.[0] || null)} />
-                      <label htmlFor="po-bill" className="flex items-center justify-between w-full px-4 py-3 bg-[#FFFBF0] dark:bg-zinc-900/50 border-2 border-dashed border-orange-100/50 dark:border-zinc-800 rounded-xl font-bold text-sm text-slate-400 cursor-pointer group-hover:border-[#FFD500] transition-all">
+                      <label htmlFor="po-bill" className="flex items-center justify-between w-full px-4 py-3 bg-[#FFFFFF] dark:bg-zinc-900/50 border-2 border-dashed border-orange-100/50 dark:border-zinc-800 rounded-xl font-bold text-sm text-slate-400 cursor-pointer group-hover:border-[#2563EB] transition-all">
                         <span className="truncate max-w-[200px]">{poFile ? poFile.name : "Choose file..."}</span>
-                        <PhotoIcon className="w-5 h-5 text-slate-300 group-hover:text-[#FFD500]" />
+                        <PhotoIcon className="w-5 h-5 text-slate-300 group-hover:text-[#2563EB]" />
                       </label>
                     </div>
                   </div>
@@ -1656,9 +1756,9 @@ export default function I2RPage() {
             </div>
 
             {/* Cream Footer */}
-            <div className="p-6 py-4 bg-[#FFFBF0] dark:bg-navy-950 border-t border-orange-100/50 dark:border-zinc-800 flex gap-4">
-              <button onClick={() => setIsPOModalOpen(false)} className="flex-1 py-3.5 bg-white dark:bg-navy-800 border border-slate-200 dark:border-navy-700 text-slate-500 dark:text-navy-400 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-slate-50 dark:hover:bg-navy-700 transition-all">Cancel</button>
-              <button onClick={handlePOSubmit} disabled={!poFormData.PO_Number || !poFormData.Qty} className="flex-1 py-3.5 bg-[#003875] dark:bg-[#FFD500] text-white dark:text-navy-950 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-[#002855] dark:hover:bg-[#FFE600] transition-all shadow-lg active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
+            <div className="p-6 py-4 bg-[#FFFFFF] dark:bg-navy-950 border-t border-orange-100/50 dark:border-zinc-800 flex gap-4">
+              <button onClick={() => setIsPOModalOpen(false)} className="flex-1 py-3.5 bg-white dark:bg-navy-800 border border-slate-200 dark:border-navy-700 text-slate-500 dark:text-navy-400 rounded-xl font-semibold text-[14px] hover:bg-slate-50 dark:hover:bg-navy-700 transition-all">Cancel</button>
+              <button onClick={handlePOSubmit} disabled={!poFormData.PO_Number || !poFormData.Qty} className="flex-1 py-3.5 bg-[#2563EB] dark:bg-[#60A5FA] text-white dark:text-navy-950 rounded-xl font-semibold text-[14px] hover:bg-[#1D4ED8] dark:hover:bg-[#1D4ED8] transition-all shadow-lg active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
                 {isUploading ? "Uploading..." : "Submit PO"}
               </button>
             </div>

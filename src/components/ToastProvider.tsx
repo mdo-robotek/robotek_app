@@ -47,7 +47,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
                             pointer-events-auto flex items-center gap-3 px-6 py-4 rounded-2xl shadow-2xl backdrop-blur-md border animate-in slide-in-from-right-10 duration-300
                             ${toast.type === 'success' ? 'bg-green-500/90 text-white border-green-400' : 
                               toast.type === 'error' ? 'bg-red-500/90 text-white border-red-400' : 
-                              'bg-[#003875]/90 text-white border-[#003875]/30'}
+                              'bg-[#2563EB]/90 text-white border-[#2563EB]/30'}
                         `}
                     >
                         {toast.type === 'success' && <CheckCircleIcon className="w-6 h-6" />}

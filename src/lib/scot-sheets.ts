@@ -530,13 +530,15 @@ export async function updateActivePartyData(
           values: [[rows[rowIndex][0] || partyName, active ? "TRUE" : "FALSE"]],
         },
       });
-    } else if (active) {
+    } else {
+      // Persist the record whether marking active OR inactive, so a
+      // never-touched party can be explicitly excluded (default = active).
       await sheets.spreadsheets.values.append({
         spreadsheetId,
         range: `'Active Party'!A:B`,
         valueInputOption: "USER_ENTERED",
         requestBody: {
-          values: [[partyName, "TRUE"]],
+          values: [[partyName, active ? "TRUE" : "FALSE"]],
         },
       });
     }

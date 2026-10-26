@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getAllO2DsForAnalytics } from "@/lib/o2d-sheets";
+import { getAllO2DsForAnalytics, getPendingStepIdx } from "@/lib/o2d-sheets";
+import { O2D_STEPS } from "@/types/o2d";
+import { getOrderFollowupRemarks, latestRemarkByOrder } from "@/lib/o2d-remarks-sheets";
 import { imsService } from "@/lib/ims-sheets";
 import { auth } from "@/auth";
 import { getWorkingHoursGapMs } from "@/lib/workingHours";
+import { rollupCategory } from "@/lib/category-rollup";
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -112,14 +115,21 @@ export async function GET(req: NextRequest) {
       }
 
       const isDispatched = !!firstItem.actual_7 && firstItem.status_7 !== "No";
-      
-      let currentStep = -1;
-      for (let i = 1; i <= 11; i++) {
-        if (!firstItem[`actual_${i}`] || firstItem[`status_${i}`] === "No") {
-          currentStep = i;
-          break;
-        }
-      }
+
+      // Pending = EXACTLY the O2D page's definition (shared getPendingStepIdx):
+      // not hold, not cancelled, and some planned step still without an
+      // actual — so the "Pending Orders" list here matches the O2D page
+      // (Sahil's team, 2026-10-23: this list was showing orders O2D
+      // doesn't count as pending).
+      const currentStep = getPendingStepIdx(items as any);
+      const isHold = !!(firstItem as any).hold;
+      const isCancelled = !!(firstItem as any).cancelled;
+      const isArchived = !!(firstItem as any).is_archived;
+      const hasOpenStep = !isHold && !isCancelled && !isArchived && currentStep !== -1;
+      // Dispatch-pending only (steps 1-7); post-dispatch paperwork counted separately.
+      const isPending = hasOpenStep && currentStep <= 7;
+      const isPostDispatchPending = hasOpenStep && currentStep >= 8;
+      const pendingStepName = currentStep >= 1 ? `${currentStep}. ${O2D_STEPS[currentStep - 1] || ""}` : "";
 
       const totalAmount = items.reduce((sum, item) => sum + (parseFloat(item.est_amount) || 0), 0);
 
@@ -137,7 +147,7 @@ export async function GET(req: NextRequest) {
             name,
             qty,
             amount: amt,
-            category: itemToCategory[name.toLowerCase()] || "Uncategorized"
+            category: itemToCategory[name.toLowerCase()] ? rollupCategory(itemToCategory[name.toLowerCase()]) : "Uncategorized"
           });
         });
       });
@@ -151,6 +161,9 @@ export async function GET(req: NextRequest) {
         isDelayed,
         isDispatched,
         currentStep,
+        isPending,
+        isPostDispatchPending,
+        pendingStepName,
         totalAmount,
         items: processedItems,
         raw: firstItem
@@ -214,19 +227,22 @@ export async function GET(req: NextRequest) {
       .sort((a, b) => a.key.localeCompare(b.key))
       .slice(-15);
 
+    const remarkByOrder = latestRemarkByOrder(await getOrderFollowupRemarks().catch(() => []));
     const mapBasicOrder = (o: any) => ({
       id: o.orderNo,
       party: o.party,
       amount: o.totalAmount,
-      date: o.createdAt.toISOString().split('T')[0]
+      date: o.createdAt.toISOString().split('T')[0],
+      step: o.pendingStepName || "",
+      remark: remarkByOrder[String(o.orderNo || "").toLowerCase()]?.remark || "",
     });
 
     // 5. Basic Stats
     const stats = {
       total: filteredOrders.length,
       dispatched: filteredOrders.filter(o => o.isDispatched).length,
-      pending: filteredOrders.filter(o => !o.isDispatched && o.currentStep !== -1).length,
-      toDispatch: filteredOrders.filter(o => o.currentStep > 0 && o.currentStep < 7).length,
+      pending: filteredOrders.filter(o => o.isPending).length,
+      toDispatch: filteredOrders.filter(o => o.isPending && o.currentStep > 0 && o.currentStep < 7).length,
       otdCount: filteredOrders.filter(o => o.isOTD).length,
       delayedCount: filteredOrders.filter(o => o.isDelayed).length,
       otdRate: filteredOrders.filter(o => o.isDispatched).length > 0 
@@ -234,7 +250,9 @@ export async function GET(req: NextRequest) {
         : 0,
       totalAmount: filteredOrders.reduce((sum, o) => sum + o.totalAmount, 0),
       ordersList: filteredOrders.map(mapBasicOrder),
-      pendingList: filteredOrders.filter(o => !o.isDispatched && o.currentStep !== -1).map(mapBasicOrder),
+      pendingList: filteredOrders.filter(o => o.isPending).map(mapBasicOrder),
+      postDispatchPending: filteredOrders.filter(o => o.isPostDispatchPending).length,
+      postDispatchPendingList: filteredOrders.filter(o => o.isPostDispatchPending).map(mapBasicOrder),
       otdList: filteredOrders.filter(o => o.isOTD).map(mapBasicOrder),
       delayedList: filteredOrders.filter(o => o.isDelayed).map(mapBasicOrder)
     };

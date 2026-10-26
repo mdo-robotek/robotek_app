@@ -98,10 +98,10 @@ function CheckboxGroup({
             key={opt}
             type="button"
             onClick={() => toggle(opt)}
-            className={`flex items-center gap-2.5 px-3 py-2 rounded-lg border-2 text-left transition-all text-[11px] font-bold w-full ${
+            className={`flex items-center gap-2.5 px-3 py-2 rounded-lg border-2 text-left transition-all text-[14px] font-bold w-full ${
               checked
-                ? "bg-[#FFD500] border-[#FFD500] text-black shadow-sm"
-                : "bg-white dark:bg-zinc-900 border-gray-200 dark:border-zinc-700 text-gray-500 dark:text-zinc-400 hover:border-[#FFD500]/60 hover:bg-[#FFD500]/5"
+                ? "bg-[#2563EB] border-[#2563EB] text-black shadow-sm"
+                : "bg-white dark:bg-zinc-900 border-gray-200 dark:border-zinc-700 text-gray-500 dark:text-zinc-400 hover:border-[#2563EB]/60 hover:bg-[#2563EB]/5"
             }`}
           >
             <span
@@ -112,7 +112,7 @@ function CheckboxGroup({
               }`}
             >
               {checked && (
-                <svg className="w-2.5 h-2.5 text-[#FFD500]" viewBox="0 0 10 10" fill="none">
+                <svg className="w-2.5 h-2.5 text-[#2563EB]" viewBox="0 0 10 10" fill="none">
                   <path
                     d="M1.5 5L4 7.5L8.5 2"
                     stroke="currentColor"
@@ -164,10 +164,10 @@ function CheckboxWithQuantityGroup({
         return (
           <div
             key={opt}
-            className={`flex items-center gap-2.5 px-3 py-2 rounded-lg border-2 text-left transition-all text-[11px] font-bold w-full ${
+            className={`flex items-center gap-2.5 px-3 py-2 rounded-lg border-2 text-left transition-all text-[14px] font-bold w-full ${
               checked
-                ? "bg-[#FFD500] border-[#FFD500] text-black shadow-sm"
-                : "bg-white dark:bg-zinc-900 border-gray-200 dark:border-zinc-700 text-gray-500 dark:text-zinc-400 hover:border-[#FFD500]/60 hover:bg-[#FFD500]/5"
+                ? "bg-[#2563EB] border-[#2563EB] text-black shadow-sm"
+                : "bg-white dark:bg-zinc-900 border-gray-200 dark:border-zinc-700 text-gray-500 dark:text-zinc-400 hover:border-[#2563EB]/60 hover:bg-[#2563EB]/5"
             }`}
           >
             <button
@@ -183,7 +183,7 @@ function CheckboxWithQuantityGroup({
                 }`}
               >
                 {checked && (
-                  <svg className="w-2.5 h-2.5 text-[#FFD500]" viewBox="0 0 10 10" fill="none">
+                  <svg className="w-2.5 h-2.5 text-[#2563EB]" viewBox="0 0 10 10" fill="none">
                     <path
                       d="M1.5 5L4 7.5L8.5 2"
                       stroke="currentColor"
@@ -204,7 +204,7 @@ function CheckboxWithQuantityGroup({
                 onChange={(e) => updateQty(opt, e.target.value)}
                 onClick={(e) => e.stopPropagation()}
                 onKeyDown={(e) => { if (e.key === 'Enter') e.preventDefault(); }}
-                className="w-16 px-2 py-1 text-xs font-bold bg-white/50 dark:bg-black/20 border border-black/10 dark:border-white/10 rounded outline-none focus:border-black dark:focus:border-white text-black dark:text-white"
+                className="w-16 px-2 py-1 text-[14px] font-bold bg-white/50 dark:bg-black/20 border border-black/10 dark:border-white/10 rounded outline-none focus:border-black dark:focus:border-white text-black dark:text-white"
                 placeholder="Qty"
               />
             )}
@@ -258,7 +258,7 @@ function SearchableDropdown({
         type="button"
         onClick={() => setOpen((p) => !p)}
         style={{ backgroundColor: 'var(--input-bg)', borderColor: 'var(--panel-border)' }}
-        className="w-full px-3 py-1.5 rounded-lg border focus:border-[#FFD500] outline-none font-bold text-xs text-gray-800 dark:text-zinc-100 transition-all shadow-sm flex items-center justify-between gap-2"
+        className="w-full px-3 py-1.5 rounded-lg border focus:border-[#2563EB] outline-none font-bold text-[14px] text-gray-800 dark:text-zinc-100 transition-all shadow-sm flex items-center justify-between gap-2"
       >
         <span className={value ? "text-gray-800 dark:text-zinc-100" : "text-gray-400 dark:text-zinc-500"}>
           {value || placeholder || "Select..."}
@@ -281,21 +281,21 @@ function SearchableDropdown({
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search..."
-              className="w-full px-2 py-1 text-xs font-bold bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-md outline-none focus:border-[#FFD500] text-gray-800 dark:text-zinc-100"
+              className="w-full px-2 py-1 text-[14px] font-bold bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-md outline-none focus:border-[#2563EB] text-gray-800 dark:text-zinc-100"
             />
           </div>
           <ul className="max-h-40 overflow-y-auto relative z-[100]">
             {filtered.length === 0 ? (
-              <li className="px-3 py-2 text-[10px] text-gray-400 font-bold uppercase tracking-widest">No results</li>
+              <li className="px-3 py-2 text-[13px] text-gray-400 font-bold">No results</li>
             ) : (
               filtered.map((opt) => (
                 <li
                   key={opt}
                   onClick={() => handleSelect(opt)}
-                  className={`px-3 py-2 text-xs font-bold cursor-pointer transition-colors ${
+                  className={`px-3 py-2 text-[14px] font-bold cursor-pointer transition-colors ${
                     value === opt
-                      ? "bg-[#FFD500]/20 text-black dark:text-white"
-                      : "hover:bg-[#FFD500]/10 text-gray-700 dark:text-zinc-300"
+                      ? "bg-[#2563EB]/20 text-black dark:text-white"
+                      : "hover:bg-[#2563EB]/10 text-gray-700 dark:text-zinc-300"
                   }`}
                 >
                   {opt}
@@ -488,10 +488,10 @@ export default function PartyFormModal({
           className="p-4 border-b flex items-center justify-between"
         >
           <div>
-            <h2 className="text-lg font-black text-gray-900 dark:text-white tracking-tight">{editingParty ? "Edit Party" : "Add New Party"}</h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white tracking-tight">{editingParty ? "Edit Party" : "Add New Party"}</h2>
             <div className="flex items-center gap-2 mt-1">
-              <p className="text-gray-400 dark:text-slate-400 font-bold text-[8px] uppercase tracking-widest">Party Configuration</p>
-              {editingParty && <span className="px-2 py-0.5 bg-orange-50 dark:bg-zinc-800 text-[8px] font-black text-gray-500 rounded border border-orange-100 dark:border-zinc-700">ID: {editingParty.id}</span>}
+              <p className="text-gray-400 dark:text-slate-400 font-bold text-[12px]">Party Configuration</p>
+              {editingParty && <span className="px-2 py-0.5 bg-orange-50 dark:bg-zinc-800 text-[12px] font-semibold text-gray-500 rounded border border-orange-100 dark:border-zinc-700">ID: {editingParty.id}</span>}
             </div>
           </div>
           <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-zinc-200 transition-colors"><XMarkIcon className="w-8 h-8" /></button>
@@ -499,8 +499,8 @@ export default function PartyFormModal({
 
         <form onSubmit={handleSubmit} className="p-4 space-y-5 max-h-[80vh] overflow-y-auto bg-white dark:bg-navy-800/50">
           <div>
-            <label className="flex items-center gap-1.5 text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">
-              <TagIcon className="w-3.5 h-3.5 text-[#FFFBF0]" />
+            <label className="flex items-center gap-1.5 text-[13px] font-semibold text-gray-400 mb-2">
+              <TagIcon className="w-3.5 h-3.5 text-[#FFFFFF]" />
               Customer Type
             </label>
             <div className="flex gap-2 flex-wrap">
@@ -509,10 +509,10 @@ export default function PartyFormModal({
                   key={type}
                   type="button"
                   onClick={() => setSelectedCustomerType(type)}
-                  className={`px-4 py-1.5 rounded-full font-black text-[10px] uppercase tracking-widest border-2 transition-all ${
+                  className={`px-4 py-1.5 rounded-full font-semibold text-[13px]   border-2 transition-all ${
                     selectedCustomerType === type
-                      ? "bg-[#003875] dark:bg-[#FFD500] text-white dark:text-black border-[#003875] dark:border-[#FFD500] shadow-md"
-                      : "bg-white dark:bg-zinc-900 text-gray-500 dark:text-zinc-400 border-gray-200 dark:border-zinc-700 hover:border-[#003875] dark:hover:border-[#FFD500]"
+                      ? "bg-[#2563EB] dark:bg-[#60A5FA] text-white dark:text-black border-[#2563EB] dark:border-[#60A5FA] shadow-md"
+                      : "bg-white dark:bg-zinc-900 text-gray-500 dark:text-zinc-400 border-gray-200 dark:border-zinc-700 hover:border-[#2563EB] dark:hover:border-[#60A5FA]"
                   }`}
                 >
                   {type}
@@ -522,20 +522,20 @@ export default function PartyFormModal({
           </div>
 
           <div>
-            <label className="flex items-center gap-1.5 text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">
-              <UserIcon className="w-3.5 h-3.5 text-[#FFFBF0]" />
+            <label className="flex items-center gap-1.5 text-[13px] font-semibold text-gray-400 mb-2">
+              <UserIcon className="w-3.5 h-3.5 text-[#FFFFFF]" />
               Party Name
             </label>
             <input 
               type="text" 
               value={formData.partyName || ""} 
               onChange={(e) => setFormData({ ...formData, partyName: e.target.value })}
-              style={{ backgroundColor: 'var(--input-bg)', borderColor: isDuplicateName ? '#CE2029' : 'var(--panel-border)' }}
-              className={`w-full px-3 py-1.5 rounded-lg border focus:border-[#FFD500] outline-none font-bold text-xs text-gray-800 dark:text-zinc-100 transition-all shadow-sm ${isDuplicateName ? 'ring-1 ring-red-500' : ''}`} 
+              style={{ backgroundColor: 'var(--input-bg)', borderColor: isDuplicateName ? '#DC2626' : 'var(--panel-border)' }}
+              className={`w-full px-3 py-1.5 rounded-lg border focus:border-[#2563EB] outline-none font-bold text-[14px] text-gray-800 dark:text-zinc-100 transition-all shadow-sm ${isDuplicateName ? 'ring-1 ring-red-500' : ''}`} 
               required 
             />
             {isDuplicateName && (
-              <p className="mt-1.5 text-[10px] font-black text-[#CE2029] uppercase tracking-wider animate-pulse flex items-center gap-1">
+              <p className="mt-1.5 text-[13px] font-semibold text-[#DC2626] tracking-wider animate-pulse flex items-center gap-1">
                 <XMarkIcon className="w-3 h-3" />
                 This party name is already registered. Please use a different name.
               </p>
@@ -562,8 +562,8 @@ export default function PartyFormModal({
           {isNewCustomer && (
             <>
               <div>
-                <label className="flex items-center gap-1.5 text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">
-                  <BriefcaseIcon className="w-3.5 h-3.5 text-[#FFFBF0]" />
+                <label className="flex items-center gap-1.5 text-[13px] font-semibold text-gray-400 mb-2">
+                  <BriefcaseIcon className="w-3.5 h-3.5 text-[#FFFFFF]" />
                   Party Type
                 </label>
                 <div className="space-y-2">
@@ -572,11 +572,11 @@ export default function PartyFormModal({
                     return (
                       <label key={opt} className="flex items-center gap-3 cursor-pointer group">
                         <span onClick={() => setSelectedPartyType(opt)}
-                          className={`w-4 h-4 flex-shrink-0 rounded-full border-2 flex items-center justify-center transition-all ${isSelected ? "border-[#003875] dark:border-[#FFD500]" : "border-gray-300 dark:border-zinc-600 group-hover:border-[#003875] dark:group-hover:border-[#FFD500]"}`}>
-                          {isSelected && <span className="w-2 h-2 rounded-full bg-[#003875] dark:bg-[#FFD500]" />}
+                          className={`w-4 h-4 flex-shrink-0 rounded-full border-2 flex items-center justify-center transition-all ${isSelected ? "border-[#2563EB] dark:border-[#60A5FA]" : "border-gray-300 dark:border-zinc-600 group-hover:border-[#2563EB] dark:group-hover:border-[#60A5FA]"}`}>
+                          {isSelected && <span className="w-2 h-2 rounded-full bg-[#2563EB] dark:bg-[#60A5FA]" />}
                         </span>
                         <span onClick={() => setSelectedPartyType(opt)}
-                          className={`text-xs font-bold transition-colors ${isSelected ? "text-gray-900 dark:text-white" : "text-gray-500 dark:text-zinc-400 group-hover:text-gray-700 dark:group-hover:text-zinc-200"}`}>
+                          className={`text-[14px] font-bold transition-colors ${isSelected ? "text-gray-900 dark:text-white" : "text-gray-500 dark:text-zinc-400 group-hover:text-gray-700 dark:group-hover:text-zinc-200"}`}>
                           {opt === "Other" ? "Other (Custom Input)" : opt}
                         </span>
                       </label>
@@ -590,15 +590,15 @@ export default function PartyFormModal({
                     onChange={(e) => setCustomPartyType(e.target.value)} 
                     placeholder="Enter custom party type..."
                     style={{ backgroundColor: 'var(--input-bg)', borderColor: 'var(--panel-border)' }}
-                    className="mt-3 w-full px-3 py-1.5 rounded-lg border focus:border-[#FFD500] outline-none font-bold text-xs text-gray-800 dark:text-zinc-100 transition-all shadow-sm" 
+                    className="mt-3 w-full px-3 py-1.5 rounded-lg border focus:border-[#2563EB] outline-none font-bold text-[14px] text-gray-800 dark:text-zinc-100 transition-all shadow-sm" 
                   />
                 )}
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="flex items-center gap-1.5 text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">
-                    <Bars3BottomLeftIcon className="w-3.5 h-3.5 text-[#FFFBF0]" />
+                  <label className="flex items-center gap-1.5 text-[13px] font-semibold text-gray-400 mb-2">
+                    <Bars3BottomLeftIcon className="w-3.5 h-3.5 text-[#FFFFFF]" />
                     Sales Funnel Unique Num
                   </label>
                   <input 
@@ -606,12 +606,12 @@ export default function PartyFormModal({
                     value={formData.salesFunnelUniqueNum || ""} 
                     onChange={(e) => setFormData({ ...formData, salesFunnelUniqueNum: e.target.value })}
                     style={{ backgroundColor: 'var(--input-bg)', borderColor: 'var(--panel-border)' }}
-                    className="w-full px-3 py-1.5 rounded-lg border focus:border-[#FFD500] outline-none font-bold text-xs text-gray-800 dark:text-zinc-100 transition-all shadow-sm" 
+                    className="w-full px-3 py-1.5 rounded-lg border focus:border-[#2563EB] outline-none font-bold text-[14px] text-gray-800 dark:text-zinc-100 transition-all shadow-sm" 
                   />
                 </div>
                 <div>
-                  <label className="flex items-center gap-1.5 text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">
-                    <IdentificationIcon className="w-3.5 h-3.5 text-[#FFFBF0]" />
+                  <label className="flex items-center gap-1.5 text-[13px] font-semibold text-gray-400 mb-2">
+                    <IdentificationIcon className="w-3.5 h-3.5 text-[#FFFFFF]" />
                     Sale Person Name
                   </label>
                   <SearchableDropdown
@@ -624,16 +624,16 @@ export default function PartyFormModal({
               </div>
 
               <div>
-                <label className="flex items-center gap-1.5 text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">
-                  <QueueListIcon className="w-3.5 h-3.5 text-[#FFFBF0]" />
+                <label className="flex items-center gap-1.5 text-[13px] font-semibold text-gray-400 mb-2">
+                  <QueueListIcon className="w-3.5 h-3.5 text-[#FFFFFF]" />
                   Add following items with First order :
                 </label>
                 <CheckboxWithQuantityGroup options={FIRST_ORDER_ITEMS_OPTIONS} selected={selectedFirstOrderItems} onChange={setSelectedFirstOrderItems} />
               </div>
 
               <div>
-                <label className="flex items-center gap-1.5 text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">
-                  <DocumentTextIcon className="w-3.5 h-3.5 text-[#FFFBF0]" />
+                <label className="flex items-center gap-1.5 text-[13px] font-semibold text-gray-400 mb-2">
+                  <DocumentTextIcon className="w-3.5 h-3.5 text-[#FFFFFF]" />
                   Details and Instructions :
                 </label>
                 <CheckboxGroup options={DETAILS_INSTRUCTIONS_OPTIONS} selected={selectedDetailsInstructions} onChange={setSelectedDetailsInstructions} />
@@ -642,24 +642,24 @@ export default function PartyFormModal({
           )}
 
           <div>
-            <label className="flex items-center gap-1.5 text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">
-              <ChatBubbleBottomCenterTextIcon className="w-3.5 h-3.5 text-[#FFFBF0]" />
+            <label className="flex items-center gap-1.5 text-[13px] font-semibold text-gray-400 mb-2">
+              <ChatBubbleBottomCenterTextIcon className="w-3.5 h-3.5 text-[#FFFFFF]" />
               Remarks
             </label>
             <textarea 
               value={formData.remarks || ""} 
               onChange={(e) => setFormData({ ...formData, remarks: e.target.value })}
               style={{ backgroundColor: 'var(--input-bg)', borderColor: 'var(--panel-border)' }}
-              className="w-full px-3 py-1.5 rounded-lg border focus:border-[#FFD500] outline-none font-bold text-xs text-gray-800 dark:text-zinc-100 transition-all shadow-sm resize-y min-h-[60px]" 
+              className="w-full px-3 py-1.5 rounded-lg border focus:border-[#2563EB] outline-none font-bold text-[14px] text-gray-800 dark:text-zinc-100 transition-all shadow-sm resize-y min-h-[60px]" 
             />
           </div>
 
           <div className="pt-2 border-t border-orange-100/50 dark:border-zinc-800 flex gap-2">
-            <button type="button" onClick={onClose} className="flex-1 px-4 py-2 rounded-xl font-black text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-all uppercase tracking-widest text-[10px]">Cancel</button>
+            <button type="button" onClick={onClose} className="flex-1 px-4 py-2 rounded-xl font-semibold text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-all text-[13px]">Cancel</button>
             <button 
               type="submit" 
               disabled={isDuplicateName}
-              className={`flex-1 bg-[#CE2029] hover:bg-[#8E161D] text-white px-4 py-2 rounded-xl font-black transition-all shadow-lg active:scale-95 uppercase tracking-widest text-[10px] ${isDuplicateName ? 'opacity-50 cursor-not-allowed grayscale' : ''}`}
+              className={`flex-1 bg-[#DC2626] hover:bg-[#8E161D] text-white px-4 py-2 rounded-xl font-semibold transition-all shadow-lg active:scale-95   text-[13px] ${isDuplicateName ? 'opacity-50 cursor-not-allowed grayscale' : ''}`}
             >
               {editingParty ? "Save changes" : skipSubmit ? "Add to Order" : "Create party"}
             </button>

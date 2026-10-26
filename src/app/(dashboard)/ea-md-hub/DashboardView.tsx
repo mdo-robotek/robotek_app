@@ -81,13 +81,13 @@ export default function DashboardView({ goToTab }: DashboardViewProps) {
     <div className="flex flex-col w-full h-full space-y-6 lg:p-4">
       {/* Header section */}
       <div>
-        <h2 className="text-3xl font-bold text-[#001736] dark:text-white tracking-tight" style={{ fontFamily: 'Georgia, serif' }}>Dashboard</h2>
+        <h2 className="text-3xl font-bold text-[#1D4ED8] dark:text-white tracking-tight" style={{ fontFamily: 'Georgia, serif' }}>Dashboard</h2>
         <p className="text-sm font-medium text-gray-500 mt-1">Good morning, here is your operations overview.</p>
       </div>
 
       {loading ? (
         <div className="flex-1 flex justify-center items-center">
-          <div className="w-12 h-12 border-4 border-[#001736] border-t-transparent rounded-full animate-spin opacity-50" />
+          <div className="w-12 h-12 border-4 border-[#1D4ED8] border-t-transparent rounded-full animate-spin opacity-50" />
         </div>
       ) : (
         <div className="space-y-6">
@@ -99,7 +99,7 @@ export default function DashboardView({ goToTab }: DashboardViewProps) {
               <h3 className="text-5xl font-bold text-rose-700 dark:text-rose-500" style={{ fontFamily: 'Georgia, serif' }}>
                 {openUrgentLogs.length}
               </h3>
-              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-2">Urgent Actions</p>
+              <p className="text-[13px] font-semibold text-gray-400 mt-2">Urgent Actions</p>
             </div>
 
             {/* Pending MD Card */}
@@ -107,7 +107,7 @@ export default function DashboardView({ goToTab }: DashboardViewProps) {
               <h3 className="text-5xl font-bold text-blue-700 dark:text-blue-500" style={{ fontFamily: 'Georgia, serif' }}>
                 {pendingMDActions.length}
               </h3>
-              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-2">Pending MD Action</p>
+              <p className="text-[13px] font-semibold text-gray-400 mt-2">Pending MD Action</p>
             </div>
 
             {/* Done This Week Card */}
@@ -115,7 +115,7 @@ export default function DashboardView({ goToTab }: DashboardViewProps) {
               <h3 className="text-5xl font-bold text-emerald-700 dark:text-emerald-500" style={{ fontFamily: 'Georgia, serif' }}>
                 {doneCount}
               </h3>
-              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-2">Done This Week</p>
+              <p className="text-[13px] font-semibold text-gray-400 mt-2">Done This Week</p>
             </div>
 
             {/* Open Queries Card */}
@@ -123,7 +123,7 @@ export default function DashboardView({ goToTab }: DashboardViewProps) {
               <h3 className="text-5xl font-bold text-amber-600 dark:text-amber-500" style={{ fontFamily: 'Georgia, serif' }}>
                 {openQueries.length}
               </h3>
-              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-2">Open Team Queries</p>
+              <p className="text-[13px] font-semibold text-gray-400 mt-2">Open Team Queries</p>
             </div>
 
           </div>
@@ -137,22 +137,22 @@ export default function DashboardView({ goToTab }: DashboardViewProps) {
                 <h4 className="text-sm font-bold text-rose-700 dark:text-rose-500">Urgent items</h4>
                 <button 
                   onClick={() => goToTab('urgent-log')}
-                  className="px-3 py-1.5 rounded-lg border border-gray-200 dark:border-navy-700 text-[10px] font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-navy-800 transition-colors"
+                  className="px-3 py-1.5 rounded-lg border border-gray-200 dark:border-navy-700 text-[13px] font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-navy-800 transition-colors"
                 >
                   View log
                 </button>
               </div>
               <div className="flex-1 flex flex-col">
                 {openUrgentLogs.length === 0 ? (
-                  <div className="flex-1 flex items-center justify-center text-[12px] font-medium text-gray-400">
+                  <div className="flex-1 flex items-center justify-center text-[14px] font-medium text-gray-400">
                     No urgent items
                   </div>
                 ) : (
                   <div className="space-y-3">
                     {openUrgentLogs.slice(0, 3).map(log => (
                       <div key={log.id} className="flex justify-between items-center bg-gray-50 dark:bg-navy-800/50 p-3 rounded-xl border border-gray-100 dark:border-navy-700">
-                        <span className="text-[12px] font-bold text-gray-800 dark:text-gray-200 truncate pr-4">{log.issueSummary}</span>
-                        <span className="text-[9px] font-black uppercase tracking-widest text-rose-600 bg-rose-100 px-2.5 py-1 rounded-md shrink-0">
+                        <span className="text-[14px] font-bold text-gray-800 dark:text-gray-200 truncate pr-4">{log.issueSummary}</span>
+                        <span className="text-[13px] font-semibold text-rose-600 bg-rose-100 px-2.5 py-1 rounded-md shrink-0">
                           {log.urgencyLevel.split(' ')[0]}
                         </span>
                       </div>
@@ -165,25 +165,25 @@ export default function DashboardView({ goToTab }: DashboardViewProps) {
             {/* Pending MD Action List */}
             <div className="bg-white dark:bg-navy-900 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-navy-800 flex flex-col min-h-[220px]">
               <div className="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-navy-800 pb-3">
-                <h4 className="text-sm font-bold text-[#1e40af] dark:text-blue-400">Pending MD action</h4>
+                <h4 className="text-sm font-bold text-[#1D4ED8] dark:text-blue-400">Pending MD action</h4>
                 <button 
                   onClick={() => goToTab('action-log')}
-                  className="px-3 py-1.5 rounded-lg border border-gray-200 dark:border-navy-700 text-[10px] font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-navy-800 transition-colors"
+                  className="px-3 py-1.5 rounded-lg border border-gray-200 dark:border-navy-700 text-[13px] font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-navy-800 transition-colors"
                 >
                   View all
                 </button>
               </div>
               <div className="flex-1 flex flex-col">
                 {pendingMDActions.length === 0 ? (
-                  <div className="flex-1 flex items-center justify-center text-[12px] font-medium text-gray-400">
+                  <div className="flex-1 flex items-center justify-center text-[14px] font-medium text-gray-400">
                     All clear
                   </div>
                 ) : (
                   <div className="space-y-3">
                     {pendingMDActions.slice(0, 3).map(action => (
                       <div key={action.id} className="flex justify-between items-center bg-gray-50 dark:bg-navy-800/50 p-3 rounded-xl border border-gray-100 dark:border-navy-700">
-                        <span className="text-[12px] font-bold text-gray-800 dark:text-gray-200 truncate pr-4">{action.task}</span>
-                        <span className="text-[9px] font-black uppercase tracking-widest text-[#1e40af] shrink-0">
+                        <span className="text-[14px] font-bold text-gray-800 dark:text-gray-200 truncate pr-4">{action.task}</span>
+                        <span className="text-[13px] font-semibold text-[#1D4ED8] shrink-0">
                            {formatDisplayDate(action.due)}
                         </span>
                       </div>
@@ -196,23 +196,23 @@ export default function DashboardView({ goToTab }: DashboardViewProps) {
             {/* Next Sync Meeting */}
             <div className="bg-white dark:bg-navy-900 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-navy-800 flex flex-col min-h-[220px]">
               <div className="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-navy-800 pb-3">
-                <h4 className="text-sm font-bold text-[#001736] dark:text-white">Next sync meeting</h4>
+                <h4 className="text-sm font-bold text-[#1D4ED8] dark:text-white">Next sync meeting</h4>
               </div>
               <div className="flex-1 flex flex-col justify-center items-start">
                 {nextMeeting ? (
                   <>
-                    <h5 className="text-xl font-black text-gray-900 dark:text-white tracking-widest mb-4">
+                    <h5 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
                       {formatDisplayDate(nextMeeting.date).toUpperCase()}
                     </h5>
                     <button 
                       onClick={() => goToTab('sync-meeting')}
-                      className="px-4 py-2 rounded-lg border border-gray-200 dark:border-navy-700 text-[11px] font-bold text-gray-800 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-navy-800 transition-colors shadow-sm"
+                      className="px-4 py-2 rounded-lg border border-gray-200 dark:border-navy-700 text-[14px] font-bold text-gray-800 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-navy-800 transition-colors shadow-sm"
                     >
                       Open agenda builder
                     </button>
                   </>
                 ) : (
-                  <div className="w-full text-center text-[12px] font-medium text-gray-400 py-4">
+                  <div className="w-full text-center text-[14px] font-medium text-gray-400 py-4">
                     No upcoming meetings
                   </div>
                 )}
@@ -222,17 +222,17 @@ export default function DashboardView({ goToTab }: DashboardViewProps) {
             {/* Open Team Queries */}
             <div className="bg-white dark:bg-navy-900 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-navy-800 flex flex-col min-h-[220px]">
               <div className="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-navy-800 pb-3">
-                <h4 className="text-sm font-bold text-[#001736] dark:text-white">Open team queries</h4>
+                <h4 className="text-sm font-bold text-[#1D4ED8] dark:text-white">Open team queries</h4>
                 <button 
                   onClick={() => goToTab('team-queries')}
-                  className="px-3 py-1.5 rounded-lg border border-gray-200 dark:border-navy-700 text-[10px] font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-navy-800 transition-colors"
+                  className="px-3 py-1.5 rounded-lg border border-gray-200 dark:border-navy-700 text-[13px] font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-navy-800 transition-colors"
                 >
                   Manage
                 </button>
               </div>
               <div className="flex-1 flex flex-col">
                 {openQueries.length === 0 ? (
-                  <div className="flex-1 flex items-center justify-center text-[12px] font-medium text-gray-400">
+                  <div className="flex-1 flex items-center justify-center text-[14px] font-medium text-gray-400">
                     No open queries
                   </div>
                 ) : (
@@ -240,12 +240,12 @@ export default function DashboardView({ goToTab }: DashboardViewProps) {
                     {openQueries.slice(0, 3).map(query => (
                       <div key={query.id} className="flex flex-col justify-center bg-gray-50 dark:bg-navy-800/50 p-3 rounded-xl border border-gray-100 dark:border-navy-700 space-y-1">
                         <div className="flex justify-between items-center">
-                          <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">{query.teamMember}</span>
-                          <span className="text-[9px] font-black uppercase tracking-widest text-amber-600 bg-amber-100 px-2 py-0.5 rounded shrink-0">
+                          <span className="text-[13px] font-semibold text-gray-500">{query.teamMember}</span>
+                          <span className="text-[13px] font-semibold text-amber-600 bg-amber-100 px-2 py-0.5 rounded shrink-0">
                             {query.status}
                           </span>
                         </div>
-                        <span className="text-[12px] font-bold text-gray-800 dark:text-gray-200 line-clamp-1">{query.query}</span>
+                        <span className="text-[14px] font-bold text-gray-800 dark:text-gray-200 line-clamp-1">{query.query}</span>
                       </div>
                     ))}
                   </div>

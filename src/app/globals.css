@@ -5,20 +5,31 @@
   --color-navy-900: #0B1120;
   --color-navy-800: #1E293B;
   --color-navy-700: #334155;
-  --font-sans: var(--font-inter);
-  --font-serif: var(--font-playfair);
+  /* Theme Step 1 (Oct 2026): system font everywhere — fast, familiar,
+     readable on budget Android phones. Serif headings retired. */
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, var(--font-inter), "Helvetica Neue", Arial, sans-serif;
+  --font-serif: var(--font-sans);
   --font-mono: var(--font-geist-mono);
 }
 
 @variant dark (&:is(.dark *));
 
 :root {
-  --background: #fcf9f0;
-  --foreground: #171717;
-  --panel-bg: #fcf9f0;
+  /* Calm neutral base + ONE action colour (blue). Colour otherwise only
+     carries meaning: green = done, amber = attention, red = overdue. */
+  --background: #F7F8FA;
+  --foreground: #1A1D21;
+  --text-secondary: #5B6472;
+  --accent: #2563EB;
+  --accent-hover: #1D4ED8;
+  --accent-soft: #EFF4FF;
+  --status-good: #15803D;
+  --status-warn: #B45309;
+  --status-bad: #B91C1C;
+  --panel-bg: #F7F8FA;
   --panel-card: #ffffff;
-  --panel-border: rgba(0, 56, 117, 0.06);
-  --header-bg: #003875;
+  --panel-border: #E5E7EB;
+  --header-bg: #ffffff;
   --chat-sidebar: #ffffff;
   --chat-window: #ffffff;
   --chat-bubble-own: #9A5BFF;
@@ -29,6 +40,10 @@
 .dark {
   --background: #070B14;
   --foreground: #f8fafc;
+  --text-secondary: #94A3B8;
+  --accent: #60A5FA;
+  --accent-hover: #93C5FD;
+  --accent-soft: rgba(96, 165, 250, 0.12);
   --panel-bg: #0B1120;
   --panel-card: #1E293B;
   --panel-border: rgba(255, 255, 255, 0.1);
@@ -43,8 +58,9 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  font-family: var(--font-sans);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
 }
 
 h1,
@@ -53,9 +69,9 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: var(--font-serif), serif;
-  font-weight: 700;
-  line-height: 1.2;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  line-height: 1.25;
 }
 
 h1 {
@@ -69,12 +85,12 @@ span,
 td,
 th,
 div {
-  font-family: var(--font-sans), sans-serif;
+  font-family: var(--font-sans);
 }
 
 .sub-header,
 .data-label {
-  font-family: var(--font-serif), serif;
+  font-family: var(--font-sans);
   font-size: 0.875rem;
   /* text-sm */
   color: #6b7280;
@@ -124,8 +140,8 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover {
 ::-webkit-datetime-edit-month-field:focus,
 ::-webkit-datetime-edit-day-field:focus,
 ::-webkit-datetime-edit-year-field:focus {
-  background-color: #FFD500;
-  color: #000;
+  background-color: #DBEAFE;
+  color: #1A1D21;
   border-radius: 3px;
 }
 

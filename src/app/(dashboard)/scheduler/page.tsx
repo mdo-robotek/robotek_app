@@ -140,7 +140,7 @@ export default function SchedulerPage() {
           {loading ? (
              <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-sm p-20 flex flex-col items-center justify-center min-h-[600px]">
                 <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-                <p className="text-sm font-black text-slate-500 dark:text-slate-400 animate-pulse uppercase tracking-widest">Compiling Scheduler Data...</p>
+                <p className="text-sm font-semibold text-slate-500 dark:text-slate-400 animate-pulse">Compiling Scheduler Data...</p>
              </div>
           ) : (
             <SchedulerCalendar
@@ -192,10 +192,10 @@ export default function SchedulerPage() {
                     {selectedEvent.type === 'meeting' ? <CalendarIcon className="w-6 h-6" /> : <InformationCircleIcon className="w-6 h-6" />}
                   </div>
                   <div>
-                    <h2 className="text-xl font-black text-slate-900 dark:text-white leading-tight capitalize">
+                    <h2 className="text-xl font-semibold text-slate-900 dark:text-white leading-tight capitalize">
                       {selectedEvent.type} Details
                     </h2>
-                    <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mt-0.5">
+                    <p className="text-[13px] font-bold text-slate-500 dark:text-slate-400 mt-0.5">
                       Information & Context
                     </p>
                   </div>
@@ -207,24 +207,24 @@ export default function SchedulerPage() {
 
               <div className="p-8 space-y-6">
                 <div>
-                   <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-2 leading-tight">{selectedEvent.title}</h3>
+                   <h3 className="text-2xl font-semibold text-slate-900 dark:text-white mb-2 leading-tight">{selectedEvent.title}</h3>
                    <p className="text-sm font-bold text-slate-500 dark:text-slate-400 leading-relaxed">{selectedEvent.description || "No description provided."}</p>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                    <div className="flex flex-col gap-1 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-800">
-                      <div className="flex items-center gap-1.5 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                      <div className="flex items-center gap-1.5 text-[13px] font-semibold text-slate-400">
                         <ClockIcon className="w-3.5 h-3.5" />
                         Time
                       </div>
-                      <p className="text-xs font-black text-slate-900 dark:text-white">{format(selectedEvent.start, "hh:mm a")}</p>
+                      <p className="text-[14px] font-semibold text-slate-900 dark:text-white">{format(selectedEvent.start, "hh:mm a")}</p>
                    </div>
                    <div className="flex flex-col gap-1 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-800">
-                      <div className="flex items-center gap-1.5 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                      <div className="flex items-center gap-1.5 text-[13px] font-semibold text-slate-400">
                         <CalendarIcon className="w-3.5 h-3.5" />
                         Date
                       </div>
-                      <p className="text-xs font-black text-slate-900 dark:text-white">{format(selectedEvent.start, "MMM dd, yyyy")}</p>
+                      <p className="text-[14px] font-semibold text-slate-900 dark:text-white">{format(selectedEvent.start, "MMM dd, yyyy")}</p>
                    </div>
                 </div>
 
@@ -235,7 +235,7 @@ export default function SchedulerPage() {
                           <UserIcon className="w-4 h-4 text-blue-500" />
                         </div>
                         <div className="flex-1">
-                           <p className="text-[10px] font-black text-slate-400 uppercase tracking-tighter leading-none mb-0.5">Assigned To</p>
+                           <p className="text-[13px] font-semibold text-slate-400 tracking-tighter leading-none mb-0.5">Assigned To</p>
                            <p className="truncate">{selectedEvent.assignedTo}</p>
                         </div>
                      </div>
@@ -245,7 +245,7 @@ export default function SchedulerPage() {
                       href={selectedEvent.link.startsWith('http') ? selectedEvent.link : `https://${selectedEvent.link}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="mt-4 flex items-center justify-center gap-2 py-3 bg-rose-500 hover:bg-rose-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest shadow-lg hover:shadow-xl transition-all"
+                      className="mt-4 flex items-center justify-center gap-2 py-3 bg-rose-500 hover:bg-rose-600 text-white rounded-2xl text-[14px] font-semibold shadow-lg hover:shadow-xl transition-all"
                      >
                         <LinkIcon className="w-4 h-4 stroke-[3]" />
                         Join Meeting Video Call
@@ -257,7 +257,7 @@ export default function SchedulerPage() {
                           <TagIcon className="w-4 h-4 text-emerald-500" />
                         </div>
                         <div className="flex-1">
-                           <p className="text-[10px] font-black text-slate-400 uppercase tracking-tighter leading-none mb-0.5">Status</p>
+                           <p className="text-[13px] font-semibold text-slate-400 tracking-tighter leading-none mb-0.5">Status</p>
                            <p className="truncate">{selectedEvent.status}</p>
                         </div>
                      </div>
@@ -269,13 +269,13 @@ export default function SchedulerPage() {
                     <>
                       <button
                         onClick={() => handleEditMeeting(selectedEvent)}
-                        className="flex-1 py-4 bg-slate-900 dark:bg-blue-600 text-white rounded-3xl text-xs font-black uppercase tracking-widest active:scale-95 transition-all"
+                        className="flex-1 py-4 bg-slate-900 dark:bg-blue-600 text-white rounded-3xl text-[14px] font-semibold active:scale-95 transition-all"
                       >
                         Edit Meeting
                       </button>
                       <button
                         onClick={() => confirmDeleteMeeting(selectedEvent.id.replace('meet-', ''))}
-                        className="flex-none px-6 py-4 bg-rose-50 hover:bg-rose-100 dark:bg-rose-500/10 dark:hover:bg-rose-500/20 text-rose-600 rounded-3xl text-xs font-black uppercase tracking-widest active:scale-95 transition-all border border-rose-100 dark:border-rose-500/20"
+                        className="flex-none px-6 py-4 bg-rose-50 hover:bg-rose-100 dark:bg-rose-500/10 dark:hover:bg-rose-500/20 text-rose-600 rounded-3xl text-[14px] font-semibold active:scale-95 transition-all border border-rose-100 dark:border-rose-500/20"
                       >
                         Delete
                       </button>
@@ -283,7 +283,7 @@ export default function SchedulerPage() {
                    )}
                    <button
                     onClick={() => setSelectedEvent(null)}
-                    className="flex-1 py-4 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-3xl text-xs font-black uppercase tracking-widest active:scale-95 transition-all"
+                    className="flex-1 py-4 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-3xl text-[14px] font-semibold active:scale-95 transition-all"
                    >
                     Close
                    </button>
@@ -314,21 +314,21 @@ export default function SchedulerPage() {
               <div className="w-16 h-16 bg-rose-50 dark:bg-rose-500/10 rounded-full flex items-center justify-center mx-auto mb-4 border-4 border-rose-100 dark:border-rose-500/20">
                 <TrashIcon className="w-8 h-8 text-rose-500" />
               </div>
-              <h3 className="text-xl font-black text-slate-900 dark:text-white mb-2">Delete Meeting?</h3>
+              <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">Delete Meeting?</h3>
               <p className="text-sm font-bold text-slate-500 dark:text-slate-400 mb-8">This action cannot be undone. This meeting and all associated references will be permanently removed.</p>
               
               <div className="flex gap-3">
                 <button
                   disabled={isDeleting}
                   onClick={() => setMeetingToDelete(null)}
-                  className="flex-1 py-3.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-2xl text-xs font-black uppercase tracking-widest active:scale-95 transition-all disabled:opacity-50"
+                  className="flex-1 py-3.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-2xl text-[14px] font-semibold active:scale-95 transition-all disabled:opacity-50"
                 >
                   Cancel
                 </button>
                 <button
                   disabled={isDeleting}
                   onClick={executeDeleteMeeting}
-                  className="flex-1 py-3.5 bg-rose-500 hover:bg-rose-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest active:scale-95 transition-all shadow-lg hover:shadow-rose-500/25 disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="flex-1 py-3.5 bg-rose-500 hover:bg-rose-600 text-white rounded-2xl text-[14px] font-semibold active:scale-95 transition-all shadow-lg hover:shadow-rose-500/25 disabled:opacity-50 flex items-center justify-center gap-2"
                 >
                   {isDeleting ? (
                     <>

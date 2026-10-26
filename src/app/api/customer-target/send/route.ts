@@ -112,8 +112,11 @@ export async function POST(req: NextRequest) {
     } else if (sendScope === "not_sent") {
       candidates = candidates.filter((r) => r.sendStatus === "NOT_SENT" || r.sendStatus === "SKIPPED");
     } else if (sendScope === "selected") {
-      // selected parties, but still hard-skip already SENT unless force
-      candidates = candidates.filter((r) => r.sendStatus !== "SENT");
+      // selected parties: TARGET hard-skips already SENT (no duplicate targets);
+      // ACHIEVEMENT may be re-sent any number of times (progress updates).
+      if (type === "TARGET") {
+        candidates = candidates.filter((r) => r.sendStatus !== "SENT");
+      }
     }
     // selected_force: keep selection as-is (allows SENT)
 
@@ -125,8 +128,9 @@ export async function POST(req: NextRequest) {
     }[] = [];
 
     for (const row of candidates) {
-      // Hard guard: never Maytapi-send already SENT unless force
-      if (row.sendStatus === "SENT" && sendScope !== "selected_force") {
+      // Hard guard (TARGET only): never Maytapi-send already SENT unless force.
+      // ACHIEVEMENT is re-sendable — achievement badalta rehta hai.
+      if (type === "TARGET" && row.sendStatus === "SENT" && sendScope !== "selected_force") {
         const skipMsg = row.preview;
         await appendSendLog({
           timestamp: new Date().toISOString(),

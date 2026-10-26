@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { navigation } from "@/lib/navigation";
 
 import { useSession, signOut } from "next-auth/react";
-import { XMarkIcon, ArrowRightOnRectangleIcon, UserCircleIcon } from "@heroicons/react/24/outline";
+import { XMarkIcon, ArrowRightOnRectangleIcon, UserCircleIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
 import { usePermissions } from "@/hooks/usePermissions";
 
 interface SidebarProps {
@@ -156,170 +156,186 @@ export default function Sidebar({ mobileOpen, setMobileOpen }: SidebarProps) {
     return isAdmin;
   });
 
+  // Pending-count badge per menu item (same numbers as before).
+  const badgeFor = (item: { id: string; href: string }): number => {
+    if (item.id === 'delegations') return delegationsPendingCount;
+    if (item.id === 'checklists') return checklistsPendingCount;
+    if (item.id === 'tickets') return ticketsOpenCount;
+    if (item.id === 'o2d') return o2dPendingCount;
+    if (item.id === 'chat') return chatUnreadCount;
+    if (item.id === 'leave') return leavePendingCount;
+    if (item.href === '/hrms/recruitment') return recruitmentPendingCount;
+    if (item.href === '/hrms/candidate') return candidatePendingCount;
+    if (item.href === '/hrms/sales') return salesPendingCount;
+    if (item.href === '/hrms/onboard') return onboardPendingCount;
+    if (item.href === '/hrms/offboard') return offboardPendingCount;
+    return 0;
+  };
+
+  // Sections open/close (Sahil, 24 Oct): the menu has many items, so each
+  // section is a folder. The section holding the current page opens by
+  // itself; what you open or close is remembered for next time.
+  const sections = useMemo(() => {
+    const out: { name: string; items: typeof filteredNavigation }[] = [];
+    filteredNavigation.forEach(item => {
+      const sectionName = (item as any).section || 'Other';
+      let section = out.find(s => s.name === sectionName);
+      if (!section) { section = { name: sectionName, items: [] }; out.push(section); }
+      section.items.push(item);
+    });
+    return out;
+  }, [filteredNavigation]);
+
+  const activeSection = useMemo(() => {
+    const hit = filteredNavigation.find(item =>
+      pathname === item.href || (item.href !== '/' && (pathname + '/').startsWith(item.href + '/'))
+    );
+    return (hit as any)?.section || 'Dashboard';
+  }, [filteredNavigation, pathname]);
+
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
+  const [restored, setRestored] = useState(false);
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('erp_menu_sections');
+      if (saved) setOpenSections(JSON.parse(saved));
+    } catch { /* ignore */ }
+    setRestored(true);
+  }, []);
+
+  useEffect(() => {
+    if (!restored || !activeSection) return;
+    setOpenSections(prev => (prev[activeSection] ? prev : { ...prev, [activeSection]: true }));
+  }, [restored, activeSection]);
+
+  const toggleSection = (name: string) => {
+    setOpenSections(prev => {
+      const next = { ...prev, [name]: !prev[name] };
+      try { localStorage.setItem('erp_menu_sections', JSON.stringify(next)); } catch { /* ignore */ }
+      return next;
+    });
+  };
+
+  // Pending count shown on a closed section, so nothing stays hidden.
+  const sectionCount = (items: typeof filteredNavigation) =>
+    items.reduce((sum, it) => sum + badgeFor(it as any), 0);
+
   return (
     <>
       {/* Mobile Overlay */}
       {mobileOpen && (
-        <div 
-          className="fixed inset-0 bg-black/50 z-40 md:hidden backdrop-blur-sm transition-all duration-300"
+        <div
+          className="fixed inset-0 bg-black/40 z-40 md:hidden"
           onClick={() => setMobileOpen?.(false)}
         />
       )}
 
-      <aside 
-        style={{ background: 'var(--panel-card)' }}
+      <aside
+        aria-label="Main menu"
         className={`
-        fixed left-0 top-0 h-screen z-50 transition-all duration-300 ease-in-out
-        ${mobileOpen 
-          ? 'w-60 translate-x-0 shadow-[20px_0_60px_-15px_rgba(0,0,0,0.3)] border-r-4 border-[#FFD500] dark:border-[#FFD500]/50 rounded-r-[2.5rem]' 
-          : 'w-16 -translate-x-full md:translate-x-0 md:hover:w-56 border-r border-gray-100'}
-        flex flex-col group overflow-hidden peer
+        fixed left-0 top-0 h-screen w-64 md:w-60 z-50 bg-white dark:bg-navy-900 border-r border-[#E5E7EB] dark:border-navy-800
+        transition-transform duration-200 ease-out flex flex-col
+        ${mobileOpen ? 'translate-x-0 shadow-xl' : '-translate-x-full md:translate-x-0'}
       `}>
 
-        <div className="flex items-center justify-between p-5 md:p-0 md:pt-3 md:pb-2 md:pl-5">
-          <Link href="/" className="flex items-center gap-4 group/logo active:scale-95 transition-transform">
-            <div className="w-10 h-10 min-w-[40px] rounded-xl overflow-hidden shadow-lg transform group-hover/logo:-rotate-6 transition-transform duration-500 ring-1 ring-black/5 dark:ring-white/10">
-              <img src="/logo_compact.png" alt="Logo" className="w-full h-full object-cover" />
+        <div className="flex items-center justify-between h-14 px-4 border-b border-[#E5E7EB] dark:border-navy-800 shrink-0">
+          <Link href="/" className="flex items-center gap-3" onClick={() => setMobileOpen?.(false)}>
+            <div className="w-8 h-8 min-w-[32px] rounded-lg overflow-hidden ring-1 ring-black/5 dark:ring-white/10">
+              <img src="/logo_compact.png" alt="Robotek" className="w-full h-full object-cover" />
             </div>
-            <span className={`text-xl font-black tracking-tight text-gray-900 dark:text-white transition-all duration-300 whitespace-nowrap ${mobileOpen ? 'opacity-100' : 'opacity-0 md:group-hover:opacity-100'}`}>
-              Robotek
+            <span className="text-[16px] font-semibold text-[#1A1D21] dark:text-white whitespace-nowrap">
+              Robotek ERP
             </span>
           </Link>
 
           {mobileOpen && (
-            <button 
+            <button
               onClick={() => setMobileOpen?.(false)}
-              className="p-2 text-[#003875] bg-[#FFD500] hover:bg-[#FFE55C] rounded-xl md:hidden transition-all shadow-md active:scale-90"
+              aria-label="Close menu"
+              className="w-11 h-11 flex items-center justify-center text-[#5B6472] hover:bg-gray-100 dark:hover:bg-white/10 rounded-lg md:hidden"
             >
-              <XMarkIcon className="w-6 h-6 stroke-[3]" />
+              <XMarkIcon className="w-6 h-6" />
             </button>
           )}
         </div>
-        
-        <nav className="flex-1 px-3 md:px-2 pt-3 md:pt-1 pb-3 overflow-y-auto overflow-x-hidden [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-          {(() => {
-            const sections: { name: string; items: typeof filteredNavigation }[] = [];
-            filteredNavigation.forEach(item => {
-              const sectionName = (item as any).section || 'Other';
-              let section = sections.find(s => s.name === sectionName);
-              if (!section) {
-                section = { name: sectionName, items: [] };
-                sections.push(section);
-              }
-              section.items.push(item);
-            });
 
-            return sections.map((section, sIdx) => (
-              <div key={section.name} className={sIdx > 0 ? "mt-2 pt-2 border-t border-slate-100 dark:border-navy-800" : ""}>
-                <div className={`px-5 pb-1.5 transition-all duration-300 overflow-hidden whitespace-nowrap flex items-center ${mobileOpen ? 'opacity-100 max-w-full' : 'opacity-0 max-w-0 md:group-hover:opacity-100 md:group-hover:max-w-full'}`}>
-                  <span className="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400 dark:text-slate-500">{section.name}</span>
-                </div>
-                <div className="space-y-0.5">
-                  {section.items.map((item) => {
-                    const isActive = pathname === item.href || (item.href !== '/' && (pathname + '/').startsWith(item.href + '/'));
-                    return (
-                      <Link
-                        key={item.name}
-                        href={item.href}
-                        onClick={() => setMobileOpen?.(false)}
-                        className={`
-                          flex items-center gap-3 px-3 py-1.5 mx-1 rounded-xl transition-all group/item font-bold overflow-hidden
-                          ${isActive 
-                            ? 'bg-[#003875] text-[#FFD500] shadow-md' 
-                            : 'text-slate-600 dark:text-slate-400 hover:text-[#003875] dark:hover:text-[#FFD500] hover:bg-[#003875]/5 dark:hover:bg-white/5 active:scale-95'}
-                        `}
-                      >
-                        <div className="flex items-center justify-center w-6 min-w-[24px]">
-                          <item.icon className={`w-[22px] h-[22px] transition-all font-bold ${isActive ? 'text-[#FFD500] stroke-[2.5]' : 'text-slate-500 dark:text-slate-400 group-hover/item:text-[#003875] dark:group-hover/item:text-[#FFD500] group-hover/item:scale-110'}`} />
-                        </div>
-                        <span className={`flex-1 text-[13px] tracking-wide transition-all duration-300 whitespace-nowrap ${mobileOpen ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4 md:group-hover:opacity-100 md:group-hover:translate-x-0'}`}>
-                          {item.name}
-                        </span>
-                        
-                        {/* Pending Counts Badge */}
-                        {item.id === 'delegations' && delegationsPendingCount > 0 && (
-                          <span className={`transition-all duration-300 ${mobileOpen ? 'opacity-100' : 'opacity-0 md:group-hover:opacity-100'} bg-[#CE2029] text-white text-xs font-black px-2.5 py-0.5 rounded-full shadow-sm`}>
-                            {delegationsPendingCount}
-                          </span>
-                        )}
-                        {item.id === 'checklists' && checklistsPendingCount > 0 && (
-                          <span className={`transition-all duration-300 ${mobileOpen ? 'opacity-100' : 'opacity-0 md:group-hover:opacity-100'} bg-[#CE2029] text-white text-xs font-black px-2.5 py-0.5 rounded-full shadow-sm`}>
-                            {checklistsPendingCount}
-                          </span>
-                        )}
-                        {item.id === 'tickets' && ticketsOpenCount > 0 && (
-                          <span className={`transition-all duration-300 ${mobileOpen ? 'opacity-100' : 'opacity-0 md:group-hover:opacity-100'} bg-[#CE2029] text-white text-xs font-black px-2.5 py-0.5 rounded-full shadow-sm`}>
-                            {ticketsOpenCount}
-                          </span>
-                        )}
-                        {item.id === 'o2d' && o2dPendingCount > 0 && (
-                          <span className={`transition-all duration-300 ${mobileOpen ? 'opacity-100' : 'opacity-0 md:group-hover:opacity-100'} bg-[#CE2029] text-white text-xs font-black px-2.5 py-0.5 rounded-full shadow-sm`}>
-                            {o2dPendingCount}
-                          </span>
-                        )}
-                        {item.id === 'chat' && chatUnreadCount > 0 && (
-                          <span className={`transition-all duration-300 ${mobileOpen ? 'opacity-100' : 'opacity-0 md:group-hover:opacity-100'} bg-[#CE2029] text-white text-xs font-black px-2.5 py-0.5 rounded-full shadow-sm`}>
-                            {chatUnreadCount}
-                          </span>
-                        )}
-                        {item.id === 'leave' && leavePendingCount > 0 && (
-                          <span className={`transition-all duration-300 ${mobileOpen ? 'opacity-100' : 'opacity-0 md:group-hover:opacity-100'} bg-[#CE2029] text-white text-xs font-black px-2.5 py-0.5 rounded-full shadow-sm`}>
-                            {leavePendingCount}
-                          </span>
-                        )}
-                        {item.href === '/hrms/recruitment' && recruitmentPendingCount > 0 && (
-                          <span className={`transition-all duration-300 ${mobileOpen ? 'opacity-100' : 'opacity-0 md:group-hover:opacity-100'} bg-[#CE2029] text-white text-xs font-black px-2.5 py-0.5 rounded-full shadow-sm`}>
-                            {recruitmentPendingCount}
-                          </span>
-                        )}
-                        {item.href === '/hrms/candidate' && candidatePendingCount > 0 && (
-                          <span className={`transition-all duration-300 ${mobileOpen ? 'opacity-100' : 'opacity-0 md:group-hover:opacity-100'} bg-[#CE2029] text-white text-xs font-black px-2.5 py-0.5 rounded-full shadow-sm`}>
-                            {candidatePendingCount}
-                          </span>
-                        )}
-                        {item.href === '/hrms/sales' && salesPendingCount > 0 && (
-                          <span className={`transition-all duration-300 ${mobileOpen ? 'opacity-100' : 'opacity-0 md:group-hover:opacity-100'} bg-[#CE2029] text-white text-xs font-black px-2.5 py-0.5 rounded-full shadow-sm`}>
-                            {salesPendingCount}
-                          </span>
-                        )}
-                        {item.href === '/hrms/onboard' && onboardPendingCount > 0 && (
-                          <span className={`transition-all duration-300 ${mobileOpen ? 'opacity-100' : 'opacity-0 md:group-hover:opacity-100'} bg-[#CE2029] text-white text-xs font-black px-2.5 py-0.5 rounded-full shadow-sm`}>
-                            {onboardPendingCount}
-                          </span>
-                        )}
-                        {item.href === '/hrms/offboard' && offboardPendingCount > 0 && (
-                          <span className={`transition-all duration-300 ${mobileOpen ? 'opacity-100' : 'opacity-0 md:group-hover:opacity-100'} bg-[#CE2029] text-white text-xs font-black px-2.5 py-0.5 rounded-full shadow-sm`}>
-                            {offboardPendingCount}
-                          </span>
-                        )}
-                      </Link>
-                    );
-                  })}
-                </div>
+        <nav className="flex-1 px-3 py-3 overflow-y-auto overflow-x-hidden custom-scrollbar">
+          {sections.map((section) => {
+            const isOpen = !!openSections[section.name];
+            const closedCount = sectionCount(section.items);
+            return (
+              <div key={section.name} className="mb-1">
+                <button
+                  type="button"
+                  onClick={() => toggleSection(section.name)}
+                  aria-expanded={isOpen}
+                  className="w-full flex items-center gap-2 px-3 min-h-[44px] md:min-h-[38px] rounded-lg text-[14px] font-semibold text-[#5B6472] dark:text-slate-400 hover:bg-[#F7F8FA] dark:hover:bg-white/5 transition-colors"
+                >
+                  <ChevronDownIcon
+                    className={`w-4 h-4 shrink-0 transition-transform duration-150 ${isOpen ? '' : '-rotate-90'}`}
+                  />
+                  <span className="flex-1 text-left truncate">{section.name}</span>
+                  {!isOpen && closedCount > 0 && (
+                    <span className="shrink-0 min-w-[22px] text-center text-[13px] font-semibold text-white bg-[#DC2626] rounded-full px-1.5 py-px tabular-nums">
+                      {closedCount}
+                    </span>
+                  )}
+                </button>
+
+                {isOpen && (
+                  <div className="space-y-0.5 mt-0.5">
+                    {section.items.map((item) => {
+                      const isActive = pathname === item.href || (item.href !== '/' && (pathname + '/').startsWith(item.href + '/'));
+                      const count = badgeFor(item as any);
+                      return (
+                        <Link
+                          key={item.name}
+                          href={item.href}
+                          onClick={() => setMobileOpen?.(false)}
+                          aria-current={isActive ? 'page' : undefined}
+                          className={`
+                            flex items-center gap-3 pl-6 pr-3 min-h-[44px] md:min-h-[40px] rounded-lg transition-colors text-[15px]
+                            ${isActive
+                              ? 'bg-[#EFF4FF] text-[#2563EB] font-semibold dark:bg-white/10 dark:text-white'
+                              : 'text-[#1A1D21] dark:text-slate-300 hover:bg-[#F7F8FA] dark:hover:bg-white/5'}
+                          `}
+                        >
+                          <item.icon className={`w-5 h-5 shrink-0 ${isActive ? 'text-[#2563EB] dark:text-white' : 'text-[#5B6472] dark:text-slate-400'}`} />
+                          <span className="flex-1 min-w-0 truncate">{item.name}</span>
+                          {count > 0 && (
+                            <span className="shrink-0 min-w-[22px] text-center text-[13px] font-semibold text-white bg-[#DC2626] rounded-full px-1.5 py-px tabular-nums">
+                              {count}
+                            </span>
+                          )}
+                        </Link>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
-            ));
-          })()}
+            );
+          })}
         </nav>
 
         {/* Mobile User Profile Section */}
         {mobileOpen && (
-          <div className="p-4 mt-auto border-t border-[#003875]/5 dark:border-white/5 md:hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="bg-white/50 dark:bg-white/5 p-4 rounded-3xl flex items-center gap-3 border border-[#003875]/10 dark:border-white/5 shadow-sm">
-              <div className="w-10 h-10 rounded-2xl bg-[#f2b60c]/10 dark:bg-[#FFD500]/10 flex items-center justify-center border border-[#f2b60c]/20 dark:border-[#FFD500]/20">
-                <UserCircleIcon className="w-6 h-6 text-[#003875] dark:text-[#FFD500]" />
-              </div>
+          <div className="p-3 border-t border-[#E5E7EB] dark:border-white/5 md:hidden">
+            <div className="flex items-center gap-3 px-2">
+              <UserCircleIcon className="w-9 h-9 text-[#5B6472]" />
               <div className="flex-1 overflow-hidden">
-                <p className="text-xs font-black text-gray-900 dark:text-white truncate">
-                  {(session?.user as any)?.username?.toUpperCase() || "USER"}
+                <p className="text-[15px] font-semibold text-[#1A1D21] dark:text-white truncate">
+                  {(session?.user as any)?.username || "User"}
                 </p>
-                <p className="text-[10px] font-bold text-gray-500 dark:text-gray-400 capitalize">
+                <p className="text-[13px] text-[#5B6472] dark:text-gray-400 capitalize">
                   {/* @ts-ignore */}
-                  {session?.user?.role || "Member"}
+                  {String(session?.user?.role || "Member").toLowerCase()}
                 </p>
               </div>
-              <button 
+              <button
                 onClick={() => signOut()}
-                className="p-2 text-gray-400 hover:text-[#CE2029] hover:bg-red-50 dark:hover:bg-red-900/10 rounded-xl transition-all"
+                aria-label="Sign out"
+                className="w-11 h-11 flex items-center justify-center text-[#5B6472] hover:text-[#B91C1C] hover:bg-red-50 dark:hover:bg-red-900/10 rounded-lg"
               >
                 <ArrowRightOnRectangleIcon className="w-5 h-5" />
               </button>

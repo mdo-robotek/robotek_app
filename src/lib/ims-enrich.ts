@@ -17,6 +17,24 @@ function parseDateStr(dStr: string) {
   return 0;
 }
 
+/**
+ * Canonical ledger key for an item name (Sahil, 2026-10-23): Busy sells the
+ * same physical item under warranty/non-warranty variant names — a trailing
+ * "W" (warranty) or "NG" (non-guarantee), sometimes in brackets: "HARMONIC"
+ * vs "HARMONIC W", "PRIMO NG" vs "PRIMO", "TWS (W)". GRN IN happens under
+ * ONE name, so the variant OUTs must land on the same ledger key or the
+ * item looks oversold while a phantom variant looks negative. Stripping is
+ * only done at the END of the name so words containing w/ng stay intact.
+ */
+export function ledgerItemKey(raw: string): string {
+  const base = raw.trim().toLowerCase();
+  let s = base;
+  s = s.replace(/\s*\(\s*(w|ng)\s*\)\s*$/, ""); // "(W)" / "(NG)" at end
+  s = s.replace(/[\s\-]+(w|ng)$/, "");            // " W" / "-NG" at end
+  s = s.trim();
+  return s || base; // never collapse to empty (e.g. an item literally named "W")
+}
+
 export type IMSMovementMaps = {
   inQtyMap: Record<string, number>;
   outQtyMap: Record<string, number>;
@@ -24,6 +42,12 @@ export type IMSMovementMaps = {
   displayNameMap: Record<string, string>;
   grnKeys: Set<string>;
   o2dKeys: Set<string>;
+  /** Most recent dated movement (GRN in, Busy/Out Form/floor out) per item, epoch ms */
+  lastActivityMap: Record<string, number>;
+  /** Item Ledger (Module A) IN breakdown by source, per item key */
+  inByGrnMap: Record<string, number>;
+  inByLocalPackMap: Record<string, number>;
+  inByAssembledMap: Record<string, number>;
 };
 
 function resolveMovementSource(
@@ -40,10 +64,12 @@ function resolveMovementSource(
 }
 
 export function buildIMSMovementMaps(
-  grns: { Item_Name?: string; Qty?: string; cancelled?: string | boolean; status_1?: string; Packed_Unpacked?: string }[],
+  grns: { Item_Name?: string; Qty?: string; cancelled?: string | boolean; status_1?: string; Packed_Unpacked?: string; updated_at?: string }[],
   outForm: { description?: string; qty?: string; date?: string; updated_at?: string }[],
   gFloorLedger: FloorLedgerRow[] = [],
-  firstFloorLedger: FloorLedgerRow[] = []
+  firstFloorLedger: FloorLedgerRow[] = [],
+  busySales: { date?: string; item?: string; qty?: number }[] = [],
+  ledgerEntries: { item_name?: string; qty?: number; source_type?: string; date?: string }[] = []
 ): IMSMovementMaps {
   const inQtyMap: Record<string, number> = {};
   const outQtyMap: Record<string, number> = {};
@@ -51,12 +77,27 @@ export function buildIMSMovementMaps(
   const displayNameMap: Record<string, string> = {};
   const grnKeys = new Set<string>();
   const o2dKeys = new Set<string>();
+  const lastActivityMap: Record<string, number> = {};
+  const inByGrnMap: Record<string, number> = {};
+  const inByLocalPackMap: Record<string, number> = {};
+  const inByAssembledMap: Record<string, number> = {};
 
   const rememberName = (raw: string) => {
-    const key = raw.trim().toLowerCase();
-    if (!key) return "";
-    if (!displayNameMap[key]) displayNameMap[key] = raw.trim();
+    const trimmed = raw.trim();
+    if (!trimmed) return "";
+    const key = ledgerItemKey(trimmed);
+    const isBaseForm = trimmed.toLowerCase() === key;
+    // Prefer the base (variant-free) spelling as the display name: if we
+    // first saw "HARMONIC W" and later see "HARMONIC", show "HARMONIC".
+    if (!displayNameMap[key] || (isBaseForm && displayNameMap[key].toLowerCase() !== key)) {
+      displayNameMap[key] = trimmed;
+    }
     return key;
+  };
+
+  const bumpActivity = (key: string, ts: number) => {
+    if (!key || !(ts > 0)) return;
+    if (!lastActivityMap[key] || ts > lastActivityMap[key]) lastActivityMap[key] = ts;
   };
 
   grns.forEach((grn) => {
@@ -66,12 +107,53 @@ export function buildIMSMovementMaps(
       if (key) {
         grnKeys.add(key);
         inQtyMap[key] = (inQtyMap[key] || 0) + qty;
+        inByGrnMap[key] = (inByGrnMap[key] || 0) + qty;
+        bumpActivity(key, parseDateStr(grn.updated_at || ""));
       }
     }
   });
 
+  // Item Ledger (Module A) — Head Office record entries (Locally Packed /
+  // Assembled). IMPORTANT (Sahil, 2026-10-23): these do NOT add to stock
+  // (inQtyMap) — the same goods already enter stock via GRN and the floor
+  // ledgers (GRN → SFG → 1st floor → FG), so counting the ledger entry too
+  // would double/triple count. They are kept only as a per-item breakdown
+  // for the Item Ledger page's audit view.
+  ledgerEntries.forEach((entry) => {
+    const key = rememberName(entry.item_name || "");
+    if (!key) return;
+    const qty = Number(entry.qty) || 0;
+    if (String(entry.source_type || "").trim() === "Assembled") {
+      inByAssembledMap[key] = (inByAssembledMap[key] || 0) + qty;
+    } else {
+      inByLocalPackMap[key] = (inByLocalPackMap[key] || 0) + qty;
+    }
+    bumpActivity(key, parseDateStr(entry.date || ""));
+  });
+
   const now = Date.now();
   const sixtyDaysMs = 60 * 24 * 60 * 60 * 1000;
+
+  // Busy sale register = single source of truth for sales OUT.
+  // Any item present in the Busy register takes its entire sales OUT from
+  // there; Out Form / floor OUT entries for those items are skipped to avoid
+  // double counting. Items absent from Busy (raw material, factory issues)
+  // keep using Out Form + floor OUT as before.
+  const busyKeys = new Set<string>();
+  busySales.forEach((row) => {
+    const qty = Number(row.qty) || 0;
+    if (!qty) return;
+    const key = rememberName(row.item || "");
+    if (!key) return;
+    busyKeys.add(key);
+    o2dKeys.add(key);
+    outQtyMap[key] = (outQtyMap[key] || 0) + qty;
+    const ts = parseDateStr(row.date || "");
+    if (ts > 0 && now - ts <= sixtyDaysMs) {
+      outQty60DaysMap[key] = (outQty60DaysMap[key] || 0) + qty;
+    }
+    bumpActivity(key, ts);
+  });
 
   outForm.forEach((row) => {
     const rowDateTs = parseDateStr(row.date || row.updated_at || "");
@@ -80,6 +162,8 @@ export function buildIMSMovementMaps(
     const addQty = (desc: string, qty: number) => {
       const key = rememberName(desc);
       if (!key) return;
+      bumpActivity(key, rowDateTs);
+      if (busyKeys.has(key)) return; // sales OUT already counted from Busy register
       o2dKeys.add(key);
       outQtyMap[key] = (outQtyMap[key] || 0) + qty;
       if (isWithin60Days) {
@@ -116,9 +200,11 @@ export function buildIMSMovementMaps(
 
     if (inQ > 0) {
       inQtyMap[key] = (inQtyMap[key] || 0) + inQ;
+      bumpActivity(key, rowDateTs);
     }
-    if (outQ > 0) {
+    if (outQ > 0 && !busyKeys.has(key)) {
       outQtyMap[key] = (outQtyMap[key] || 0) + outQ;
+      bumpActivity(key, rowDateTs);
       if (isWithin60Days) {
         outQty60DaysMap[key] = (outQty60DaysMap[key] || 0) + outQ;
       }
@@ -127,13 +213,16 @@ export function buildIMSMovementMaps(
 
   applyFloorOutToGFloorInMap(firstFloorLedger, inQtyMap, rememberName);
 
-  return { inQtyMap, outQtyMap, outQty60DaysMap, displayNameMap, grnKeys, o2dKeys };
+  return {
+    inQtyMap, outQtyMap, outQty60DaysMap, displayNameMap, grnKeys, o2dKeys, lastActivityMap,
+    inByGrnMap, inByLocalPackMap, inByAssembledMap,
+  };
 }
 
 function enrichQtyFields(
   nameKey: string,
   maps: IMSMovementMaps
-): Pick<IMS, "in_qty" | "out_qty" | "live_stock" | "sale_percent" | "avg_daily_con" | "lead_time" | "safety_factor" | "max_level"> {
+): Pick<IMS, "in_qty" | "out_qty" | "live_stock" | "sale_percent" | "avg_daily_con" | "lead_time" | "safety_factor" | "max_level" | "last_activity_date"> {
   const in_qty = maps.inQtyMap[nameKey] || 0;
   const out_qty = maps.outQtyMap[nameKey] || 0;
   const live_stock = in_qty - out_qty;
@@ -143,6 +232,8 @@ function enrichQtyFields(
   const lead_time = 30;
   const safety_factor = 1;
   const max_level = avg_daily_con * lead_time * safety_factor;
+  const lastTs = maps.lastActivityMap[nameKey] || 0;
+  const last_activity_date = lastTs > 0 ? new Date(lastTs).toISOString().split("T")[0] : "";
 
   return {
     in_qty,
@@ -153,6 +244,7 @@ function enrichQtyFields(
     lead_time,
     safety_factor,
     max_level: Number(max_level.toFixed(2)),
+    last_activity_date,
   };
 }
 
@@ -162,12 +254,12 @@ export function enrichIMSItems(
 ): IMS[] {
   const catalogKeys = new Set(
     catalogItems
-      .map((item) => (item.item_name || "").trim().toLowerCase())
+      .map((item) => ledgerItemKey(item.item_name || ""))
       .filter(Boolean)
   );
 
   const enrichedCatalog = catalogItems.map((item) => {
-    const nameKey = (item.item_name || "").trim().toLowerCase();
+    const nameKey = ledgerItemKey(item.item_name || "");
     return {
       ...item,
       ...enrichQtyFields(nameKey, maps),
@@ -212,7 +304,7 @@ export function summarizeIMSMovement(
 ): { totalIn: number; totalOut: number; liveStock: number } {
   const catalogKeys = new Set(
     catalogItems
-      .map((item) => (item.item_name || "").trim().toLowerCase())
+      .map((item) => ledgerItemKey(item.item_name || ""))
       .filter(Boolean)
   );
 
@@ -230,4 +322,119 @@ export function summarizeIMSMovement(
     totalOut,
     liveStock: totalIn - totalOut,
   };
+}
+
+// ── Module A: per-item ledger statement ─────────────────────────────────
+// Entry-level view (kab kitna aaya / gaya, running balance) built from the
+// SAME rules as buildIMSMovementMaps, so the statement always reconciles
+// with the summary totals. Manual Item Ledger entries appear as
+// record-only rows (balance unaffected — see the double-counting fix).
+
+export type LedgerStatementEntry = {
+  date: string; // ISO yyyy-mm-dd ("" when unknown)
+  ts: number;
+  type: string; // "GRN IN" | "Floor IN (G)" | "1st→G Transfer IN" | "Sale OUT (Busy)" | "Out Form OUT" | "Floor OUT (G)" | "Record: Locally Packed" | "Record: Assembled"
+  ref: string; // GRN no / row id etc.
+  inQty: number;
+  outQty: number;
+  recordOnly: boolean;
+  balance: number; // running, record-only rows keep previous balance
+};
+
+export function buildItemLedgerStatement(
+  itemName: string,
+  grns: { Item_Name?: string; GRN_No?: string; Qty?: string; cancelled?: string | boolean; status_1?: string; Packed_Unpacked?: string; updated_at?: string }[],
+  outForm: { description?: string; qty?: string; date?: string; updated_at?: string; order_no?: string }[],
+  gFloorLedger: FloorLedgerRow[],
+  firstFloorLedger: FloorLedgerRow[],
+  busySales: { date?: string; item?: string; qty?: number }[],
+  ledgerEntries: { item_name?: string; qty?: number; source_type?: string; date?: string; id?: string }[]
+): { entries: LedgerStatementEntry[]; totalIn: number; totalOut: number; net: number } {
+  const key = ledgerItemKey(itemName);
+  const raw: Omit<LedgerStatementEntry, "balance">[] = [];
+
+  const toDate = (s: string) => {
+    const ts = parseDateStr(s || "");
+    return { ts, date: ts > 0 ? new Date(ts).toISOString().split("T")[0] : "" };
+  };
+
+  grns.forEach((g) => {
+    if (!g.Item_Name || g.cancelled || g.status_1 === "Rejected" || !isGrnForGFloor(g)) return;
+    if (ledgerItemKey(g.Item_Name) !== key) return;
+    const qty = parseFloat(g.Qty || "") || 0;
+    if (!qty) return;
+    const { ts, date } = toDate(g.updated_at || "");
+    raw.push({ date, ts, type: "GRN IN", ref: g.GRN_No || "", inQty: qty, outQty: 0, recordOnly: false });
+  });
+
+  const isBusyItem = busySales.some((r) => ledgerItemKey(r.item || "") === key && (Number(r.qty) || 0) !== 0);
+
+  busySales.forEach((r) => {
+    if (ledgerItemKey(r.item || "") !== key) return;
+    const qty = Number(r.qty) || 0;
+    if (!qty) return;
+    const { ts, date } = toDate(r.date || "");
+    raw.push({ date, ts, type: "Sale OUT (Busy)", ref: "", inQty: 0, outQty: qty, recordOnly: false });
+  });
+
+  gFloorLedger.forEach((row) => {
+    if (!row.item_name || ledgerItemKey(row.item_name) !== key) return;
+    const inQ = parseFloat(String(row.in_qty || 0)) || 0;
+    const outQ = parseFloat(String(row.out_qty || 0)) || 0;
+    const { ts, date } = toDate(row.date || row.updated_at || "");
+    if (inQ > 0) raw.push({ date, ts, type: "Floor IN (G)", ref: String(row.id || ""), inQty: inQ, outQty: 0, recordOnly: false });
+    if (outQ > 0 && !isBusyItem) raw.push({ date, ts, type: "Floor OUT (G)", ref: String(row.id || ""), inQty: 0, outQty: outQ, recordOnly: false });
+  });
+
+  firstFloorLedger.forEach((row) => {
+    if (!row.item_name || ledgerItemKey(row.item_name) !== key) return;
+    const outQ = parseFloat(String(row.out_qty ?? 0)) || 0;
+    if (outQ <= 0) return;
+    const { ts, date } = toDate(row.date || row.updated_at || "");
+    raw.push({ date, ts, type: "1st→G Transfer IN", ref: String(row.id || ""), inQty: outQ, outQty: 0, recordOnly: false });
+  });
+
+  if (!isBusyItem) {
+    outForm.forEach((row) => {
+      const { ts, date } = toDate(row.date || row.updated_at || "");
+      const push = (desc: string, qty: number) => {
+        if (ledgerItemKey(desc) !== key || !qty) return;
+        raw.push({ date, ts, type: "Out Form OUT", ref: String((row as any).order_no || ""), inQty: 0, outQty: qty, recordOnly: false });
+      };
+      const d = row.description || "";
+      if (d.trim().startsWith("[") && d.trim().endsWith("]")) {
+        try {
+          JSON.parse(d).forEach((it: any) => {
+            push((it.Description || it.description || "").trim(), parseFloat(it.Qty || it.qty || "") || 0);
+          });
+        } catch { /* ignore */ }
+      } else if (d) {
+        push(d.trim(), parseFloat(row.qty || "") || 0);
+      }
+    });
+  }
+
+  ledgerEntries.forEach((e) => {
+    if (ledgerItemKey(e.item_name || "") !== key) return;
+    const qty = Number(e.qty) || 0;
+    if (!qty) return;
+    const { ts, date } = toDate(e.date || "");
+    const t = String(e.source_type || "").trim() === "Assembled" ? "Record: Assembled" : "Record: Locally Packed";
+    raw.push({ date, ts, type: t, ref: String(e.id || ""), inQty: qty, outQty: 0, recordOnly: true });
+  });
+
+  raw.sort((a, b) => a.ts - b.ts);
+  let bal = 0;
+  let totalIn = 0;
+  let totalOut = 0;
+  const entries: LedgerStatementEntry[] = raw.map((e) => {
+    if (!e.recordOnly) {
+      bal += e.inQty - e.outQty;
+      totalIn += e.inQty;
+      totalOut += e.outQty;
+    }
+    return { ...e, balance: Math.round(bal * 100) / 100 };
+  });
+
+  return { entries, totalIn: Math.round(totalIn), totalOut: Math.round(totalOut), net: Math.round(totalIn - totalOut) };
 }

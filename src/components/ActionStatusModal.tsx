@@ -35,8 +35,8 @@ export default function ActionStatusModal({ isOpen, status, message, onClose }: 
         <div className="flex flex-col items-center gap-4">
           {isLoading ? (
             <div className="relative w-16 h-16">
-              <div className="absolute inset-0 border-4 border-[#FFD500]/20 rounded-full" />
-              <div className="absolute inset-0 border-4 border-[#FFD500] border-t-transparent rounded-full animate-spin" />
+              <div className="absolute inset-0 border-4 border-[#2563EB]/20 rounded-full" />
+              <div className="absolute inset-0 border-4 border-[#2563EB] border-t-transparent rounded-full animate-spin" />
             </div>
           ) : isSuccess ? (
             <CheckCircleIcon className="w-16 h-16 text-green-500" />
@@ -46,10 +46,10 @@ export default function ActionStatusModal({ isOpen, status, message, onClose }: 
           }
           
           <div className="space-y-1">
-            <h3 className={`text-[10px] font-black uppercase tracking-[0.2em] ${isError ? 'text-red-500' : isSuccess ? 'text-green-500' : 'text-gray-900 dark:text-white'}`}>
+            <h3 className={`text-[13px] font-semibold   ${isError ? 'text-red-500' : isSuccess ? 'text-green-500' : 'text-gray-900 dark:text-white'}`}>
               {isLoading ? "Processing" : isSuccess ? "Success" : "Validation Error"}
             </h3>
-            <p className="text-[11px] font-bold text-gray-500 dark:text-slate-400 uppercase tracking-widest whitespace-pre-wrap leading-relaxed">
+            <p className="text-[14px] font-bold text-gray-500 dark:text-slate-400 whitespace-pre-wrap leading-relaxed">
               {message}
             </p>
           </div>
@@ -57,7 +57,7 @@ export default function ActionStatusModal({ isOpen, status, message, onClose }: 
           {!isLoading && (
             <button
                onClick={onClose}
-               className="mt-2 px-6 py-2 bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all"
+               className="mt-2 px-6 py-2 bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 rounded-xl text-[13px] font-semibold transition-all"
             >
               Dismiss
             </button>

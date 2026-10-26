@@ -118,7 +118,7 @@ export default function MessageSearchSidebar({
         ) : (
           groupedResults.map((group) => (
             <div key={group.date}>
-              <p className="px-4 py-2 text-xs text-gray-500 bg-[#F0F2F5] sticky top-0">{group.date}</p>
+              <p className="px-4 py-2 text-[14px] text-gray-500 bg-[#F0F2F5] sticky top-0">{group.date}</p>
               {group.items.map((msg) => {
                 const text = getMessageSearchText(msg);
                 return (

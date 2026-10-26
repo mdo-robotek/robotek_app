@@ -31,7 +31,7 @@ export default function TechInfoCards({ compact = false, fillHeight = false }: {
         <FieldCard key={card.title} title={card.title} icon={<span>{card.icon}</span>} compact className={fillHeight ? 'h-full' : ''}>
           <ul className="space-y-0.5">
             {card.items.slice(0, compact ? 4 : undefined).map((item) => (
-              <li key={item} className="flex items-center gap-1.5 text-[11px] text-gray-600 dark:text-gray-300">
+              <li key={item} className="flex items-center gap-1.5 text-[14px] text-gray-600 dark:text-gray-300">
                 <span className="text-green-500 font-bold">✓</span>
                 {item}
               </li>

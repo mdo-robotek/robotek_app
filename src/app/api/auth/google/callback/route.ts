@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
             pre { background: #1e293b; color: #f8fafc; padding: 20px; border-radius: 12px; overflow-x: auto; }
             code { font-family: monospace; }
             h1 { color: #0f172a; }
-            .hint { background: #eff6ff; color: #1e40af; padding: 15px; border-radius: 12px; margin-bottom: 20px; border-left: 4px solid #3b82f6; }
+            .hint { background: #eff6ff; color: #1D4ED8; padding: 15px; border-radius: 12px; margin-bottom: 20px; border-left: 4px solid #3b82f6; }
           </style>
         </head>
         <body>

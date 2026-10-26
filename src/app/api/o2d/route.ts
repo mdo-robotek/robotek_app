@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getO2DsPaginated, addO2Ds, addItem, getO2Ds, o2dService, o2dArchivedService, getAllO2DsForAnalytics } from "@/lib/o2d-sheets";
+import { getO2DsPaginated, addO2Ds, addItem, getO2Ds, o2dService, o2dArchivedService, getAllO2DsForAnalytics, allocateO2DOrderNo } from "@/lib/o2d-sheets";
 import { uploadFileToDrive, O2D_UPLOADS_FOLDER_ID } from "@/lib/google-drive";
 import { auth } from "@/auth";
 import { sendO2DRemarkNotification } from "@/lib/o2d-notifications";
@@ -137,29 +137,45 @@ export async function POST(req: NextRequest) {
       }
 
       const timestamp = new Date().toISOString();
+
+      // New order → the SERVER assigns the order number (one at a time,
+      // from a fresh sheet read) so quick back-to-back punches can never
+      // share a number and look "merged". Every row of this submission
+      // belongs to the same new order.
+      const assignedOrderNo = await allocateO2DOrderNo();
+
       const recordsToSave = o2dDataArray.map(item => ({
         ...item,
+        order_no: assignedOrderNo,
         id: item.id || `O2D-${Date.now()}-${Math.random()}`,
         order_screenshot: screenshotUrl || item.order_screenshot || "",
         created_at: item.created_at || timestamp,
         updated_at: timestamp
       }));
 
-      await addO2Ds(recordsToSave);
-      
-      // Send WhatsApp Notification for the new order(s)
-      // Group by order number if multiple were added
-      const orderGroups = recordsToSave.reduce((acc, curr) => {
-        if (!acc[curr.order_no]) acc[curr.order_no] = [];
-        acc[curr.order_no].push(curr);
-        return acc;
-      }, {} as Record<string, any[]>);
-
-      for (const orderNo in orderGroups) {
-        await sendO2DRemarkNotification(orderGroups[orderNo], "Created");
+      // Save, and VERIFY it saved. Before, a failed Google write still
+      // returned "success" — the team saw "Order Created!" but the order
+      // never appeared and had to be punched again. One retry for a
+      // momentary Google hiccup, then an honest error.
+      let saved = await addO2Ds(recordsToSave);
+      if (!saved) {
+        await new Promise((r) => setTimeout(r, 1500));
+        saved = await addO2Ds(recordsToSave);
+      }
+      if (!saved) {
+        return NextResponse.json(
+          { error: "Order could not be saved. Please try again — nothing was saved." },
+          { status: 503 }
+        );
       }
 
-      return NextResponse.json({ message: "O2D records added successfully" });
+      // WhatsApp notification must never turn a saved order into an
+      // "error" (that made people re-punch and create duplicates).
+      void sendO2DRemarkNotification(recordsToSave, "Created").catch((e: unknown) =>
+        console.error("O2D create notification failed:", e)
+      );
+
+      return NextResponse.json({ message: "O2D records added successfully", order_no: assignedOrderNo });
     } else {
       const o2dData = await req.json();
       const timestamp = new Date().toISOString();

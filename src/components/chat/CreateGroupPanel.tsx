@@ -127,7 +127,7 @@ export default function CreateGroupPanel({
             />
           </div>
 
-          <p className="text-xs text-[#25D366] font-medium uppercase tracking-wide mb-3">
+          <p className="text-[14px] text-[#25D366] font-medium tracking-wide mb-3">
             Participants: {allParticipants.length}
           </p>
           <div className="space-y-1">
@@ -173,7 +173,7 @@ export default function CreateGroupPanel({
         <div>
           <h2 className="text-[19px] font-normal leading-tight">Add group members</h2>
           {selectedUsers.length > 0 && (
-            <p className="text-xs text-white/70">{selectedUsers.length} selected</p>
+            <p className="text-[14px] text-white/70">{selectedUsers.length} selected</p>
           )}
         </div>
       </div>
@@ -221,7 +221,7 @@ export default function CreateGroupPanel({
           groupedUsers.map(([letter, letterUsers]) => (
             <div key={letter}>
               <div className="px-4 py-1.5 bg-[#F0F2F5] sticky top-0">
-                <span className="text-xs font-medium text-[#25D366]">{letter}</span>
+                <span className="text-[14px] font-medium text-[#25D366]">{letter}</span>
               </div>
               {letterUsers.map((user) => {
                 const isSelected = selectedUsers.includes(user.username);

@@ -234,21 +234,21 @@ export default function ActionLogView() {
       {/* Filter & Action Bar */}
       <div className="bg-white dark:bg-navy-800 p-3 rounded-2xl border border-gray-100 dark:border-navy-700 shadow-sm flex items-center justify-between overflow-x-auto no-scrollbar gap-4">
         <div className="flex items-center gap-2">
-          <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest px-2">Filter:</span>
+          <span className="text-[13px] font-semibold text-gray-400 px-2">Filter:</span>
           {filters.map(f => {
             const count = getFilterCount(f);
             return (
               <button
                 key={f}
                 onClick={() => setActiveFilter(f)}
-                className={`px-3 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all flex items-center gap-2 ${
+                className={`px-3 py-1.5 rounded-xl text-[13px] font-semibold   transition-all flex items-center gap-2 ${
                   activeFilter === f 
-                  ? 'bg-[#001736] text-white shadow-md scale-105' 
+                  ? 'bg-[#1D4ED8] text-white shadow-md scale-105' 
                   : 'bg-gray-50 text-gray-500 border border-gray-100 hover:bg-gray-100 dark:bg-navy-900 dark:border-white/5'
                 }`}
               >
                 {f}
-                <span className={`px-1.5 py-0.5 rounded-full text-[8px] ${
+                <span className={`px-1.5 py-0.5 rounded-full text-[12px] ${
                   activeFilter === f ? 'bg-white/20 text-white' : 'bg-gray-200 text-gray-600 dark:bg-gray-800 dark:text-gray-400'
                 }`}>
                   {count}
@@ -260,7 +260,7 @@ export default function ActionLogView() {
         
         <button 
           onClick={() => openModal()}
-          className="bg-[#1e40af] text-white px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 hover:bg-[#1e3a8a] transition-all shrink-0 shadow-lg active:scale-95"
+          className="bg-[#1D4ED8] text-white px-5 py-2.5 rounded-xl text-[13px] font-semibold flex items-center gap-2 hover:bg-[#1e3a8a] transition-all shrink-0 shadow-lg active:scale-95"
         >
           <PlusIcon className="w-4 h-4 stroke-[3]" /> New action item
         </button>
@@ -271,55 +271,55 @@ export default function ActionLogView() {
           <div className="overflow-x-auto h-full">
             <table className="w-full text-left border-collapse min-w-[800px]">
               <thead className="sticky top-0 z-20">
-                <tr className="bg-[#001736] text-white">
-                  <th className="px-4 py-3.5 text-[9px] font-black uppercase tracking-widest w-12 text-center">#</th>
-                  <th className="px-4 py-3.5 text-[9px] font-black uppercase tracking-widest">Task</th>
-                  <th className="px-4 py-3.5 text-[9px] font-black uppercase tracking-widest w-32">Owner</th>
-                  <th className="px-4 py-3.5 text-[9px] font-black uppercase tracking-widest w-28 text-center">Priority</th>
-                  <th className="px-4 py-3.5 text-[9px] font-black uppercase tracking-widest w-32 text-center">Status</th>
-                  <th className="px-4 py-3.5 text-[9px] font-black uppercase tracking-widest w-28 text-center">Due</th>
-                  <th className="px-4 py-3.5 text-[9px] font-black uppercase tracking-widest w-24 text-center">Update</th>
+                <tr className="bg-[#1D4ED8] text-white">
+                  <th className="px-4 py-3.5 text-[13px] font-semibold w-12 text-center">#</th>
+                  <th className="px-4 py-3.5 text-[13px] font-semibold">Task</th>
+                  <th className="px-4 py-3.5 text-[13px] font-semibold w-32">Owner</th>
+                  <th className="px-4 py-3.5 text-[13px] font-semibold w-28 text-center">Priority</th>
+                  <th className="px-4 py-3.5 text-[13px] font-semibold w-32 text-center">Status</th>
+                  <th className="px-4 py-3.5 text-[13px] font-semibold w-28 text-center">Due</th>
+                  <th className="px-4 py-3.5 text-[13px] font-semibold w-24 text-center">Update</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
                 {isLoading ? (
                   <tr>
                     <td colSpan={7} className="py-20 text-center">
-                      <ArrowPathIcon className="w-8 h-8 text-[#1e40af] animate-spin mx-auto opacity-20" />
+                      <ArrowPathIcon className="w-8 h-8 text-[#1D4ED8] animate-spin mx-auto opacity-20" />
                     </td>
                   </tr>
                 ) : filteredItems.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="py-20 text-center text-gray-400 font-bold text-xs italic bg-gray-50/30">
+                    <td colSpan={7} className="py-20 text-center text-gray-400 font-bold text-[14px] italic bg-gray-50/30">
                       No items found
                     </td>
                   </tr>
                 ) : (
                   filteredItems.map((item, index) => (
                     <tr key={item.id} className="hover:bg-gray-50/50 dark:hover:bg-navy-800/50 transition-colors group">
-                      <td className="px-4 py-4 text-[10px] font-black text-gray-400 text-center">{index + 1}</td>
-                      <td className="px-4 py-4 text-[11px] font-bold text-gray-800 dark:text-gray-200 min-w-[200px]">
+                      <td className="px-4 py-4 text-[13px] font-semibold text-gray-400 text-center">{index + 1}</td>
+                      <td className="px-4 py-4 text-[14px] font-bold text-gray-800 dark:text-gray-200 min-w-[200px]">
                         {item.task}
                         {item.notes && (
-                          <div className="mt-1 text-[9px] text-gray-400 font-medium italic truncate max-w-sm">
+                          <div className="mt-1 text-[13px] text-gray-400 font-medium italic truncate max-w-sm">
                             NB: {item.notes}
                           </div>
                         )}
                       </td>
-                      <td className="px-4 py-4 text-[10px] font-black text-[#1e40af] dark:text-blue-400 uppercase tracking-widest">
+                      <td className="px-4 py-4 text-[13px] font-semibold text-[#1D4ED8] dark:text-blue-400">
                         {item.owner || "—"}
                       </td>
                       <td className="px-4 py-4 text-center">
-                        <span className={`inline-block px-2.5 py-1 rounded-full text-[8px] font-black uppercase tracking-widest border ${getPriorityStyle(item.priority)}`}>
+                        <span className={`inline-block px-2.5 py-1 rounded-full text-[12px] font-semibold   border ${getPriorityStyle(item.priority)}`}>
                           {item.priority}
                         </span>
                       </td>
                       <td className="px-4 py-4 text-center">
-                        <span className={`inline-block px-2.5 py-1 rounded-full text-[8px] font-black uppercase tracking-widest border ${getStatusStyle(item.status)}`}>
+                        <span className={`inline-block px-2.5 py-1 rounded-full text-[12px] font-semibold   border ${getStatusStyle(item.status)}`}>
                           {item.status}
                         </span>
                       </td>
-                      <td className="px-4 py-4 text-center text-[10px] font-black text-gray-500 uppercase tracking-widest">
+                      <td className="px-4 py-4 text-center text-[13px] font-semibold text-gray-500">
                         {formatDate(item.due)}
                       </td>
                       <td className="px-4 py-4 text-center">
@@ -344,16 +344,16 @@ export default function ActionLogView() {
       {isModalOpen && (
         <Portal>
           <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-[#001736]/60 backdrop-blur-md" onClick={closeModal} />
+            <div className="absolute inset-0 bg-[#1D4ED8]/60 backdrop-blur-md" onClick={closeModal} />
             <div className="relative bg-white dark:bg-navy-900 w-full max-w-xl rounded-2xl shadow-2xl flex flex-col animate-in fade-in zoom-in-95 duration-200 border border-white/20 overflow-hidden">
-                         <div className="px-8 py-6 border-b border-gray-100 dark:border-navy-800 flex justify-between items-center bg-[#FFFBF0] dark:bg-navy-900">
+                         <div className="px-8 py-6 border-b border-gray-100 dark:border-navy-800 flex justify-between items-center bg-[#FFFFFF] dark:bg-navy-900">
                 <div>
-                  <h2 className="text-xl font-black text-gray-900 dark:text-white tracking-tight uppercase">
+                  <h2 className="text-xl font-semibold text-gray-900 dark:text-white tracking-tight">
                     {editingItem ? "Update Task" : "Create New Task"}
                   </h2>
                   <div className="flex items-center gap-2 mt-1">
-                    <p className="text-gray-400 dark:text-slate-400 font-bold text-[8px] uppercase tracking-widest">EA-MD Hub Action Tracker</p>
-                    <span className="px-2 py-0.5 bg-orange-50 dark:bg-navy-800 text-[8px] font-black text-[#003875] dark:text-[#FFD500] rounded border border-orange-100 dark:border-navy-700 uppercase">
+                    <p className="text-gray-400 dark:text-slate-400 font-bold text-[12px]">EA-MD Hub Action Tracker</p>
+                    <span className="px-2 py-0.5 bg-orange-50 dark:bg-navy-800 text-[12px] font-semibold text-[#2563EB] dark:text-[#60A5FA] rounded border border-orange-100 dark:border-navy-700">
                       Task Details
                     </span>
                   </div>
@@ -365,29 +365,29 @@ export default function ActionLogView() {
 
               {isSaving && (
                 <div className="absolute inset-0 bg-white/60 dark:bg-navy-900/60 backdrop-blur-sm z-50 flex items-center justify-center">
-                  <div className="w-12 h-12 border-4 border-[#003875] border-t-transparent rounded-full animate-spin" />
+                  <div className="w-12 h-12 border-4 border-[#2563EB] border-t-transparent rounded-full animate-spin" />
                 </div>
               )}
 
               <form onSubmit={handleSave} className="p-8 space-y-6 bg-white dark:bg-navy-800/50 max-h-[80vh] overflow-y-auto">
                 {/* Section Header */}
                 <div>
-                  <p className="text-[10px] font-black text-[#003875] dark:text-[#FFD500] uppercase tracking-[0.2em] mb-1">Task Information</p>
-                  <div className="h-0.5 w-10 bg-[#003875] dark:bg-[#FFD500] rounded-full mb-4"></div>
+                  <p className="text-[13px] font-semibold text-[#2563EB] dark:text-[#60A5FA] mb-1">Task Information</p>
+                  <div className="h-0.5 w-10 bg-[#2563EB] dark:bg-[#60A5FA] rounded-full mb-4"></div>
                 </div>
 
                 <div>
-                  <label className="flex items-center gap-2 text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 px-1">
+                  <label className="flex items-center gap-2 text-[13px] font-semibold text-gray-400 mb-2 px-1">
                     Task Description *
                   </label>
                   <textarea required rows={3} value={formTask} onChange={e => setFormTask(e.target.value)}
                     placeholder="Enter task details..."
-                    className="w-full bg-[#FFFBF0] dark:bg-navy-900 px-4 py-3 rounded-xl border border-orange-100 dark:border-navy-700/50 focus:border-[#003875] dark:focus:border-[#FFD500] focus:bg-white outline-none text-[13px] font-bold text-gray-800 dark:text-white transition-all shadow-sm resize-none" />
+                    className="w-full bg-[#FFFFFF] dark:bg-navy-900 px-4 py-3 rounded-xl border border-orange-100 dark:border-navy-700/50 focus:border-[#2563EB] dark:focus:border-[#60A5FA] focus:bg-white outline-none text-[13px] font-bold text-gray-800 dark:text-white transition-all shadow-sm resize-none" />
                 </div>
 
                 <div className="grid grid-cols-2 gap-6">
                   <div>
-                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 px-1 block">
+                    <label className="text-[13px] font-semibold text-gray-400 mb-2 px-1 block">
                       Owner *
                     </label>
                     <SearchableSelect 
@@ -395,23 +395,23 @@ export default function ActionLogView() {
                       value={formOwner} 
                       onChange={setFormOwner} 
                       placeholder="Assign to" 
-                      className="bg-[#FFFBF0] dark:bg-navy-900 border border-orange-100 dark:border-navy-700/50"
+                      className="bg-[#FFFFFF] dark:bg-navy-900 border border-orange-100 dark:border-navy-700/50"
                     />
                   </div>
                   <div>
-                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 px-1 block">
+                    <label className="text-[13px] font-semibold text-gray-400 mb-2 px-1 block">
                       Due Date *
                     </label>
                     <div className="relative group/date">
-                      <CalendarDaysIcon className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none group-focus-within/date:text-[#003875] dark:group-focus-within/date:text-[#FFD500]" />
+                      <CalendarDaysIcon className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none group-focus-within/date:text-[#2563EB] dark:group-focus-within/date:text-[#60A5FA]" />
                       <input required type="date" value={formDue} onChange={e => setFormDue(e.target.value)}
-                        className="w-full bg-[#FFFBF0] dark:bg-navy-900 pr-12 pl-4 py-2.5 rounded-xl border border-orange-100 dark:border-navy-700/50 focus:border-[#003875] dark:focus:border-[#FFD500] outline-none text-sm font-bold text-gray-800 dark:text-white transition-all shadow-sm" />
+                        className="w-full bg-[#FFFFFF] dark:bg-navy-900 pr-12 pl-4 py-2.5 rounded-xl border border-orange-100 dark:border-navy-700/50 focus:border-[#2563EB] dark:focus:border-[#60A5FA] outline-none text-sm font-bold text-gray-800 dark:text-white transition-all shadow-sm" />
                     </div>
                   </div>
                 </div>
 
                 <div>
-                  <label className="flex items-center gap-2 text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3 px-1">
+                  <label className="flex items-center gap-2 text-[13px] font-semibold text-gray-400 mb-3 px-1">
                     Priority Level *
                   </label>
                   <div className="flex flex-wrap gap-2">
@@ -427,7 +427,7 @@ export default function ActionLogView() {
                           key={p.l}
                           type="button"
                           onClick={() => setFormPriority(p.l)}
-                          className={`flex-1 px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all shadow-sm ${
+                          className={`flex-1 px-4 py-2.5 rounded-xl text-[13px] font-semibold   border transition-all shadow-sm ${
                             isActive 
                             ? p.c + ' ring-2 ring-offset-1 ring-gray-100 scale-105'
                             : 'bg-white text-gray-400 border-gray-200 dark:bg-navy-900 dark:border-white/5 opacity-50 grayscale hover:grayscale-0 hover:opacity-100'
@@ -441,7 +441,7 @@ export default function ActionLogView() {
                 </div>
 
                 <div>
-                  <label className="flex items-center gap-2 text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3 px-1">
+                  <label className="flex items-center gap-2 text-[13px] font-semibold text-gray-400 mb-3 px-1">
                     Task Status *
                   </label>
                   <div className="flex flex-row overflow-x-auto no-scrollbar gap-2 pb-1">
@@ -457,7 +457,7 @@ export default function ActionLogView() {
                           key={s.l}
                           type="button"
                           onClick={() => setFormStatus(s.l)}
-                          className={`flex-1 min-w-[100px] px-3 py-3 rounded-xl text-[9px] font-black uppercase tracking-widest border transition-all text-center whitespace-nowrap shadow-sm ${
+                          className={`flex-1 min-w-[100px] px-3 py-3 rounded-xl text-[13px] font-semibold   border transition-all text-center whitespace-nowrap shadow-sm ${
                             isActive 
                             ? s.c + ' ring-2 ring-offset-1 ring-gray-100'
                             : 'bg-white text-gray-400 border-gray-200 dark:bg-navy-900 dark:border-white/5 opacity-60 hover:opacity-100'
@@ -471,18 +471,18 @@ export default function ActionLogView() {
                 </div>
 
                 <div>
-                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 px-1 block">Notes & Details</label>
+                  <label className="text-[13px] font-semibold text-gray-400 mb-2 px-1 block">Notes & Details</label>
                   <input type="text" value={formNotes} onChange={e => setFormNotes(e.target.value)}
                     placeholder="Any specific instructions?"
-                    className="w-full bg-[#FFFBF0] dark:bg-navy-900 px-4 py-2.5 rounded-xl border border-orange-100 dark:border-navy-700/50 focus:border-[#003875] dark:focus:border-[#FFD500] outline-none text-sm font-bold text-gray-800 dark:text-white transition-all shadow-sm" />
+                    className="w-full bg-[#FFFFFF] dark:bg-navy-900 px-4 py-2.5 rounded-xl border border-orange-100 dark:border-navy-700/50 focus:border-[#2563EB] dark:focus:border-[#60A5FA] outline-none text-sm font-bold text-gray-800 dark:text-white transition-all shadow-sm" />
                 </div>
 
                 <div className="pt-4 flex justify-end gap-5">
-                  <button type="button" onClick={closeModal} className="px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-gray-900 transition-colors">
+                  <button type="button" onClick={closeModal} className="px-8 py-3 rounded-xl text-[13px] font-semibold text-gray-400 hover:text-gray-900 transition-colors">
                     Dismiss
                   </button>
                   <button type="submit" 
-                    className="px-12 py-3 rounded-xl text-[11px] font-black uppercase tracking-widest text-white bg-[#003875] dark:bg-[#FFD500] dark:text-black hover:shadow-xl transition-all active:scale-95 shadow-lg border-b-4 border-black/20"
+                    className="px-12 py-3 rounded-xl text-[14px] font-semibold text-white bg-[#2563EB] dark:bg-[#60A5FA] dark:text-black hover:shadow-xl transition-all active:scale-95 shadow-lg border-b-4 border-black/20"
                   >
                     {editingItem ? "Update Changes" : "Confirm & Create"}
                   </button>

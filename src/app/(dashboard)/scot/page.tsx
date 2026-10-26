@@ -61,11 +61,24 @@ export default function ScotPage() {
     fetcher
   );
 
+  // Real party mobile numbers (Target/Calls sheet) — used to recover the
+  // real customer name for calls Callyzer logged as "Unknown" (happens
+  // whenever that number isn't saved in the employee's own phone contacts).
+  const { data: partyNumbersData } = useSWR('/api/scot/party-numbers', fetcher);
+
   const o2ds: O2D[] = o2dDataRes?.data || [];
   const feeders: DataFeeder[] = feederData || [];
   const followUps = followUpsData || [];
   const frequencies = freqData?.data || [];
   const activeParties = activePartyData?.data || [];
+
+  const partyNameByNumber: Record<string, string> = useMemo(() => {
+    const map: Record<string, string> = {};
+    (partyNumbersData?.data || []).forEach((p: { partyName: string; mobileNum: string }) => {
+      if (p.partyName && p.mobileNum) map[p.partyName] = p.mobileNum;
+    });
+    return map;
+  }, [partyNumbersData]);
 
   const [isFreqModalOpen, setIsFreqModalOpen] = useState(false);
   const [freqParty, setFreqParty] = useState("");
@@ -157,14 +170,14 @@ export default function ScotPage() {
 
   const handleGenerateWeeklyReports = async () => {
     setIsReportLoading(true);
-    toast.info("Aggregating spreadsheet metrics for last week (active parties only)...");
+    toast.info("Aggregating spreadsheet metrics for last week (excluding Inactive parties)...");
     try {
-      const res = await fetch('/api/scot/report?activeOnly=true&source=scot');
+      const res = await fetch('/api/scot/report?source=scot');
       if (res.ok) {
         const data = await res.json();
         const coordinators = data.report || [];
         if (coordinators.length === 0) {
-          toast.error("No active parties found. Mark parties as active to generate weekly report.");
+          toast.error("No parties found to report on.");
           return;
         }
         
@@ -186,10 +199,13 @@ export default function ScotPage() {
     }
   };
 
-  const activePartySet = useMemo(() => {
+  // Default = every party is active/callable. A party only lands here when
+  // explicitly marked Inactive (unchecked) — nothing to toggle on means
+  // nothing is excluded, which matches how calling/scoring should behave.
+  const inactivePartySet = useMemo(() => {
     return new Set(
       activeParties
-        .filter((record: { partyName: string; active: boolean }) => record.active)
+        .filter((record: { partyName: string; active: boolean }) => record.active === false)
         .map((record: { partyName: string }) => record.partyName.toLowerCase().trim())
     );
   }, [activeParties]);
@@ -204,7 +220,7 @@ export default function ScotPage() {
       });
       if (res.ok) {
         mutateActiveParties();
-        toast.success(active ? "Marked as active party" : "Removed from active parties");
+        toast.success(active ? "Party marked active — will be called & scored again" : "Party marked inactive — excluded from calling & scoring");
       } else {
         toast.error("Failed to update active party");
       }
@@ -494,13 +510,13 @@ export default function ScotPage() {
         isManualFrequency,
         manualFollowUpDate,
         rawOrders: orders,
-        isActive: activePartySet.has(toName.toLowerCase().trim()),
+        isActive: !inactivePartySet.has(toName.toLowerCase().trim()),
       };
     });
 
     const partyCounts = {
-      active: rows.filter((row) => activePartySet.has(row.toName.toLowerCase().trim())).length,
-      inactive: rows.filter((row) => !activePartySet.has(row.toName.toLowerCase().trim())).length,
+      active: rows.filter((row) => !inactivePartySet.has(row.toName.toLowerCase().trim())).length,
+      inactive: rows.filter((row) => inactivePartySet.has(row.toName.toLowerCase().trim())).length,
     };
 
     const searchTerm = searchScot.toLowerCase().trim();
@@ -534,7 +550,7 @@ export default function ScotPage() {
     });
 
     return { rows: filteredRows, partyCounts };
-  }, [feeders, o2ds, searchScot, showTodayOnly, followUps, frequencies, activePartySet, scotListView]);
+  }, [feeders, o2ds, searchScot, showTodayOnly, followUps, frequencies, inactivePartySet, scotListView]);
 
   const scotRows = scotRowsResult.rows;
   const scotPartyCounts = scotRowsResult.partyCounts;
@@ -658,8 +674,8 @@ export default function ScotPage() {
             <InformationCircleIcon className="w-6 h-6 text-blue-500" />
           </div>
           <div>
-            <h1 className="text-xl font-black text-slate-900 dark:text-white leading-tight">Scot</h1>
-            <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mt-0.5">Call Data Integration & Analytics</p>
+            <h1 className="text-xl font-semibold text-slate-900 dark:text-white leading-tight">Scot</h1>
+            <p className="text-[13px] font-bold text-slate-500 dark:text-slate-400 mt-0.5">Call Data Integration & Analytics</p>
           </div>
         </div>
 
@@ -668,21 +684,21 @@ export default function ScotPage() {
           <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-2xl">
             <button 
               onClick={() => setActiveTab("dashboard")} 
-              className={`px-4 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 ${activeTab === 'dashboard' ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
+              className={`px-4 py-2 rounded-xl text-[14px] font-semibold transition-all flex items-center gap-1.5 ${activeTab === 'dashboard' ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
             >
               <ChartBarIcon className="w-4 h-4" />
               <span className="hidden sm:inline">Dashboard</span>
             </button>
             <button 
               onClick={() => setActiveTab("data-feeder")} 
-              className={`px-4 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 ${activeTab === 'data-feeder' ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
+              className={`px-4 py-2 rounded-xl text-[14px] font-semibold transition-all flex items-center gap-1.5 ${activeTab === 'data-feeder' ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
             >
               <DocumentArrowUpIcon className="w-4 h-4" />
               <span className="hidden sm:inline">Data Feeder</span>
             </button>
             <button 
               onClick={() => setActiveTab("scot")} 
-              className={`px-4 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 ${activeTab === 'scot' ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
+              className={`px-4 py-2 rounded-xl text-[14px] font-semibold transition-all flex items-center gap-1.5 ${activeTab === 'scot' ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
             >
               <TableCellsIcon className="w-4 h-4" />
               <span className="hidden sm:inline">Scot</span>
@@ -693,7 +709,7 @@ export default function ScotPage() {
 
       {/* Dashboard Tab */}
       {activeTab === "dashboard" && (
-        <AnalyticsDashboard feeders={feeders} scotRows={scotRows} />
+        <AnalyticsDashboard feeders={feeders} scotRows={scotRows} partyNameByNumber={partyNameByNumber} />
       )}
 
       {/* Data Feeder Tab */}
@@ -703,7 +719,7 @@ export default function ScotPage() {
             {/* Header / Actions Row */}
             <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800">
               <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-                <h3 className="font-black text-slate-900 dark:text-white text-sm uppercase tracking-widest flex items-center gap-2">
+                <h3 className="font-semibold text-slate-900 dark:text-white text-sm flex items-center gap-2">
                   <TableCellsIcon className="w-5 h-5 text-blue-500" />
                   Recent Feeds
                 </h3>
@@ -721,13 +737,13 @@ export default function ScotPage() {
                   />
                   <div className="flex items-center gap-2">
                     {uploadMessage && (
-                      <span className="text-[10px] font-bold text-blue-500 animate-pulse whitespace-nowrap">
+                      <span className="text-[13px] font-bold text-blue-500 animate-pulse whitespace-nowrap">
                         {uploadMessage}
                       </span>
                     )}
                     <label 
                       htmlFor="file-upload" 
-                      className={`flex items-center gap-2 px-4 py-1.5 rounded-xl font-black uppercase tracking-widest text-[10px] transition-all cursor-pointer shadow-sm active:scale-95 whitespace-nowrap ${
+                      className={`flex items-center gap-2 px-4 py-1.5 rounded-xl font-semibold   text-[13px] transition-all cursor-pointer shadow-sm active:scale-95 whitespace-nowrap ${
                         uploading 
                           ? 'bg-slate-100 text-slate-400 dark:bg-slate-800 pointer-events-none' 
                           : 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-600/20'
@@ -740,9 +756,9 @@ export default function ScotPage() {
 
                   {/* Pagination Actions */}
                   <div className="flex gap-1.5">
-                    <button onClick={() => setFeederPage(p => Math.max(1, p - 1))} disabled={feederPage === 1} className="px-3 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[10px] font-black uppercase tracking-widest rounded-xl disabled:opacity-50 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors shadow-sm text-slate-700 dark:text-slate-300">Prev</button>
-                    <span className="flex items-center px-2 text-[10px] font-black uppercase tracking-widest text-slate-400 whitespace-nowrap">{feederPage} / {Math.ceil(filteredFeeders.length / itemsPerPage) || 1}</span>
-                    <button onClick={() => setFeederPage(p => Math.min(Math.ceil(filteredFeeders.length / itemsPerPage), p + 1))} disabled={feederPage >= Math.ceil(filteredFeeders.length / itemsPerPage)} className="px-3 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[10px] font-black uppercase tracking-widest rounded-xl disabled:opacity-50 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors shadow-sm text-slate-700 dark:text-slate-300">Next</button>
+                    <button onClick={() => setFeederPage(p => Math.max(1, p - 1))} disabled={feederPage === 1} className="px-3 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[13px] font-semibold rounded-xl disabled:opacity-50 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors shadow-sm text-slate-700 dark:text-slate-300">Prev</button>
+                    <span className="flex items-center px-2 text-[13px] font-semibold text-slate-400 whitespace-nowrap">{feederPage} / {Math.ceil(filteredFeeders.length / itemsPerPage) || 1}</span>
+                    <button onClick={() => setFeederPage(p => Math.min(Math.ceil(filteredFeeders.length / itemsPerPage), p + 1))} disabled={feederPage >= Math.ceil(filteredFeeders.length / itemsPerPage)} className="px-3 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[13px] font-semibold rounded-xl disabled:opacity-50 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors shadow-sm text-slate-700 dark:text-slate-300">Next</button>
                   </div>
 
                   {/* Search Input */}
@@ -751,7 +767,7 @@ export default function ScotPage() {
                     placeholder="Search Names or Numbers..." 
                     value={searchFeeder} 
                     onChange={(e) => {setSearchFeeder(e.target.value); setFeederPage(1);}} 
-                    className="px-4 py-1.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold outline-none focus:ring-2 focus:ring-blue-500 text-slate-700 dark:text-white w-full sm:w-64 transition-all"
+                    className="px-4 py-1.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-[14px] font-bold outline-none focus:ring-2 focus:ring-blue-500 text-slate-700 dark:text-white w-full sm:w-64 transition-all"
                   />
                 </div>
               </div>
@@ -762,15 +778,15 @@ export default function ScotPage() {
               <table className="w-full text-left border-collapse table-auto relative">
                 <thead>
                   <tr className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
-                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest whitespace-nowrap border-r-2 border-blue-500/50">Employee Details</th>
-                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest whitespace-nowrap border-r-2 border-blue-500/50">Target Info</th>
-                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest whitespace-nowrap border-r-2 border-blue-500/50">Call Metrics</th>
-                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest whitespace-nowrap">Timestamp</th>
+                    <th className="px-6 py-4 text-[13px] font-semibold whitespace-nowrap border-r-2 border-blue-500/50">Employee Details</th>
+                    <th className="px-6 py-4 text-[13px] font-semibold whitespace-nowrap border-r-2 border-blue-500/50">Target Info</th>
+                    <th className="px-6 py-4 text-[13px] font-semibold whitespace-nowrap border-r-2 border-blue-500/50">Call Metrics</th>
+                    <th className="px-6 py-4 text-[13px] font-semibold whitespace-nowrap">Timestamp</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y-2 divide-slate-200 dark:divide-slate-800">
                   {paginatedFeeders.length === 0 ? (
-                    <tr><td colSpan={4} className="px-6 py-10 text-center text-sm font-bold text-slate-400 uppercase tracking-widest">No data available</td></tr>
+                    <tr><td colSpan={4} className="px-6 py-10 text-center text-sm font-bold text-slate-400">No data available</td></tr>
                   ) : paginatedFeeders.map((f, idx) => (
                     <tr key={idx} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
                       <td className="px-6 py-4">
@@ -779,21 +795,21 @@ export default function ScotPage() {
                             <UserIcon className="w-4 h-4" />
                           </div>
                           <div>
-                            <p className="text-xs font-black text-slate-900 dark:text-white flex items-center gap-1.5">
+                            <p className="text-[14px] font-semibold text-slate-900 dark:text-white flex items-center gap-1.5">
                               {f.employeeName || "Unknown"}
-                              <span className="text-[9px] font-bold px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-500 rounded">ID: {f.id}</span>
+                              <span className="text-[13px] font-bold px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-500 rounded">ID: {f.id}</span>
                             </p>
-                            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">#{f.employeeNumber || "N/A"}</p>
+                            <p className="text-[13px] font-bold text-slate-500 mt-0.5">#{f.employeeNumber || "N/A"}</p>
                           </div>
                         </div>
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex flex-col gap-1">
-                          <p className="text-xs font-black text-slate-900 dark:text-white flex items-center gap-1.5">
+                          <p className="text-[14px] font-semibold text-slate-900 dark:text-white flex items-center gap-1.5">
                             <UserGroupIcon className="w-3.5 h-3.5 text-slate-400" />
                             {f.toName || "Unknown"}
                           </p>
-                          <p className="text-[11px] font-bold text-slate-500 flex items-center gap-1.5">
+                          <p className="text-[14px] font-bold text-slate-500 flex items-center gap-1.5">
                             <PhoneIcon className="w-3 h-3 text-slate-400" />
                             {f.countryCode ? `+${f.countryCode} ` : ""}{f.toNumber || "N/A"}
                           </p>
@@ -801,10 +817,10 @@ export default function ScotPage() {
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex flex-col gap-2">
-                          <span className="inline-flex w-fit items-center px-2 py-0.5 bg-blue-500/10 text-blue-600 dark:text-blue-400 text-[9px] font-black uppercase tracking-widest rounded">
+                          <span className="inline-flex w-fit items-center px-2 py-0.5 bg-blue-500/10 text-blue-600 dark:text-blue-400 text-[13px] font-semibold rounded">
                             {f.callType || 'N/A'}
                           </span>
-                          <span className="text-[11px] font-bold text-slate-500 flex items-center gap-1.5">
+                          <span className="text-[14px] font-bold text-slate-500 flex items-center gap-1.5">
                             <ClockIcon className="w-3 h-3 text-slate-400" />
                             {f.duration || '0s'}
                           </span>
@@ -812,11 +828,11 @@ export default function ScotPage() {
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex flex-col gap-1">
-                          <span className="text-xs font-black text-slate-900 dark:text-slate-200 flex items-center gap-1.5" title="Call Date & Time">
+                          <span className="text-[14px] font-semibold text-slate-900 dark:text-slate-200 flex items-center gap-1.5" title="Call Date & Time">
                             <CalendarIcon className="w-3.5 h-3.5 text-blue-500" />
                             {formatCallDate(f.callDate)} {formatCallTime(f.callTime) !== "No Time" ? `at ${formatCallTime(f.callTime)}` : ""}
                           </span>
-                          <span className="text-[10px] font-bold text-slate-500 flex items-center gap-1.5 mt-1" title="Created At / Uploaded At">
+                          <span className="text-[13px] font-bold text-slate-500 flex items-center gap-1.5 mt-1" title="Created At / Uploaded At">
                             <ClockIcon className="w-3 h-3 text-slate-400" />
                             Uploaded: {f.timestamp ? new Date(f.timestamp).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: '2-digit', hour: '2-digit', minute: '2-digit' }) : "N/A"}
                           </span>
@@ -843,7 +859,7 @@ export default function ScotPage() {
               ? "bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 text-white border-none"
               : "border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900"
           }`}>
-            <h2 className={`text-sm font-black uppercase tracking-widest flex items-center gap-2 ${
+            <h2 className={`text-sm font-semibold   flex items-center gap-2 ${
               scotListView === "tiles" ? "text-white" : "text-slate-900 dark:text-white"
             }`}>
               {scotListView !== "tiles" && (
@@ -855,7 +871,7 @@ export default function ScotPage() {
                     setSearchScot("");
                     setShowTodayOnly(false);
                   }}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 mr-1 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 mr-1 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-[13px] font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
                 >
                   <ArrowLeftIcon className="w-4 h-4" />
                   Back
@@ -864,10 +880,10 @@ export default function ScotPage() {
               <TableCellsIcon className={`w-5 h-5 ${scotListView === "tiles" ? "text-emerald-100" : "text-emerald-500"}`} />
               Party Call Cross-Reference
               {scotListView === "active" && (
-                <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400">— Active Parties</span>
+                <span className="text-[13px] font-semibold text-emerald-600 dark:text-emerald-400">— Active Parties</span>
               )}
               {scotListView === "inactive" && (
-                <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">— Non Active Parties</span>
+                <span className="text-[13px] font-semibold text-slate-500">— Non Active Parties</span>
               )}
             </h2>
             <div className={`flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto ${scotListView === "tiles" ? "hidden" : ""}`}>
@@ -875,7 +891,7 @@ export default function ScotPage() {
               <button
                 onClick={handleGenerateWeeklyReports}
                 disabled={isReportLoading}
-                className="px-4 py-1.5 bg-rose-50 dark:bg-rose-900/30 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-400 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-rose-100 dark:hover:bg-rose-900/50 transition-colors shadow-sm flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-1.5 bg-rose-50 dark:bg-rose-900/30 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-400 rounded-xl text-[14px] font-semibold hover:bg-rose-100 dark:hover:bg-rose-900/50 transition-colors shadow-sm flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
                 title="Download Sales Coordinator Reports"
               >
                 {isReportLoading ? (
@@ -888,15 +904,15 @@ export default function ScotPage() {
 
               {/* Pagination Actions */}
               <div className="flex gap-1.5">
-                <button onClick={() => setScotPage(p => Math.max(1, p - 1))} disabled={scotPage === 1} className="px-3 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[10px] font-black uppercase tracking-widest rounded-xl disabled:opacity-50 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors shadow-sm text-slate-700 dark:text-slate-300">Prev</button>
-                <span className="flex items-center px-2 text-[10px] font-black uppercase tracking-widest text-slate-400 whitespace-nowrap">{scotPage} / {Math.ceil(scotRows.length / itemsPerPage) || 1}</span>
-                <button onClick={() => setScotPage(p => Math.min(Math.ceil(scotRows.length / itemsPerPage), p + 1))} disabled={scotPage >= Math.ceil(scotRows.length / itemsPerPage)} className="px-3 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[10px] font-black uppercase tracking-widest rounded-xl disabled:opacity-50 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors shadow-sm text-slate-700 dark:text-slate-300">Next</button>
+                <button onClick={() => setScotPage(p => Math.max(1, p - 1))} disabled={scotPage === 1} className="px-3 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[13px] font-semibold rounded-xl disabled:opacity-50 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors shadow-sm text-slate-700 dark:text-slate-300">Prev</button>
+                <span className="flex items-center px-2 text-[13px] font-semibold text-slate-400 whitespace-nowrap">{scotPage} / {Math.ceil(scotRows.length / itemsPerPage) || 1}</span>
+                <button onClick={() => setScotPage(p => Math.min(Math.ceil(scotRows.length / itemsPerPage), p + 1))} disabled={scotPage >= Math.ceil(scotRows.length / itemsPerPage)} className="px-3 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[13px] font-semibold rounded-xl disabled:opacity-50 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors shadow-sm text-slate-700 dark:text-slate-300">Next</button>
               </div>
 
               {/* CSV Export Button */}
               <button 
                 onClick={exportScotCSV}
-                className="px-4 py-1.5 bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-400 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors shadow-sm flex items-center gap-1.5"
+                className="px-4 py-1.5 bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-400 rounded-xl text-[14px] font-semibold hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors shadow-sm flex items-center gap-1.5"
               >
                 <DocumentArrowUpIcon className="w-4 h-4" />
                 CSV
@@ -905,7 +921,7 @@ export default function ScotPage() {
               {/* Today Button */}
               <button 
                 onClick={() => {setShowTodayOnly(!showTodayOnly); setScotPage(1);}}
-                className={`px-4 py-1.5 border rounded-xl text-xs font-black uppercase tracking-widest transition-colors shadow-sm flex items-center gap-1.5 ${showTodayOnly ? 'bg-teal-500 text-white border-teal-600' : 'bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-white hover:bg-slate-100 dark:hover:bg-slate-700'}`}
+                className={`px-4 py-1.5 border rounded-xl text-[14px] font-semibold   transition-colors shadow-sm flex items-center gap-1.5 ${showTodayOnly ? 'bg-teal-500 text-white border-teal-600' : 'bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-white hover:bg-slate-100 dark:hover:bg-slate-700'}`}
               >
                 <CalendarIcon className="w-4 h-4" />
                 Today
@@ -917,7 +933,7 @@ export default function ScotPage() {
                 placeholder="Search Party Name..." 
                 value={searchScot} 
                 onChange={(e) => {setSearchScot(e.target.value); setScotPage(1);}} 
-                className="px-4 py-1.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold outline-none focus:ring-2 focus:ring-emerald-500 text-slate-700 dark:text-white w-full sm:w-64 transition-all"
+                className="px-4 py-1.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-[14px] font-bold outline-none focus:ring-2 focus:ring-emerald-500 text-slate-700 dark:text-white w-full sm:w-64 transition-all"
               />
 
               {/* Month Selector */}
@@ -925,7 +941,7 @@ export default function ScotPage() {
                 <select 
                   value={activeScotMonth}
                   onChange={(e) => setSelectedScotMonth(e.target.value)}
-                  className="px-4 py-1.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold outline-none focus:ring-2 focus:ring-blue-500 text-slate-700 dark:text-white w-full sm:w-auto transition-all"
+                  className="px-4 py-1.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-[14px] font-bold outline-none focus:ring-2 focus:ring-blue-500 text-slate-700 dark:text-white w-full sm:w-auto transition-all"
                 >
                   {uniqueMonths.map(m => <option key={m} value={m}>{m}</option>)}
                 </select>
@@ -939,7 +955,7 @@ export default function ScotPage() {
               <div className="pointer-events-none absolute -bottom-24 -right-24 h-72 w-72 rounded-full bg-cyan-300/30 blur-3xl dark:bg-cyan-500/10" />
 
               <div className="relative z-10 w-full max-w-6xl mx-auto">
-                <p className="text-center text-[11px] font-black uppercase tracking-[0.25em] text-emerald-700/80 dark:text-emerald-300/80 mb-6">
+                <p className="text-center text-[14px] font-semibold text-emerald-700/80 dark:text-emerald-300/80 mb-6">
                   Select a category to view party list
                 </p>
 
@@ -957,14 +973,14 @@ export default function ScotPage() {
                       <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-white/20 ring-1 ring-white/30 backdrop-blur-sm">
                         <CheckCircleIcon className="h-9 w-9 text-white" />
                       </div>
-                      <span className="inline-flex items-center gap-1 rounded-full bg-white/15 px-3 py-1 text-[10px] font-black uppercase tracking-widest ring-1 ring-white/20">
+                      <span className="inline-flex items-center gap-1 rounded-full bg-white/15 px-3 py-1 text-[13px] font-semibold ring-1 ring-white/20">
                         View list
                         <ChevronRightIcon className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
                       </span>
                     </div>
-                    <p className="mt-6 text-[11px] font-black uppercase tracking-[0.2em] text-emerald-100">Active Parties</p>
-                    <p className="mt-2 text-6xl font-black leading-none">{scotPartyCounts.active}</p>
-                    <p className="mt-3 text-xs font-bold uppercase tracking-widest text-emerald-100/90">Included in weekly report</p>
+                    <p className="mt-6 text-[14px] font-semibold text-emerald-100">Active Parties</p>
+                    <p className="mt-2 text-6xl font-semibold leading-none">{scotPartyCounts.active}</p>
+                    <p className="mt-3 text-[14px] font-bold text-emerald-100/90">Included in weekly report</p>
                   </button>
 
                   <button
@@ -980,14 +996,14 @@ export default function ScotPage() {
                       <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-white/20 ring-1 ring-white/30 backdrop-blur-sm">
                         <XCircleIcon className="h-9 w-9 text-white" />
                       </div>
-                      <span className="inline-flex items-center gap-1 rounded-full bg-white/15 px-3 py-1 text-[10px] font-black uppercase tracking-widest ring-1 ring-white/20">
+                      <span className="inline-flex items-center gap-1 rounded-full bg-white/15 px-3 py-1 text-[13px] font-semibold ring-1 ring-white/20">
                         View list
                         <ChevronRightIcon className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
                       </span>
                     </div>
-                    <p className="mt-6 text-[11px] font-black uppercase tracking-[0.2em] text-indigo-100">Non Active Parties</p>
-                    <p className="mt-2 text-6xl font-black leading-none">{scotPartyCounts.inactive}</p>
-                    <p className="mt-3 text-xs font-bold uppercase tracking-widest text-indigo-100/90">Excluded from weekly report</p>
+                    <p className="mt-6 text-[14px] font-semibold text-indigo-100">Non Active Parties</p>
+                    <p className="mt-2 text-6xl font-semibold leading-none">{scotPartyCounts.inactive}</p>
+                    <p className="mt-3 text-[14px] font-bold text-indigo-100/90">Excluded from weekly report</p>
                   </button>
                 </div>
               </div>
@@ -997,20 +1013,20 @@ export default function ScotPage() {
             <table className="w-full text-left border-collapse table-auto relative">
               <thead>
                 <tr className="bg-gradient-to-r from-emerald-600 to-teal-600 text-white">
-                  <th className="px-2 py-4 text-[10px] font-black uppercase tracking-widest text-center whitespace-nowrap sticky top-0 left-0 z-40 bg-emerald-600 border-r-2 border-emerald-700/80 min-w-[52px]">Active</th>
-                  <th className="px-2 py-4 text-[10px] font-black uppercase tracking-widest whitespace-nowrap sticky top-0 left-[52px] z-30 bg-emerald-600 border-r-2 border-emerald-700/80 shadow-[4px_0_10px_-4px_rgba(0,0,0,0.3)]">Target Name</th>
-                  <th className="px-2 py-4 text-[10px] font-black uppercase tracking-widest text-center whitespace-normal leading-tight sticky top-0 z-20 bg-emerald-600 border-r-2 border-emerald-500/80 min-w-[60px]">Total Orders</th>
-                  <th className="px-2 py-4 text-[10px] font-black uppercase tracking-widest text-center whitespace-normal leading-tight sticky top-0 z-20 bg-emerald-600 border-r-2 border-emerald-500/80 min-w-[70px]">Last Order Date</th>
-                  <th className="px-2 py-4 text-[10px] font-black uppercase tracking-widest text-center whitespace-normal leading-tight sticky top-0 z-20 bg-emerald-600 border-r-2 border-emerald-500/80 min-w-[70px]">Recent Follow Up</th>
-                  <th className="px-2 py-4 text-[10px] font-black uppercase tracking-widest text-center whitespace-normal leading-tight sticky top-0 z-20 bg-emerald-600 border-r-2 border-emerald-500/80 min-w-[75px]">Order Frequency</th>
-                  <th className="px-2 py-4 text-[10px] font-black uppercase tracking-widest text-center whitespace-normal leading-tight sticky top-0 z-20 bg-emerald-600 border-r-2 border-emerald-500/80 min-w-[70px]">Manual Follow Up</th>
-                  <th className="px-2 py-4 text-[10px] font-black uppercase tracking-widest text-center whitespace-normal leading-tight sticky top-0 z-20 bg-emerald-600 border-r-2 border-emerald-500/80 min-w-[80px]">Next Planned Date</th>
+                  <th className="px-2 py-4 text-[13px] font-semibold text-center whitespace-nowrap sticky top-0 left-0 z-40 bg-emerald-600 border-r-2 border-emerald-700/80 min-w-[52px]">Active</th>
+                  <th className="px-2 py-4 text-[13px] font-semibold whitespace-nowrap sticky top-0 left-[52px] z-30 bg-emerald-600 border-r-2 border-emerald-700/80 shadow-[4px_0_10px_-4px_rgba(0,0,0,0.3)]">Target Name</th>
+                  <th className="px-2 py-4 text-[13px] font-semibold text-center whitespace-normal leading-tight sticky top-0 z-20 bg-emerald-600 border-r-2 border-emerald-500/80 min-w-[60px]">Total Orders</th>
+                  <th className="px-2 py-4 text-[13px] font-semibold text-center whitespace-normal leading-tight sticky top-0 z-20 bg-emerald-600 border-r-2 border-emerald-500/80 min-w-[70px]">Last Order Date</th>
+                  <th className="px-2 py-4 text-[13px] font-semibold text-center whitespace-normal leading-tight sticky top-0 z-20 bg-emerald-600 border-r-2 border-emerald-500/80 min-w-[70px]">Recent Follow Up</th>
+                  <th className="px-2 py-4 text-[13px] font-semibold text-center whitespace-normal leading-tight sticky top-0 z-20 bg-emerald-600 border-r-2 border-emerald-500/80 min-w-[75px]">Order Frequency</th>
+                  <th className="px-2 py-4 text-[13px] font-semibold text-center whitespace-normal leading-tight sticky top-0 z-20 bg-emerald-600 border-r-2 border-emerald-500/80 min-w-[70px]">Manual Follow Up</th>
+                  <th className="px-2 py-4 text-[13px] font-semibold text-center whitespace-normal leading-tight sticky top-0 z-20 bg-emerald-600 border-r-2 border-emerald-500/80 min-w-[80px]">Next Planned Date</th>
                   {scotMonthDates.map(dateStr => {
                     const d = new Date(dateStr);
                     const day = d.getDate();
                     const month = d.toLocaleString('default', { month: 'short' });
                     return (
-                      <th key={dateStr} className="px-4 py-4 text-[10px] font-black uppercase tracking-widest text-center whitespace-nowrap sticky top-0 z-20 bg-emerald-600/90 backdrop-blur-sm border-r-2 border-emerald-500/30">
+                      <th key={dateStr} className="px-4 py-4 text-[13px] font-semibold text-center whitespace-nowrap sticky top-0 z-20 bg-emerald-600/90 backdrop-blur-sm border-r-2 border-emerald-500/30">
                         {day}{day === 1 || day === 21 || day === 31 ? 'st' : day === 2 || day === 22 ? 'nd' : day === 3 || day === 23 ? 'rd' : 'th'} {month}
                       </th>
                     );
@@ -1019,7 +1035,7 @@ export default function ScotPage() {
               </thead>
               <tbody className="divide-y-2 divide-slate-200 dark:divide-slate-700">
                 {paginatedScotRows.length === 0 ? (
-                  <tr><td colSpan={8 + scotMonthDates.length} className="px-6 py-10 text-center text-sm font-bold text-slate-400 uppercase tracking-widest">No target records found</td></tr>
+                  <tr><td colSpan={8 + scotMonthDates.length} className="px-6 py-10 text-center text-sm font-bold text-slate-400">No target records found</td></tr>
                 ) : paginatedScotRows.map((row, idx) => (
                   <tr key={idx} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors group/row">
                     <td className="px-2 py-4 text-center whitespace-nowrap sticky left-0 z-20 bg-white dark:bg-slate-900 border-r-2 border-slate-200 dark:border-slate-700 group-hover/row:bg-slate-50 dark:group-hover/row:bg-slate-800/80 transition-colors">
@@ -1029,51 +1045,51 @@ export default function ScotPage() {
                         disabled={togglingParty === row.toName}
                         onChange={(e) => toggleActiveParty(row.toName, e.target.checked)}
                         className="h-4 w-4 cursor-pointer rounded border-emerald-300 accent-emerald-600 focus:ring-2 focus:ring-emerald-500 focus:ring-offset-0 disabled:opacity-50 dark:border-emerald-700 dark:accent-emerald-500"
-                        title={row.isActive ? "Active party (included in weekly report)" : "Mark as active party"}
+                        title={row.isActive ? "Active party — called & scored (uncheck to mark Inactive)" : "Inactive — excluded from calling & scoring (check to reactivate)"}
                       />
                     </td>
                     <td className="px-2 py-4 whitespace-nowrap sticky left-[52px] z-10 bg-white dark:bg-slate-900 border-r-2 border-slate-200 dark:border-slate-700 shadow-[4px_0_10px_-4px_rgba(0,0,0,0.1)] dark:shadow-[4px_0_10px_-4px_rgba(0,0,0,0.5)] truncate group-hover/row:bg-slate-50 dark:group-hover/row:bg-slate-800/80 transition-colors max-w-[250px]">
                       <div className="flex flex-col gap-1">
-                        <p className="text-xs font-black text-slate-900 dark:text-white flex items-center gap-1.5" title={row.toName}>
+                        <p className="text-[14px] font-semibold text-slate-900 dark:text-white flex items-center gap-1.5" title={row.toName}>
                           <UserGroupIcon className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
                           <span className="truncate">{row.toName}</span>
                         </p>
-                        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest truncate">{row.employeeName || "No Staff Assigned"}</p>
+                        <p className="text-[13px] font-bold text-slate-500 truncate">{row.employeeName || "No Staff Assigned"}</p>
                       </div>
                     </td>
                     <td className="px-2 py-4 text-center whitespace-nowrap bg-white dark:bg-slate-900 border-r-2 border-slate-200 dark:border-slate-700 group-hover/row:bg-slate-50 dark:group-hover/row:bg-slate-800/80 transition-colors">
-                      <span className={`inline-flex items-center gap-1 px-2.5 py-1 text-xs font-black rounded-xl ${row.totalOrders > 0 ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' : 'bg-slate-100 text-slate-500 dark:bg-slate-800/50'}`}>
+                      <span className={`inline-flex items-center gap-1 px-2.5 py-1 text-[14px] font-semibold rounded-xl ${row.totalOrders > 0 ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' : 'bg-slate-100 text-slate-500 dark:bg-slate-800/50'}`}>
                         {row.totalOrders > 0 && <ShoppingBagIcon className="w-3.5 h-3.5" />}
                         {row.totalOrders}
                       </span>
                     </td>
                     <td className="px-2 py-4 text-center whitespace-nowrap bg-white dark:bg-slate-900 border-r-2 border-slate-200 dark:border-slate-700 group-hover/row:bg-slate-50 dark:group-hover/row:bg-slate-800/80 transition-colors">
                       {row.lastOrderDate ? (
-                        <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300">
+                        <span className="text-[14px] font-bold text-slate-700 dark:text-slate-300">
                           {row.lastOrderDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: '2-digit' })}
                         </span>
                       ) : (
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">N/A</span>
+                        <span className="text-[13px] font-bold text-slate-400">N/A</span>
                       )}
                     </td>
                     <td className="px-2 py-4 text-center whitespace-nowrap bg-white dark:bg-slate-900 border-r-2 border-slate-200 dark:border-slate-700 group-hover/row:bg-slate-50 dark:group-hover/row:bg-slate-800/80 transition-colors">
                       {row.lastCallDate ? (
-                        <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300">
+                        <span className="text-[14px] font-bold text-slate-700 dark:text-slate-300">
                           {row.lastCallDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: '2-digit' })}
                         </span>
                       ) : (
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">N/A</span>
+                        <span className="text-[13px] font-bold text-slate-400">N/A</span>
                       )}
                     </td>
                     <td className="px-2 py-4 text-center whitespace-nowrap group bg-white dark:bg-slate-900 border-r-2 border-slate-200 dark:border-slate-700 group-hover/row:bg-slate-50 dark:group-hover/row:bg-slate-800/80 transition-colors">
                       <div className="flex items-center justify-center gap-2">
                         {row.frequencyDays ? (
-                          <span className={`inline-flex items-center gap-1.5 px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-full border shadow-sm ${row.isManualFrequency ? 'bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/20' : 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20'}`} title={row.isManualFrequency ? 'Manual Frequency' : 'Calculated Frequency'}>
+                          <span className={`inline-flex items-center gap-1.5 px-3 py-1 text-[13px] font-semibold   rounded-full border shadow-sm ${row.isManualFrequency ? 'bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/20' : 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20'}`} title={row.isManualFrequency ? 'Manual Frequency' : 'Calculated Frequency'}>
                             <ArrowPathIcon className="w-3.5 h-3.5" />
                             {row.frequencyDays} Days
                           </span>
                         ) : (
-                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">N/A</span>
+                          <span className="text-[13px] font-bold text-slate-400">N/A</span>
                         )}
                         <button 
                           onClick={() => { setFreqParty(row.toName); setFreqValue(row.isManualFrequency ? String(row.frequencyDays) : ""); setIsFreqModalOpen(true); }}
@@ -1086,11 +1102,11 @@ export default function ScotPage() {
                     <td className="px-2 py-4 text-center whitespace-nowrap group bg-white dark:bg-slate-900 border-r-2 border-slate-200 dark:border-slate-700 group-hover/row:bg-slate-50 dark:group-hover/row:bg-slate-800/80 transition-colors">
                       <div className="flex items-center justify-center gap-2">
                         {row.manualFollowUpDate ? (
-                          <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300">
+                          <span className="text-[14px] font-bold text-slate-700 dark:text-slate-300">
                             {row.manualFollowUpDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: '2-digit' })}
                           </span>
                         ) : (
-                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">N/A</span>
+                          <span className="text-[13px] font-bold text-slate-400">N/A</span>
                         )}
                         <button 
                           onClick={() => { 
@@ -1107,12 +1123,12 @@ export default function ScotPage() {
                     </td>
                     <td className="px-2 py-4 text-center whitespace-nowrap bg-white dark:bg-slate-900 border-r-2 border-slate-200 dark:border-slate-700 shadow-[4px_0_10px_-4px_rgba(0,0,0,0.1)] dark:shadow-[4px_0_10px_-4px_rgba(0,0,0,0.5)] group-hover/row:bg-slate-50 dark:group-hover/row:bg-slate-800/80 transition-colors">
                       {row.nextPlannedDate ? (
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px] font-black uppercase tracking-widest rounded-full border border-emerald-500/20 shadow-sm">
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[13px] font-semibold rounded-full border border-emerald-500/20 shadow-sm">
                           <CalendarIcon className="w-3.5 h-3.5" />
                           {row.nextPlannedDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: '2-digit' })}
                         </span>
                       ) : (
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">N/A</span>
+                        <span className="text-[13px] font-bold text-slate-400">N/A</span>
                       )}
                     </td>
 
@@ -1129,12 +1145,12 @@ export default function ScotPage() {
                         <td key={dateStr} className="px-4 py-4 text-center border-l-2 border-slate-200 dark:border-slate-700">
                           <div className="flex items-center justify-center gap-1">
                             {isScheduledDate && (
-                              <span title="Scheduled Order Date" className="w-6 h-6 flex items-center justify-center rounded-full bg-teal-500 text-white shadow-md font-black text-[11px]">
+                              <span title="Scheduled Order Date" className="w-6 h-6 flex items-center justify-center rounded-full bg-teal-500 text-white shadow-md font-semibold text-[14px]">
                                 S
                               </span>
                             )}
                             {cType && (
-                              <span title={`Call Type: ${cType}`} className={`w-6 h-6 flex items-center justify-center rounded-full text-[11px] font-black text-white shadow-md ${
+                              <span title={`Call Type: ${cType}`} className={`w-6 h-6 flex items-center justify-center rounded-full text-[14px] font-semibold text-white shadow-md ${
                                 cType.toUpperCase().includes('MISS') ? 'bg-rose-500' :
                                 cType.toUpperCase().includes('OUT') ? 'bg-emerald-500' :
                                 cType.toUpperCase().includes('REJ') ? 'bg-amber-500' :
@@ -1168,12 +1184,12 @@ export default function ScotPage() {
       {isFreqModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-xl w-full max-w-sm animate-in zoom-in-95 duration-200">
-            <h3 className="text-lg font-black text-slate-900 dark:text-white mb-1">Set Manual Frequency</h3>
-            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-6">Party: <span className="text-blue-500">{freqParty}</span></p>
+            <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-1">Set Manual Frequency</h3>
+            <p className="text-[13px] font-bold text-slate-500 mb-6">Party: <span className="text-blue-500">{freqParty}</span></p>
             
             <div className="space-y-4">
               <div>
-                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Frequency (in Days)</label>
+                <label className="block text-[13px] font-bold text-slate-500 mb-2">Frequency (in Days)</label>
                 <input 
                   type="number" 
                   value={freqValue}
@@ -1187,14 +1203,14 @@ export default function ScotPage() {
                 <button 
                   onClick={() => setIsFreqModalOpen(false)}
                   disabled={isSavingFreq}
-                  className="px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                  className="px-4 py-2 rounded-xl text-[14px] font-semibold text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                 >
                   Cancel
                 </button>
                 <button 
                   onClick={saveFrequency}
                   disabled={isSavingFreq}
-                  className="px-6 py-2 rounded-xl text-xs font-black uppercase tracking-widest bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-500/20 disabled:opacity-50 transition-all flex items-center gap-2"
+                  className="px-6 py-2 rounded-xl text-[14px] font-semibold bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-500/20 disabled:opacity-50 transition-all flex items-center gap-2"
                 >
                   {isSavingFreq ? <ArrowPathIcon className="w-4 h-4 animate-spin" /> : <CheckCircleIcon className="w-4 h-4" />}
                   {isSavingFreq ? 'Saving...' : 'Save'}
@@ -1209,12 +1225,12 @@ export default function ScotPage() {
       {isFollowUpModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-xl w-full max-w-sm animate-in zoom-in-95 duration-200">
-            <h3 className="text-lg font-black text-slate-900 dark:text-white mb-1">Set Manual Follow Up</h3>
-            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-6">Party: <span className="text-blue-500">{followUpParty}</span></p>
+            <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-1">Set Manual Follow Up</h3>
+            <p className="text-[13px] font-bold text-slate-500 mb-6">Party: <span className="text-blue-500">{followUpParty}</span></p>
             
             <div className="space-y-4">
               <div>
-                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Next Follow Up Date</label>
+                <label className="block text-[13px] font-bold text-slate-500 mb-2">Next Follow Up Date</label>
                 <input 
                   type="date" 
                   value={followUpDateValue}
@@ -1227,14 +1243,14 @@ export default function ScotPage() {
                 <button 
                   onClick={() => setIsFollowUpModalOpen(false)}
                   disabled={isSavingFollowUp}
-                  className="px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                  className="px-4 py-2 rounded-xl text-[14px] font-semibold text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                 >
                   Cancel
                 </button>
                 <button 
                   onClick={saveFollowUp}
                   disabled={isSavingFollowUp}
-                  className="px-6 py-2 rounded-xl text-xs font-black uppercase tracking-widest bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-500/20 disabled:opacity-50 transition-all flex items-center gap-2"
+                  className="px-6 py-2 rounded-xl text-[14px] font-semibold bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-500/20 disabled:opacity-50 transition-all flex items-center gap-2"
                 >
                   {isSavingFollowUp ? <ArrowPathIcon className="w-4 h-4 animate-spin" /> : <CheckCircleIcon className="w-4 h-4" />}
                   {isSavingFollowUp ? 'Saving...' : 'Save'}

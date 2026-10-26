@@ -68,7 +68,7 @@ export default function LoginPage() {
 
       <div className="w-full max-w-md lg:max-w-[500px] p-8 sm:p-12 lg:p-16 relative z-10 flex flex-col justify-center min-h-screen">
         
-        <h2 className="text-3xl font-black text-white text-center mb-8 tracking-tight drop-shadow-lg">
+        <h2 className="text-3xl font-semibold text-white text-center mb-8 tracking-tight drop-shadow-lg">
           Welcome Back
         </h2>
 
@@ -140,7 +140,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-[#0052d4] hover:bg-[#4364f7] text-white font-bold py-4 rounded-xl shadow-[0_0_20px_rgba(0,112,243,0.4)] transition-all duration-300 disabled:opacity-50 active:scale-[0.98] uppercase tracking-wider text-sm mt-4 border border-white/10"
+            className="w-full bg-[#0052d4] hover:bg-[#4364f7] text-white font-bold py-4 rounded-xl shadow-[0_0_20px_rgba(0,112,243,0.4)] transition-all duration-300 disabled:opacity-50 active:scale-[0.98] tracking-wider text-sm mt-4 border border-white/10"
           >
             {isLoading ? (
               <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mx-auto" />

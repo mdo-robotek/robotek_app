@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getUserByUsernameOrEmail } from "@/lib/google-sheets";
+import { findLoginUser } from "@/lib/google-sheets";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -10,7 +10,10 @@ export async function GET(request: Request) {
   }
 
   try {
-    const user = await getUserByUsernameOrEmail(identifier);
+    const { user, sharedEmail } = await findLoginUser(identifier);
+    if (sharedEmail) {
+      return NextResponse.json({ exists: true, sharedEmail: true });
+    }
     if (!user) {
       return NextResponse.json({ exists: false });
     }

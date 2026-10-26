@@ -188,10 +188,15 @@ export default function CeoOverview() {
                 {collection.overdueOutstanding > 0 ? `${inr(collection.overdueOutstanding)} overdue` : `${collection.partyCount} parties`}
               </p>
             </>
+          ) : collection?.sheetReady ? (
+            <>
+              <p className="mt-3 text-[15px] font-semibold text-[#1A1D21] dark:text-white">Waiting for data</p>
+              <p className="mt-1.5 text-[13px] text-[#5B6472] dark:text-gray-400 line-clamp-2">Accounts team: paste today&apos;s outstanding from Busy</p>
+            </>
           ) : (
             <>
               <p className="mt-3 text-[15px] font-semibold text-[#1A1D21] dark:text-white">Not connected yet</p>
-              <p className="mt-1.5 text-[13px] text-[#5B6472] dark:text-gray-400">Needs the outstanding sheet from Busy</p>
+              <p className="mt-1.5 text-[13px] text-[#5B6472] dark:text-gray-400 line-clamp-2">Needs the outstanding sheet from Busy</p>
             </>
           )}
         </Link>

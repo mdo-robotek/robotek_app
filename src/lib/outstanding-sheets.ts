@@ -7,12 +7,18 @@ import { globalCache } from "./cache";
  * Sahil, 2026-10-25: the ERP has no receivables data of its own, so the
  * Collection card reads a sheet the accounts team refreshes from Busy.
  *
- * Expected sheet: tab named "Outstanding" with these headers in row 1 —
- *   Party Name | Outstanding Amount | Overdue Days | As On Date
- * Only the first two are required. Put the spreadsheet id in .env as
- * OUTSTANDING_SHEET_ID. Until that is set the card shows a "not connected"
- * state instead of a wrong number.
+ * Sheet (set up 2026-10-26): "Sarthi - Busy Outstanding", tab "Outstanding",
+ * headings  Party Name | Outstanding Amount | Overdue Days | As On Date
+ * Only the first two are needed. A "How to update" tab tells the accounts
+ * team what to paste. OUTSTANDING_SHEET_ID in .env can point somewhere else.
+ *
+ * States the card can show:
+ *   connected   — rows found, real numbers
+ *   sheetReady  — sheet opens but nothing pasted yet ("Waiting for data")
+ *   neither     — sheet can't be opened (not shared with the ERP account)
+ * Never a made-up number.
  */
+const DEFAULT_SHEET_ID = "1gK3ZgHG6_hGV_FjknPKuijtfG-sd4RqtfF1swoBXSak";
 
 async function getSheetsClient() {
   const oauth2Client = new google.auth.OAuth2(
@@ -32,6 +38,7 @@ const CACHE_TTL = 10 * 60 * 1000;
 
 export interface OutstandingSummary {
   connected: boolean;
+  sheetReady: boolean;
   totalOutstanding: number;
   overdueOutstanding: number;
   partyCount: number;
@@ -41,6 +48,7 @@ export interface OutstandingSummary {
 
 const EMPTY: OutstandingSummary = {
   connected: false,
+  sheetReady: false,
   totalOutstanding: 0,
   overdueOutstanding: 0,
   partyCount: 0,
@@ -53,9 +61,80 @@ const num = (v: unknown): number => {
   return Number.isFinite(n) ? n : 0;
 };
 
+/** Busy writes balances like "12,345.00 Dr" — "Cr" means the party has paid
+ *  in advance, which is not money to collect. */
+const isCredit = (v: unknown) => /\bcr\.?\s*$/i.test(String(v ?? "").trim());
+
+/** Pure: rows from the sheet -> summary. Exported for tests. */
+export function summarizeOutstanding(rows: unknown[][]): OutstandingSummary {
+  const ready: OutstandingSummary = { ...EMPTY, sheetReady: true };
+  if (!rows || rows.length === 0) return ready;
+
+  const norm = (h: unknown) => String(h ?? "").trim().toLowerCase();
+  const find = (headers: string[], names: string[]) => {
+    for (const n of names) {
+      const i = headers.findIndex((h) => h === n);
+      if (i !== -1) return i;
+    }
+    for (const n of names) {
+      const i = headers.findIndex((h) => h.includes(n));
+      if (i !== -1) return i;
+    }
+    return -1;
+  };
+  const PARTY = ["party name", "party", "particulars", "account name", "account"];
+  const AMOUNT = ["outstanding amount", "outstanding", "closing balance", "balance", "pending amount", "amount"];
+  const DAYS = ["overdue days", "overdue", "days"];
+  const DATE = ["as on date", "as on", "date"];
+
+  // Busy exports often have a title line or two above the headings.
+  let headerAt = -1;
+  for (let r = 0; r < Math.min(rows.length, 10); r++) {
+    const h = (rows[r] || []).map(norm);
+    if (find(h, PARTY) !== -1 && find(h, AMOUNT) !== -1) { headerAt = r; break; }
+  }
+  if (headerAt === -1) return ready;
+
+  const headers = rows[headerAt].map(norm);
+  const iParty = find(headers, PARTY);
+  const iAmt = find(headers, AMOUNT);
+  const iDays = find(headers, DAYS);
+  const iDate = find(headers, DATE);
+
+  let total = 0;
+  let overdue = 0;
+  let parties = 0;
+  let asOn = "";
+  const list: { party: string; amount: number; overdueDays: number }[] = [];
+
+  rows.slice(headerAt + 1).forEach((r) => {
+    const party = String(r[iParty] ?? "").trim();
+    if (!party || /^(grand )?total$/i.test(party)) return;
+    if (isCredit(r[iAmt])) return;
+    const amount = num(r[iAmt]);
+    if (amount <= 0) return;
+    const days = iDays === -1 ? 0 : num(r[iDays]);
+    total += amount;
+    if (days > 0) overdue += amount;
+    parties += 1;
+    list.push({ party, amount, overdueDays: days });
+    if (!asOn && iDate !== -1 && r[iDate]) asOn = String(r[iDate]).trim();
+  });
+
+  if (parties === 0) return ready;
+  return {
+    connected: true,
+    sheetReady: true,
+    totalOutstanding: Math.round(total),
+    overdueOutstanding: Math.round(overdue),
+    partyCount: parties,
+    asOnDate: asOn,
+    topParties: list.sort((a, b) => b.amount - a.amount).slice(0, 5),
+  };
+}
+
 export async function getOutstandingSummary(): Promise<OutstandingSummary> {
-  const sheetId = process.env.OUTSTANDING_SHEET_ID || "";
-  if (!sheetId) return EMPTY;
+  const sheetId = process.env.OUTSTANDING_SHEET_ID || DEFAULT_SHEET_ID;
 
   const cached = globalCache.get<OutstandingSummary>(CACHE_KEY);
   if (cached) return cached;
@@ -64,55 +143,15 @@ export async function getOutstandingSummary(): Promise<OutstandingSummary> {
     const sheets = await getSheetsClient();
     const res = await sheets.spreadsheets.values.get({
       spreadsheetId: sheetId,
-      range: `${SHEET_NAME}!A:D`,
+      range: `${SHEET_NAME}!A:Z`,
       valueRenderOption: "UNFORMATTED_VALUE",
     });
-    const rows = (res.data.values || []) as unknown[][];
-    if (rows.length <= 1) return EMPTY;
-
-    const headers = rows[0].map((h) => String(h ?? "").trim().toLowerCase());
-    const idx = (...names: string[]) => {
-      for (const n of names) {
-        const i = headers.findIndex((h) => h === n || h.includes(n));
-        if (i !== -1) return i;
-      }
-      return -1;
-    };
-    const iParty = idx("party name", "party");
-    const iAmt = idx("outstanding amount", "outstanding", "amount");
-    const iDays = idx("overdue days", "overdue", "days");
-    const iDate = idx("as on date", "as on", "date");
-
-    let total = 0;
-    let overdue = 0;
-    let parties = 0;
-    let asOn = "";
-    const list: { party: string; amount: number; overdueDays: number }[] = [];
-
-    rows.slice(1).forEach((r) => {
-      const party = String(r[iParty] ?? "").trim();
-      const amount = num(r[iAmt]);
-      if (!party || amount === 0) return;
-      const days = iDays === -1 ? 0 : num(r[iDays]);
-      total += amount;
-      if (days > 0) overdue += amount;
-      parties += 1;
-      list.push({ party, amount, overdueDays: days });
-      if (!asOn && iDate !== -1 && r[iDate]) asOn = String(r[iDate]).trim();
-    });
-
-    const summary: OutstandingSummary = {
-      connected: true,
-      totalOutstanding: Math.round(total),
-      overdueOutstanding: Math.round(overdue),
-      partyCount: parties,
-      asOnDate: asOn,
-      topParties: list.sort((a, b) => b.amount - a.amount).slice(0, 5),
-    };
+    const summary = summarizeOutstanding((res.data.values || []) as unknown[][]);
     globalCache.set(CACHE_KEY, summary, CACHE_TTL);
     return summary;
   } catch (error) {
     console.error("getOutstandingSummary failed", error);
+    globalCache.set(CACHE_KEY, EMPTY, 2 * 60 * 1000);
     return EMPTY;
   }
 }

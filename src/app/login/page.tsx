@@ -40,7 +40,9 @@ export default function LoginPage() {
           const statusRes = await fetch(`/api/users/status?identifier=${encodeURIComponent(identifier)}`);
           const statusData = await statusRes.json();
 
-          if (statusData.exists && statusData.isActive === false) {
+          if (statusData.sharedEmail) {
+            setError("This email is used by more than one person. Please log in with your username instead.");
+          } else if (statusData.exists && statusData.isActive === false) {
             setError("This account is no longer active. If that's a mistake, please contact your admin.");
           } else {
             setError("Wrong ID or password. Please check and try again.");

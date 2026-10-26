@@ -39,6 +39,7 @@ import {
   ComputerDesktopIcon,
   DevicePhoneMobileIcon,
   ChatBubbleLeftRightIcon,
+  RocketLaunchIcon,
 } from "@heroicons/react/24/outline";
 
 export const navigation = [
@@ -74,6 +75,7 @@ export const navigation = [
   // Operations Section
   { name: 'O2D', id: 'o2d', href: '/o2d', icon: ShoppingCartIcon, section: 'Operations' },
   { name: 'O2D KB', id: 'o2dkb', href: '/o2dkb', icon: BuildingStorefrontIcon, section: 'Operations' },
+  { name: 'New Launch FMS', id: 'new-launch', href: '/new-launch', icon: RocketLaunchIcon, section: 'Operations' },
   { name: 'I2R', id: 'i2r', href: '/i2r', icon: DocumentPlusIcon, section: 'Operations' },
   { name: 'I2R Packing', id: 'i2r-packing', href: '/i2r-packing', icon: ArchiveBoxArrowDownIcon, section: 'Operations' },
   { name: 'Item Receive (PACKING)', id: 'item-receive-packing', href: '/item-receive-packing', icon: InboxArrowDownIcon, section: 'Operations' },

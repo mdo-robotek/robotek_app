@@ -162,6 +162,10 @@ export default function TicketsPage() {
       if (searchParams.get('action') === 'new') {
         setIsNewModalOpen(true);
       }
+      // From the dashboard's "Help tickets for you" row: show only tickets assigned to me.
+      if (searchParams.get('filter') === 'tome') {
+        setAssignmentFilters(['ToMe']);
+      }
     }
   }, []);
 

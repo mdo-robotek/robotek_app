@@ -4,6 +4,8 @@ import { getUsers } from "@/lib/google-sheets";
 import { leaveRequestService } from "@/lib/leave-sheets";
 import { getIMSGFloorApprovals } from "@/lib/ims-gfloor-approval-sheets";
 import { paymentVendorService } from "@/lib/payment-vendor-sheets";
+import { getTickets } from "@/lib/ticket-sheets";
+import { helpTicketsFor } from "@/lib/help-tickets";
 import {
   approvalsForUser,
   isPendingStatus,
@@ -14,11 +16,15 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 interface ApprovalGroup {
-  key: ApprovalKey;
+  key: ApprovalKey | "help-tickets";
   title: string;
   href: string;
   count: number;
   oldestDays: number | null;
+  /** Items past their promised date (help tickets only). */
+  late?: number;
+  /** Button text; defaults to "Review" on the card. */
+  action?: string;
   samples: { label: string; sub: string }[];
 }
 
@@ -53,12 +59,16 @@ export async function GET() {
       username,
       designation: me?.designation || "",
     });
-    if (mine.length === 0) {
-      return NextResponse.json({ groups: [], total: 0 });
-    }
 
     const wanted = new Set(mine.map((d) => d.key));
     const groups: ApprovalGroup[] = [];
+
+    try {
+      const tickets = helpTicketsFor(await getTickets(), username);
+      if (tickets) groups.push(tickets);
+    } catch (e) {
+      console.error("approvals/pending: tickets failed", e);
+    }
 
     if (wanted.has("leave")) {
       const rows = await leaveRequestService.getAll();

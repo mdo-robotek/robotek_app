@@ -11,12 +11,15 @@ interface ApprovalGroup {
   href: string;
   count: number;
   oldestDays: number | null;
+  late?: number;
+  action?: string;
   samples: { label: string; sub: string }[];
 }
 
 /**
- * Pending Approvals — shows only the approvals THIS user has to clear
- * (routing lives in src/lib/approval-routing.ts). Hides itself completely
+ * "Waiting for you" — the approvals THIS user has to clear, plus help
+ * tickets raised to them (routing: src/lib/approval-routing.ts and
+ * src/lib/help-tickets.ts). Hides itself completely
  * when there is nothing waiting, so it never becomes dashboard noise.
  */
 export default function PendingApprovalsCard() {
@@ -33,7 +36,7 @@ export default function PendingApprovalsCard() {
     <div className="rounded-2xl bg-white dark:bg-navy-900 border border-[#E5E7EB] dark:border-navy-800 overflow-hidden">
       <div className="px-4 py-3 border-b border-[#E5E7EB] dark:border-navy-800 flex items-center justify-between">
         <h3 className="text-[15px] font-semibold text-[#1A1D21] dark:text-white">
-          Pending Approvals
+          Waiting for you
         </h3>
         <span className="text-[13px] font-semibold text-[#D97706] bg-amber-50 dark:bg-amber-500/10 px-2.5 py-0.5 rounded-full">
           {data?.total} waiting
@@ -45,9 +48,9 @@ export default function PendingApprovalsCard() {
           <Link
             key={g.key}
             href={g.href}
-            className="flex items-center gap-4 px-4 py-3 hover:bg-[#F7F8FA] dark:hover:bg-navy-800/50 transition-colors"
+            className="flex items-center gap-3 md:gap-4 px-4 py-3 hover:bg-[#F7F8FA] dark:hover:bg-navy-800/50 transition-colors"
           >
-            <div className="min-w-[56px] text-right">
+            <div className="min-w-[32px] md:min-w-[56px] text-right">
               <span className="text-[22px] font-semibold text-[#1A1D21] dark:text-white tabular-nums">
                 {g.count}
               </span>
@@ -65,13 +68,17 @@ export default function PendingApprovalsCard() {
                   : ""}
               </p>
             </div>
-            {g.oldestDays !== null && g.oldestDays >= 2 && (
+            {g.late ? (
+              <span className="shrink-0 text-[13px] font-semibold text-[#DC2626] bg-rose-50 dark:bg-rose-500/10 px-2 py-0.5 rounded-full">
+                {g.late} late
+              </span>
+            ) : g.oldestDays !== null && g.oldestDays >= 2 ? (
               <span className="shrink-0 text-[13px] font-semibold text-[#DC2626] bg-rose-50 dark:bg-rose-500/10 px-2 py-0.5 rounded-full">
                 {g.oldestDays}d old
               </span>
-            )}
+            ) : null}
             <span className="shrink-0 text-[13px] font-semibold text-[#2563EB]">
-              Review
+              {g.action || "Review"}
             </span>
           </Link>
         ))}

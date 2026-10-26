@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect, useRef, useMemo } from "react";
+import { useOpenFromLink } from "@/hooks/useOpenFromLink";
+import { defaultDueLocal } from "@/lib/quick-new";
 import { useSession } from "next-auth/react";
 import { Delegation } from "@/types/delegation";
 import { 
@@ -469,13 +471,16 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
       assigned_to: "",
       department: "",
       priority: "Medium",
-      due_date: "",
+      due_date: defaultDueLocal(),
       status: "Pending",
       voice_note_url: "",
       reference_docs: "",
       evidence_required: "No",
     });
   }
+
+  // "+ New" → Delegation opens the form straight away (/delegations?new=1).
+  useOpenFromLink("new", "1", () => { resetForm(); setIsModalOpen(true); });
 
   const handleEdit = (delegation: Delegation) => {
     setEditingDelegation(delegation);

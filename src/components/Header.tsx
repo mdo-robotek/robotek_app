@@ -17,6 +17,7 @@ import {
 } from "@heroicons/react/24/outline";
 
 import ThemeToggle from "./ThemeToggle";
+import QuickNew from "./QuickNew";
 
 interface HeaderProps {
   onMenuClick?: () => void;
@@ -149,6 +150,9 @@ export default function Header({ onMenuClick }: HeaderProps) {
             </div>
           )}
         </div>
+
+        {/* "+ New": the common forms in two taps (phones get a round button instead) */}
+        <QuickNew variant="header" />
 
         {/* Theme Toggle (Replaces Bell) */}
         <ThemeToggle />

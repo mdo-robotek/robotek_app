@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useMemo } from "react";
+import { useOpenFromLink } from "@/hooks/useOpenFromLink";
 import { useSession } from "next-auth/react";
 import { I2R, I2RStepConfig, I2R_STEPS } from "@/types/i2r";
 import { GRN } from "@/types/grn";
@@ -646,6 +647,8 @@ export default function I2RPage() {
   };
 
   const openAddModal = () => { setEditingItem(null); setFormData({ ...EMPTY_FORM, filled_by: "Robotek" }); setIsModalOpen(true); };
+  // "+ New" → Indent opens the form straight away (/i2r?new=1).
+  useOpenFromLink("new", "1", () => openAddModal());
   const openEditModal = (item: I2R) => { setEditingItem(item); setFormData({ ...item }); setIsModalOpen(true); };
   const closeModal = () => setIsModalOpen(false);
   const handleSave = async () => {

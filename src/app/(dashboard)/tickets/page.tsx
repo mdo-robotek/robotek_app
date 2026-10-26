@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useOpenFromLink } from "@/hooks/useOpenFromLink";
 import { useSession } from "next-auth/react";
 import {
   PlusIcon,
@@ -154,14 +155,14 @@ export default function TicketsPage() {
 
   const categories = ["Software", "Hardware/IT", "HR / Admin", "Finance", "Other"];
 
+  // "+ New" → Help Ticket (and My Day's "New Ticket") open the form: /tickets?action=new
+  useOpenFromLink("action", "new", () => setIsNewModalOpen(true));
+
   useEffect(() => {
     fetchUsers();
 
     if (typeof window !== "undefined") {
       const searchParams = new URLSearchParams(window.location.search);
-      if (searchParams.get('action') === 'new') {
-        setIsNewModalOpen(true);
-      }
       // From the dashboard's "Help tickets for you" row: show only tickets assigned to me.
       if (searchParams.get('filter') === 'tome') {
         setAssignmentFilters(['ToMe']);

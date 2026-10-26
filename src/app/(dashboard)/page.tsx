@@ -8,9 +8,7 @@ import {
   MapPinIcon, 
   UserMinusIcon,
   ChatBubbleLeftRightIcon,
-  CalendarIcon,
   ClockIcon,
-  PlusIcon
 } from "@heroicons/react/24/outline";
 import { 
   CompactWelcome,
@@ -26,6 +24,9 @@ import {
 } from "./DashboardComponents";
 import PendingApprovalsCard from "@/components/PendingApprovalsCard";
 import CeoOverview from "@/components/CeoOverview";
+import { QUICK_NEW_ICONS } from "@/components/QuickNew";
+import { quickNewFor } from "@/lib/quick-new";
+import { usePermissions } from "@/hooks/usePermissions";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -42,6 +43,8 @@ export default function Dashboard() {
   const username = (session?.user as any)?.username as string | undefined;
   const userRole = (session?.user as any)?.role || 'User';
   const isAdmin = (session?.user as any)?.role === 'ADMIN' || (session?.user as any)?.role === 'EA';
+  const { permissions, isAdmin: isAdminRole } = usePermissions();
+  const quickActions = quickNewFor({ username, isAdmin: isAdminRole, permissions });
 
 
   // Busy sale register freshness — reminder for the accounts team to copy
@@ -138,8 +141,10 @@ export default function Dashboard() {
            <StatusTile label="Absent" value={data?.summary?.outOfOffice || 0} icon={MapPinIcon} color="text-rose-600 dark:text-rose-400" bg="bg-rose-50 dark:bg-rose-900/30" />
            <StatusTile label="On Leave" value={data?.summary?.onLeave || 0} icon={UserMinusIcon} color="text-amber-600 dark:text-amber-400" bg="bg-amber-50 dark:bg-amber-900/30" />
            
-           <QuickActionSquare label="New Ticket" href="/tickets?action=new" icon={PlusIcon} color="bg-[#2563EB] dark:bg-[#60A5FA] dark:text-[#60A5FA]" />
-           <QuickActionSquare label="Apply Leave" href="/leave?open=apply" icon={CalendarIcon} color="bg-rose-500" />
+           {/* Same forms as the "+ New" button, so both places always match */}
+           {quickActions.map((item) => (
+             <QuickActionSquare key={item.key} label={item.key === "leave" ? "Apply Leave" : `New ${item.label}`} href={item.href} icon={QUICK_NEW_ICONS[item.key]} />
+           ))}
            <QuickActionSquare label="Attendance" href="/attendance" icon={ClockIcon} color="bg-emerald-500" />
         </div>
 

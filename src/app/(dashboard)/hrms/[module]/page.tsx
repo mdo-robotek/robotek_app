@@ -706,10 +706,14 @@ export default function HRMSModulePage({ params }: { params: Promise<{ module: s
     const pD = new Date(pl);
     const aD = act ? new Date(act) : now;
     const diffMs = aD.getTime() - pD.getTime();
-    const diffHrs = Math.floor(diffMs / (1000 * 60 * 60));
-    const diffMins = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-    if (diffMs <= 0) return { text: `${Math.abs(diffHrs)}h ${Math.abs(diffMins)}m Left`, color: "text-emerald-500" };
-    return { text: `${diffHrs}h ${diffMins}m Late`, color: "text-red-500" };
+    // Over a day → show days, not "669h" (Sahil, 2026-10-26).
+    const abs = Math.abs(diffMs);
+    const days = Math.floor(abs / 86400000);
+    const hrs = Math.floor((abs % 86400000) / 3600000);
+    const mins = Math.floor((abs % 3600000) / 60000);
+    const span = days > 0 ? `${days}d${hrs ? ` ${hrs}h` : ""}` : `${hrs}h ${mins}m`;
+    if (diffMs <= 0) return { text: `${span} left`, color: "text-emerald-500" };
+    return { text: `${span} late`, color: "text-red-500" };
   };
 
   const fmtDt = (iso: string) => iso ? new Date(iso).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "—";

@@ -25,7 +25,7 @@ import {
   CalendarIcon,
   LinkIcon,
 } from "@heroicons/react/24/outline";
-import { NewLaunchStep, NEW_LAUNCH_LAUNCH_STEP, NEW_LAUNCH_TOTAL_STEPS } from "@/lib/new-launch-steps";
+import { NewLaunchField, NewLaunchStep, NEW_LAUNCH_BRIEF_FIELDS, NEW_LAUNCH_LAUNCH_STEP, NEW_LAUNCH_TOTAL_STEPS } from "@/lib/new-launch-steps";
 import { NewLaunch, NewLaunchHistoryEntry } from "@/types/new-launch";
 
 const fetcher = (url: string) =>
@@ -461,6 +461,7 @@ function LaunchCard({
   const fields = parseJson<Record<string, string>>(item.fields, {});
   const rejections = history.filter((h) => h.action === "rejected");
   const launched = !!item[`actual_${NEW_LAUNCH_LAUNCH_STEP}`];
+  const brief = briefOf(item);
 
   return (
     <div className={`${card} overflow-hidden ${delay?.overdue ? "border-l-4 border-l-red-500" : ""}`}>
@@ -474,7 +475,17 @@ function LaunchCard({
               {item.status === "Completed" && <span className="px-2 py-0.5 rounded-full bg-emerald-600 text-white text-[13px] font-semibold">Completed</span>}
               {item.status === "Cancelled" && <span className="px-2 py-0.5 rounded-full bg-slate-200 dark:bg-navy-700 text-slate-600 dark:text-slate-300 text-[13px] font-semibold">Cancelled</span>}
               {rejections.length > 0 && <span className="px-2 py-0.5 rounded-full bg-red-50 dark:bg-red-900/20 text-red-600 text-[13px] font-semibold">{rejections.length} rework</span>}
+              {brief.priority === "High" && <span className="px-2 py-0.5 rounded-full bg-red-600 text-white text-[13px] font-semibold">High priority</span>}
             </div>
+            {(brief.category || brief.target_mrp) && (
+              <div className="flex flex-wrap items-center gap-1.5 mt-1.5 text-[13px]">
+                {brief.category && <span className="px-2 py-0.5 rounded bg-blue-50 dark:bg-blue-900/20 text-[#2563EB] dark:text-blue-300 font-semibold">{brief.category}</span>}
+                {brief.target_mrp && <span className="px-2 py-0.5 rounded bg-slate-100 dark:bg-navy-900 text-slate-700 dark:text-slate-200">MRP ₹{brief.target_mrp}</span>}
+                {brief.target_cost && <span className="px-2 py-0.5 rounded bg-slate-100 dark:bg-navy-900 text-slate-700 dark:text-slate-200">Cost ₹{brief.target_cost}</span>}
+                {brief.first_order_qty && <span className="px-2 py-0.5 rounded bg-slate-100 dark:bg-navy-900 text-slate-700 dark:text-slate-200">{brief.first_order_qty} pcs</span>}
+                {brief.target_launch_month && <span className="px-2 py-0.5 rounded bg-slate-100 dark:bg-navy-900 text-slate-700 dark:text-slate-200">Target {fmtMonth(brief.target_launch_month)}</span>}
+              </div>
+            )}
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1.5 text-[13px] text-slate-500 dark:text-slate-400">
               <span className="flex items-center gap-1"><UserIcon className="w-3.5 h-3.5" /> {item.filled_by || "—"}</span>
               <span className="flex items-center gap-1"><CalendarIcon className="w-3.5 h-3.5" /> Form: {fmtDate(item.form_date)}</span>
@@ -542,6 +553,7 @@ function LaunchCard({
 
       {expanded && (
         <div className="border-t border-slate-100 dark:border-navy-700 bg-slate-50/60 dark:bg-navy-900/40 p-3 space-y-3">
+          <BriefView item={item} />
           <div className="overflow-x-auto">
             <table className="w-full text-[13px] min-w-[720px]">
               <thead>
@@ -635,38 +647,121 @@ function todayIST() {
   return new Date(Date.now() + 5.5 * 3_600_000).toISOString().slice(0, 10);
 }
 
-function LaunchFormModal({ item, onClose, onSubmit }: { item: NewLaunch | null; onClose: () => void; onSubmit: (v: { product_name: string; form_date: string; remark: string }) => Promise<void> }) {
+function briefOf(item: NewLaunch): Record<string, string> {
+  const fields = parseJson<Record<string, string>>(item.fields, {});
+  const out: Record<string, string> = {};
+  NEW_LAUNCH_BRIEF_FIELDS.forEach((f) => { out[f.key] = fields[`0_${f.key}`] || ""; });
+  return out;
+}
+
+function fmtMonth(v?: string) {
+  if (!v || !/^\d{4}-\d{2}$/.test(v)) return v || "";
+  return new Date(`${v}-01T00:00:00+05:30`).toLocaleDateString("en-IN", { month: "short", year: "numeric", timeZone: IST });
+}
+
+function FieldInput({ f, value, onChange, autoFocus }: { f: NewLaunchField; value: string; onChange: (v: string) => void; autoFocus?: boolean }) {
+  if (f.type === "select") {
+    return (
+      <select value={value} onChange={(e) => onChange(e.target.value)} className={inputCls} autoFocus={autoFocus}>
+        <option value="">Select…</option>
+        {f.options?.map((o) => <option key={o} value={o}>{o}</option>)}
+      </select>
+    );
+  }
+  if (f.type === "textarea") {
+    return <textarea value={value} onChange={(e) => onChange(e.target.value)} rows={3} className={inputCls} placeholder={f.placeholder} autoFocus={autoFocus} />;
+  }
+  return (
+    <input
+      type={f.type === "number" ? "number" : f.type === "date" ? "date" : f.type === "url" ? "url" : f.type === "month" ? "month" : "text"}
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      className={inputCls}
+      placeholder={f.placeholder || (f.type === "url" ? "https://…" : f.type === "month" ? "YYYY-MM" : "")}
+      step={f.type === "number" ? "any" : undefined}
+      min={f.type === "number" ? 0 : undefined}
+      autoFocus={autoFocus}
+    />
+  );
+}
+
+/** Read-only product brief — shown on the card's detail and in every step popup. */
+function BriefView({ item, compact }: { item: NewLaunch; compact?: boolean }) {
+  const b = briefOf(item);
+  const rows = NEW_LAUNCH_BRIEF_FIELDS.filter((f) => b[f.key]);
+  if (rows.length === 0) return null;
+  return (
+    <div className={`rounded-lg border border-slate-200 dark:border-navy-700 bg-slate-50 dark:bg-navy-900 ${compact ? "p-2.5" : "p-3"}`}>
+      <p className="text-[13px] font-semibold text-slate-700 dark:text-slate-200 mb-1.5">Product brief</p>
+      <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1 text-[13px]">
+        {rows.map((f) => (
+          <div key={f.key} className={f.type === "textarea" ? "sm:col-span-2" : ""}>
+            <dt className="inline text-slate-500">{f.label.replace(/ \(.*\)$/, "")}: </dt>
+            <dd className="inline text-slate-800 dark:text-slate-100 whitespace-pre-line">
+              {f.type === "url" ? <a href={b[f.key]} target="_blank" rel="noreferrer" className="text-[#2563EB] underline">open link</a>
+                : f.type === "month" ? fmtMonth(b[f.key])
+                : f.key === "target_mrp" || f.key === "target_cost" ? `₹${b[f.key]}`
+                : b[f.key]}
+            </dd>
+          </div>
+        ))}
+      </dl>
+    </div>
+  );
+}
+
+type LaunchFormValues = { product_name: string; form_date: string; remark: string; form: Record<string, string> };
+
+function LaunchFormModal({ item, onClose, onSubmit }: { item: NewLaunch | null; onClose: () => void; onSubmit: (v: LaunchFormValues) => Promise<void> }) {
   const [product, setProduct] = useState(item?.product_name || "");
   const [date, setDate] = useState(item?.form_date || todayIST());
   const [remark, setRemark] = useState(item?.remark || "");
+  const [form, setForm] = useState<Record<string, string>>(() => {
+    const b = item ? briefOf(item) : {};
+    return { ...b, priority: b.priority || "Normal" };
+  });
   const [busy, setBusy] = useState(false);
+  const missing = [
+    ...(product.trim() ? [] : ["Product name"]),
+    ...NEW_LAUNCH_BRIEF_FIELDS.filter((f) => f.required && !String(form[f.key] || "").trim()).map((f) => f.label),
+  ];
   return (
-    <Modal title={item ? `Edit ${item.launch_no}` : "Upcoming New Launch"} onClose={onClose}>
+    <Modal title={item ? `Edit ${item.launch_no}` : "Upcoming New Launch"} onClose={onClose} wide>
       <form
         className="space-y-3"
         onSubmit={async (e) => {
           e.preventDefault();
+          if (missing.length) return;
           setBusy(true);
-          await onSubmit({ product_name: product, form_date: date, remark });
+          await onSubmit({ product_name: product, form_date: date, remark, form });
           setBusy(false);
         }}
       >
-        <div>
-          <Label>Product name *</Label>
-          <input autoFocus required value={product} onChange={(e) => setProduct(e.target.value)} className={inputCls} placeholder="e.g. TWS Earbuds R-55" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <Label>Product name *</Label>
+            <input autoFocus required value={product} onChange={(e) => setProduct(e.target.value)} className={inputCls} placeholder="e.g. TWS Earbuds R-55" />
+          </div>
+          <div>
+            <Label>Date</Label>
+            <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className={inputCls} />
+          </div>
+          {NEW_LAUNCH_BRIEF_FIELDS.map((f) => (
+            <div key={f.key} className={f.type === "textarea" ? "sm:col-span-2" : ""}>
+              <Label>{f.label}{f.required ? " *" : ""}</Label>
+              <FieldInput f={f} value={form[f.key] || ""} onChange={(v) => setForm((s) => ({ ...s, [f.key]: v }))} />
+            </div>
+          ))}
+          <div className="sm:col-span-2">
+            <Label>Remark</Label>
+            <textarea value={remark} onChange={(e) => setRemark(e.target.value)} rows={2} className={inputCls} placeholder="Anything else the team should know" />
+          </div>
         </div>
-        <div>
-          <Label>Date</Label>
-          <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className={inputCls} />
-        </div>
-        <div>
-          <Label>Remark</Label>
-          <textarea value={remark} onChange={(e) => setRemark(e.target.value)} rows={3} className={inputCls} placeholder="Anything the team should know" />
-        </div>
-        {!item && <p className="text-[13px] text-slate-500">Filled by you. Step 1 (Final Vendor — Himanshi, 5 days) starts as soon as you save.</p>}
+        {missing.length > 0 && <p className="text-[13px] text-amber-700 dark:text-amber-400">Still needed: {missing.join(", ")}</p>}
+        {!item && missing.length === 0 && <p className="text-[13px] text-slate-500">Filled by you. Step 1 (Final Vendor — Himanshi, 5 days) starts as soon as you save.</p>}
         <div className="flex justify-end gap-2 pt-1">
           <button type="button" onClick={onClose} className={btnGhost}>Cancel</button>
-          <button type="submit" disabled={busy || !product.trim()} className={btnPrimary}>{busy ? "Saving…" : item ? "Save" : "Start launch"}</button>
+          <button type="submit" disabled={busy || missing.length > 0} className={btnPrimary}>{busy ? "Saving…" : item ? "Save" : "Start launch"}</button>
         </div>
       </form>
     </Modal>
@@ -712,6 +807,7 @@ function StepActionModal({
       >
         <p className="text-[14px] text-slate-600 dark:text-slate-300"><span className="font-semibold">{item.product_name}</span> · {item.launch_no}</p>
         {step?.detail && mode !== "cancel" && <p className="text-[13px] text-slate-500">{step.detail}</p>}
+        {mode !== "cancel" && <BriefView item={item} compact />}
         {mode === "reject" && rework && (
           <p className="text-[13px] p-2 rounded-lg bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300">
             Goes back to Step {rework.n} — {rework.name} ({rework.doer}) for rework.
@@ -721,14 +817,7 @@ function StepActionModal({
         {fieldList.map((f) => (
           <div key={f.key}>
             <Label>{f.label}{f.required ? " *" : ""}</Label>
-            <input
-              type={f.type === "number" ? "number" : f.type === "date" ? "date" : f.type === "url" ? "url" : "text"}
-              value={values[f.key] || ""}
-              onChange={(e) => setValues((v) => ({ ...v, [f.key]: e.target.value }))}
-              className={inputCls}
-              placeholder={f.type === "url" ? "https://…" : ""}
-              step={f.type === "number" ? "any" : undefined}
-            />
+            <FieldInput f={f} value={values[f.key] || ""} onChange={(val) => setValues((v) => ({ ...v, [f.key]: val }))} />
           </div>
         ))}
         <div>

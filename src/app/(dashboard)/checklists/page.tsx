@@ -1656,7 +1656,8 @@ export default function ChecklistsPage() {
                           <div key={`to-${u.username || `id-${u.id}`}`}
                             className="px-3 py-2 text-[14px] font-bold text-gray-700 dark:text-gray-300 hover:bg-[#2563EB]/5 dark:hover:bg-[#60A5FA]/10 cursor-pointer"
                             onClick={() => { 
-                              setFormData({ ...formData, assigned_to: u.username }); 
+                              // Department comes from the person's row in the Users sheet.
+                              setFormData({ ...formData, assigned_to: u.username, department: String((u as { department?: string }).department ?? "").trim() || formData.department }); 
                               setAssignedToOpen(false); 
                               setAssignedToSearch(""); 
                             }}

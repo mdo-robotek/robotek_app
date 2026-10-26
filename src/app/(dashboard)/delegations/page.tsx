@@ -164,6 +164,9 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
   ];
   const [departmentSearch, setDepartmentSearch] = useState("");
   const [departmentOpen, setDepartmentOpen] = useState(false);
+  // Department comes from the Users sheet of the person picked in "Assigned To".
+  // Only someone with no department on file (or a deliberate "Change") gets the list.
+  const [deptManual, setDeptManual] = useState(false);
 
   // Media Recorder States
   const [isRecording, setIsRecording] = useState(false);
@@ -456,6 +459,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
     }
     setRefDocFile(null);
     setDepartmentOpen(false);
+    setDeptManual(false);
     
     setFormData({
       id: "",
@@ -481,6 +485,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
     });
     setVoiceNoteFile(null);
     setRefDocFile(null);
+    setDeptManual(false);
     setIsModalOpen(true);
   };
 
@@ -1935,7 +1940,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                 </button>
               </div>
 
-              <form onSubmit={handleSubmit} className="p-4 space-y-6 max-h-[80vh] overflow-y-auto bg-white dark:bg-navy-800/50">
+              <form onSubmit={handleSubmit} className="p-4 space-y-6 max-h-[80vh] overflow-y-auto overflow-x-hidden bg-white dark:bg-navy-800/50">
                 
                 <div className="space-y-4">
                   <div className="space-y-2">
@@ -2046,7 +2051,12 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                           {usersList.filter(u => u.username.toLowerCase().includes(assignedToSearch.toLowerCase())).map(u => (
                             <div key={`to-${u.id}`}
                               className="px-3 py-2 text-[14px] font-bold text-gray-700 dark:text-gray-300 hover:bg-[#2563EB]/5 dark:hover:bg-[#60A5FA]/10 cursor-pointer flex justify-between items-center"
-                              onClick={() => { setFormData({ ...formData, assigned_to: u.username }); setAssignedToOpen(false); setAssignedToSearch(""); }}
+                              onClick={() => {
+                                const dept = String(u.department ?? "").trim();
+                                setFormData({ ...formData, assigned_to: u.username, department: dept || formData.department });
+                                setDeptManual(!dept);
+                                setAssignedToOpen(false); setAssignedToSearch("");
+                              }}
                             >
                               <span>{u.username}</span>
                               {u.role_name && <span className="text-[13px] px-1.5 py-0.5 rounded-full bg-gray-100 dark:bg-zinc-800 text-gray-500">{u.role_name}</span>}
@@ -2100,9 +2110,26 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
                 {/* Row 3: Department + Due Date & Time */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* Department Dropdown */}
-                  <div className="relative">
+                  {/* Department — filled from the Assigned To person; list only when needed */}
+                  <div className="relative min-w-0">
                     <label className="text-[13px] font-semibold text-[#5B6472] block mb-2">Department</label>
+                    {!deptManual ? (
+                      <div className="w-full min-h-[44px] bg-[#F7F8FA] dark:bg-zinc-900/60 border border-[#E5E7EB] dark:border-zinc-800 rounded-lg px-3 flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <TagIcon className="w-3.5 h-3.5 text-[#5B6472] shrink-0" />
+                          {formData.department ? (
+                            <span className="font-semibold text-[14px] text-[#1A1D21] dark:text-zinc-100 truncate">{formData.department}</span>
+                          ) : (
+                            <span className="text-[14px] text-[#5B6472] truncate">Fills in when you pick a person</span>
+                          )}
+                        </div>
+                        <button type="button"
+                          onClick={() => { setDeptManual(true); setDepartmentOpen(true); setAssignedByOpen(false); setAssignedToOpen(false); }}
+                          className="shrink-0 text-[13px] font-semibold text-[#2563EB] px-2 py-2"
+                        >Change</button>
+                      </div>
+                    ) : (
+                    <>
                     <div 
                       className="w-full bg-[#FFFFFF] dark:bg-zinc-900 border border-[#E5E7EB] dark:border-zinc-800 rounded-lg shadow-sm cursor-pointer"
                       onClick={() => { setDepartmentOpen(!departmentOpen); setAssignedByOpen(false); setAssignedToOpen(false); }}
@@ -2139,10 +2166,12 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                         </div>
                       </div>
                     )}
+                    </>
+                    )}
                   </div>
 
                   {/* Due Date & Time */}
-                  <div>
+                  <div className="min-w-0">
                     <label className="text-[13px] font-semibold text-[#5B6472] block mb-2">Due Date &amp; Time</label>
                   <div className="relative group/date">
                     <CalendarDaysIcon className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5B6472] pointer-events-none group-focus-within/date:text-[#2563EB]" />
@@ -2150,7 +2179,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                       type="datetime-local"
                       value={formData.due_date}
                       onChange={(e) => setFormData({ ...formData, due_date: e.target.value })}
-                      className="w-full bg-[#FFFFFF] dark:bg-zinc-900 pr-10 pl-3 py-1.5 rounded-lg border border-[#E5E7EB] dark:border-zinc-800 focus:border-[#2563EB] focus:bg-white dark:focus:bg-zinc-900 outline-none font-bold text-[14px] text-gray-800 dark:text-zinc-100 transition-all shadow-sm cursor-pointer"
+                      className="block w-full min-w-0 max-w-full appearance-none min-h-[44px] relative [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:right-2 [&::-webkit-calendar-picker-indicator]:w-6 [&::-webkit-calendar-picker-indicator]:h-6 [&::-webkit-calendar-picker-indicator]:cursor-pointer bg-[#FFFFFF] dark:bg-zinc-900 pr-10 pl-3 py-1.5 rounded-lg border border-[#E5E7EB] dark:border-zinc-800 focus:border-[#2563EB] focus:bg-white dark:focus:bg-zinc-900 outline-none font-bold text-[14px] text-gray-800 dark:text-zinc-100 transition-all shadow-sm cursor-pointer"
                     />
                   </div>
                   </div>
@@ -2201,7 +2230,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                             <p className="text-[13px] font-bold text-red-500/70 mt-1 animate-pulse">Recording Live...</p>
                           </>
                         ) : (
-                          <div className="flex w-full items-center gap-4">
+                          <div className="flex w-full min-w-0 items-center gap-3 sm:gap-4">
                             <button
                               type="button"
                               onClick={startRecording}
@@ -2211,16 +2240,16 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                               <MicrophoneIcon className="w-6 h-6 group-hover:scale-110 transition-transform" />
                             </button>
                             
-                            <div className="flex-1 text-left border-l-2 border-gray-200 dark:border-zinc-700 pl-4 h-full flex flex-col justify-center">
+                            <div className="flex-1 min-w-0 text-left border-l-2 border-gray-200 dark:border-zinc-700 pl-3 sm:pl-4 h-full flex flex-col justify-center">
                               <p className="text-sm font-semibold text-gray-800 dark:text-zinc-200">
                                 {voiceNoteFile ? "Voice Note Ready" : "Record Live"}
                               </p>
-                              <p className="text-[13px] font-bold text-gray-500 mt-0.5 max-w-[150px] truncate">
-                                {voiceNoteFile ? voiceNoteFile.name : (formData.voice_note_url ? "Existing Clip Linked" : "Click mic to start recording")}
+                              <p className="text-[13px] font-bold text-gray-500 mt-0.5 truncate">
+                                {voiceNoteFile ? voiceNoteFile.name : (formData.voice_note_url ? "Existing Clip Linked" : "Tap the mic to record")}
                               </p>
                             </div>
                             
-                            <label className="flex items-center gap-2 cursor-pointer bg-white dark:bg-zinc-800 px-3 py-1.5 rounded border border-gray-200 dark:border-zinc-700 shadow-sm hover:bg-gray-50 dark:hover:bg-zinc-700 transition-colors tooltip justify-center flex-shrink-0" title="Upload File instead">
+                            <label className="flex items-center gap-1.5 min-h-[44px] cursor-pointer bg-white dark:bg-zinc-800 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-zinc-700 shadow-sm hover:bg-gray-50 dark:hover:bg-zinc-700 transition-colors tooltip justify-center flex-shrink-0" title="Upload File instead">
                               <PaperClipIcon className="w-4 h-4 text-gray-500 dark:text-zinc-400" />
                               <span className="text-[13px] font-bold text-gray-500">Upload</span>
                               <input
@@ -2270,14 +2299,14 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                   <button
                     type="button"
                     onClick={() => setIsModalOpen(false)}
-                    className="flex-1 px-4 py-2 rounded-xl font-semibold text-[#5B6472] hover:text-gray-600 hover:bg-gray-50 dark:hover:bg-zinc-800 transition-all text-[13px]"
+                    className="flex-1 min-h-[44px] px-4 py-2 rounded-xl font-semibold text-[#5B6472] hover:text-gray-600 hover:bg-gray-50 dark:hover:bg-zinc-800 transition-all text-[15px]"
                   >
                     Cancel
                   </button>
                    <button
                      type="submit"
                      disabled={submitting}
-                     className="flex-1 bg-[#DC2626] hover:bg-[#8E161D] text-white px-4 py-2 rounded-xl font-semibold transition-all shadow-lg active:scale-95 text-[13px] flex items-center justify-center gap-2 disabled:opacity-50"
+                     className="flex-1 min-h-[44px] bg-[#2563EB] hover:bg-[#1D4ED8] text-white px-4 py-2 rounded-xl font-semibold transition-all active:scale-95 text-[15px] flex items-center justify-center gap-2 disabled:opacity-50"
                    >
                      {submitting ? (
                        <>

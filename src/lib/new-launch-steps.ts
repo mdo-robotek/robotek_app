@@ -6,14 +6,35 @@
 // Approval steps: MD / Admin approves → next step; rejects → flow goes back
 // to `reworkStep` (the design step) and comes back for approval again.
 
-export type NewLaunchFieldType = "text" | "number" | "date" | "url";
+export type NewLaunchFieldType = "text" | "number" | "date" | "url" | "month" | "select" | "textarea";
 
 export interface NewLaunchField {
   key: string;
   label: string;
   type: NewLaunchFieldType;
   required?: boolean;
+  options?: string[];
+  placeholder?: string;
 }
+
+// Product brief filled when the launch is raised (the "Google Form"). Step 1
+// (Final Vendor) can only be done well if the vendor hunt knows what to
+// source, at what cost, in what quantity, by when — so these are mandatory.
+// Stored in the launch's `fields` JSON under `0_<key>`.
+export const NEW_LAUNCH_CATEGORIES = ["TWS Earbuds", "Neckband", "Speaker", "Charger", "Cable", "Power Bank", "Battery", "Other"];
+export const NEW_LAUNCH_BRIEF_FIELDS: NewLaunchField[] = [
+  { key: "category", label: "Category", type: "select", required: true, options: NEW_LAUNCH_CATEGORIES },
+  { key: "priority", label: "Priority", type: "select", required: true, options: ["Normal", "High"] },
+  { key: "key_specs", label: "Key specs required", type: "textarea", required: true, placeholder: "e.g. 40 hrs playtime, BT 5.3, ENC mic, Type-C, 13mm driver" },
+  { key: "target_mrp", label: "Target MRP (₹)", type: "number", required: true, placeholder: "e.g. 1299" },
+  { key: "target_cost", label: "Target landed cost (₹)", type: "number", required: true, placeholder: "e.g. 380" },
+  { key: "first_order_qty", label: "First order qty (pcs)", type: "number", required: true, placeholder: "e.g. 2000" },
+  { key: "target_launch_month", label: "Target launch month", type: "month", required: true },
+  { key: "model_no", label: "Model / code (if decided)", type: "text" },
+  { key: "colours", label: "Colours / variants", type: "text", placeholder: "e.g. Black, White" },
+  { key: "reference_link", label: "Reference photo / competitor link", type: "url" },
+  { key: "suggested_vendors", label: "Suggested vendors (if any)", type: "text" },
+];
 
 export interface NewLaunchStep {
   n: number;

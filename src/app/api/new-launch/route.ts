@@ -9,6 +9,7 @@ import {
   saveNewLaunchConfig,
 } from "@/lib/new-launch-sheets";
 import {
+  NEW_LAUNCH_BRIEF_FIELDS,
   NEW_LAUNCH_TOTAL_STEPS,
   NewLaunchStep,
   NewLaunchStepConfig,
@@ -79,7 +80,21 @@ type Body = {
   product_name?: string;
   form_date?: string;
   configs?: NewLaunchStepConfig[];
+  form?: Record<string, string>;
 };
+
+/** Validates the product brief; returns `0_<key>` entries for the fields JSON. */
+function readBrief(form: Record<string, string> | undefined): Record<string, string> {
+  const out: Record<string, string> = {};
+  for (const f of NEW_LAUNCH_BRIEF_FIELDS) {
+    const v = String(form?.[f.key] ?? "").trim();
+    if (f.required && !v) throw new HttpError(400, `${f.label} is required`);
+    if (v && f.type === "number" && !(Number(v) > 0)) throw new HttpError(400, `${f.label} must be a number above 0`);
+    if (v && f.options && !f.options.includes(v)) throw new HttpError(400, `${f.label}: pick one of the options`);
+    out[`0_${f.key}`] = v;
+  }
+  return out;
+}
 
 class HttpError extends Error {
   constructor(public status: number, message: string) {
@@ -128,6 +143,7 @@ async function handle(body: Body, me: { name: string; isAdmin: boolean }): Promi
   if (body.action === "create") {
     const product = String(body.product_name || "").trim();
     if (!product) throw new HttpError(400, "Product name is required");
+    const brief = readBrief(body.form);
     const all = await getNewLaunches();
     const maxId = all.reduce((m, r) => Math.max(m, parseInt(r.id) || 0), 0);
     const id = String(maxId + 1);
@@ -144,7 +160,7 @@ async function handle(body: Body, me: { name: string; isAdmin: boolean }): Promi
       launch_date: "",
       created_at: now,
       updated_at: now,
-      fields: "{}",
+      fields: JSON.stringify(brief),
       history: JSON.stringify(history),
     } as NewLaunch;
     item.planned_1 = plannedFor(steps[0], item, nowDate);
@@ -179,6 +195,7 @@ async function handle(body: Body, me: { name: string; isAdmin: boolean }): Promi
     item.product_name = product;
     if (body.form_date) item.form_date = String(body.form_date);
     if (body.remark !== undefined) item.remark = remark;
+    if (body.form) Object.assign(fields, readBrief(body.form));
     history.push({ at: now, by: me.name, step: Number(item.current_step) || 0, action: "edited" });
     return save();
   }

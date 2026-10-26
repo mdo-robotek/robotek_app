@@ -4,6 +4,9 @@ import { uploadFileToDrive } from "@/lib/google-drive";
 import { getUserByUsernameOrEmail } from "@/lib/google-sheets";
 import { sendWhatsAppMessage } from "@/lib/maytapi";
 import { formatDate } from "@/lib/dateUtils";
+import { NEED_REVISION } from "@/lib/delegation-revisions";
+import { getAppBaseUrl } from "@/lib/app-url";
+import { shortIst } from "@/lib/ist-format";
 
 export const dynamic = "force-dynamic";
 
@@ -26,6 +29,53 @@ export async function POST(
 
     if (!current) {
       return NextResponse.json({ error: "Delegation not found" }, { status: 404 });
+    }
+
+    // "Need Revision" = asking for a new date (Sahil, 2026-10-26). The date
+    // does NOT change here — it changes only when the task giver approves
+    // (see ../revision-decision). No reason is asked.
+    if (newStatus === NEED_REVISION) {
+      const wanted = Date.parse(revisedDueDate);
+      if (!revisedDueDate || !Number.isFinite(wanted)) {
+        return NextResponse.json({ error: "Pick the new date you will finish by." }, { status: 400 });
+      }
+      if (wanted <= Date.now()) {
+        return NextResponse.json({ error: "The new date must be later than now." }, { status: 400 });
+      }
+      const requestedIso = new Date(wanted).toISOString();
+      const asked = { ...current, status: NEED_REVISION, updated_at: new Date().toISOString() };
+      await delegationService.update(id, asked);
+      await addDelegationRevision({
+        id: `REV-${Date.now()}`,
+        delegation_id: id,
+        old_status: current.status || "",
+        new_status: NEED_REVISION,
+        old_due_date: current.due_date || "",
+        new_due_date: current.due_date || "",
+        reason: "",
+        created_at: new Date().toISOString(),
+        evidence_urls: "",
+        requested_due_date: requestedIso,
+      });
+
+      void (async () => {
+        try {
+          const giver = current.assigned_by && current.assigned_by !== current.assigned_to ? current.assigned_by : "";
+          if (!giver) return;
+          const user = await getUserByUsernameOrEmail(giver);
+          if (!user?.phone) return;
+          const text =
+            `📅 *New date asked*\n` +
+            `${current.assigned_to} wants to finish this task by *${shortIst(requestedIso)}* (was ${shortIst(current.due_date)}).\n\n` +
+            `📌 ${current.title}\n\n` +
+            `Approve or say no: ${getAppBaseUrl()}/delegations?task=${encodeURIComponent(id)}`;
+          await sendWhatsAppMessage(user.phone, text);
+        } catch (err) {
+          console.error("New-date WhatsApp failed:", err);
+        }
+      })();
+
+      return NextResponse.json({ message: "New date asked — waiting for approval", delegation: asked });
     }
 
     let evidenceUrl = "";

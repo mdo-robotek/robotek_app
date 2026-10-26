@@ -6,6 +6,9 @@ import { getIMSGFloorApprovals } from "@/lib/ims-gfloor-approval-sheets";
 import { paymentVendorService } from "@/lib/payment-vendor-sheets";
 import { getTickets } from "@/lib/ticket-sheets";
 import { helpTicketsFor } from "@/lib/help-tickets";
+import { delegationService, getRevisionIndex } from "@/lib/delegation-sheets";
+import { isDecider, NEED_REVISION } from "@/lib/delegation-revisions";
+import { shortIst } from "@/lib/ist-format";
 import {
   approvalsForUser,
   isPendingStatus,
@@ -16,7 +19,7 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 interface ApprovalGroup {
-  key: ApprovalKey | "help-tickets";
+  key: ApprovalKey | "help-tickets" | "date-changes";
   title: string;
   href: string;
   count: number;
@@ -68,6 +71,34 @@ export async function GET() {
       if (tickets) groups.push(tickets);
     } catch (e) {
       console.error("approvals/pending: tickets failed", e);
+    }
+
+    // New-date asks on delegations: for the task giver, and for EA (EA
+    // maintains delegations — Sahil, 2026-10-26).
+    try {
+      const asking = (await delegationService.getAll()).filter((t) => t.status === NEED_REVISION);
+      if (asking.length > 0) {
+        const index = await getRevisionIndex();
+        const meForTasks = { username, designation: me?.designation || "" };
+        const mine = asking
+          .map((t) => ({ t, p: index.get(String(t.id))?.pending }))
+          .filter((x) => x.p && isDecider(meForTasks, x.t))
+          .sort((a, b) => Date.parse(a.p!.asked_at || "") - Date.parse(b.p!.asked_at || ""));
+        if (mine.length > 0) {
+          const oldest = Date.parse(mine[0].p!.asked_at || "");
+          groups.push({
+            key: "date-changes",
+            title: "Date change requests",
+            href: "/delegations?revisions=1",
+            count: mine.length,
+            oldestDays: Number.isFinite(oldest) ? Math.max(0, Math.floor((Date.now() - oldest) / 86400000)) : null,
+            action: "Review",
+            samples: mine.slice(0, 3).map(({ t, p }) => ({ label: t.title || "Task", sub: `${t.assigned_to} → ${shortIst(p!.requested_due_date)}` })),
+          });
+        }
+      }
+    } catch (e) {
+      console.error("approvals/pending: date changes failed", e);
     }
 
     if (wanted.has("leave")) {

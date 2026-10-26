@@ -2,6 +2,9 @@
 
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useOpenFromLink } from "@/hooks/useOpenFromLink";
+import { useRouter, useSearchParams } from "next/navigation";
+import { canDecide } from "@/lib/delegation-revisions";
+import RevisionAskPanel from "@/components/RevisionAskPanel";
 import { defaultDueLocal } from "@/lib/quick-new";
 import { useSession } from "next-auth/react";
 import { Delegation } from "@/types/delegation";
@@ -65,6 +68,14 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
     revalidateOnReconnect: false,
     revalidateOnMount: true,
   });
+
+  // Date changes per task: how many times the date moved (R1, R2...) and an
+  // open "new date" ask waiting for approval. See src/lib/delegation-revisions.ts
+  type RevInfo = { count: number; pending: { requested_due_date: string; asked_at: string } | null };
+  const { data: revMap, mutate: mutateRevisions } = useSWR<Record<string, RevInfo>>("/api/delegations/revisions", fetcher, {
+    revalidateOnFocus: true,
+  });
+  const revOf = (id: string | number) => revMap?.[String(id)];
 
   // SSE: incrementally update local cache when a change is detected
   useSSE({ 
@@ -220,8 +231,71 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
       
       // Fetch history for selected task
       fetchTaskHistory(selectedTask.id);
+
+      // Opened from the morning WhatsApp link (?ask=ID): go straight to "new date".
+      if (askRef.current === String(selectedTask.id)) {
+        setUpdatingStatus("Need Revision");
+        askRef.current = null;
+      }
     }
   }, [selectedTask]);
+
+  // WhatsApp / dashboard links:
+  //   ?task=ID      open that task
+  //   ?ask=ID       open that task with "pick a new date" ready
+  //   ?revisions=1  show only tasks waiting for a new-date approval
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const askRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (searchParams?.get("revisions") === "1") {
+      setModalStatusFilter(["Need Revision"]);
+      router.replace("/delegations", { scroll: false });
+      return;
+    }
+    const ask = searchParams?.get("ask");
+    const taskId = searchParams?.get("task") || ask;
+    if (!taskId || !swrDelegations) return;
+    const t = swrDelegations.find((d) => String(d.id) === String(taskId));
+    if (t) {
+      if (ask) askRef.current = String(t.id);
+      setSelectedTask(t);
+    }
+    router.replace("/delegations", { scroll: false });
+  }, [searchParams, swrDelegations]);
+
+  const myDesignation = String(usersList.find((u) => String(u.username).toLowerCase() === String(currentUser).toLowerCase())?.designation || "");
+  const mayDecideOn = (t: Delegation) => canDecide({ username: currentUser, role: userRole, designation: myDesignation }, t);
+
+  const decideRevision = async (decision: "approve" | "reject", note: string) => {
+    if (!selectedTask) return;
+    setIsSubmittingUpdate(true);
+    setActionStatus('loading');
+    setActionMessage(decision === "approve" ? "Approving new date..." : "Saving...");
+    setIsStatusModalOpen(true);
+    try {
+      const res = await fetch(`/api/delegations/${selectedTask.id}/revision-decision`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ decision, note }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || "Could not save. Please try again.");
+      setActionStatus('success');
+      setActionMessage(decision === "approve" ? `New date approved. ${selectedTask.assigned_to} gets a WhatsApp.` : `Not approved. The old date stays. ${selectedTask.assigned_to} gets a WhatsApp.`);
+      if (data.delegation) {
+        setSelectedTask(data.delegation);
+        mutateDelegations((current) => current?.map((d) => String(d.id) === String(data.delegation.id) ? data.delegation : d), false);
+      }
+      mutateRevisions();
+      fetchTaskHistory(selectedTask.id);
+    } catch (error: any) {
+      setActionStatus('error');
+      setActionMessage(error?.message || "Could not save. Please try again.");
+    } finally {
+      setIsSubmittingUpdate(false);
+    }
+  };
 
   const fetchTaskHistory = async (id: string) => {
     setIsLoadingHistory(true);
@@ -240,6 +314,15 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
   const handleUpdateStatus = async () => {
     if (!selectedTask || !updatingStatus) return;
+    if (updatingStatus === "Need Revision") {
+      const t = Date.parse(revisedDueDate);
+      if (!revisedDueDate || !Number.isFinite(t) || t <= Date.now()) {
+        setActionStatus('error');
+        setActionMessage(!revisedDueDate ? "Pick the new date you will finish by." : "The new date must be later than now.");
+        setIsStatusModalOpen(true);
+        return;
+      }
+    }
 
     setIsSubmittingUpdate(true);
     setActionStatus('loading');
@@ -273,7 +356,10 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
       if (res.ok) {
         const data = await res.json();
         setActionStatus('success');
-        setActionMessage("Status updated successfully");
+        setActionMessage(updatingStatus === "Need Revision"
+          ? `New date asked. ${selectedTask.assigned_by && selectedTask.assigned_by !== selectedTask.assigned_to ? selectedTask.assigned_by : "EA"} will approve it.`
+          : "Status updated successfully");
+        mutateRevisions();
         
         // Update local state immediately for both sidebar and main list
         if (data.delegation) {
@@ -297,9 +383,9 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
         const errData = await res.json();
         throw new Error(errData.error || "Failed to update status");
       }
-    } catch (error) {
+    } catch (error: any) {
       setActionStatus('error');
-      setActionMessage("Error updating status");
+      setActionMessage(error?.message || "Error updating status");
     } finally {
       setIsSubmittingUpdate(false);
     }
@@ -661,7 +747,10 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
   const getDisplayStatus = (del: Delegation) => {
     const s = del.status;
-    if (s && s !== 'Pending') {
+    // An old "Need Revision" label with no open new-date ask is just a task
+    // with a date — show it as Planned / Pending / Overdue like any other.
+    const staleRevision = s === 'Need Revision' && revMap !== undefined && !revOf(del.id)?.pending;
+    if (s && s !== 'Pending' && !staleRevision) {
       // Map sheet status to standardized labels if needed
       if (s === 'Need Clarity') return 'Need Clarity';
       if (s === 'Completed') return 'Completed';
@@ -949,6 +1038,21 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
       <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-[13px] font-semibold   rounded-md border ${config.color}`}>
         <config.icon className="w-3 h-3" />
         {config.label}
+      </span>
+    );
+  };
+
+  const getRevisionBadge = (id: string | number) => {
+    const n = revOf(id)?.count || 0;
+    if (!n) return null;
+    const tone = n === 1
+      ? "bg-gray-100 text-[#5B6472] border-gray-200 dark:bg-white/10 dark:text-gray-300 dark:border-white/10"
+      : n === 2
+        ? "bg-amber-50 text-[#D97706] border-amber-200 dark:bg-amber-500/10 dark:border-amber-500/30"
+        : "bg-rose-50 text-[#DC2626] border-rose-200 dark:bg-rose-500/10 dark:border-rose-500/30";
+    return (
+      <span title={`Date moved ${n} time${n > 1 ? "s" : ""}`} className={`inline-flex items-center px-1.5 py-0.5 rounded-md border text-[13px] font-semibold tabular-nums ${tone}`}>
+        R{n}
       </span>
     );
   };
@@ -1350,7 +1454,10 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                         {getPriorityBadge(del.priority)}
                       </td>
                       <td className="px-4 py-3">
-                        {getStatusBadge(getDisplayStatus(del))}
+                        <div className="flex items-center gap-1.5">
+                          {getStatusBadge(getDisplayStatus(del))}
+                          {getRevisionBadge(del.id)}
+                        </div>
                       </td>
                       <td className="px-4 py-3">
                         <p className="text-[13px] md:text-xs font-bold text-gray-600 dark:text-slate-300">{formatDateDisplay(del.due_date) || "—"}</p>
@@ -1416,8 +1523,9 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                           </div>
                           <h3 className="font-semibold text-sm text-gray-900 dark:text-white leading-tight line-clamp-2 tracking-wide group-hover:text-[#2563EB] dark:group-hover:text-[#60A5FA] transition-colors">{del.title}</h3>
                         </div>
-                        <div className="flex-shrink-0">
+                        <div className="flex-shrink-0 flex items-center gap-1.5">
                           {getStatusBadge(status)}
+                          {getRevisionBadge(del.id)}
                         </div>
                       </div>
 
@@ -1534,11 +1642,26 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                   </div>
                   <div className="flex flex-wrap items-center gap-2">
                     {getStatusBadge(getDisplayStatus(selectedTask))}
+                    {getRevisionBadge(selectedTask.id)}
                     {getPriorityBadge(selectedTask.priority)}
                     {getEvidenceBadge(selectedTask.evidence_required)}
                     {getDepartmentBadge(selectedTask.department)}
                   </div>
                 </section>
+
+                {/* Open new-date ask — approve / not approve */}
+                {selectedTask.status === "Need Revision" && revOf(selectedTask.id)?.pending && (
+                  <RevisionAskPanel
+                    doer={selectedTask.assigned_to}
+                    giver={selectedTask.assigned_by && selectedTask.assigned_by !== selectedTask.assigned_to ? selectedTask.assigned_by : "EA"}
+                    currentDue={formatDateDisplay(selectedTask.due_date)}
+                    askedDue={formatDateDisplay(revOf(selectedTask.id)!.pending!.requested_due_date)}
+                    askedAt={formatDateDisplay(revOf(selectedTask.id)!.pending!.asked_at)}
+                    mayDecide={mayDecideOn(selectedTask)}
+                    busy={isSubmittingUpdate}
+                    onDecide={decideRevision}
+                  />
+                )}
 
                 {/* Compact Details Grid */}
                 <div className="bg-red-50/30 dark:bg-red-900/10 rounded-2xl border border-red-100/50 dark:border-red-900/30 overflow-hidden divide-y divide-red-100/30 dark:divide-red-900/20">
@@ -1754,7 +1877,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                   {/* Conditional: Revised Due Date */}
                   {['Need Revision', 'Hold', 'Re-Open'].includes(updatingStatus) && (
                     <div className="animate-in fade-in slide-in-from-top-2 duration-300">
-                      <label className="text-[13px] font-semibold text-red-600 dark:text-red-400 mb-1.5 block">Revised Due Date & Time</label>
+                      <label className="text-[13px] font-semibold text-red-600 dark:text-red-400 mb-1.5 block">{updatingStatus === 'Need Revision' ? 'New date you will finish by' : 'Revised Due Date & Time'}</label>
                       <div className="relative group/date">
                         <input
                           type="datetime-local"
@@ -1764,7 +1887,11 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                         />
                         <CalendarDaysIcon className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-red-400 pointer-events-none group-hover/date:scale-110 transition-transform" />
                       </div>
-                      <p className="text-[14px] text-[#5B6472] mt-1 font-bold italic tracking-tighter">* Set the new target completion time</p>
+                      <p className="text-[14px] text-[#5B6472] mt-1 font-bold tracking-tighter">
+                        {updatingStatus === 'Need Revision'
+                          ? `The date changes only after ${selectedTask.assigned_by && selectedTask.assigned_by !== selectedTask.assigned_to ? selectedTask.assigned_by : 'EA'} approves.`
+                          : '* Set the new target completion time'}
+                      </p>
                     </div>
                   )}
 
@@ -1790,8 +1917,8 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                     </div>
                   )}
 
-                  {/* Optional Reason for status change */}
-                  {updatingStatus && (
+                  {/* Optional Reason for status change — not asked when asking for a new date (Sahil: no excuses) */}
+                  {updatingStatus && updatingStatus !== 'Need Revision' && (
                     <div className="animate-in fade-in slide-in-from-top-2 duration-300">
                       <label className="text-[13px] font-semibold text-red-600 dark:text-red-400 mb-1.5 block">Reason for Status Change</label>
                       <textarea
@@ -1887,7 +2014,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
               <div className="p-5 px-6 border-t border-gray-200 dark:border-white/10 bg-white dark:bg-navy-900 flex gap-4 mt-auto sticky bottom-0 z-30 shadow-[0_-10px_30px_-15px_rgba(0,0,0,0.1)]">
                 <button
                   onClick={handleUpdateStatus}
-                  disabled={!updatingStatus || isSubmittingUpdate}
+                  disabled={!updatingStatus || isSubmittingUpdate || (updatingStatus === 'Need Revision' && !revisedDueDate)}
                   className="w-[70%] px-4 py-3.5 bg-[#DC2626] hover:bg-red-700 disabled:bg-gray-300 text-white rounded-2xl text-[14px] font-semibold transition-all flex items-center justify-center gap-2 active:scale-95 no-underline border-none"
                   style={{ backgroundColor: '#DC2626' }}
                 >
@@ -1896,7 +2023,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                   ) : (
                     <CheckCircleIcon className="w-5 h-5" />
                   )}
-                  Update Status
+                  {updatingStatus === 'Need Revision' ? 'Ask for new date' : 'Update Status'}
                 </button>
                 <button
                   onClick={handleAddRemark}

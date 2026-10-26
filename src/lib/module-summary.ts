@@ -230,11 +230,11 @@ export function tasksSummary(coo: any): ModuleSummary {
     title: "Tasks",
     href: "/delegations",
     headline: { value: overdue, label: "tasks overdue", tone: toneCount(overdue, true) },
-    note: `${pending} pending · ${revision} need revision`,
+    note: `${pending} pending · ${revision} new dates asked`,
     figures: [
       { key: "overdue", label: "Overdue", value: overdue, tone: toneCount(overdue, true) },
       { key: "pending", label: "Pending", value: pending, tone: "neutral" },
-      { key: "revision", label: "Need revision", value: revision, tone: toneCount(revision) },
+      { key: "revision", label: "New dates asked", value: revision, tone: toneCount(revision) },
       { key: "done", label: "Completed", value: done, tone: "neutral" },
     ],
   };

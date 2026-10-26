@@ -1,5 +1,5 @@
 import { getAttendanceRecords, getLeaveRequests } from "@/lib/sheets/attendance-sheets";
-import { getDelegations } from "@/lib/delegation-sheets";
+import { getDelegations, getRevisionIndex } from "@/lib/delegation-sheets";
 import { getChecklistsPaginated } from "@/lib/checklist-sheets";
 import { ChecklistOccurrence } from "@/types/checklist";
 import { getUsers } from "@/lib/google-sheets";
@@ -248,7 +248,11 @@ export async function buildCooReport(searchParams: URLSearchParams): Promise<any
     });
 
     const completed = allDelegations.filter(d => d.status === "Completed").length;
-    const needRevision = allDelegations.filter(d => d.status === "Need Revision").length;
+    // "Need Revision" now means "asked for a new date, waiting for approval".
+    // Old tasks still carrying the label without an open ask are not counted.
+    const revisionIndex = await getRevisionIndex().catch(() => new Map());
+    const isAsking = (d: any) => d.status === "Need Revision" && !!revisionIndex.get(String(d.id))?.pending;
+    const needRevision = allDelegations.filter(isAsking).length;
     const overdue = allDelegations.filter(d => {
       const due = normalizeDate(d.due_date);
       return due && due < todayStr && d.status !== "Completed";
@@ -666,7 +670,7 @@ export async function buildCooReport(searchParams: URLSearchParams): Promise<any
         zeroTaskEmployees,
         overdueList: overdue.map((d: any) => ({ id: d.id, title: d.title, assignedTo: d.assigned_to, due: normalizeDate(d.due_date) })),
         pendingList: allDelegations.filter((d: any) => d.status === "Pending").map((d: any) => ({ id: d.id, title: d.title, assignedTo: d.assigned_to, due: normalizeDate(d.due_date) })),
-        needRevisionList: allDelegations.filter((d: any) => d.status === "Need Revision").map((d: any) => ({ id: d.id, title: d.title, assignedTo: d.assigned_to, due: normalizeDate(d.due_date) }))
+        needRevisionList: allDelegations.filter(isAsking).map((d: any) => ({ id: d.id, title: d.title, assignedTo: d.assigned_to, due: normalizeDate(d.due_date) }))
       },
       orders: {
         todayRevenue,

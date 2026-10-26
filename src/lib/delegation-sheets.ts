@@ -1,6 +1,7 @@
 import { BaseSheetsService } from "./sheets/base-service";
 import { Delegation } from "@/types/delegation";
 import { getUsers } from "./google-sheets";
+import { buildRevisionIndex, rowFromSheet, type RevisionInfo, type RevisionRow } from "./delegation-revisions";
 
 const GOOGLE_SHEET_ID = "1kqX1fWoTyk2Y7IUCpO5PrrcF0fvGSj0n3xZaNdmm3Iw";
 const SHEET_NAME = "delegation";
@@ -168,11 +169,11 @@ export async function deleteDelegation(id: string) {
 
 export async function getDelegationHistory(id: string) {
   const sheets = await (delegationService as any).getSheetsClient();
-  const revResponse = await sheets.spreadsheets.values.get({ spreadsheetId: GOOGLE_SHEET_ID, range: `delegation_revision_history!A:I` });
+  const revResponse = await sheets.spreadsheets.values.get({ spreadsheetId: GOOGLE_SHEET_ID, range: `delegation_revision_history!A:J` });
   const remResponse = await sheets.spreadsheets.values.get({ spreadsheetId: GOOGLE_SHEET_ID, range: `delegation_remarks!A:F` });
   const history: any[] = [];
   (revResponse.data.values || []).slice(1).forEach((row: any) => {
-    if (String(row[1]) === String(id)) history.push({ type: 'revision', id: row[0], old_status: row[2], new_status: row[3], old_due_date: row[4], new_due_date: row[5], reason: row[6], created_at: row[7], evidence_urls: row[8] });
+    if (String(row[1]) === String(id)) history.push({ type: 'revision', id: row[0], old_status: row[2], new_status: row[3], old_due_date: row[4], new_due_date: row[5], reason: row[6], created_at: row[7], evidence_urls: row[8], requested_due_date: row[9] || "" });
   });
   (remResponse.data.values || []).slice(1).forEach((row: any) => {
     if (String(row[1]) === String(id)) history.push({ type: 'remark', id: row[0], user_id: row[2], username: row[3], remark: row[4], created_at: row[5] });
@@ -193,9 +194,28 @@ export async function addDelegationRemark(remark: any) {
 export async function addDelegationRevision(rev: any) {
   const sheets = await (delegationService as any).getSheetsClient();
   await sheets.spreadsheets.values.append({
-    spreadsheetId: GOOGLE_SHEET_ID, range: `delegation_revision_history!A:I`, valueInputOption: "USER_ENTERED",
-    requestBody: { values: [[rev.id, rev.delegation_id, rev.old_status, rev.new_status, rev.old_due_date, rev.new_due_date, rev.reason, rev.created_at, rev.evidence_urls]] }
+    spreadsheetId: GOOGLE_SHEET_ID, range: `delegation_revision_history!A:J`, valueInputOption: "USER_ENTERED",
+    requestBody: { values: [[rev.id, rev.delegation_id, rev.old_status, rev.new_status, rev.old_due_date, rev.new_due_date, rev.reason, rev.created_at, rev.evidence_urls, rev.requested_due_date || ""]] }
   });
+  revisionCache = null; // the next read sees this row
   void delegationService.triggerSync();
   return true;
+}
+
+// ── Date-change index (see src/lib/delegation-revisions.ts) ──
+let revisionCache: { at: number; rows: RevisionRow[] } | null = null;
+const REVISION_TTL = 30 * 1000;
+
+export async function getRevisionRows(): Promise<RevisionRow[]> {
+  if (revisionCache && Date.now() - revisionCache.at < REVISION_TTL) return revisionCache.rows;
+  const sheets = await (delegationService as any).getSheetsClient();
+  const res = await sheets.spreadsheets.values.get({ spreadsheetId: GOOGLE_SHEET_ID, range: `delegation_revision_history!A:J` });
+  const rows = ((res.data.values || []) as unknown[][]).slice(1).map(rowFromSheet);
+  revisionCache = { at: Date.now(), rows };
+  return rows;
+}
+
+/** id -> { count of date moves, open "new date" ask } */
+export async function getRevisionIndex(): Promise<Map<string, RevisionInfo>> {
+  return buildRevisionIndex(await getRevisionRows());
 }

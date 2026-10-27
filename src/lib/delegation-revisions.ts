@@ -130,7 +130,7 @@ export function canDecide(
   if (me === to) return false;
   if (norm(user.designation) === "ea") return true;
   const by = norm(task.assigned_by);
-  if (by && by !== to) return me === by;
+  if (by && by !== to) { if (me === by) return true; }
   const role = norm(user.role);
   return role === "admin" || role === "ea";
 }

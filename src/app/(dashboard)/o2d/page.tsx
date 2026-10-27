@@ -5156,7 +5156,28 @@ function O2DDetailPanel({
                       .toLocaleString()}
                   </div>
                 </div>
-                <div className="overflow-x-auto">
+                {/* Phone: one row per item, no side scrolling */}
+                <div className="md:hidden divide-y divide-gray-100 dark:divide-navy-800/40">
+                  {selectedOrder.map((item: O2D, idx: number) => (
+                    <div key={idx} className="px-4 py-3">
+                      <div className="flex items-start justify-between gap-3">
+                        <p className="text-[15px] font-semibold text-[#1A1D21] dark:text-white break-words">{item.item_name}</p>
+                        <p className="text-[15px] font-semibold text-[#1A1D21] dark:text-white tabular-nums shrink-0">₹{(parseFloat(item.est_amount) || 0).toLocaleString("en-IN")}</p>
+                      </div>
+                      <p className="text-[14px] text-[#5B6472] mt-0.5">
+                        Qty <span className="font-semibold text-[#1A1D21] dark:text-white tabular-nums">{item.item_qty || "—"}</span>
+                        {item.item_specification ? <span> · {item.item_specification}</span> : null}
+                      </p>
+                    </div>
+                  ))}
+                  <div className="px-4 py-3 flex items-center justify-between bg-[#F7F8FA] dark:bg-black/20">
+                    <span className="text-[14px] text-[#5B6472]">{selectedOrder.length} items</span>
+                    <span className="text-[15px] font-semibold text-[#1A1D21] dark:text-white tabular-nums">
+                      ₹{selectedOrder.reduce((sum: number, i: O2D) => sum + (parseFloat(i.est_amount) || 0), 0).toLocaleString("en-IN")}
+                    </span>
+                  </div>
+                </div>
+                <div className="hidden md:block overflow-x-auto">
                   <table className="w-full text-left border-collapse">
                     <thead>
                       <tr className="bg-amber-100 dark:bg-navy-950 text-[13px] font-semibold text-[#2563EB] dark:text-[#60A5FA]">

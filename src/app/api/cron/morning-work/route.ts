@@ -10,7 +10,8 @@ import { getItemReceivePackingItems, getItemReceivePackingStepConfig } from "@/l
 import { getReplaceItems, getReplaceStepConfig } from "@/lib/replace-sheets";
 import { getServiceForModule, getHrmsStepConfig } from "@/lib/hrms-sheets";
 import { getStepCount } from "@/lib/hrms-fields";
-import { delegationService, getRevisionIndex } from "@/lib/delegation-sheets";
+import { delegationService, getRevisionIndex, getRevisionRows } from "@/lib/delegation-sheets";
+import { eaSection, giverSections, giverYesterday, isEaUser, isManagement, waitingAsks, type ExtraSection } from "@/lib/delegation-digest";
 import { grnActiveStep, i2rActiveStep } from "@/lib/module-summary";
 import { buildMorningMessage, fmsWork, isFlagOn, taskWork, type WorkItem } from "@/lib/morning-work";
 import type { HrmsModuleType } from "@/types/hrms";
@@ -137,10 +138,11 @@ export async function GET(req: NextRequest) {
   const now = Date.now();
 
   try {
-    const [{ work, errors }, tasks, revIndex, users] = await Promise.all([
+    const [{ work, errors }, tasks, revIndex, revRows, users] = await Promise.all([
       collectFms(),
       delegationService.getAll().catch(() => []),
       getRevisionIndex().catch(() => new Map()),
+      getRevisionRows().catch(() => []),
       getUsers(),
     ]);
 
@@ -161,13 +163,32 @@ export async function GET(req: NextRequest) {
     for (const t of tw.today) bucket(t.person)?.today.push(t);
 
     const base = getAppBaseUrl();
+
+    // Delegation date changes (Sahil, 2026-10-27): the EA gets the list of asks
+    // waiting for him; management gets what changed since yesterday morning
+    // (Monday covers Saturday too) instead of WhatsApps during the day.
+    const extras = new Map<string, ExtraSection[]>();
+    const istDow = new Date(now + 330 * 60000).getUTCDay();
+    const since = now - (istDow === 1 ? 48 : 24) * 3600000;
+    const asks = waitingAsks(tasks as any[], revIndex);
+    for (const u of users) {
+      const key = s(u.username).toLowerCase();
+      if (!key || u.isActive === false) continue;
+      const list: ExtraSection[] = [];
+      if (isEaUser(u as any)) { const sec = eaSection(asks, base); if (sec) list.push(sec); }
+      if (isManagement(u.username)) list.push(...giverSections(giverYesterday(s(u.username), tasks as any[], revRows as any[], since)));
+      if (list.length) {
+        extras.set(key, list);
+        if (!people.has(key)) people.set(key, { fms: [], late: [], today: [] });
+      }
+    }
     const report: { person: string; late: number; today: number; tasksLate: number; sent: boolean; reason?: string }[] = [];
     let sample: string | null = null;
 
     for (const [key, p] of people) {
       if (only && key !== only) continue;
       const user = userByKey.get(key)!;
-      const text = buildMorningMessage({ username: s(user.username), fms: p.fms, tasksLate: p.late, tasksToday: p.today, now, baseUrl: base });
+      const text = buildMorningMessage({ username: s(user.username), fms: p.fms, tasksLate: p.late, tasksToday: p.today, now, baseUrl: base, extra: extras.get(key) || [] });
       if (!text) continue;
       const lateCount = p.fms.filter((w) => w.planned < now).length;
       const row = { person: s(user.username), late: lateCount, today: p.fms.length - lateCount + p.today.length, tasksLate: p.late.length, sent: false } as (typeof report)[number];

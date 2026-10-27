@@ -8,6 +8,9 @@ import { CalendarDaysIcon } from "@heroicons/react/24/outline";
  * The giver (or EA) sees Approve / Not approve; everyone else sees who decides.
  */
 export default function RevisionAskPanel({
+  title,
+  description,
+  timesMoved = 0,
   doer,
   giver,
   currentDue,
@@ -17,6 +20,9 @@ export default function RevisionAskPanel({
   busy,
   onDecide,
 }: {
+  title?: string;
+  description?: string;
+  timesMoved?: number;
   doer: string;
   giver: string;
   currentDue: string;
@@ -33,11 +39,27 @@ export default function RevisionAskPanel({
         <CalendarDaysIcon className="w-5 h-5 text-[#D97706] shrink-0" />
         <p className="text-[15px] font-semibold text-[#1A1D21] dark:text-white">New date asked</p>
       </div>
-      <p className="text-[15px] text-[#1A1D21] dark:text-white">
-        {doer} will finish by <span className="font-semibold">{askedDue}</span>
-      </p>
+      {/* What the task is — so the decision can be made right here (Sahil, 2026-10-27) */}
+      {title ? (
+        <div className="rounded-xl bg-white dark:bg-navy-900 border border-amber-100 dark:border-white/10 p-3">
+          <p className="text-[16px] font-semibold text-[#1A1D21] dark:text-white break-words">{title}</p>
+          {description ? <p className="text-[14px] text-[#5B6472] dark:text-gray-400 mt-1 line-clamp-3 break-words">{description}</p> : null}
+          <p className="text-[13px] text-[#5B6472] dark:text-gray-400 mt-2">Given by {giver} · Doing: {doer}</p>
+        </div>
+      ) : null}
+      <div className="grid grid-cols-2 gap-2">
+        <div className="rounded-xl bg-white dark:bg-navy-900 border border-amber-100 dark:border-white/10 p-3">
+          <p className="text-[13px] text-[#5B6472] dark:text-gray-400">Due now</p>
+          <p className="text-[15px] font-semibold text-[#1A1D21] dark:text-white">{currentDue}</p>
+        </div>
+        <div className="rounded-xl bg-white dark:bg-navy-900 border border-amber-200 dark:border-amber-500/30 p-3">
+          <p className="text-[13px] text-[#D97706]">Asks for</p>
+          <p className="text-[15px] font-semibold text-[#1A1D21] dark:text-white">{askedDue}</p>
+        </div>
+      </div>
       <p className="text-[13px] text-[#5B6472] dark:text-gray-400">
-        Current due date: {currentDue} · asked {askedAt}
+        Asked {askedAt}
+        {timesMoved > 0 ? <span className={timesMoved >= 3 ? "text-[#DC2626] font-semibold" : "text-[#D97706] font-semibold"}> · date already moved {timesMoved} time{timesMoved === 1 ? "" : "s"}</span> : null}
       </p>
       {mayDecide ? (
         <>
@@ -69,7 +91,7 @@ export default function RevisionAskPanel({
           <p className="text-[13px] text-[#5B6472] dark:text-gray-400">Not approve keeps the old date. {doer} gets a WhatsApp either way.</p>
         </>
       ) : (
-        <p className="text-[13px] text-[#5B6472] dark:text-gray-400">Waiting for {giver} to approve.</p>
+        <p className="text-[13px] text-[#5B6472] dark:text-gray-400">Waiting for the EA to approve.</p>
       )}
     </div>
   );

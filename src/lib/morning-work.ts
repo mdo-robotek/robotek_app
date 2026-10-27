@@ -188,8 +188,10 @@ export function buildMorningMessage(opts: {
   tasksToday: TaskItem[];
   now: number;
   baseUrl: string;
+  extra?: { title: string; body: string }[];
 }): string | null {
   const { fms, tasksLate, tasksToday, now, baseUrl } = opts;
+  const extra = opts.extra || [];
   const late = fms.filter((w) => w.planned < now).sort((a, b) => a.planned - b.planned);
   const eod = endOfIstDay(now);
   const todayFms = fms.filter((w) => w.planned >= now && w.planned <= eod);
@@ -200,7 +202,7 @@ export function buildMorningMessage(opts: {
     ...tasksToday.map((t) => ({ at: t.due, text: `• Task: ${t.title} (by ${istTime(t.due)})` })),
   ].sort((a, b) => a.at - b.at);
 
-  if (late.length + todayLines.length + tasksLate.length === 0) return null;
+  if (late.length + todayLines.length + tasksLate.length + extra.length === 0) return null;
 
   const parts: string[] = [];
   parts.push(`Good morning, ${displayName(opts.username)}\nYour work for today (${istDayLabel(now)})`);
@@ -225,6 +227,8 @@ export function buildMorningMessage(opts: {
     if (sorted.length > MAX_TASK_LINKS) lines.push(`…and ${sorted.length - MAX_TASK_LINKS} more on the Delegations page`);
     parts.push(`*📋 TASKS PAST DUE DATE — ${sorted.length}*\nFinish today, or tap the link and pick the new date you will finish by.\n${lines.join("\n")}`);
   }
+
+  for (const x of extra) parts.push(`*${x.title}*\n${x.body}`);
 
   parts.push(`Open Sarthi: ${baseUrl}`);
   return parts.join("\n\n");

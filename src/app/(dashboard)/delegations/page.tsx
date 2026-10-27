@@ -6,6 +6,7 @@ import { useOpenFromLink } from "@/hooks/useOpenFromLink";
 import { useRouter, useSearchParams } from "next/navigation";
 import { canDecide } from "@/lib/delegation-revisions";
 import RevisionAskPanel from "@/components/RevisionAskPanel";
+import { shortIst } from "@/lib/ist-format";
 import { defaultDueLocal } from "@/lib/quick-new";
 import { useSession } from "next-auth/react";
 import { Delegation } from "@/types/delegation";
@@ -359,7 +360,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
         const data = await res.json();
         setActionStatus('success');
         setActionMessage(updatingStatus === "Need Revision"
-          ? `New date asked. ${selectedTask.assigned_by && selectedTask.assigned_by !== selectedTask.assigned_to ? selectedTask.assigned_by : "EA"} will approve it.`
+          ? (data.message === "New date saved" ? "New date saved." : "New date asked. The EA will approve it.")
           : "Status updated successfully");
         mutateRevisions();
         
@@ -1654,11 +1655,14 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                 {/* Open new-date ask — approve / not approve */}
                 {selectedTask.status === "Need Revision" && revOf(selectedTask.id)?.pending && (
                   <RevisionAskPanel
+                    title={selectedTask.title}
+                    description={selectedTask.description}
+                    timesMoved={revOf(selectedTask.id)?.count || 0}
                     doer={selectedTask.assigned_to}
                     giver={selectedTask.assigned_by && selectedTask.assigned_by !== selectedTask.assigned_to ? selectedTask.assigned_by : "EA"}
-                    currentDue={formatDateDisplay(selectedTask.due_date)}
-                    askedDue={formatDateDisplay(revOf(selectedTask.id)!.pending!.requested_due_date)}
-                    askedAt={formatDateDisplay(revOf(selectedTask.id)!.pending!.asked_at)}
+                    currentDue={shortIst(selectedTask.due_date)}
+                    askedDue={shortIst(revOf(selectedTask.id)!.pending!.requested_due_date)}
+                    askedAt={shortIst(revOf(selectedTask.id)!.pending!.asked_at)}
                     mayDecide={mayDecideOn(selectedTask)}
                     busy={isSubmittingUpdate}
                     onDecide={decideRevision}

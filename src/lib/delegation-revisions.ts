@@ -111,6 +111,7 @@ export function buildRevisionIndex(rows: RevisionRow[]): Map<string, RevisionInf
 }
 
 const norm = (v: unknown) => String(v ?? "").trim().toLowerCase();
+const MANAGEMENT = new Set(["sahil sir", "nikita mam", "aman sir"]);
 
 /**
  * Who may approve a date change:
@@ -142,6 +143,8 @@ export function isDecider(
   const me = norm(user.username);
   if (!me || me === norm(task.assigned_to)) return false;
   if (norm(user.designation) === "ea") return true;
+  // Management doesn't get these in their list — the EA handles them (Sahil, 2026-10-27).
+  if (MANAGEMENT.has(me)) return false;
   const by = norm(task.assigned_by);
   return !!by && by !== norm(task.assigned_to) && me === by;
 }

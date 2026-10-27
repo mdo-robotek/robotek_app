@@ -49,7 +49,7 @@ export function parseSheetDate(v: unknown): Date | null {
   if (!s) return null;
   const d = new Date(s);
   if (!isNaN(d.getTime())) return d;
-  // dd/mm/yyyy [hh:mm[:ss]]
+  // dd/mm/yyyy with optional hh:mm or hh:mm:ss
   const m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:[ ,T]+(\d{1,2}):(\d{2})(?::(\d{2}))?)?/);
   if (m) {
     const [, dd, mm, yyyy, hh = "0", mi = "0", ss = "0"] = m;

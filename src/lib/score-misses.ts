@@ -30,7 +30,7 @@ export interface MissItem {
   delayHours: number;  // hours late (till now when not done)
 }
 
-interface RawWork {
+export interface RawWork {
   module: string;
   step: string;
   title: string;
@@ -125,10 +125,13 @@ const call = <T>(mod: unknown, fn: string, ...args: unknown[]): Promise<T> => {
   return Promise.resolve((f as (...a: unknown[]) => T)(...args));
 };
 
-export async function collectWork(): Promise<{ work: RawWork[]; failedSources: string[] }> {
+/** Reads every module; `skip` leaves out modules the caller already has. */
+export async function collectWork(opts: { skip?: string[] } = {}): Promise<{ work: RawWork[]; failedSources: string[] }> {
   const failed: string[] = [];
+  const skip = new Set(opts.skip || []);
+  const run = (name: string, fn: () => Promise<RawWork[]>) => (skip.has(name) ? Promise.resolve([]) : source(name, failed, fn));
   const parts = await Promise.all([
-    source("Delegation", failed, async () => {
+    run("Delegation", async () => {
       const rows = await call<AnyRow[]>(Delegations, "getDelegations");
       return rows.map((d) => {
         const status = str(d.status);
@@ -140,7 +143,7 @@ export async function collectWork(): Promise<{ work: RawWork[]; failedSources: s
         };
       });
     }),
-    source("Checklist", failed, async () => {
+    run("Checklist", async () => {
       const page = await call<{ data?: AnyRow[] }>(
         Checklists, "getChecklistsPaginated",
         1, 100000, "", [], "All", "", "ADMIN", [], "", "", [], [], [], [], [], [], "due_date", "desc", "tasks",
@@ -154,7 +157,7 @@ export async function collectWork(): Promise<{ work: RawWork[]; failedSources: s
         };
       });
     }),
-    source("Help Ticket", failed, async () => {
+    run("Help Ticket", async () => {
       const svc = (Tickets as unknown as { ticketService?: { getAll: () => Promise<AnyRow[]> } }).ticketService;
       if (!svc) throw new Error("ticketService not available");
       const rows = await svc.getAll();
@@ -168,19 +171,19 @@ export async function collectWork(): Promise<{ work: RawWork[]; failedSources: s
         };
       });
     }),
-    source("O2D", failed, async () => {
+    run("O2D", async () => {
       const [rows, cfg] = await Promise.all([call<AnyRow[]>(O2D, "getO2Ds"), call<StepCfg[]>(O2D, "getO2DStepConfig")]);
       return fmsWork("O2D", rows, cfg, 11, ["party_name"], ["order_no", "id"]);
     }),
-    source("I2R", failed, async () => {
+    run("I2R", async () => {
       const [rows, cfg] = await Promise.all([call<AnyRow[]>(I2R, "getI2RItems"), call<StepCfg[]>(I2R, "getI2RStepConfig")]);
       return fmsWork("I2R", rows, cfg, 11, ["item_name"], ["indend_num", "id"]);
     }),
-    source("I2R Packing", failed, async () => {
+    run("I2R Packing", async () => {
       const [rows, cfg] = await Promise.all([call<AnyRow[]>(I2RPacking, "getI2RPackingItems"), call<StepCfg[]>(I2RPacking, "getI2RPackingStepConfig")]);
       return fmsWork("I2R Packing", rows, cfg, 15, ["item_name", "packing_design"], ["ppf_num", "id"]);
     }),
-    source("GRN", failed, async () => {
+    run("GRN", async () => {
       const [rows, cfg] = await Promise.all([call<AnyRow[]>(GRN, "getGRNItems"), call<StepCfg[]>(GRN, "getGRNStepConfig")]);
       return fmsWork("GRN", rows, cfg, 15, ["Item_Name", "item_name"], ["GRN_No", "id"]);
     }),
@@ -191,13 +194,13 @@ export async function collectWork(): Promise<{ work: RawWork[]; failedSources: s
       ["onboard", "Onboard FMS", 11, ["candidate_name"]],
       ["offboard", "Offboard FMS", 4, ["emp_name"]],
     ] as const).map(([mod, label, steps, titleKeys]) =>
-      source(label, failed, async () => {
+      run(label, async () => {
         const svc = await call<{ getAll: () => Promise<AnyRow[]> }>(Hrms, "getServiceForModule", mod);
         const [rows, cfg] = await Promise.all([svc.getAll(), call<StepCfg[]>(Hrms, "getHrmsStepConfig", mod)]);
         return fmsWork(label, rows, cfg, steps, [...titleKeys], ["id"]);
       }),
     ),
-    source("New Launch FMS", failed, async () => {
+    run("New Launch FMS", async () => {
       const [rows, cfg] = await Promise.all([
         call<AnyRow[]>(NewLaunch, "getNewLaunches"),
         call<Parameters<typeof mergeStepConfig>[0]>(NewLaunch, "getNewLaunchConfig"),

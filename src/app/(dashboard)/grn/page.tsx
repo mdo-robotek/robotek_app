@@ -53,8 +53,8 @@ const GRN_STEP_SHORT = [
   "Inform the Vendor",
   "Quality Check with vendor",
   "Debit Note issue to Vendor",
-  "Update Purchase in Busy",
-  "Update journal in Busy",
+  "Update Purchase in Busy (Shubham)",
+  "Update Purchase in Busy (Vishal)",
   "Settle Payment"
 ];
 

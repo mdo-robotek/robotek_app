@@ -143,8 +143,8 @@ export function i2rSummary(items: I2R[], nowDate = new Date()): ModuleSummary {
 // ---------------------------------------------------------------- GRN ------
 export const GRN_STEP_SHORT = [
   "Quantity check", "Inform Vendor & Confirm Qty", "Quality check", "Inform the Vendor",
-  "Quality Check with vendor", "Debit Note issue to Vendor", "Update Purchase in Busy",
-  "Update journal in Busy", "Settle Payment",
+  "Quality Check with vendor", "Debit Note issue to Vendor", "Update Purchase in Busy (Shubham)",
+  "Update Purchase in Busy (Vishal)", "Settle Payment",
 ];
 
 /** Same rules as getActiveStep on the GRN page. -1 cancelled, 0 completed. */

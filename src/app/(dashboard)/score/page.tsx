@@ -1867,6 +1867,7 @@ function ScorePageContent() {
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 px-4">
         <div>
           <h1 className="text-xl font-semibold text-gray-900 dark:text-white tracking-tight">Performance Score</h1>
+          <a href="/score/why" className="inline-flex items-center gap-1 mt-1 px-3 py-1.5 rounded-lg bg-red-50 text-red-700 border border-red-200 text-[13px] font-semibold hover:bg-red-100 print:hidden">Why did the score drop? →</a>
           <p className="text-[13px] font-bold text-gray-400 mt-0.5">Operational Analytics & Rankings</p>
         </div>
 

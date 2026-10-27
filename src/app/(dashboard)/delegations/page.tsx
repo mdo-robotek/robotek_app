@@ -1153,7 +1153,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
         </div>
         
         <div className="w-full lg:w-1/3 flex justify-center flex-shrink-0 min-w-0">
-          <div className="flex items-center gap-1.5 rounded-full border-2 border-b-4 border-[#2563EB] dark:border-[#60A5FA] bg-white dark:bg-navy-800 shadow-sm transition-all active:translate-y-[2px] active:border-b-2 p-1 overflow-x-auto no-scrollbar max-w-full">
+          <div className="flex flex-wrap justify-center items-center gap-1 rounded-full border-2 border-b-4 border-[#2563EB] dark:border-[#60A5FA] bg-white dark:bg-navy-800 shadow-sm transition-all active:translate-y-[2px] active:border-b-2 p-1 max-w-full">
           {/* View Toggle */}
           <div className="flex items-center bg-gray-100 dark:bg-navy-900 rounded-full p-0.5 mr-1">
             <button
@@ -1397,7 +1397,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                   <th onClick={() => handleSort('id')} className="px-3 py-3 text-[13px] font-semibold cursor-pointer hover:bg-white/5 transition-colors text-center w-12">
                     <div className="flex items-center justify-center">ID <SortIcon column="id" /></div>
                   </th>
-                  <th onClick={() => handleSort('title')} className="px-3 py-3 text-[13px] font-semibold cursor-pointer hover:bg-white/5 transition-colors min-w-[200px]">
+                  <th onClick={() => handleSort('title')} className="px-3 py-3 text-[13px] font-semibold cursor-pointer hover:bg-white/5 transition-colors min-w-[160px]">
                     <div className="flex items-center">Title &amp; Desc <SortIcon column="title" /></div>
                   </th>
                   <th onClick={() => handleSort('assigned_to')} className="px-3 py-3 text-[13px] font-semibold cursor-pointer hover:bg-white/5 transition-colors hidden sm:table-cell">

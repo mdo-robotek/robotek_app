@@ -376,7 +376,7 @@ export default function TicketsPage() {
 
         // API Update for Ticket
         await fetch(`/api/tickets/${selectedTicket.id}`, {
-          method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(updatedTicket)
+          method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...updatedTicket, notify: false })
         });
         mutateTickets();
       }
@@ -435,7 +435,7 @@ export default function TicketsPage() {
       payload.append("historyData", JSON.stringify(historyData));
 
       await fetch(`/api/tickets/${selectedTicket.id}`, {
-        method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(updatedTicket)
+        method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...updatedTicket, notify: false })
       });
       const historyRes = await fetch(`/api/tickets/${selectedTicket.id}/history`, { method: "POST", body: payload });
 

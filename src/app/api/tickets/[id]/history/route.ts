@@ -4,6 +4,7 @@ import { uploadFileToDrive } from "@/lib/google-drive";
 import { getUsers } from "@/lib/google-sheets";
 import { sendWhatsAppMessage } from "@/lib/maytapi";
 import { formatDate } from "@/lib/dateUtils";
+import { auth } from "@/auth";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -78,7 +79,12 @@ export async function POST(
           : '';
         const message = `${header}\n━━━━━━━━━━━━━━━━━\n🔖 *Ticket ID:* ${ticket.id}\n📌 *Title:* ${ticket.title}\n🏷️ *Category:* ${ticket.category}\n🎯 *Priority:* ${ticket.priority}\n👤 *Raised By:* ${ticket.raised_by}\n👨‍🔧 *Assigned To:* ${ticket.solver_person || 'Unassigned'}\n📊 *Current Status:* ${isStatusChange ? newHistory.new_status : ticket.status}\n${statusLine}${commentLine}👤 *Updated By:* ${newHistory.actor_username}\n⏱️ *Updated At:* ${formattedNow}`;
 
-        const parties = [ticket.raised_by, ticket.solver_person].filter(Boolean);
+        // Only the other person hears about it: when the solver resolves, the
+        // raiser gets the WhatsApp; when the raiser replies, the solver does.
+        // The one who made the change never gets their own update (Sahil, 2026-10-27).
+        const session = await auth();
+        const actor = String((session?.user as any)?.username || newHistory.actor_username || "").trim().toLowerCase();
+        const parties = [ticket.raised_by, ticket.solver_person].filter((u) => u && String(u).trim().toLowerCase() !== actor);
         const uniqueParties = [...new Set(parties)];
         const allUsers = await getUsers();
 

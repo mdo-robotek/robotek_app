@@ -56,10 +56,10 @@ export default function ModuleStrip({
 
   return (
     <div className="px-2 pb-3 shrink-0">
-      <div className="flex items-stretch gap-2 overflow-x-auto no-scrollbar">
+      <div className="grid grid-cols-2 gap-2 md:flex md:items-stretch md:overflow-x-auto no-scrollbar">
         {(m?.figures || Array.from({ length: 4 }).map(() => null)).map((f, i) => {
           if (!f) {
-            return <div key={i} className="min-w-[140px] flex-1 h-[64px] rounded-xl bg-[#F1F3F6] dark:bg-navy-800 animate-pulse" />;
+            return <div key={i} className="md:min-w-[140px] flex-1 h-[64px] rounded-xl bg-[#F1F3F6] dark:bg-navy-800 animate-pulse" />;
           }
           const tappable = !!onFigure && f.step !== undefined;
           const Tag = tappable ? "button" : "div";
@@ -67,7 +67,7 @@ export default function ModuleStrip({
             <Tag
               key={f.key}
               {...(tappable ? { type: "button", onClick: () => onFigure!(f) } : {})}
-              className={`min-w-[140px] flex-1 text-left rounded-xl bg-white dark:bg-navy-900 border border-[#E5E7EB] dark:border-navy-800 px-3 py-2 ${
+              className={`min-w-0 md:min-w-[140px] flex-1 text-left rounded-xl bg-white dark:bg-navy-900 border border-[#E5E7EB] dark:border-navy-800 px-3 py-2 ${
                 tappable ? "hover:border-[#2563EB] transition-colors" : ""
               }`}
             >
@@ -83,7 +83,7 @@ export default function ModuleStrip({
           <button
             type="button"
             onClick={() => setOpen(true)}
-            className="shrink-0 flex flex-col items-center justify-center gap-1 min-w-[96px] rounded-xl border border-[#E5E7EB] dark:border-navy-800 bg-white dark:bg-navy-900 px-3 text-[#2563EB] dark:text-[#60A5FA] hover:border-[#2563EB] transition-colors"
+            className="shrink-0 flex md:flex-col items-center justify-center gap-1.5 md:gap-1 min-h-[44px] md:min-w-[96px] rounded-xl border border-[#E5E7EB] dark:border-navy-800 bg-white dark:bg-navy-900 px-3 text-[#2563EB] dark:text-[#60A5FA] hover:border-[#2563EB] transition-colors"
           >
             <ChartBarIcon className="w-5 h-5" />
             <span className="text-[13px] font-semibold">Performance</span>

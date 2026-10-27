@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useMemo } from "react";
+import { useIsPhone } from "@/hooks/useIsPhone";
+import PhoneStepSelect from "@/components/PhoneStepSelect";
 import { useSession } from "next-auth/react";
 import { Replace, ReplaceStepConfig, REPLACE_STEPS } from "@/types/replace";
 import useSWR from "swr";
@@ -275,6 +277,7 @@ export default function ReplacePage() {
   const [cancelTargetId, setCancelTargetId] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<"active" | "cancelled">("active");
   const [layoutMode, setLayoutMode] = useState<"smart" | "standard">("smart");
+  const isPhone = useIsPhone();
   const [expandedTiles, setExpandedTiles] = useState<Record<string, boolean>>({});
   const [dateFilter, setDateFilter] = useState<string | null>(null);
 
@@ -671,13 +674,13 @@ export default function ReplacePage() {
   return (
     <div className="flex flex-col h-[calc(100vh-100px)] overflow-hidden">
       {/* ─── Header ─── */}
-      <div className="flex items-center justify-between px-2 py-0.5 shrink-0">
+      <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between px-2 py-0.5 shrink-0">
         <div>
           <h1 className="text-xl font-semibold text-[#2563EB] dark:text-white tracking-tight">Replace Management</h1>
           <p className="text-[13px] font-bold text-[#5B6472] dark:text-slate-400">INWARD REPLACEMENTS — RECOVERY WORKFLOW</p>
         </div>
 
-        <div className="flex items-center gap-1 rounded-full border-2 border-[#2563EB] dark:border-[#60A5FA] bg-white dark:bg-navy-900 shadow-xl p-0.5">
+        <div className="self-start flex flex-wrap items-center gap-1 rounded-2xl md:rounded-full border-2 border-[#2563EB] dark:border-[#60A5FA] bg-white dark:bg-navy-900 shadow-xl p-0.5">
           <button onClick={handleExport} className="flex items-center gap-2 px-4 py-1 font-semibold text-[13px] text-[#2563EB] dark:text-[#60A5FA] hover:bg-slate-50 dark:hover:bg-navy-800 transition-all rounded-full">
             <ArrowDownTrayIcon className="w-3.5 h-3.5" /> <span>Export</span>
           </button>
@@ -687,21 +690,21 @@ export default function ReplacePage() {
           <button onClick={() => { setEditingItem(null); setFormData({...EMPTY_FORM}); setIsModalOpen(true); }} className="px-3 py-1 text-[#2563EB] dark:text-[#60A5FA] hover:bg-slate-50 dark:hover:bg-navy-800 transition-all rounded-full">
             <PlusIcon className="w-4 h-4 stroke-[2.5]" />
           </button>
-          <div className="w-[1px] h-5 bg-slate-200 dark:bg-navy-700 mx-1" />
+          <div className="hidden md:block w-[1px] h-5 bg-slate-200 dark:bg-navy-700 mx-1" />
           <button onClick={() => setViewMode(viewMode==='cancelled'?'active':'cancelled')} className={`flex items-center gap-2 px-4 py-1 font-semibold   text-[13px] transition-all rounded-full ${viewMode==='cancelled'?'bg-red-500 text-white shadow-md':'text-[#2563EB] dark:text-[#60A5FA] hover:bg-slate-50 dark:hover:bg-navy-800'}`}>
             <NoSymbolIcon className="w-3.5 h-3.5" /> <span>CANCELLED ({items.filter(i => !!(i.cancelled || "").trim()).length})</span>
           </button>
         </div>
 
-        <div className="flex items-center gap-0.5 bg-slate-100 dark:bg-navy-900 rounded-full p-0.5 border border-slate-200 dark:border-navy-800 shadow-inner">
+        <div className="hidden md:flex items-center gap-0.5 bg-slate-100 dark:bg-navy-900 rounded-full p-0.5 border border-slate-200 dark:border-navy-800 shadow-inner">
           <button onClick={() => setLayoutMode("standard")} className={`px-4 py-1 rounded-full text-[13px] font-semibold   transition-all ${layoutMode === "standard" ? "bg-white dark:bg-navy-800 text-[#2563EB] dark:text-[#60A5FA] shadow-md" : "text-[#5B6472] dark:text-navy-600"}`}>Standard</button>
-          <button onClick={() => setLayoutMode("smart")} className={`px-4 py-1 rounded-full text-[13px] font-semibold   transition-all ${layoutMode === "smart" ? "bg-white dark:bg-navy-800 text-[#2563EB] dark:text-[#60A5FA] shadow-md" : "text-[#5B6472] dark:text-navy-600"}`}>Smart View</button>
+          <button onClick={() => setLayoutMode("smart")} className={`px-4 py-1 rounded-full text-[13px] font-semibold   transition-all ${(layoutMode === "smart" || isPhone) ? "bg-white dark:bg-navy-800 text-[#2563EB] dark:text-[#60A5FA] shadow-md" : "text-[#5B6472] dark:text-navy-600"}`}>Smart View</button>
         </div>
       </div>
 
       <div className="flex gap-4 flex-1 overflow-hidden mt-1 px-1">
         {/* Sidebar */}
-        <div className="w-60 flex flex-col shrink-0 h-full overflow-y-auto custom-scrollbar border-r border-slate-100 dark:border-navy-800 pr-3 py-0.5">
+        <div className="w-60 hidden md:flex flex-col shrink-0 h-full overflow-y-auto custom-scrollbar border-r border-slate-100 dark:border-navy-800 pr-3 py-0.5">
           <p className="text-[13px] font-semibold text-[#5B6472] dark:text-navy-500 mb-1.5 px-2">Filters</p>
           <div className="space-y-1.5 pb-10">
             <button onClick={() => setSelectedStepFilter("all")} className={`w-full flex items-center justify-start gap-3 px-5 py-2.5 rounded-full transition-all border-b-4 ${selectedStepFilter === "all" ? "bg-[#EFF4FF] dark:bg-[#D1D5DB]/20 border-[#D1D5DB] text-[#2563EB] dark:text-[#60A5FA] shadow-md" : "bg-white dark:bg-navy-900 border-slate-100 dark:border-navy-800 text-slate-500 dark:text-navy-400"}`}>
@@ -722,8 +725,16 @@ export default function ReplacePage() {
 
         {/* Content */}
         <div className="flex-1 flex flex-col min-w-0 h-full py-0.5">
-          <div className="flex items-center gap-3 mb-3 shrink-0 px-1">
-            <div className="relative group flex-1 max-w-xs">
+          <div className="flex flex-wrap items-center gap-2 md:gap-3 mb-3 shrink-0 px-1">
+            <PhoneStepSelect
+              steps={REPLACE_STEP_SHORT}
+              counts={REPLACE_STEP_SHORT.map((_: unknown, i: number) => stepCounts[i + 1] || 0)}
+              value={selectedStepFilter}
+              onChange={setSelectedStepFilter}
+              allLabel="All replacements"
+              completedCount={stepCounts.completed || 0}
+            />
+            <div className="relative group flex-1 min-w-[160px] md:max-w-xs">
               <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#5B6472] dark:text-navy-600" />
               <input type="text" placeholder="Search RN, Party..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="w-full pl-9 pr-3 py-1.5 bg-white dark:bg-navy-900 border border-slate-200 dark:border-navy-800 rounded-xl text-[14px] font-bold text-gray-700 dark:text-white outline-none focus:border-[#2563EB] dark:focus:border-[#60A5FA]" />
             </div>
@@ -741,18 +752,18 @@ export default function ReplacePage() {
               <div className="flex flex-col items-center justify-center p-10 animate-pulse text-slate-200"><ArrowPathIcon className="w-8 h-8 animate-spin mb-4" /><p className="text-[13px] font-semibold">SYNCHRONIZING...</p></div>
             ) : paginatedItems.length === 0 ? (
               <div className="flex flex-col items-center justify-center p-10 text-slate-100"><MagnifyingGlassIcon className="w-12 h-12 mb-4" /><p className="text-[13px] font-semibold">No Data Found</p></div>
-            ) : layoutMode === "smart" ? (
+            ) : (layoutMode === "smart" || isPhone) ? (
               paginatedItems.map(item => {
                 const sel = selectedIds.has(item.id); const step = getActiveStep(item); const exp = expandedTiles[item.id];
                 return (
                   <div key={item.id} className="px-1">
                     <div onClick={() => { const n = new Set(selectedIds); if (n.has(item.id)) n.delete(item.id); else n.add(item.id); setSelectedIds(n); }} className={`bg-white dark:bg-navy-800 rounded-2xl border transition-all cursor-pointer overflow-hidden ${sel ? "border-[#2563EB] dark:border-[#60A5FA] border-2 shadow-lg" : "border-slate-100 dark:border-navy-700 shadow-sm"}`}>
                       <div className="p-3">
-                        <div className="flex items-start justify-between mb-2">
+                        <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3 mb-2">
                           <div className="flex items-start gap-3">
                             <input type="checkbox" checked={sel} readOnly className="w-4 h-4 mt-1 rounded border-slate-300 text-[#2563EB] dark:text-[#60A5FA]" />
                             <div>
-                              <div className="flex items-center gap-2">
+                              <div className="flex flex-wrap items-center gap-2">
                                 <span className="px-2 py-0.5 bg-blue-50 dark:bg-blue-900/20 text-[#2563EB] dark:text-blue-400 rounded text-[13px] font-semibold border border-blue-100 dark:border-blue-900/50">{item.rn_num}</span>
                                 <h3 className="text-base font-semibold text-slate-800 dark:text-white tracking-tight leading-none">{item.party_name}</h3>
                               </div>
@@ -764,7 +775,7 @@ export default function ReplacePage() {
                             </div>
                           </div>
                           
-                          <div className="flex items-center gap-2">
+                          <div className="flex flex-wrap items-center gap-2">
                             {step > 0 && (
                               <div className="flex items-center bg-white dark:bg-navy-800 border border-[#2563EB] rounded-full shadow-sm overflow-hidden divide-x divide-[#2563EB]/30 mr-1">
                                 <div className="flex flex-col items-center justify-center px-3 py-1.5 min-w-[120px]">
@@ -796,7 +807,7 @@ export default function ReplacePage() {
                         </div>
 
                         <div className="mt-3 border-t border-slate-50 dark:border-navy-700 pt-3">
-                          <div className="grid grid-cols-8 gap-3 items-start">
+                          <div className="grid grid-cols-2 md:grid-cols-8 gap-3 items-start">
                             {/* Receiver */}
                             <div className="space-y-0.5">
                               <p className="text-[13px] font-semibold text-emerald-500">Receiver</p>
@@ -862,7 +873,7 @@ export default function ReplacePage() {
                         </div>
 
                         {exp && (
-                          <div className="mt-3 grid grid-cols-5 gap-2 animate-in slide-in-from-top-2 duration-300">
+                          <div className="mt-3 grid grid-cols-2 md:grid-cols-5 gap-2 animate-in slide-in-from-top-2 duration-300">
                             {Array.from({ length: 9 }, (_, i) => {
                               const n = i + 1; const act = (item as any)[`actual_${n}`]; const pl = (item as any)[`planned_${n}`]; 
                               const done = !!act; const isPending = !done && n === getActiveStep(item);
@@ -985,7 +996,7 @@ export default function ReplacePage() {
 
       {/* Floating Bulk Bar */}
       {selectedIds.size > 0 && (
-        <div className="fixed bottom-10 left-1/2 -translate-x-1/2 bg-[#FFFFFF] dark:bg-navy-800 px-1.5 py-1.5 rounded-full shadow-2xl flex items-center gap-4 border border-[#EFF4FF] dark:border-navy-700 z-[100] animate-in slide-in-from-bottom-12">
+        <div className="fixed bottom-24 md:bottom-10 left-1/2 -translate-x-1/2 bg-[#FFFFFF] dark:bg-navy-800 px-1.5 py-1.5 rounded-full shadow-2xl flex items-center gap-4 border border-[#EFF4FF] dark:border-navy-700 z-[100] animate-in slide-in-from-bottom-12">
           <div className="flex items-center gap-2.5 pl-3">
             <div className="w-8 h-8 bg-[#2563EB] text-white rounded-full flex items-center justify-center font-semibold text-sm">{selectedIds.size}</div>
             <p className="text-[13px] font-semibold text-[#2563EB] dark:text-[#60A5FA]">Selected</p>
@@ -1065,17 +1076,17 @@ export default function ReplacePage() {
       {isBulkModalOpen && (
         <div className="fixed inset-0 z-[1200] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-[#1D4ED8]/60 backdrop-blur-md" onClick={() => setIsBulkModalOpen(false)} />
-          <div className="relative bg-[#FFFFFF] dark:bg-navy-800 w-full max-w-5xl rounded-[3.5rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
-            <div className="px-10 pt-6 pb-3 flex items-start justify-between border-b border-slate-100 dark:border-navy-700">
+          <div className="relative bg-[#FFFFFF] dark:bg-navy-800 w-full max-w-5xl rounded-3xl md:rounded-[3.5rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div className="px-5 md:px-10 pt-6 pb-3 flex items-start justify-between border-b border-slate-100 dark:border-navy-700">
               <div><h2 className="text-[26px] font-semibold italic tracking-tighter text-[#2563EB] dark:text-white leading-none">Bulk Processor</h2><p className="text-[13px] font-semibold mt-1 text-[#5B6472]">Processing {Array.from(selectedIds).length} items</p></div>
               <button onClick={() => setIsBulkModalOpen(false)} className="p-2 hover:bg-slate-100 rounded-full text-[#5B6472]"><XMarkIcon className="w-6 h-6" /></button>
             </div>
-            <div className="flex-1 overflow-y-auto px-10 pb-24 pt-4 space-y-3 custom-scrollbar">
+            <div className="flex-1 overflow-y-auto px-3 md:px-10 pb-24 pt-4 space-y-3 custom-scrollbar">
               {Array.from(selectedIds).map(id => {
                 const it = items.find(r => r.id === id); if (!it) return null; const n = getActiveStep(it); const t = bulkToggles[id] ?? true;
                 return (
-                  <div key={id} className={`p-5 bg-white dark:bg-navy-900 rounded-3xl border transition-all ${t ? "border-[#2563EB]/20 dark:border-[#60A5FA]/20 shadow-sm" : "opacity-40"}`}>
-                    <div className="grid grid-cols-[1.5fr_2fr_auto] items-center gap-8">
+                  <div key={id} className={`p-4 md:p-5 bg-white dark:bg-navy-900 rounded-3xl border transition-all ${t ? "border-[#2563EB]/20 dark:border-[#60A5FA]/20 shadow-sm" : "opacity-40"}`}>
+                    <div className="grid grid-cols-1 md:grid-cols-[1.5fr_2fr_auto] items-center gap-3 md:gap-8">
                       <div><span className="px-2 py-0.5 bg-blue-50 dark:bg-blue-900/20 text-[#2563EB] dark:text-blue-400 rounded text-[13px] font-semibold">{it.rn_num}</span><h3 className="text-[13px] font-semibold text-[#2563EB] dark:text-white mt-1">{it.party_name}</h3></div>
                       <div>
                         {t && (
@@ -1119,7 +1130,7 @@ export default function ReplacePage() {
                 );
               })}
             </div>
-            <div className="absolute bottom-0 left-0 right-0 py-3.5 px-10 bg-[#FFFFFF] dark:bg-navy-800 border-t border-slate-100 dark:border-navy-700 flex items-center justify-between">
+            <div className="absolute bottom-0 left-0 right-0 py-3.5 px-4 md:px-10 bg-[#FFFFFF] dark:bg-navy-800 border-t border-slate-100 dark:border-navy-700 flex items-center justify-between">
               <button onClick={() => setIsBulkModalOpen(false)} className="px-6 py-3 text-[14px] font-semibold text-[#5B6472]">Cancel</button>
               <button onClick={handleBulkStepSave} className="bg-[#2563EB] dark:bg-[#60A5FA] text-white dark:text-navy-950 px-10 py-3.5 rounded-2xl font-semibold text-[14px] shadow-lg">Execute Bulk Update</button>
             </div>
@@ -1131,15 +1142,15 @@ export default function ReplacePage() {
       {isConfigModalOpen && (
         <div className="fixed inset-0 z-[1200] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-[#1D4ED8]/60 backdrop-blur-md" onClick={() => setIsConfigModalOpen(false)} />
-          <div className="relative bg-[#FFFFFF] dark:bg-navy-800 w-full max-w-4xl rounded-[3.5rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
-            <div className="px-10 pt-6 pb-3 flex items-start justify-between border-b border-slate-100 dark:border-navy-700">
+          <div className="relative bg-[#FFFFFF] dark:bg-navy-800 w-full max-w-4xl rounded-3xl md:rounded-[3.5rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div className="px-5 md:px-10 pt-6 pb-3 flex items-start justify-between border-b border-slate-100 dark:border-navy-700">
               <div><h2 className="text-[26px] font-semibold italic tracking-tighter text-[#2563EB] dark:text-white leading-none">Step Configuration</h2><p className="text-[13px] font-semibold mt-1 text-[#5B6472]">Define TAT and Operators for Replace Workflow</p></div>
               <button onClick={() => setIsConfigModalOpen(false)} className="p-2 hover:bg-slate-100 rounded-full text-[#5B6472]"><XMarkIcon className="w-6 h-6" /></button>
             </div>
-            <div className="flex-1 overflow-y-auto px-10 pb-24 space-y-3 custom-scrollbar">
+            <div className="flex-1 overflow-y-auto px-3 md:px-10 pb-24 space-y-3 custom-scrollbar">
               {stepConfigs.map((cfg, i) => (
                 <div key={i} className="p-5 bg-white dark:bg-navy-900 rounded-3xl border border-slate-100 dark:border-navy-700 shadow-sm transition-all group">
-                  <div className="grid grid-cols-[1fr_200px_350px] items-center gap-8">
+                  <div className="grid grid-cols-1 md:grid-cols-[1fr_200px_350px] items-center gap-3 md:gap-8">
                     <div className="space-y-0.5"><p className="text-[13px] font-semibold text-[#5B6472]">Step {i+1}</p><h3 className="text-[13px] font-semibold text-[#2563EB] dark:text-white leading-tight">{cfg.step_name}</h3></div>
                     <div className="flex flex-col gap-1.5">
                       <div className="flex items-center gap-1.5 text-[#5B6472] dark:text-navy-600">
@@ -1181,7 +1192,7 @@ export default function ReplacePage() {
                 </div>
               ))}
             </div>
-            <div className="absolute bottom-0 left-0 right-0 py-3.5 px-10 bg-[#FFFFFF] dark:bg-navy-800 border-t border-slate-100 dark:border-navy-700 flex items-center justify-between">
+            <div className="absolute bottom-0 left-0 right-0 py-3.5 px-4 md:px-10 bg-[#FFFFFF] dark:bg-navy-800 border-t border-slate-100 dark:border-navy-700 flex items-center justify-between">
               <button onClick={() => setIsConfigModalOpen(false)} className="px-6 py-3 text-[14px] font-semibold text-[#5B6472]">Cancel</button>
               <button onClick={async () => {
                 await fetch("/api/replace/config", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(stepConfigs) });
@@ -1208,7 +1219,7 @@ export default function ReplacePage() {
             <div className="space-y-6">
               <div>
                 <label className="text-[14px] font-semibold text-slate-800 dark:text-white/80 block mb-3">Select Step to Reset</label>
-                <div className="grid grid-cols-5 gap-2">
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
                   {Array.from({ length: 9 }, (_, i) => i + 1).map(s => (
                     <button
                       key={s}

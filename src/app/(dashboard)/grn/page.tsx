@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useMemo } from "react";
+import { useIsPhone } from "@/hooks/useIsPhone";
+import PhoneStepSelect from "@/components/PhoneStepSelect";
 import { useSession } from "next-auth/react";
 import { GRN, GRNStepConfig } from "@/types/grn";
 import useSWR from "swr";
@@ -191,6 +193,7 @@ export default function GRNDashboard() {
   const nextPO = data?.nextPO || "";
 
   const [layoutMode, setLayoutMode] = useState<"smart" | "standard">("smart");
+  const isPhone = useIsPhone();
   const [selectedStepFilter, setSelectedStepFilter] = useState<number | "all" | "completed">("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [expandedTiles, setExpandedTiles] = useState<Record<string, boolean>>({});
@@ -581,29 +584,29 @@ export default function GRNDashboard() {
     <div className="flex flex-col h-screen bg-[#FFFFFF] dark:bg-navy-950 overflow-hidden">
       {/* ─── Header Section ─── */}
       <div className="px-2 py-0.5 bg-[#FFFFFF] dark:bg-navy-900 border-b border-slate-100 dark:border-navy-800 shrink-0 relative">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
           <div>
             <h1 className="text-xl font-semibold text-[#1A1D21] dark:text-white leading-none">GRN</h1>
             <p className="text-[14px] text-[#5B6472] dark:text-slate-400 mt-1.5">Goods received</p>
           </div>
           
           {/* Central Pill Actions */}
-          <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-1 rounded-full border-2 border-[#2563EB] dark:border-[#60A5FA] bg-white dark:bg-navy-900 shadow-xl p-0.5">
+          <div className="self-start md:absolute md:left-1/2 md:-translate-x-1/2 flex flex-wrap items-center gap-1 rounded-2xl md:rounded-full border-2 border-[#2563EB] dark:border-[#60A5FA] bg-white dark:bg-navy-900 shadow-xl p-0.5">
             <button className="flex items-center gap-2 px-4 py-1.5 font-semibold text-[13px] text-[#2563EB] dark:text-[#60A5FA] hover:bg-slate-50 dark:hover:bg-navy-800 transition-all rounded-full">
               <ArrowDownTrayIcon className="w-3.5 h-3.5" /> <span>Export</span>
             </button>
             <button onClick={openConfigModal} className="flex items-center gap-2 px-4 py-1.5 font-semibold text-[13px] text-[#2563EB] dark:text-[#60A5FA] hover:bg-slate-50 dark:hover:bg-navy-800 transition-all rounded-full">
               <Cog6ToothIcon className="w-3.5 h-3.5" /> <span>Config</span>
             </button>
-            <div className="w-[1px] h-5 bg-slate-200 dark:bg-navy-700 mx-1" />
+            <div className="hidden md:block w-[1px] h-5 bg-slate-200 dark:bg-navy-700 mx-1" />
             <button onClick={() => setViewMode(viewMode === "active" ? "cancelled" : "active")} className={`flex items-center gap-2 px-4 py-1.5 font-semibold   text-[13px] transition-all rounded-full ${viewMode === "cancelled" ? "bg-red-500 text-white shadow-md" : "text-[#2563EB] dark:text-[#60A5FA] hover:bg-slate-50 dark:hover:bg-navy-800"}`}>
               <NoSymbolIcon className="w-3.5 h-3.5" /> <span>Cancelled ({items.filter(i => i.cancelled).length})</span>
             </button>
           </div>
 
-          <div className="flex items-center gap-0.5 bg-slate-100 dark:bg-navy-900 rounded-full p-0.5 border border-slate-200 dark:border-navy-800 shadow-inner">
+          <div className="hidden md:flex items-center gap-0.5 bg-slate-100 dark:bg-navy-900 rounded-full p-0.5 border border-slate-200 dark:border-navy-800 shadow-inner">
             <button onClick={() => setLayoutMode("standard")} className={`px-4 py-1.5 rounded-full text-[13px] font-semibold   transition-all ${layoutMode === "standard" ? "bg-white dark:bg-navy-800 text-[#2563EB] dark:text-[#60A5FA] shadow-md" : "text-[#5B6472] dark:text-navy-600"}`}>Standard</button>
-            <button onClick={() => setLayoutMode("smart")} className={`px-4 py-1.5 rounded-full text-[13px] font-semibold   transition-all ${layoutMode === "smart" ? "bg-white dark:bg-navy-800 text-[#2563EB] dark:text-[#60A5FA] shadow-md" : "text-[#5B6472] dark:text-navy-600"}`}>Smart View</button>
+            <button onClick={() => setLayoutMode("smart")} className={`px-4 py-1.5 rounded-full text-[13px] font-semibold   transition-all ${(layoutMode === "smart" || isPhone) ? "bg-white dark:bg-navy-800 text-[#2563EB] dark:text-[#60A5FA] shadow-md" : "text-[#5B6472] dark:text-navy-600"}`}>Smart View</button>
           </div>
         </div>
       </div>
@@ -613,7 +616,7 @@ export default function GRNDashboard() {
       {/* ─── Main Content ─── */}
       <div className="flex flex-1 overflow-hidden">
         {/* Sidebar Navigation */}
-        <div className="w-60 flex flex-col shrink-0 h-full overflow-y-auto custom-scrollbar border-r border-slate-100 dark:border-navy-800 pr-3 py-0.5">
+        <div className="w-60 hidden md:flex flex-col shrink-0 h-full overflow-y-auto custom-scrollbar border-r border-slate-100 dark:border-navy-800 pr-3 py-0.5">
           <p className="text-[13px] font-semibold text-[#5B6472] dark:text-navy-500 mb-1.5 px-2">Filters</p>
           <div className="space-y-1.5 pb-10">
             <button
@@ -670,8 +673,16 @@ export default function GRNDashboard() {
         {/* Display Area */}
         <div className="flex-1 overflow-hidden flex flex-col p-2 py-0.5">
           {/* Toolbar / Filters Row */}
-          <div className="flex items-center gap-3 mb-3 shrink-0 px-1">
-            <div className="relative group flex-1 max-w-xs">
+          <div className="flex flex-wrap items-center gap-2 md:gap-3 mb-3 shrink-0 px-1">
+            <PhoneStepSelect
+              steps={GRN_STEP_SHORT}
+              counts={GRN_STEP_SHORT.map((_, i) => items.filter((it) => getActiveStep(it) === i + 1).length)}
+              value={selectedStepFilter}
+              onChange={setSelectedStepFilter}
+              allLabel="All GRN entries"
+              completedCount={items.filter((it) => getActiveStep(it) === 0).length}
+            />
+            <div className="relative group flex-1 min-w-[160px] md:max-w-xs">
               <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#5B6472] group-focus-within:text-[#2563EB] transition-colors" />
               <input type="text" placeholder="Search..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="w-full pl-9 pr-3 py-1.5 bg-white dark:bg-navy-900 border border-slate-200 dark:border-navy-800 rounded-xl text-[14px] font-bold text-gray-700 dark:text-white outline-none focus:border-[#2563EB] dark:focus:border-[#60A5FA] transition-all shadow-sm" />
             </div>
@@ -716,18 +727,18 @@ export default function GRNDashboard() {
               <div className="flex flex-col items-center justify-center p-20 animate-pulse text-slate-200"><ArrowPathIcon className="w-12 h-12 animate-spin mb-4" /><p className="text-[13px] font-semibold">SYNCHRONIZING...</p></div>
             ) : paginatedItems.length === 0 ? (
               <div className="flex flex-col items-center justify-center p-20 text-slate-100"><MagnifyingGlassIcon className="w-16 h-16 mb-4" /><p className="text-[13px] font-semibold">No Data Found</p></div>
-            ) : layoutMode === "smart" ? (
+            ) : (layoutMode === "smart" || isPhone) ? (
               paginatedItems.map((item: GRN) => {
                 const sel = selectedIds.has(item.id); const step = getActiveStep(item); const exp = expandedTiles[item.id];
                 return (
                   <div key={item.id} className="px-1">
                     <div onClick={() => { const n = new Set(selectedIds); if (n.has(item.id)) n.delete(item.id); else n.add(item.id); setSelectedIds(n); }} className={`bg-white dark:bg-navy-800 rounded-2xl border transition-all cursor-pointer overflow-hidden ${sel ? "border-[#2563EB] border-2 shadow-lg scale-[1.002]" : "border-slate-100 dark:border-navy-700 shadow-sm hover:border-slate-200"}`}>
                       <div className="p-4">
-                        <div className="flex items-start justify-between mb-2">
+                        <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3 mb-2">
                           <div className="flex items-start gap-4">
                             <input type="checkbox" checked={sel} readOnly className="w-4 h-4 mt-1.5 rounded border-slate-300 text-[#2563EB] focus:ring-[#2563EB]" />
                             <div>
-                              <div className="flex items-center gap-3">
+                              <div className="flex flex-wrap items-center gap-2 md:gap-3">
                                 <span className="px-2.5 py-1 bg-blue-50 dark:bg-blue-900/20 text-[#2563EB] dark:text-blue-400 rounded text-[13px] font-semibold border border-blue-100 dark:border-blue-900/50">{item.GRN_No}</span>
                                 <h3 className="text-[15px] font-semibold text-slate-800 dark:text-white tracking-tight leading-none">{item.Item_Name}</h3>
                               </div>
@@ -745,14 +756,14 @@ export default function GRNDashboard() {
                             </div>
                           </div>
                           
-                          <div className="flex items-center gap-2">
+                          <div className="flex flex-wrap items-center gap-2">
                             {item.cancelled ? (
                               <div className="flex items-center gap-2 px-4 py-2 bg-red-50 text-red-600 rounded-full text-[14px] font-semibold shadow-sm">
                                 <NoSymbolIcon className="w-4 h-4 text-red-500 stroke-[3]" /> CANCELLED
                                 <span className="ml-1 opacity-70 text-[13px] font-bold">{fmtDt(item.cancelled)} {fmtTm(item.cancelled)}</span>
                               </div>
                             ) : (
-                              <button className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-navy-800 border border-[#2563EB] text-[#2563EB] dark:text-[#60A5FA] rounded-full text-[14px] font-semibold shadow-sm">
+                              <button className="flex flex-wrap items-center gap-x-2 gap-y-1 px-4 py-2 bg-white dark:bg-navy-800 border border-[#2563EB] text-[#2563EB] dark:text-[#60A5FA] rounded-2xl md:rounded-full text-[14px] font-semibold shadow-sm text-left">
                                 <ClockIcon className="w-4 h-4 text-[#2563EB] stroke-[3]" />
                                 {step === 0 ? "DONE" : (
                                   <span className="flex items-center gap-2">
@@ -795,7 +806,7 @@ export default function GRNDashboard() {
                         </div>
 
                         {/* Card Bottom Grid */}
-                        <div className="grid grid-cols-4 gap-4 py-3 border-t border-slate-50 dark:border-navy-700 mt-2">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 py-3 border-t border-slate-50 dark:border-navy-700 mt-2">
                           <div className="space-y-0.5">
                             <div className="flex items-center gap-1.5 text-emerald-500"><BuildingOfficeIcon className="w-3.5 h-3.5" /><p className="text-[13px] font-semibold">Country</p></div>
                             <p className="text-[14px] font-semibold text-slate-800 dark:text-white ml-5 truncate">{item.Country || "—"}</p>
@@ -823,7 +834,7 @@ export default function GRNDashboard() {
                         {/* Empty space filler when collapsed to maintain card aesthetics if needed, or just removed as requested */}
 
                         {exp && (
-                          <div className="mt-2 grid grid-cols-5 gap-2 animate-in slide-in-from-top-2 duration-300">
+                          <div className="mt-2 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 animate-in slide-in-from-top-2 duration-300">
                              {Array.from({ length: 9 }, (_, i) => {
                                const n = i + 1; const act = (item as any)[`actual_${n}`]; const pl = (item as any)[`planned_${n}`]; 
                                const done = !!act; const isPending = !done && n === getActiveStep(item);
@@ -957,7 +968,7 @@ export default function GRNDashboard() {
 
       {/* ─── Floating Bulk Bar ─── */}
       {selectedIds.size > 0 && (
-        <div className="fixed bottom-10 left-1/2 -translate-x-1/2 bg-[#FFFFFF] dark:bg-navy-800 px-1.5 py-1.5 rounded-full shadow-[0_15px_40px_rgba(0,0,0,0.15)] flex items-center gap-4 border border-[#EFF4FF] dark:border-navy-700 z-[100] animate-in slide-in-from-bottom-12 duration-500 ring-4 ring-[#FFFFFF] dark:ring-navy-950">
+        <div className="fixed bottom-24 md:bottom-10 left-1/2 -translate-x-1/2 bg-[#FFFFFF] dark:bg-navy-800 px-1.5 py-1.5 rounded-full shadow-[0_15px_40px_rgba(0,0,0,0.15)] flex items-center gap-4 border border-[#EFF4FF] dark:border-navy-700 z-[100] animate-in slide-in-from-bottom-12 duration-500 ring-4 ring-[#FFFFFF] dark:ring-navy-950">
           <div className="flex items-center gap-2.5 pl-3">
             <div className="w-8 h-8 bg-[#2563EB] text-white rounded-full flex items-center justify-center font-semibold text-sm shadow-sm">{selectedIds.size}</div>
             <p className="text-[13px] font-semibold text-[#2563EB] dark:text-[#60A5FA]">Selected</p>
@@ -973,12 +984,12 @@ export default function GRNDashboard() {
       {isBulkModalOpen && (
         <div className="fixed inset-0 z-[1200] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-[#1D4ED8]/60 backdrop-blur-md" onClick={() => setIsBulkModalOpen(false)} />
-          <div className="relative bg-[#FFFFFF] dark:bg-navy-800 w-full max-w-5xl rounded-[3.5rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-500">
-            <div className="px-10 pt-6 pb-3 bg-[#FFFFFF] dark:bg-navy-800 flex items-start justify-between relative shrink-0 border-b border-slate-100 dark:border-navy-700">
+          <div className="relative bg-[#FFFFFF] dark:bg-navy-800 w-full max-w-5xl rounded-3xl md:rounded-[3.5rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-500">
+            <div className="px-5 md:px-10 pt-6 pb-3 bg-[#FFFFFF] dark:bg-navy-800 flex items-start justify-between relative shrink-0 border-b border-slate-100 dark:border-navy-700">
               <div><h2 className="text-[26px] font-semibold italic tracking-tighter text-[#2563EB] dark:text-white leading-none">Bulk Processor</h2><p className="text-[13px] font-semibold mt-1 text-[#5B6472]">Processing {Array.from(selectedIds).length} selected GRN entries</p></div>
               <button onClick={() => setIsBulkModalOpen(false)} className="p-2 hover:bg-slate-100 dark:hover:bg-navy-700 rounded-full transition-all text-[#5B6472] hover:text-slate-900 dark:hover:text-white absolute top-5 right-8"><XMarkIcon className="w-6 h-6" /></button>
             </div>
-            <div className="flex-1 overflow-y-auto px-10 pb-24 pt-4 space-y-3 custom-scrollbar">
+            <div className="flex-1 overflow-y-auto px-3 md:px-10 pb-24 pt-4 space-y-3 custom-scrollbar">
               {Array.from(selectedIds).map(id => {
                 const it = items.find(r => r.id === id); if (!it) return null; 
                 const n = getActiveStep(it); 
@@ -987,8 +998,8 @@ export default function GRNDashboard() {
                 const isCheckStep = n === 1 || n === 3 || n === 5;
                 
                 return (
-                  <div key={id} className={`p-5 bg-white dark:bg-navy-900 rounded-3xl border transition-all ${t ? "border-[#2563EB]/20 dark:border-[#60A5FA]/20 shadow-sm" : "border-slate-100 dark:border-navy-800 opacity-40 shadow-none grayscale"}`}>
-                    <div className="grid grid-cols-[1fr_1.5fr_1.5fr] items-center gap-6">
+                  <div key={id} className={`p-4 md:p-5 bg-white dark:bg-navy-900 rounded-3xl border transition-all ${t ? "border-[#2563EB]/20 dark:border-[#60A5FA]/20 shadow-sm" : "border-slate-100 dark:border-navy-800 opacity-40 shadow-none grayscale"}`}>
+                    <div className="grid grid-cols-1 md:grid-cols-[1fr_1.5fr_1.5fr] items-center gap-3 md:gap-6">
                        <div className="flex items-center gap-4">
                           <button onClick={() => setBulkToggles({...bulkToggles, [id]: !t})} className={`w-8 h-8 rounded-xl border-2 flex items-center justify-center shrink-0 transition-all ${t ? "bg-[#2563EB] border-[#2563EB] text-white" : "border-slate-100 text-transparent"}`}><CheckCircleIcon className="w-5 h-5" /></button>
                           <div className="min-w-0"><p className="text-[13px] font-semibold text-[#5B6472] truncate">{it.GRN_No}</p><p className="text-[13px] font-semibold text-[#2563EB] dark:text-white truncate">{it.Item_Name}</p></div>
@@ -997,13 +1008,13 @@ export default function GRNDashboard() {
                        <div className="flex items-center gap-4">
                           <div className="flex-1 px-4 py-2 bg-slate-50 dark:bg-navy-800 rounded-xl border border-slate-100 dark:border-navy-700 min-w-0">
                              <p className="text-[14px] font-semibold text-[#5B6472]">Current Step</p>
-                             <p className="text-[13px] font-semibold text-slate-700 dark:text-white truncate">{n <= 9 && n > 0 ? GRN_STEP_SHORT[n-1] : "COMPLETED"}</p>
+                             <p className="text-[13px] font-semibold text-slate-700 dark:text-white break-words md:truncate">{n <= 9 && n > 0 ? GRN_STEP_SHORT[n-1] : "COMPLETED"}</p>
                           </div>
                           {n <= 9 && n > 0 && <ChevronRightIcon className="w-4 h-4 text-[#5B6472] shrink-0" />}
                           {n <= 9 && n > 0 && (
                             <div className="flex-1 px-4 py-2 bg-[#FFFFFF] dark:bg-[#60A5FA]/10 rounded-xl border border-[#2563EB]/30 min-w-0">
                                <p className="text-[14px] font-semibold text-[#5B6472]">Action</p>
-                               <p className="text-[13px] font-semibold text-[#2563EB] dark:text-[#60A5FA] truncate">Complete Step {n}</p>
+                               <p className="text-[13px] font-semibold text-[#2563EB] dark:text-[#60A5FA] break-words md:truncate">Complete Step {n}</p>
                             </div>
                           )}
                        </div>
@@ -1063,7 +1074,7 @@ export default function GRNDashboard() {
                 );
               })}
             </div>
-            <div className="absolute bottom-0 left-0 right-0 py-3.5 px-10 bg-[#FFFFFF] dark:bg-navy-800 border-t border-slate-100 dark:border-navy-700 flex items-center justify-between shadow-[0_-10px_30px_rgba(0,0,0,0.05)]">
+            <div className="absolute bottom-0 left-0 right-0 py-3.5 px-4 md:px-10 bg-[#FFFFFF] dark:bg-navy-800 border-t border-slate-100 dark:border-navy-700 flex items-center justify-between shadow-[0_-10px_30px_rgba(0,0,0,0.05)]">
                <button onClick={() => setIsBulkModalOpen(false)} className="px-6 py-3 text-[14px] font-semibold text-[#5B6472] dark:text-navy-700 hover:text-slate-800 dark:hover:text-white transition-all">Cancel</button>
                <button onClick={handleBulkProcess} className="flex items-center gap-2.5 bg-[#2563EB] dark:bg-[#60A5FA] text-white dark:text-navy-950 px-10 py-3.5 rounded-2xl font-semibold text-[14px] shadow-lg hover:scale-[1.02] active:scale-95 transition-all border-b-4 border-[#1D4ED8] dark:border-navy-950"><SparklesIcon className="w-4 h-4" /> Execute Bulk Update</button>
             </div>
@@ -1176,8 +1187,8 @@ export default function GRNDashboard() {
       {isConfigModalOpen && (
         <div className="fixed inset-0 z-[1200] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-[#1D4ED8]/60 backdrop-blur-md" onClick={() => setIsConfigModalOpen(false)} />
-          <div className="relative bg-[#FFFFFF] dark:bg-navy-800 w-full max-w-4xl rounded-[3.5rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-500">
-            <div className="px-10 pt-6 pb-3 bg-[#FFFFFF] dark:bg-navy-800 flex items-start justify-between relative shrink-0">
+          <div className="relative bg-[#FFFFFF] dark:bg-navy-800 w-full max-w-4xl rounded-3xl md:rounded-[3.5rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-500">
+            <div className="px-5 md:px-10 pt-6 pb-3 bg-[#FFFFFF] dark:bg-navy-800 flex items-start justify-between relative shrink-0">
               <div>
                 <h2 className="text-[26px] font-semibold italic tracking-tighter text-[#2563EB] dark:text-white leading-none">System Configuration</h2>
                 <p className="text-[13px] font-semibold mt-1 text-[#5B6472] dark:text-navy-600">Define TAT and Operators</p>
@@ -1187,10 +1198,10 @@ export default function GRNDashboard() {
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto px-10 pb-24 space-y-3 custom-scrollbar">
+            <div className="flex-1 overflow-y-auto px-3 md:px-10 pb-24 space-y-3 custom-scrollbar">
               {stepConfigs.map((cfg, i) => (
                 <div key={i} className="p-5 bg-white dark:bg-navy-900 rounded-3xl border border-slate-100 dark:border-navy-700 shadow-sm hover:shadow-md transition-all group">
-                  <div className="grid grid-cols-[1fr_200px_350px] items-center gap-8">
+                  <div className="grid grid-cols-1 md:grid-cols-[1fr_200px_350px] items-center gap-3 md:gap-8">
                     <div className="space-y-0.5">
                       <p className="text-[13px] font-semibold text-[#5B6472] dark:text-navy-600">Step {i+1}</p>
                       <h3 className="text-[13px] font-semibold text-[#2563EB] dark:text-white tracking-tight leading-tight">{cfg.step_name}</h3>
@@ -1220,7 +1231,7 @@ export default function GRNDashboard() {
               ))}
             </div>
 
-            <div className="absolute bottom-0 left-0 right-0 py-3.5 px-10 bg-[#FFFFFF] dark:bg-navy-800 border-t border-slate-100 dark:border-navy-700 flex items-center justify-between shadow-[0_-10px_30px_rgba(0,0,0,0.05)]">
+            <div className="absolute bottom-0 left-0 right-0 py-3.5 px-4 md:px-10 bg-[#FFFFFF] dark:bg-navy-800 border-t border-slate-100 dark:border-navy-700 flex items-center justify-between shadow-[0_-10px_30px_rgba(0,0,0,0.05)]">
               <button onClick={() => setIsConfigModalOpen(false)} className="px-6 py-3 text-[14px] font-semibold text-[#5B6472] dark:text-navy-600 hover:text-slate-800 dark:hover:text-white transition-all">Cancel</button>
               <button onClick={handleSaveConfig} className="flex items-center gap-2.5 bg-[#2563EB] dark:bg-[#60A5FA] text-white dark:text-navy-950 px-10 py-3.5 rounded-2xl font-semibold text-[14px] shadow-lg hover:scale-[1.02] active:scale-95 transition-all border-b-4 border-[#1D4ED8] dark:border-navy-950">
                 <Cog6ToothIcon className="w-4 h-4" /> Save Configuration
@@ -1246,7 +1257,7 @@ export default function GRNDashboard() {
             <div className="space-y-6">
               <div>
                 <label className="text-[14px] font-semibold text-slate-800 dark:text-white/80 block mb-3">Select Step to Reset</label>
-                <div className="grid grid-cols-5 gap-2">
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
                   {Array.from({ length: 9 }, (_, i) => i + 1).map(s => (
                     <button
                       key={s}

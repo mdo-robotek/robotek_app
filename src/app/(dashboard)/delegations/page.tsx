@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useMemo } from "react";
+import { useIsPhone } from "@/hooks/useIsPhone";
 import { useOpenFromLink } from "@/hooks/useOpenFromLink";
 import { useRouter, useSearchParams } from "next/navigation";
 import { canDecide } from "@/lib/delegation-revisions";
@@ -116,6 +117,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
   const [assignmentFilter, setAssignmentFilter] = useState<'All' | 'ToMe' | 'ByMe'>('All');
   const [sortConfig, setSortConfig] = useState<{ key: keyof Delegation; direction: 'asc' | 'desc' } | null>({ key: 'id', direction: 'desc' });
   const [viewMode, setViewMode] = useState<'list' | 'tile'>('list');
+  const isPhone = useIsPhone();
   
   // Advanced Filter Modal States
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
@@ -1219,7 +1221,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
         className="rounded-2xl border overflow-hidden shadow-sm transition-all duration-500 w-full max-w-full min-w-0"
       >
         {/* Status Filtration Tiles - Single row scrollable on mobile */}
-        <div className="flex flex-nowrap overflow-x-auto no-scrollbar gap-2 p-3 bg-gray-50/50 dark:bg-navy-900/30 border-b border-gray-100 dark:border-navy-700/50">
+        <div className="flex flex-wrap gap-2 p-3 bg-gray-50/50 dark:bg-navy-900/30 border-b border-gray-100 dark:border-navy-700/50">
           {[
             { label: 'All', icon: <TagIcon className="w-3 h-3" />, color: 'bg-white text-gray-700 border-gray-300 dark:bg-navy-800 dark:text-gray-300 dark:border-navy-600' },
             { label: 'Pending', icon: <ClockIcon className="w-3 h-3" />, color: 'bg-gray-50 text-gray-600 border-gray-300 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600' },
@@ -1315,7 +1317,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
             </div>
 
             {/* Date Filters Row */}
-            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1 w-full lg:w-auto min-w-0">
+            <div className="flex flex-wrap items-center gap-1.5 py-1 w-full lg:w-auto min-w-0">
               {[
                 { id: 'Delayed', label: 'Delayed', color: 'bg-red-50 text-red-600 border-red-300 dark:bg-red-900/30 dark:text-red-400 dark:border-red-700' },
                 { id: 'Today', label: 'Today', color: 'bg-amber-50 text-amber-600 border-amber-300 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-700' },
@@ -1384,7 +1386,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
       </div>
 
         {/* Conditional View: List (Table) or Tile (Cards) */}
-        {viewMode === 'list' ? (
+        {viewMode === 'list' && !isPhone ? (
           <div 
             style={{ backgroundColor: 'var(--panel-card)' }}
             className="overflow-x-auto transition-colors duration-500 min-h-[400px] w-full"
@@ -1392,31 +1394,31 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
             <table className="w-full text-left border-collapse table-auto min-w-[800px]">
               <thead>
                 <tr className="bg-[#2563EB] dark:bg-navy-950 text-white dark:text-slate-200 whitespace-nowrap">
-                  <th onClick={() => handleSort('id')} className="px-4 py-3 text-[13px] font-semibold cursor-pointer hover:bg-white/5 transition-colors text-center w-12">
+                  <th onClick={() => handleSort('id')} className="px-3 py-3 text-[13px] font-semibold cursor-pointer hover:bg-white/5 transition-colors text-center w-12">
                     <div className="flex items-center justify-center">ID <SortIcon column="id" /></div>
                   </th>
-                  <th onClick={() => handleSort('title')} className="px-4 py-3 text-[13px] font-semibold cursor-pointer hover:bg-white/5 transition-colors min-w-[200px]">
+                  <th onClick={() => handleSort('title')} className="px-3 py-3 text-[13px] font-semibold cursor-pointer hover:bg-white/5 transition-colors min-w-[200px]">
                     <div className="flex items-center">Title &amp; Desc <SortIcon column="title" /></div>
                   </th>
-                  <th onClick={() => handleSort('assigned_to')} className="px-4 py-3 text-[13px] font-semibold cursor-pointer hover:bg-white/5 transition-colors hidden sm:table-cell">
+                  <th onClick={() => handleSort('assigned_to')} className="px-3 py-3 text-[13px] font-semibold cursor-pointer hover:bg-white/5 transition-colors hidden sm:table-cell">
                     <div className="flex items-center">Assigned To <SortIcon column="assigned_to" /></div>
                   </th>
-                  <th onClick={() => handleSort('assigned_by')} className="px-4 py-3 text-[13px] font-semibold cursor-pointer hover:bg-white/5 transition-colors hidden sm:table-cell">
+                  <th onClick={() => handleSort('assigned_by')} className="px-3 py-3 text-[13px] font-semibold cursor-pointer hover:bg-white/5 transition-colors hidden sm:table-cell">
                     <div className="flex items-center">Assigned By <SortIcon column="assigned_by" /></div>
                   </th>
-                  <th onClick={() => handleSort('department')} className="px-4 py-3 text-[13px] font-semibold cursor-pointer hover:bg-white/5 transition-colors hidden md:table-cell">
+                  <th onClick={() => handleSort('department')} className="px-3 py-3 text-[13px] font-semibold cursor-pointer hover:bg-white/5 transition-colors hidden 2xl:table-cell">
                     <div className="flex items-center">Dept <SortIcon column="department" /></div>
                   </th>
-                  <th onClick={() => handleSort('priority')} className="px-4 py-3 text-[13px] font-semibold cursor-pointer hover:bg-white/5 transition-colors hidden sm:table-cell">
+                  <th onClick={() => handleSort('priority')} className="px-3 py-3 text-[13px] font-semibold cursor-pointer hover:bg-white/5 transition-colors hidden sm:table-cell">
                     <div className="flex items-center">Priority <SortIcon column="priority" /></div>
                   </th>
-                  <th onClick={() => handleSort('status')} className="px-4 py-3 text-[13px] font-semibold cursor-pointer hover:bg-white/5 transition-colors">
+                  <th onClick={() => handleSort('status')} className="px-3 py-3 text-[13px] font-semibold cursor-pointer hover:bg-white/5 transition-colors">
                     <div className="flex items-center">Status <SortIcon column="status" /></div>
                   </th>
-                  <th onClick={() => handleSort('due_date')} className="px-4 py-3 text-[10px) font-semibold cursor-pointer hover:bg-white/5 transition-colors">
+                  <th onClick={() => handleSort('due_date')} className="px-3 py-3 text-[13px] font-semibold cursor-pointer hover:bg-white/5 transition-colors">
                     <div className="flex items-center">Due <SortIcon column="due_date" /></div>
                   </th>
-                  <th className="px-4 py-3 text-[10px) font-semibold text-right">Actions</th>
+                  <th className="px-3 py-3 text-[13px] font-semibold text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-white/10">
@@ -1434,35 +1436,35 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                 ) : (
                   paginatedDelegations.map((del) => (
                     <tr key={del.id} className="hover:bg-[#F7F8FA] border-b-2 border-gray-200 dark:border-white/10 last:border-0 transition-colors group">
-                      <td className="px-4 py-3 text-center">
+                      <td className="px-3 py-3 text-center">
                         <span className="font-mono text-[13px] text-[#5B6472] font-bold">#{del.id}</span>
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="px-3 py-3">
                         <p className="font-semibold text-[14px] text-gray-900 dark:text-white leading-tight">{del.title}</p>
                         <p className="font-bold text-[13px] text-gray-500 dark:text-gray-400 leading-tight line-clamp-1 mt-0.5">{del.description}</p>
                       </td>
-                      <td className="px-4 py-3 hidden sm:table-cell">
+                      <td className="px-3 py-3 hidden sm:table-cell">
                         {renderUserAvatar(del.assigned_to)}
                       </td>
-                      <td className="px-4 py-3 hidden sm:table-cell">
+                      <td className="px-3 py-3 hidden sm:table-cell">
                         {renderUserAvatar(del.assigned_by)}
                       </td>
-                      <td className="px-4 py-3 hidden md:table-cell">
+                      <td className="px-3 py-3 hidden 2xl:table-cell">
                         {getDepartmentBadge(del.department)}
                       </td>
-                      <td className="px-4 py-3 hidden sm:table-cell">
+                      <td className="px-3 py-3 hidden sm:table-cell">
                         {getPriorityBadge(del.priority)}
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="px-3 py-3">
                         <div className="flex items-center gap-1.5">
                           {getStatusBadge(getDisplayStatus(del))}
                           {getRevisionBadge(del.id)}
                         </div>
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="px-3 py-3">
                         <p className="text-[13px] md:text-xs font-bold text-gray-600 dark:text-slate-300">{formatDateDisplay(del.due_date) || "—"}</p>
                       </td>
-                      <td className="px-4 py-3 text-right">
+                      <td className="px-3 py-3 text-right">
                         <div className="flex items-center justify-end gap-1">
                           <button onClick={() => setSelectedTask(del)} className="p-1.5 bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400 hover:bg-emerald-600 hover:text-white dark:hover:bg-emerald-500 dark:hover:text-black rounded-lg transition-all" title="Follow Up"><ArrowTopRightOnSquareIcon className="w-3.5 h-3.5" /></button>
                           {(['ADMIN', 'EA'].includes(userRole?.toUpperCase()) || del.assigned_by === currentUser) && (

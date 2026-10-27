@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useIsPhone } from "@/hooks/useIsPhone";
 import { useSession } from "next-auth/react";
 import { Checklist, ChecklistOccurrence } from "@/types/checklist";
 import { formatDateDdMmmYy, toDateOnlyString } from "@/lib/dateUtils";
@@ -73,6 +74,7 @@ export default function ChecklistsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [viewMode, setViewMode] = useState<'list' | 'tile'>('list');
+  const isPhone = useIsPhone();
   const [activeTab, setActiveTab] = useState<'tasks' | 'master'>('tasks');
 
   useEffect(() => {
@@ -1018,7 +1020,7 @@ export default function ChecklistsPage() {
         {/* Search + filters + pagination — one row */}
         <div
           style={{ backgroundColor: "var(--panel-card)", border: "1px solid var(--panel-border)" }}
-          className="p-2.5 flex flex-nowrap items-center gap-2 overflow-x-auto no-scrollbar rounded-2xl shadow-sm"
+          className="p-2.5 flex flex-wrap md:flex-nowrap items-center gap-2 md:overflow-x-auto no-scrollbar rounded-2xl shadow-sm"
         >
           <div className="relative group flex-shrink-0 w-[140px] sm:w-[180px]">
             <MagnifyingGlassIcon className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#5B6472] group-focus-within:text-[#2563EB] transition-colors" />
@@ -1132,7 +1134,7 @@ export default function ChecklistsPage() {
         style={{ borderColor: "var(--panel-border)" }}
         className="rounded-2xl border overflow-hidden shadow-sm transition-all duration-500"
       >
-        {viewMode === 'list' ? (
+        {viewMode === 'list' && !isPhone ? (
           /* Table View - Scrollable on mobile */
           <div 
             style={{ backgroundColor: 'var(--panel-card)' }}
@@ -1163,38 +1165,38 @@ export default function ChecklistsPage() {
                   </th>
                 )}
                 {activeTab === "master" && (
-                  <th onClick={() => handleSort('id')} className="px-4 py-3 text-[13px] font-semibold cursor-pointer hover:bg-white/5 transition-colors">
+                  <th onClick={() => handleSort('id')} className="px-3 py-3 text-[13px] font-semibold cursor-pointer hover:bg-white/5 transition-colors">
                     <div className="flex items-center">ID <SortIcon column="id" /></div>
                   </th>
                 )}
-                <th onClick={() => handleSort('task')} className="px-4 py-3 text-[13px] font-semibold cursor-pointer hover:bg-white/5 transition-colors min-w-[220px]">
+                <th onClick={() => handleSort('task')} className="px-3 py-3 text-[13px] font-semibold cursor-pointer hover:bg-white/5 transition-colors min-w-[220px]">
                   <div className="flex items-center">Task <SortIcon column="task" /></div>
                 </th>
-                <th onClick={() => handleSort('assigned_to')} className="px-4 py-3 text-[13px] font-semibold cursor-pointer hover:bg-white/5 transition-colors hidden sm:table-cell min-w-[120px]">
+                <th onClick={() => handleSort('assigned_to')} className="px-3 py-3 text-[13px] font-semibold cursor-pointer hover:bg-white/5 transition-colors hidden sm:table-cell min-w-[120px]">
                   <div className="flex items-center">Assigned To <SortIcon column="assigned_to" /></div>
                 </th>
-                <th onClick={() => handleSort('assigned_by')} className="px-4 py-3 text-[13px] font-semibold cursor-pointer hover:bg-white/5 transition-colors hidden sm:table-cell min-w-[120px]">
+                <th onClick={() => handleSort('assigned_by')} className="px-3 py-3 text-[13px] font-semibold cursor-pointer hover:bg-white/5 transition-colors hidden sm:table-cell min-w-[120px]">
                   <div className="flex items-center">Assigned By <SortIcon column="assigned_by" /></div>
                 </th>
-                <th onClick={() => handleSort('department')} className="px-4 py-3 text-[13px] font-semibold cursor-pointer hover:bg-white/5 transition-colors hidden md:table-cell">
+                <th onClick={() => handleSort('department')} className="px-3 py-3 text-[13px] font-semibold cursor-pointer hover:bg-white/5 transition-colors hidden 2xl:table-cell">
                   <div className="flex items-center">Dept <SortIcon column="department" /></div>
                 </th>
-                <th onClick={() => handleSort('priority')} className="px-4 py-3 text-[13px] font-semibold cursor-pointer hover:bg-white/5 transition-colors hidden sm:table-cell">
+                <th onClick={() => handleSort('priority')} className="px-3 py-3 text-[13px] font-semibold cursor-pointer hover:bg-white/5 transition-colors hidden sm:table-cell">
                   <div className="flex items-center">Priority <SortIcon column="priority" /></div>
                 </th>
-                <th onClick={() => handleSort('frequency')} className="px-4 py-3 text-[13px] font-semibold cursor-pointer hover:bg-white/5 transition-colors hidden xl:table-cell">
+                <th onClick={() => handleSort('frequency')} className="px-3 py-3 text-[13px] font-semibold cursor-pointer hover:bg-white/5 transition-colors hidden 2xl:table-cell">
                   <div className="flex items-center">Freq <SortIcon column="frequency" /></div>
                 </th>
-                <th onClick={() => handleSort('due_date')} className="px-4 py-3 text-[13px] font-semibold cursor-pointer hover:bg-white/5 transition-colors whitespace-nowrap">
+                <th onClick={() => handleSort('due_date')} className="px-3 py-3 text-[13px] font-semibold cursor-pointer hover:bg-white/5 transition-colors whitespace-nowrap">
                   <div className="flex items-center">Due <SortIcon column="due_date" /></div>
                 </th>
                 {activeTab === "tasks" && (
-                  <th className="px-4 py-3 text-[13px] font-semibold">
+                  <th className="px-3 py-3 text-[13px] font-semibold">
                     Status
                   </th>
                 )}
                 {activeTab === "tasks" && (
-                  <th className="px-4 py-3 text-[13px] font-semibold whitespace-nowrap">
+                  <th className="px-3 py-3 text-[13px] font-semibold whitespace-nowrap">
                     Completed
                   </th>
                 )}
@@ -1287,26 +1289,26 @@ export default function ChecklistsPage() {
                       </td>
                     )}
                     {activeTab === "master" && (
-                      <td className="px-4 py-3">
+                      <td className="px-3 py-3">
                         <span className="font-mono text-[13px] text-[#5B6472] font-bold">#{item.id}</span>
                       </td>
                     )}
-                    <td className="px-4 py-3 min-w-[260px] max-w-[420px]">
+                    <td className="px-3 py-3 min-w-[260px] max-w-[420px]">
                       <p className="font-semibold text-sm text-gray-900 dark:text-white leading-snug whitespace-normal break-words">
                         {item.task || "—"}
                       </p>
                     </td>
-                    <td className="px-4 py-3 hidden sm:table-cell">
+                    <td className="px-3 py-3 hidden sm:table-cell">
                       {renderUserName(item.assigned_to)}
                     </td>
-                    <td className="px-4 py-3 hidden sm:table-cell">
+                    <td className="px-3 py-3 hidden sm:table-cell">
                       {renderUserName(item.assigned_by)}
                     </td>
-                    <td className="px-4 py-3 hidden md:table-cell">
+                    <td className="px-3 py-3 hidden 2xl:table-cell">
                       {getDeptBadge(item.department)}
                     </td>
-                    <td className="px-4 py-3 hidden sm:table-cell">{getPriorityBadge(item.priority)}</td>
-                    <td className="px-4 py-3 hidden xl:table-cell">
+                    <td className="px-3 py-3 hidden sm:table-cell">{getPriorityBadge(item.priority)}</td>
+                    <td className="px-3 py-3 hidden 2xl:table-cell">
                       <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-indigo-50 text-indigo-600 border border-indigo-200 dark:bg-indigo-900/20 dark:text-indigo-400 dark:border-indigo-800 text-[13px] font-semibold rounded-md">
                         <CalendarDaysIcon className="w-3 h-3" />
                         {item.frequency?.includes(':') ? (
@@ -1318,7 +1320,7 @@ export default function ChecklistsPage() {
                         ) : (item.frequency || "Daily")}
                       </span>
                     </td>
-                    <td className="px-4 py-3 whitespace-nowrap">
+                    <td className="px-3 py-3 whitespace-nowrap">
                       <span className="text-[14px] font-bold text-gray-600 dark:text-slate-300 whitespace-nowrap">
                         {formatDateDisplay(
                           activeTab === "tasks"
@@ -1328,10 +1330,10 @@ export default function ChecklistsPage() {
                       </span>
                     </td>
                     {activeTab === "tasks" && (
-                      <td className="px-4 py-3">{getStatusBadge(getDisplayStatus(item))}</td>
+                      <td className="px-3 py-3">{getStatusBadge(getDisplayStatus(item))}</td>
                     )}
                     {activeTab === "tasks" && (
-                      <td className="px-4 py-3 whitespace-nowrap">
+                      <td className="px-3 py-3 whitespace-nowrap">
                         <span className="text-[14px] font-bold text-gray-600 dark:text-slate-300 whitespace-nowrap">
                           {formatDateDisplay(occ.completed_date || "") || "—"}
                         </span>

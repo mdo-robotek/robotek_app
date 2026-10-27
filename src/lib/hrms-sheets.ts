@@ -372,6 +372,8 @@ class OnboardService extends BaseSheetsService<Onboard> {
     "Planned_9", "Actual_9", "Status_9", "Remark_9",
     "Planned_10", "Actual_10", "Status_10", "Remark_10",
     "Planned_11", "Actual_11", "Status_11", "Remark_11",
+    // source_id links an Onboard row to its Candidate (already in the sheet after Remark_11)
+    "source_id",
     // 2026-10-27: Onboard grew to 14 steps
     "Planned_12", "Actual_12", "Status_12", "Remark_12",
     "Planned_13", "Actual_13", "Status_13", "Remark_13",
@@ -401,6 +403,7 @@ class OnboardService extends BaseSheetsService<Onboard> {
       created_at: get("created_at"),
       updated_at: get("updated_at"),
       cancelled: get("Cancelled"),
+      source_id: get("source_id"),
     };
     for (let i = 1; i <= STEP_COLUMNS.onboard.length; i++) {
       item[`planned_${i}`] = get(`Planned_${i}`);
@@ -438,6 +441,7 @@ class OnboardService extends BaseSheetsService<Onboard> {
     set("created_at", item.created_at);
     set("updated_at", (item as any).updated_at);
     set("Cancelled", item.cancelled);
+    set("source_id", item.source_id);
 
     for (let i = 1; i <= STEP_COLUMNS.onboard.length; i++) {
       set(`Planned_${i}`, (item as any)[`planned_${i}`]);
@@ -672,4 +676,82 @@ export async function updateHrmsItem(module: HrmsModuleType, id: string, data: A
 export async function deleteHrmsItem(module: HrmsModuleType, id: string): Promise<boolean> {
   const service = getServiceForModule(module);
   return service.delete(id);
+}
+
+// Same rule as the HRMS page's calculatePlannedDate, pinned to IST so it is
+// right on a UTC server: "N Days" = N days ahead skipping Sundays, kept inside
+// 9:30 AM–6:30 PM; "N Hrs" = N working hours inside 9:30 AM–6:30 PM.
+export function hrmsPlannedDateIST(base: Date, tat: string): string {
+  const OFFSET = 5.5 * 60 * 60 * 1000;
+  const d = new Date(base.getTime() + OFFSET); // UTC fields now read as IST wall clock
+  const val = parseFloat(tat) || 24;
+  const hour = () => d.getUTCHours() + d.getUTCMinutes() / 60;
+  const nextMorning = () => { d.setUTCDate(d.getUTCDate() + 1); d.setUTCHours(9, 30, 0, 0); };
+
+  if (/day/i.test(tat)) {
+    let days = Math.ceil(val);
+    while (days > 0) {
+      d.setUTCDate(d.getUTCDate() + 1);
+      if (d.getUTCDay() !== 0) days--;
+    }
+    if (hour() < 9.5) d.setUTCHours(9, 30, 0, 0);
+    else if (hour() > 18.5) d.setUTCHours(18, 30, 0, 0);
+  } else {
+    let mins = Math.round(val * 60);
+    for (let guard = 0; mins > 0 && guard < 1000; guard++) {
+      if (d.getUTCDay() === 0 || hour() >= 18.5) { nextMorning(); continue; }
+      if (hour() < 9.5) d.setUTCHours(9, 30, 0, 0);
+      const avail = Math.floor((18.5 - hour()) * 60);
+      if (mins <= avail) { d.setUTCMinutes(d.getUTCMinutes() + mins); mins = 0; }
+      else { mins -= avail; nextMorning(); }
+    }
+  }
+  return new Date(d.getTime() - OFFSET).toISOString();
+}
+
+const normName = (v?: string) => String(v || "").trim().toLowerCase().replace(/\s+/g, " ");
+const normPhone = (v?: string) => String(v || "").replace(/\D/g, "").slice(-10);
+
+/**
+ * Candidate FMS step 7 = "Selected" → the candidate starts Onboarding
+ * automatically (Sahil, 2026-10-27). Skipped if the candidate is already in
+ * Onboard (same source_id, or same name + WhatsApp number from a manual import).
+ */
+export async function createOnboardFromCandidate(c: Candidate): Promise<"created" | "exists" | "failed"> {
+  try {
+    const existing = await onboardService.getAll();
+    const name = normName(c.candidate_name);
+    const phone = normPhone(c.whatsapp_number);
+    const already = existing.some((o) =>
+      (o.source_id && o.source_id === c.id) ||
+      (name && normName(o.candidate_name) === name && normPhone(o.whatsapp_number) === phone)
+    );
+    if (already) return "exists";
+
+    const config = await getHrmsStepConfig("onboard");
+    const payload: Partial<Onboard> = {
+      candidate_name: c.candidate_name || "",
+      date_of_birth: c.date_of_birth || "",
+      applied_for: c.applied_for || "",
+      total_experience: c.total_experience || "",
+      current_ctc: c.current_ctc || "",
+      expected_ctc: c.expected_ctc || "",
+      notice_period_in_days: c.notice_period_in_days || "",
+      whatsapp_number: c.whatsapp_number || "",
+      current_living_location: c.current_living_location || "",
+      upload_updated_cv: c.upload_updated_cv || "",
+      reason_for_quit: c.reason_for_quit || "",
+      share_two_professional_references: c.share_two_professional_references || "",
+      gtk_office_comfortable: c.gtk_office_comfortable || "",
+      slot_booking: c.slot_booking || "",
+      remark: c.remark || "",
+      lead_time: c.lead_time_for_emp_joining_7 || "",
+      source_id: c.id,
+      planned_1: hrmsPlannedDateIST(new Date(), config[0]?.tat || "24 Hrs"),
+    };
+    return (await addHrmsItem("onboard", payload)) ? "created" : "failed";
+  } catch (error) {
+    console.error("Error moving selected candidate to Onboard:", c?.id, error);
+    return "failed";
+  }
 }

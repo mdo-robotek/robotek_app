@@ -248,6 +248,8 @@ export default function HRMSModulePage({ params }: { params: Promise<{ module: s
   const [bulkNotNeeded, setBulkNotNeeded] = useState<Record<string, boolean>>({});
   const [bulkSocialMedia, setBulkSocialMedia] = useState<Record<string, string[]>>({});
   const [bulkLeadTimeInputs, setBulkLeadTimeInputs] = useState<Record<string, string>>({});
+  // Candidate step 7 final decision (Sahil, 2026-10-27): Selected → auto Onboarding, Rejected → closed.
+  const [bulkDecisionInputs, setBulkDecisionInputs] = useState<Record<string, "Selected" | "Rejected" | "">>({});
   const [bulkOffboardInputs, setBulkOffboardInputs] = useState<Record<string, Record<string, string>>>({});
 
   const [isRemoveFollowUpModalOpen, setIsRemoveFollowUpModalOpen] = useState(false);
@@ -671,15 +673,24 @@ export default function HRMSModulePage({ params }: { params: Promise<{ module: s
     setBulkNotNeeded({});
     setBulkSocialMedia(sm);
     setBulkLeadTimeInputs(lt);
+    setBulkDecisionInputs({});
     setBulkOffboardInputs(ob);
     setIsBulkModalOpen(true);
   };
 
+  const needsDecision = (id: string) => {
+    if (module !== 'candidate') return false;
+    const it = items.find(r => r.id === id);
+    return !!it && getActiveStep(it) === 7;
+  };
+  const missingDecision = Array.from(selectedIds).some(id => bulkToggles[id] && needsDecision(id) && !bulkDecisionInputs[id]);
+
   const handleBulkStepSave = async () => {
     const toProc = Array.from(selectedIds).filter(id => bulkToggles[id]);
     if (!toProc.length) return;
+    if (toProc.some(id => needsDecision(id) && !bulkDecisionInputs[id])) return;
     setActionStatus("loading"); setActionMessage("Processing updates..."); setIsStatusModalOpen(true); setIsBulkModalOpen(false);
-    const currentNow = new Date().toISOString(); let errors = 0;
+    const currentNow = new Date().toISOString(); let errors = 0; let movedToOnboard = 0;
 
     const blocked: string[] = [];
     for (const id of toProc) {
@@ -706,7 +717,10 @@ export default function HRMSModulePage({ params }: { params: Promise<{ module: s
       }
 
       if (module === 'candidate' && n === 7) {
-        upd.lead_time_for_emp_joining_7 = bulkLeadTimeInputs[id] || "";
+        const decision = bulkDecisionInputs[id];
+        upd[`status_${n}`] = decision;
+        upd.lead_time_for_emp_joining_7 = decision === "Selected" ? (bulkLeadTimeInputs[id] || "") : "";
+        if (decision === "Selected") movedToOnboard++;
       }
 
       if (module === 'offboard') {
@@ -720,13 +734,17 @@ export default function HRMSModulePage({ params }: { params: Promise<{ module: s
         upd[`planned_${n + 1}`] = calculatePlannedDate(currentNow, globalConfigs[n]?.tat || "24 Hrs");
       }
 
-      try { await fetch(`/api/hrms/${module}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(upd) }); } catch { errors++; }
+      try {
+        const res = await fetch(`/api/hrms/${module}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(upd) });
+        if (!res.ok) errors++;
+      } catch { errors++; }
     }
     if (blocked.length) {
       setActionStatus("error");
       setActionMessage(`Not completed — documents missing. ${blocked.join(" · ")}. Upload them from the Docs button, then try again.`);
     } else {
-      setActionStatus(errors ? "error" : "success"); setActionMessage(errors ? `Finished with ${errors} errors` : "All updated!");
+      setActionStatus(errors ? "error" : "success");
+      setActionMessage(errors ? `Finished with ${errors} errors` : movedToOnboard ? `All updated! ${movedToOnboard} selected candidate${movedToOnboard > 1 ? "s" : ""} moved to Onboarding.` : "All updated!");
     }
     // Keep the "documents missing" message up long enough to read.
     setTimeout(() => { setIsStatusModalOpen(false); setSelectedIds(new Set()); mutateItems(); }, blocked.length ? 8000 : 2000);
@@ -1242,8 +1260,30 @@ export default function HRMSModulePage({ params }: { params: Promise<{ module: s
 
                                 {module === 'candidate' && step === 7 && (
                                   <div className="bg-slate-50 dark:bg-navy-900 p-3 rounded-xl border border-slate-100 dark:border-navy-800 space-y-2">
-                                    <p className="text-[13px] font-semibold text-[#5B6472]">Lead Time For Emp. Joining (Step 7)</p>
-                                    <input type="text" placeholder="Enter Lead Time" value={bulkLeadTimeInputs[id] || ""} onChange={e => setBulkLeadTimeInputs({ ...bulkLeadTimeInputs, [id]: e.target.value })} className="w-full px-4 py-2 bg-white dark:bg-navy-950 border border-slate-100 dark:border-navy-800 rounded-xl font-bold text-[14px] outline-none focus:border-[#2563EB]" />
+                                    <p className="text-[13px] font-semibold text-[#5B6472]">Final decision (Step 7) *</p>
+                                    <div className="flex gap-2">
+                                      {(["Selected", "Rejected"] as const).map(opt => {
+                                        const on = bulkDecisionInputs[id] === opt;
+                                        const tone = opt === "Selected"
+                                          ? (on ? "bg-emerald-600 border-emerald-600 text-white" : "border-emerald-200 text-emerald-700 hover:bg-emerald-50")
+                                          : (on ? "bg-red-600 border-red-600 text-white" : "border-red-200 text-red-600 hover:bg-red-50");
+                                        return (
+                                          <button key={opt} type="button" onClick={() => setBulkDecisionInputs({ ...bulkDecisionInputs, [id]: opt })} className={`flex-1 min-h-[40px] rounded-xl border-2 text-[14px] font-semibold transition-colors ${tone}`}>
+                                            {opt === "Selected" ? "✓ Selected" : "✕ Rejected"}
+                                          </button>
+                                        );
+                                      })}
+                                    </div>
+                                    {bulkDecisionInputs[id] === "Selected" && (
+                                      <>
+                                        <p className="text-[13px] text-emerald-700">Will move to Onboarding automatically.</p>
+                                        <p className="text-[13px] font-semibold text-[#5B6472]">Lead Time For Emp. Joining</p>
+                                        <input type="text" placeholder="Enter Lead Time" value={bulkLeadTimeInputs[id] || ""} onChange={e => setBulkLeadTimeInputs({ ...bulkLeadTimeInputs, [id]: e.target.value })} className="w-full px-4 py-2 bg-white dark:bg-navy-950 border border-slate-100 dark:border-navy-800 rounded-xl font-bold text-[14px] outline-none focus:border-[#2563EB]" />
+                                      </>
+                                    )}
+                                    {bulkDecisionInputs[id] === "Rejected" && (
+                                      <p className="text-[13px] text-red-600">Candidate will be closed as Rejected. Add the reason in the remark.</p>
+                                    )}
                                   </div>
                                 )}
 
@@ -1343,9 +1383,12 @@ export default function HRMSModulePage({ params }: { params: Promise<{ module: s
                 );
               })}
             </div>
-            <div className="absolute bottom-0 left-0 right-0 py-3.5 px-4 md:px-10 bg-[#FFFFFF] dark:bg-navy-800 border-t border-slate-100 dark:border-navy-700 flex items-center justify-between">
+            <div className="absolute bottom-0 left-0 right-0 py-3.5 px-4 md:px-10 bg-[#FFFFFF] dark:bg-navy-800 border-t border-slate-100 dark:border-navy-700 flex items-center justify-between gap-3">
               <button onClick={() => setIsBulkModalOpen(false)} className="px-6 py-3 text-[14px] font-semibold text-[#5B6472]">Cancel</button>
-              <button onClick={handleBulkStepSave} className="bg-[#2563EB] dark:bg-[#60A5FA] text-white dark:text-navy-950 px-10 py-3.5 rounded-2xl font-semibold text-[14px] shadow-lg hover:scale-[1.02] transition-all">Execute Bulk Update</button>
+              <div className="flex flex-wrap items-center justify-end gap-3">
+                {missingDecision && <span className="text-[13px] font-semibold text-amber-600">Choose Selected or Rejected for every step 7 candidate</span>}
+                <button onClick={handleBulkStepSave} disabled={missingDecision} className="bg-[#2563EB] dark:bg-[#60A5FA] text-white dark:text-navy-950 px-10 py-3.5 rounded-2xl font-semibold text-[14px] shadow-lg hover:scale-[1.02] transition-all disabled:opacity-50 disabled:hover:scale-100">Execute Bulk Update</button>
+              </div>
             </div>
           </div>
         </div>

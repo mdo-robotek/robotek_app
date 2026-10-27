@@ -93,6 +93,8 @@ export interface Sales extends CandidateBase {
 
 export interface Onboard extends CandidateBase {
   lead_time: string;
+  /** Candidate id this onboarding was created from (step 7 = Selected). */
+  source_id?: string;
   planned_1: string; actual_1: string; status_1: string; remark_1: string;
   planned_2: string; actual_2: string; status_2: string; remark_2: string;
   planned_3: string; actual_3: string; status_3: string; remark_3: string;

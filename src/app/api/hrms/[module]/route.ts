@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { getServiceForModule, addHrmsItem, updateHrmsItem, deleteHrmsItem } from "@/lib/hrms-sheets";
-import { HrmsModuleType } from "@/types/hrms";
+import { getServiceForModule, addHrmsItem, updateHrmsItem, deleteHrmsItem, createOnboardFromCandidate } from "@/lib/hrms-sheets";
+import { Candidate, HrmsModuleType } from "@/types/hrms";
 
 export const dynamic = "force-dynamic";
 
@@ -49,6 +49,11 @@ export async function PUT(request: Request, { params }: { params: Promise<{ modu
     }
     const success = await updateHrmsItem(module, body.id, body);
     if (success) {
+      // Step 7 decided "Selected" → start Onboarding automatically (only once).
+      if (module === "candidate" && body.actual_7 && String(body.status_7 || "").trim().toLowerCase() === "selected") {
+        const onboard = await createOnboardFromCandidate(body as Candidate);
+        return NextResponse.json({ success: true, onboard });
+      }
       return NextResponse.json({ success: true });
     }
     return NextResponse.json({ error: "Failed to update item" }, { status: 500 });

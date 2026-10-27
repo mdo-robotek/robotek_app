@@ -21,7 +21,13 @@ async function getDriveClient() {
   return google.drive({ version: "v3", auth: oauth2Client });
 }
 
-export async function uploadFileToDrive(file: File, folderId?: string): Promise<string | null> {
+/**
+ * Uploads a file and returns its Drive id. By default the file is opened to
+ * "anyone with the link" (existing behaviour for CVs, voice notes etc.).
+ * Pass { private: true } for ID documents (Aadhaar, PAN, bank) — those are
+ * served only through Sarthi to logged-in HR/admins (Sahil, 2026-10-27).
+ */
+export async function uploadFileToDrive(file: File, folderId?: string, opts?: { private?: boolean }): Promise<string | null> {
   try {
     const drive = await getDriveClient();
     
@@ -51,8 +57,8 @@ export async function uploadFileToDrive(file: File, folderId?: string): Promise<
     const fileId = response.data.id;
     if (!fileId) return null;
 
-    // Set permission to anyone with the link can view
-    await drive.permissions.create({
+    // Set permission to anyone with the link can view (not for private documents)
+    if (!opts?.private) await drive.permissions.create({
       fileId: fileId,
       requestBody: {
         role: "reader",

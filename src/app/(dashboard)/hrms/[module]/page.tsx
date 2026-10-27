@@ -5,6 +5,8 @@ import { useSession } from "next-auth/react";
 import { useSSE } from "@/hooks/useSSE";
 import { applyIncrementalUpdate } from "@/lib/utils/swr-sync";
 import useSWR from "swr";
+import EmployeeDocs from "@/components/EmployeeDocs";
+import { docsFor, docProgress, personKey, type DocUpload } from "@/lib/employee-docs";
 import { HrmsModuleType, AnyHrmsRecord, HrmsStepConfig } from "@/types/hrms";
 import { getFieldsForModule, getStepCount, getModuleName } from "@/lib/hrms-fields";
 import {
@@ -331,6 +333,13 @@ export default function HRMSModulePage({ params }: { params: Promise<{ module: s
   const { data: swrItems, mutate: mutateItems } = useSWR<AnyHrmsRecord[]>(`/api/hrms/${module}`, fetcher, {
     refreshInterval: 0, revalidateOnFocus: true, revalidateOnMount: true,
   });
+
+  // Joining documents checklist (Sahil, 2026-10-27): Onboard records, and
+  // candidates who have reached the last step / finished.
+  const showsDocs = module === "onboard" || module === "candidate";
+  const { data: docsByPerson, mutate: mutateDocs } = useSWR<Record<string, DocUpload[]>>(showsDocs ? "/api/hrms/documents" : null, fetcher, { revalidateOnFocus: true });
+  const docsVisibleFor = (it: any) => module === "onboard" || (module === "candidate" && !!(String(it.actual_6 || "").trim() || String(it.actual_7 || "").trim()));
+  const missingDocsFor = (it: any) => docProgress(docsFor(docsByPerson?.[personKey(it, module)], it)).missingRequired;
 
   useSSE({
     modules: [module],
@@ -665,9 +674,16 @@ export default function HRMSModulePage({ params }: { params: Promise<{ module: s
     setActionStatus("loading"); setActionMessage("Processing updates..."); setIsStatusModalOpen(true); setIsBulkModalOpen(false);
     const currentNow = new Date().toISOString(); let errors = 0;
 
+    const blocked: string[] = [];
     for (const id of toProc) {
       const it = items.find(r => r.id === id); if (!it) continue;
       const n = getActiveStep(it); if (n <= 0) continue;
+
+      // Onboarding can't finish while required joining documents are missing.
+      if (module === "onboard" && n === stepCount) {
+        const missing = missingDocsFor(it);
+        if (missing.length) { blocked.push(`${(it as any).candidate_name || id}: ${missing.join(", ")}`); continue; }
+      }
 
       const upd = { ...it } as any;
       upd[`actual_${n}`] = currentNow;
@@ -697,8 +713,14 @@ export default function HRMSModulePage({ params }: { params: Promise<{ module: s
 
       try { await fetch(`/api/hrms/${module}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(upd) }); } catch { errors++; }
     }
-    setActionStatus(errors ? "error" : "success"); setActionMessage(errors ? `Finished with ${errors} errors` : "All updated!");
-    setTimeout(() => { setIsStatusModalOpen(false); setSelectedIds(new Set()); mutateItems(); }, 2000);
+    if (blocked.length) {
+      setActionStatus("error");
+      setActionMessage(`Not completed — documents missing. ${blocked.join(" · ")}. Upload them from the Docs button, then try again.`);
+    } else {
+      setActionStatus(errors ? "error" : "success"); setActionMessage(errors ? `Finished with ${errors} errors` : "All updated!");
+    }
+    // Keep the "documents missing" message up long enough to read.
+    setTimeout(() => { setIsStatusModalOpen(false); setSelectedIds(new Set()); mutateItems(); }, blocked.length ? 8000 : 2000);
   };
 
   const getDelayInfo = (pl: string, act: string | null) => {
@@ -868,6 +890,9 @@ export default function HRMSModulePage({ params }: { params: Promise<{ module: s
                               <span className="flex items-center gap-1.5 px-3 py-1 bg-red-50 dark:bg-red-900/10 text-[13px] font-semibold text-red-600 dark:text-red-400 rounded-full border border-red-200 dark:border-red-900/30 mr-1">
                                 <NoSymbolIcon className="w-3.5 h-3.5" /> CANCELLED ON: {fmtDt(item.cancelled)} {fmtTm(item.cancelled)}
                               </span>
+                            )}
+                            {showsDocs && docsVisibleFor(item) && (
+                              <EmployeeDocs record={item as any} module={module} uploads={docsByPerson?.[personKey(item as any, module)]} onUploaded={() => mutateDocs()} />
                             )}
                             <div className="flex items-center gap-1 px-2 py-1 bg-white dark:bg-navy-800 rounded-full border border-slate-100 dark:border-navy-700 shadow-lg">
                               <button onClick={e => { e.stopPropagation(); setExpandedTiles(p => ({ ...p, [item.id]: !exp })); }} className={`p-1.5 rounded-full transition-all ${exp ? "bg-[#2563EB] text-white" : "text-[#2563EB] dark:text-[#60A5FA] hover:bg-yellow-50"}`}><ChevronDownIcon className={`w-3.5 h-3.5 stroke-[3] transition-transform ${exp ? "rotate-180" : ""}`} /></button>

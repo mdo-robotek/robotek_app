@@ -199,19 +199,33 @@ export default function TicketsPage() {
     } catch (e) { console.error(e); }
   };
 
+  // Which ticket's log we are waiting for — a slow reply for an older ticket
+  // must never show up under the ticket that is open now.
+  const historyForRef = useRef<string | null>(null);
   const fetchHistory = async (id: string) => {
+    historyForRef.current = id;
     setHistoryLoading(true);
     try {
       const res = await fetch(`/api/tickets/${id}/history`);
-      if (res.ok) setTicketHistory(await res.json());
-    } catch (e) { console.error(e); } finally { setHistoryLoading(false); }
+      const data = res.ok ? await res.json() : [];
+      if (historyForRef.current === id) setTicketHistory(Array.isArray(data) ? data : []);
+    } catch (e) { console.error(e); } finally { if (historyForRef.current === id) setHistoryLoading(false); }
   };
 
+  // Sahil, 2026-10-27: the panel showed remarks from the ticket opened before
+  // (log was never re-loaded) and kept that ticket's status choice. Every
+  // open now starts clean for this ticket.
   const openTicketDetails = (t: Ticket) => {
     setSelectedTicket(t);
     setPendingStatus(t.status);
+    setTicketHistory([]);
+    setNewComment("");
+    setVoiceNoteFile(null);
+    setRefDocFile(null);
     fetchHistory(t.id);
   };
+
+  const [postedNote, setPostedNote] = useState<string | null>(null);
 
   const showStatus = (msg: string) => {
     setStatusMessage(msg);
@@ -392,6 +406,13 @@ export default function TicketsPage() {
         setNewComment("");
         setVoiceNoteFile(null);
         setRefDocFile(null);
+        // Close the panel and say clearly that it was saved, so nobody posts twice.
+        const label = `#${String(selectedTicket.id).split("-").pop()}`;
+        setPostedNote(hasStatusChange && pendingStatus ? `Saved. Ticket ${label} is now ${pendingStatus}.` : `Saved. Your remark is added to ticket ${label}.`);
+        setTimeout(() => setPostedNote(null), 3500);
+        setSelectedTicket(null);
+      } else {
+        alert("Could not save. Please try again.");
       }
     } catch (err) {
       console.error(err);
@@ -671,7 +692,7 @@ export default function TicketsPage() {
                   {/* Top Right Actions */}
                   <div className="flex items-center gap-1.5 shrink-0">
                     <button
-                      onClick={() => setSelectedTicket(ticket)}
+                      onClick={() => openTicketDetails(ticket)}
                       className="p-1.5 bg-emerald-100/50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 hover:bg-emerald-600 hover:text-white rounded-lg transition-all border border-emerald-200 dark:border-emerald-800/30"
                       title="Follow Up"
                     >
@@ -1026,6 +1047,13 @@ export default function TicketsPage() {
       )}
 
       {/* Ticket Details Right Sidebar */}
+      {postedNote && (
+        <div role="status" className="fixed z-[400] left-1/2 -translate-x-1/2 bottom-24 md:bottom-8 max-w-[calc(100%-32px)] flex items-center gap-2 px-4 py-3 rounded-xl bg-[#1A1D21] text-white text-[15px] font-semibold shadow-lg">
+          <CheckCircleIcon className="w-5 h-5 text-[#4ADE80] shrink-0" />
+          {postedNote}
+        </div>
+      )}
+
       {selectedTicket && (
         <Portal>
         <div className="fixed inset-0 z-[99999] flex justify-end overflow-hidden">

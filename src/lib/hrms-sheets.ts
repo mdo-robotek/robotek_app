@@ -1,5 +1,6 @@
 import { BaseSheetsService } from "./sheets/base-service";
 import { Recruitment, Candidate, Sales, Onboard, OffboardRecord, HrmsStepConfig, HrmsModuleType, AnyHrmsRecord } from "@/types/hrms";
+import { STEP_COLUMNS, STEP_CONFIG_TABS } from "./hrms-steps";
 import { globalCache } from "./cache";
 
 const GOOGLE_SHEET_ID = "1q00QfCvnk69ZHXZ9ZPPHXXLDBDfSAfqk20MK15xqOVk";
@@ -54,7 +55,7 @@ const DEFAULT_HRMS_STEPS: Record<HrmsModuleType, string[]> = {
 class RecruitmentService extends BaseSheetsService<Recruitment> {
   protected spreadsheetId = GOOGLE_SHEET_ID;
   protected sheetName = "Recruitment";
-  protected range = "A:AJ";
+  protected range = "A:AZ";
   protected idColumnIndex = 0;
 
   public readonly CANONICAL_HEADERS = [
@@ -65,7 +66,9 @@ class RecruitmentService extends BaseSheetsService<Recruitment> {
     "Planned_2", "Actual_2", "Status_2", "Remark_2",
     "Planned_3", "Actual_3", "Status_3", "Remark_3",
     "Planned_4", "Actual_4", "Status_4", "Remark_4",
-    "Planned_5", "Actual_5", "Status_5", "Remark_5"
+    "Planned_5", "Actual_5", "Status_5", "Remark_5",
+    // 2026-10-27: new step 1 "Requirement approved" + a status for the posting step
+    "Planned_AP", "Actual_AP", "Status_AP", "Remark_AP", "Status_1"
   ];
 
   mapRowToItem(row: any[]): Recruitment {
@@ -89,12 +92,13 @@ class RecruitmentService extends BaseSheetsService<Recruitment> {
       cancelled: get("Cancelled"),
       social_medias_1: get("Social_Medias_1"),
     };
-    for (let i = 1; i <= 5; i++) {
-      item[`planned_${i}`] = get(`Planned_${i}`);
-      item[`actual_${i}`] = get(`Actual_${i}`);
-      item[`remark_${i}`] = get(`Remark_${i}`);
-      if (i > 1) item[`status_${i}`] = get(`Status_${i}`);
-    }
+    STEP_COLUMNS.recruitment.forEach((c, k) => {
+      const i = k + 1;
+      item[`planned_${i}`] = get(`Planned_${c}`);
+      item[`actual_${i}`] = get(`Actual_${c}`);
+      item[`remark_${i}`] = get(`Remark_${c}`);
+      item[`status_${i}`] = get(`Status_${c}`);
+    });
     return item as Recruitment;
   }
 
@@ -123,12 +127,13 @@ class RecruitmentService extends BaseSheetsService<Recruitment> {
     set("Cancelled", item.cancelled);
     set("Social_Medias_1", (item as any).social_medias_1);
 
-    for (let i = 1; i <= 5; i++) {
-      set(`Planned_${i}`, (item as any)[`planned_${i}`]);
-      set(`Actual_${i}`, (item as any)[`actual_${i}`]);
-      set(`Remark_${i}`, (item as any)[`remark_${i}`]);
-      if (i > 1) set(`Status_${i}`, (item as any)[`status_${i}`]);
-    }
+    STEP_COLUMNS.recruitment.forEach((c, k) => {
+      const i = k + 1;
+      set(`Planned_${c}`, (item as any)[`planned_${i}`]);
+      set(`Actual_${c}`, (item as any)[`actual_${i}`]);
+      set(`Remark_${c}`, (item as any)[`remark_${i}`]);
+      set(`Status_${c}`, (item as any)[`status_${i}`]);
+    });
 
     return row;
   }
@@ -287,12 +292,13 @@ class SalesService extends BaseSheetsService<Sales> {
       updated_at: get("updated_at"),
       cancelled: get("Cancelled"),
     };
-    for (let i = 1; i <= 8; i++) {
-      item[`planned_${i}`] = get(`Planned_${i}`);
-      item[`actual_${i}`] = get(`Actual_${i}`);
-      item[`status_${i}`] = get(`Status_${i}`);
-      item[`remark_${i}`] = get(`Remark_${i}`);
-    }
+    STEP_COLUMNS.sales.forEach((c, k) => {
+      const i = k + 1;
+      item[`planned_${i}`] = get(`Planned_${c}`);
+      item[`actual_${i}`] = get(`Actual_${c}`);
+      item[`status_${i}`] = get(`Status_${c}`);
+      item[`remark_${i}`] = get(`Remark_${c}`);
+    });
     return item as Sales;
   }
 
@@ -324,12 +330,13 @@ class SalesService extends BaseSheetsService<Sales> {
     set("updated_at", (item as any).updated_at);
     set("Cancelled", item.cancelled);
 
-    for (let i = 1; i <= 8; i++) {
-      set(`Planned_${i}`, (item as any)[`planned_${i}`]);
-      set(`Actual_${i}`, (item as any)[`actual_${i}`]);
-      set(`Status_${i}`, (item as any)[`status_${i}`]);
-      set(`Remark_${i}`, (item as any)[`remark_${i}`]);
-    }
+    STEP_COLUMNS.sales.forEach((c, k) => {
+      const i = k + 1;
+      set(`Planned_${c}`, (item as any)[`planned_${i}`]);
+      set(`Actual_${c}`, (item as any)[`actual_${i}`]);
+      set(`Status_${c}`, (item as any)[`status_${i}`]);
+      set(`Remark_${c}`, (item as any)[`remark_${i}`]);
+    });
 
     return row;
   }
@@ -347,7 +354,7 @@ class SalesService extends BaseSheetsService<Sales> {
 class OnboardService extends BaseSheetsService<Onboard> {
   protected spreadsheetId = GOOGLE_SHEET_ID;
   protected sheetName = "Onboard";
-  protected range = "A:BM";
+  protected range = "A:CZ";
   protected idColumnIndex = 0;
 
   public readonly CANONICAL_HEADERS = [
@@ -364,7 +371,11 @@ class OnboardService extends BaseSheetsService<Onboard> {
     "Planned_8", "Actual_8", "Status_8", "Remark_8",
     "Planned_9", "Actual_9", "Status_9", "Remark_9",
     "Planned_10", "Actual_10", "Status_10", "Remark_10",
-    "Planned_11", "Actual_11", "Status_11", "Remark_11"
+    "Planned_11", "Actual_11", "Status_11", "Remark_11",
+    // 2026-10-27: Onboard grew to 14 steps
+    "Planned_12", "Actual_12", "Status_12", "Remark_12",
+    "Planned_13", "Actual_13", "Status_13", "Remark_13",
+    "Planned_14", "Actual_14", "Status_14", "Remark_14"
   ];
 
   mapRowToItem(row: any[]): Onboard {
@@ -391,7 +402,7 @@ class OnboardService extends BaseSheetsService<Onboard> {
       updated_at: get("updated_at"),
       cancelled: get("Cancelled"),
     };
-    for (let i = 1; i <= 11; i++) {
+    for (let i = 1; i <= STEP_COLUMNS.onboard.length; i++) {
       item[`planned_${i}`] = get(`Planned_${i}`);
       item[`actual_${i}`] = get(`Actual_${i}`);
       item[`status_${i}`] = get(`Status_${i}`);
@@ -428,7 +439,7 @@ class OnboardService extends BaseSheetsService<Onboard> {
     set("updated_at", (item as any).updated_at);
     set("Cancelled", item.cancelled);
 
-    for (let i = 1; i <= 11; i++) {
+    for (let i = 1; i <= STEP_COLUMNS.onboard.length; i++) {
       set(`Planned_${i}`, (item as any)[`planned_${i}`]);
       set(`Actual_${i}`, (item as any)[`actual_${i}`]);
       set(`Status_${i}`, (item as any)[`status_${i}`]);
@@ -451,7 +462,7 @@ class OnboardService extends BaseSheetsService<Onboard> {
 class OffboardService extends BaseSheetsService<OffboardRecord> {
   protected spreadsheetId = GOOGLE_SHEET_ID;
   protected sheetName = "Offboard";
-  protected range = "A:AL";
+  protected range = "A:AZ";
   protected idColumnIndex = 0;
 
   public readonly CANONICAL_HEADERS = [
@@ -459,7 +470,9 @@ class OffboardService extends BaseSheetsService<OffboardRecord> {
     "Planned_1", "Actual_1", "Status_1", "HR_Remarks_1", "Notice_Period_(In Days)_1", "LWD_1", "Handover_Name_1", "Reason_of_Leaving_1", "Remarks_of_Management_1",
     "Planned_2", "Actual_2", "Status_2", "HR_Remarks_2", "Knowledge_Transfer_2", "Asset_Recovery_2",
     "Planned_3", "Actual_3", "Status_3", "Discussion_with_HR_3", "Conclusion_3",
-    "Planned_4", "Actual_4", "Status_4", "Remarks_4", "Relieving_Letter_4", "Experience_Letter_4", "F&F_Statement_4", "Salary_Slips_(if_requested)_4"
+    "Planned_4", "Actual_4", "Status_4", "Remarks_4", "Relieving_Letter_4", "Experience_Letter_4", "F&F_Statement_4", "Salary_Slips_(if_requested)_4",
+    // 2026-10-27: new step 4 "Remove access"; the old step 4 (closure, *_4 columns) is now step 5
+    "Planned_RA", "Actual_RA", "Status_RA", "Remarks_RA"
   ];
 
   mapRowToItem(row: any[]): OffboardRecord {
@@ -485,7 +498,11 @@ class OffboardService extends BaseSheetsService<OffboardRecord> {
 
       planned_3: get("Planned_3"), actual_3: get("Actual_3"), status_3: get("Status_3"), discussion_with_hr_3: get("Discussion_with_HR_3"), conclusion_3: get("Conclusion_3"),
 
-      planned_4: get("Planned_4"), actual_4: get("Actual_4"), status_4: get("Status_4"), remarks_4: get("Remarks_4"), remark_4: get("Remarks_4"),
+      // Step 4 — Remove access (new columns)
+      planned_4: get("Planned_RA"), actual_4: get("Actual_RA"), status_4: get("Status_RA"), remark_4: get("Remarks_RA"),
+
+      // Step 5 — Documentation & closure (old *_4 columns; field names keep their _4 suffix)
+      planned_5: get("Planned_4"), actual_5: get("Actual_4"), status_5: get("Status_4"), remarks_4: get("Remarks_4"), remark_5: get("Remarks_4"),
       relieving_letter_4: get("Relieving_Letter_4"), experience_letter_4: get("Experience_Letter_4"), f_and_f_statement_4: get("F&F_Statement_4"),
       salary_slips_if_requested_4: get("Salary_Slips_(if_requested)_4")
     };
@@ -519,7 +536,9 @@ class OffboardService extends BaseSheetsService<OffboardRecord> {
 
     set("Planned_3", item.planned_3); set("Actual_3", item.actual_3); set("Status_3", item.status_3); set("Discussion_with_HR_3", item.discussion_with_hr_3); set("Conclusion_3", item.conclusion_3);
 
-    set("Planned_4", item.planned_4); set("Actual_4", item.actual_4); set("Status_4", item.status_4); set("Remarks_4", item.remark_4 || item.remarks_4);
+    const it = item as any;
+    set("Planned_RA", it.planned_4); set("Actual_RA", it.actual_4); set("Status_RA", it.status_4); set("Remarks_RA", it.remark_4);
+    set("Planned_4", it.planned_5); set("Actual_4", it.actual_5); set("Status_4", it.status_5); set("Remarks_4", it.remark_5 || it.remarks_4);
     set("Relieving_Letter_4", item.relieving_letter_4); set("Experience_Letter_4", item.experience_letter_4); set("F&F_Statement_4", item.f_and_f_statement_4);
     set("Salary_Slips_(if_requested)_4", item.salary_slips_if_requested_4);
 
@@ -558,13 +577,8 @@ export async function getHrmsStepConfig(module: HrmsModuleType): Promise<HrmsSte
   const cached = globalCache.get<HrmsStepConfig[]>(cacheKey);
   if (cached) return cached;
 
-  const sheetNameMap = {
-    recruitment: "Recruitment_Step Configuration",
-    candidate: "Candidate_Step Configuration",
-    sales: "Sales_Step Configuration",
-    onboard: "Onboard_Step Configuration",
-    offboard: "Offboard_Step Configuration"
-  };
+  // New step lists (2026-10-27) live in "... v2" tabs — see hrms-steps.ts
+  const sheetNameMap = STEP_CONFIG_TABS;
 
   const sheets = await (recruitmentService as any).getSheetsClient();
   try {
@@ -594,13 +608,7 @@ export async function getHrmsStepConfig(module: HrmsModuleType): Promise<HrmsSte
 }
 
 export async function updateHrmsStepConfig(module: HrmsModuleType, configs: HrmsStepConfig[]): Promise<boolean> {
-  const sheetNameMap = {
-    recruitment: "Recruitment_Step Configuration",
-    candidate: "Candidate_Step Configuration",
-    sales: "Sales_Step Configuration",
-    onboard: "Onboard_Step Configuration",
-    offboard: "Offboard_Step Configuration"
-  };
+  const sheetNameMap = STEP_CONFIG_TABS;
 
   try {
     const sheets = await (recruitmentService as any).getSheetsClient();

@@ -9,6 +9,7 @@ import EmployeeDocs from "@/components/EmployeeDocs";
 import { docsFor, docProgress, personKey, type DocUpload } from "@/lib/employee-docs";
 import { HrmsModuleType, AnyHrmsRecord, HrmsStepConfig } from "@/types/hrms";
 import { getFieldsForModule, getStepCount, getModuleName } from "@/lib/hrms-fields";
+import { RECRUITMENT_POST_STEP, OFFBOARD_CLOSURE_STEP, ONBOARD_DOCS_STEP, NOT_NEEDED } from "@/lib/hrms-steps";
 import {
   PlusIcon, PencilSquareIcon, TrashIcon, XMarkIcon, MagnifyingGlassIcon,
   ChevronLeftIcon, ChevronRightIcon, ChevronDownIcon, ClockIcon, CheckCircleIcon,
@@ -240,6 +241,8 @@ export default function HRMSModulePage({ params }: { params: Promise<{ module: s
   const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
   const [bulkRemarkInputs, setBulkRemarkInputs] = useState<Record<string, string>>({});
   const [bulkToggles, setBulkToggles] = useState<Record<string, boolean>>({});
+  // "Not needed" per person: the step is skipped, not done (e.g. assessment for an Office Boy).
+  const [bulkNotNeeded, setBulkNotNeeded] = useState<Record<string, boolean>>({});
   const [bulkSocialMedia, setBulkSocialMedia] = useState<Record<string, string[]>>({});
   const [bulkLeadTimeInputs, setBulkLeadTimeInputs] = useState<Record<string, string>>({});
   const [bulkOffboardInputs, setBulkOffboardInputs] = useState<Record<string, Record<string, string>>>({});
@@ -561,7 +564,7 @@ export default function HRMSModulePage({ params }: { params: Promise<{ module: s
     const startStep = removeFollowUpStep;
 
     const clearModuleSpecificFields = (s: number, upd: any) => {
-      if (module === 'recruitment' && s === 1) upd.social_medias_1 = "";
+      if (module === 'recruitment' && s === RECRUITMENT_POST_STEP) upd.social_medias_1 = "";
       if (module === 'candidate' && s === 7) upd.lead_time_for_emp_joining_7 = "";
       if (module === 'offboard') {
         if (s === 1) {
@@ -570,7 +573,7 @@ export default function HRMSModulePage({ params }: { params: Promise<{ module: s
           upd.knowledge_transfer_2 = ""; upd.asset_recovery_2 = "";
         } else if (s === 3) {
           upd.discussion_with_hr_3 = ""; upd.conclusion_3 = "";
-        } else if (s === 4) {
+        } else if (s === OFFBOARD_CLOSURE_STEP) {
           upd.relieving_letter_4 = ""; upd.experience_letter_4 = ""; upd.f_and_f_statement_4 = ""; upd.salary_slips_if_requested_4 = "";
         }
       }
@@ -662,6 +665,7 @@ export default function HRMSModulePage({ params }: { params: Promise<{ module: s
     });
     setBulkRemarkInputs(rmks);
     setBulkToggles(ts);
+    setBulkNotNeeded({});
     setBulkSocialMedia(sm);
     setBulkLeadTimeInputs(lt);
     setBulkOffboardInputs(ob);
@@ -680,19 +684,21 @@ export default function HRMSModulePage({ params }: { params: Promise<{ module: s
       const n = getActiveStep(it); if (n <= 0) continue;
 
       // Onboarding can't finish while required joining documents are missing.
-      if (module === "onboard" && n === stepCount) {
+      if (module === "onboard" && n === ONBOARD_DOCS_STEP) {
         const missing = missingDocsFor(it);
         if (missing.length) { blocked.push(`${(it as any).candidate_name || id}: ${missing.join(", ")}`); continue; }
       }
 
       const upd = { ...it } as any;
+      const skip = !!bulkNotNeeded[id] && !(module === "onboard" && n === ONBOARD_DOCS_STEP);
       upd[`actual_${n}`] = currentNow;
-      upd[`status_${n}`] = "Done";
+      upd[`status_${n}`] = skip ? NOT_NEEDED : "Done";
+      if (skip && !bulkRemarkInputs[id]) upd[`remark_${n}`] = "Not needed for this person";
       if (bulkRemarkInputs[id]) {
         upd[`remark_${n}`] = bulkRemarkInputs[id];
       }
 
-      if (module === 'recruitment' && n === 1) {
+      if (module === 'recruitment' && n === RECRUITMENT_POST_STEP) {
         upd.social_medias_1 = JSON.stringify(bulkSocialMedia[id] || []);
       }
 
@@ -977,14 +983,16 @@ export default function HRMSModulePage({ params }: { params: Promise<{ module: s
                             {Array.from({ length: stepCount }, (_, i) => {
                               const n = i + 1; const act = (item as any)[`actual_${n}`]; const pl = (item as any)[`planned_${n}`];
                               const done = !!act; const isPending = !done && n === getActiveStep(item);
+                              const skipped = done && String((item as any)[`status_${n}`] || "") === NOT_NEEDED;
                               let statusClasses = "bg-white dark:bg-navy-900 border-slate-200 dark:border-navy-700 text-[#5B6472]";
-                              if (done) statusClasses = "bg-emerald-50/50 dark:bg-emerald-900/10 border-emerald-500 text-emerald-700 dark:text-emerald-400 shadow-sm";
+                              if (skipped) statusClasses = "bg-[#F7F8FA] dark:bg-navy-900 border-dashed border-slate-300 dark:border-navy-700 text-[#5B6472]";
+                              else if (done) statusClasses = "bg-emerald-50/50 dark:bg-emerald-900/10 border-emerald-500 text-emerald-700 dark:text-emerald-400 shadow-sm";
                               else if (isPending) statusClasses = "bg-[#F7F8FA] dark:bg-[#FEF3C7] border-[#E5E7EB] text-[#D97706] dark:text-[#D97706] shadow-sm";
                               return (
                                 <div key={n} className={`flex-none w-64 p-3 rounded-xl border transition-all flex flex-col justify-between ${statusClasses}`}>
                                   <div>
                                     <div className="flex items-center justify-between mb-1">
-                                      <p className={`text-[13px] font-semibold   ${done ? "text-emerald-600" : isPending ? "text-[#D97706]" : "text-[#5B6472]"}`}>STEP {n}</p>
+                                      <p className={`text-[13px] font-semibold   ${skipped ? "text-[#5B6472]" : done ? "text-emerald-600" : isPending ? "text-[#D97706]" : "text-[#5B6472]"}`}>STEP {n}{skipped ? " · Not needed" : ""}</p>
                                       {done ? <CheckCircleIcon className="w-3.5 h-3.5 text-emerald-600" /> : isPending ? <ClockIcon className="w-3.5 h-3.5 text-[#D97706] animate-pulse" /> : null}
                                     </div>
                                     <p className={`text-[14px] font-semibold leading-snug line-clamp-2 ${done ? "text-emerald-900 dark:text-emerald-200" : isPending ? "text-[#D97706] dark:text-[#D97706]" : "text-slate-600"}`}>{globalConfigs[i]?.step_name}</p>
@@ -1014,7 +1022,7 @@ export default function HRMSModulePage({ params }: { params: Promise<{ module: s
                                         )}
                                       </div>
                                     )}
-                                    {module === 'recruitment' && n === 1 && (item as any).social_medias_1 && (
+                                    {module === 'recruitment' && n === RECRUITMENT_POST_STEP && (item as any).social_medias_1 && (
                                       <div className="flex flex-wrap gap-1 mt-1.5 pt-1.5 border-t border-slate-100 dark:border-navy-800">
                                         {(() => {
                                           try {
@@ -1052,7 +1060,7 @@ export default function HRMSModulePage({ params }: { params: Promise<{ module: s
                                             {(item as any).conclusion_3 && <div className="flex justify-between items-start text-[13px] font-semibold"><span className="opacity-50">Conclusion</span><span className="text-right line-clamp-2 max-w-[120px]" title={(item as any).conclusion_3}>{(item as any).conclusion_3}</span></div>}
                                           </>
                                         )}
-                                        {n === 4 && (
+                                        {n === OFFBOARD_CLOSURE_STEP && (
                                           <div className="flex flex-wrap gap-1 mt-1">
                                             {['relieving_letter_4', 'experience_letter_4', 'f_and_f_statement_4', 'salary_slips_if_requested_4'].map((doc, idx) => {
                                               if ((item as any)[doc] === "Done") {
@@ -1183,11 +1191,22 @@ export default function HRMSModulePage({ params }: { params: Promise<{ module: s
                           <div className="space-y-1">
                             {step > 0 ? (
                               <div className="space-y-3">
-                                <p className="text-[13px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-1 rounded w-max truncate max-w-full" title={`Marking Step ${step} Done — ${globalConfigs[step - 1]?.step_name}`}>
-                                  Marking Step {step} Done — {globalConfigs[step - 1]?.step_name}
+                                <p className={`text-[13px] font-semibold px-2 py-1 rounded w-max truncate max-w-full ${bulkNotNeeded[id] ? "text-[#5B6472] bg-slate-100" : "text-emerald-600 bg-emerald-50"}`} title={`Step ${step} — ${globalConfigs[step - 1]?.step_name}`}>
+                                  {bulkNotNeeded[id] ? "Skipping" : "Marking"} Step {step} {bulkNotNeeded[id] ? "(not needed)" : "Done"} — {globalConfigs[step - 1]?.step_name}
                                 </p>
+                                {!(module === "onboard" && step === ONBOARD_DOCS_STEP) && (
+                                  <label className="flex items-center gap-2 min-h-[36px] cursor-pointer w-max">
+                                    <input
+                                      type="checkbox"
+                                      checked={!!bulkNotNeeded[id]}
+                                      onChange={(e) => setBulkNotNeeded((p) => ({ ...p, [id]: e.target.checked }))}
+                                      className="w-4 h-4 accent-[#2563EB]"
+                                    />
+                                    <span className="text-[14px] text-[#1A1D21] dark:text-white">Not needed for this person</span>
+                                  </label>
+                                )}
 
-                                {module === 'recruitment' && step === 1 && (
+                                {module === 'recruitment' && step === RECRUITMENT_POST_STEP && (
                                   <div className="bg-slate-50 dark:bg-navy-900 p-3 rounded-xl border border-slate-100 dark:border-navy-800 space-y-2">
                                     <p className="text-[13px] font-semibold text-[#5B6472]">Social Media Platforms Posted</p>
                                     <div className="flex flex-wrap gap-2">
@@ -1283,7 +1302,7 @@ export default function HRMSModulePage({ params }: { params: Promise<{ module: s
                                         <textarea placeholder="Conclusion" value={bulkOffboardInputs[id]?.conclusion_3 || ""} onChange={e => setBulkOffboardInputs({ ...bulkOffboardInputs, [id]: { ...(bulkOffboardInputs[id] || {}), conclusion_3: e.target.value } })} className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded font-bold text-[14px] resize-none h-16" />
                                       </div>
                                     )}
-                                    {step === 4 && (
+                                    {step === OFFBOARD_CLOSURE_STEP && (
                                       <div className="grid grid-cols-2 gap-2">
                                         {['Relieving Letter', 'Experience Letter', 'F&F Statement', 'Salary Slips (if requested)'].map((doc, idx) => {
                                           const fName = ['relieving_letter_4', 'experience_letter_4', 'f_and_f_statement_4', 'salary_slips_if_requested_4'][idx];

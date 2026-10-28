@@ -193,11 +193,23 @@ export function phoneDigits(p: string): string {
 }
 
 /** Admin, EA and the Process Coordinator. */
+/**
+ * Process Coordinators and the EA by name (Sahil, 2026-10-28: Vandana and
+ * Abhishek are both PC; Rachit is the EA). Names work even when the login
+ * doesn't carry a designation (the menu only knows username + role).
+ */
+export const ACTION_BOARD_PEOPLE = ["vandana", "abhishek gupta", "rachit aggarwal"];
+
 export function canSeeActionBoard(u: { username?: string; role?: string; role_name?: string; designation?: string } | undefined): boolean {
   if (!u) return false;
-  const role = String(u.role || "").toUpperCase();
+  const role = String(u.role || u.role_name || "").toUpperCase();
   const desig = String(u.designation || "").trim().toLowerCase();
-  return role === "ADMIN" || role === "EA" || desig === "ea" || desig === "executive assistant" || desig === "process coordinator" || ownsLeaveFollowUp(u);
+  const name = String(u.username || "").trim().toLowerCase();
+  return (
+    role === "ADMIN" || role === "EA" || role === "PC" ||
+    desig === "ea" || desig === "executive assistant" || desig === "pc" || desig === "process coordinator" ||
+    ACTION_BOARD_PEOPLE.includes(name) || ownsLeaveFollowUp(u)
+  );
 }
 
 

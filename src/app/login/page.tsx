@@ -48,7 +48,16 @@ export default function LoginPage() {
           setError("Invalid username/email or password");
         }
       } else {
-        router.push("/");
+        router.push((() => {
+          // Back to the page that needed login (e.g. the Delegation QR), same site only.
+          try {
+            const cb = new URLSearchParams(window.location.search).get("callbackUrl");
+            const u = new URL(cb || "/", window.location.origin);
+            return u.origin === window.location.origin ? u.pathname + u.search : "/";
+          } catch {
+            return "/";
+          }
+        })());
         router.refresh();
       }
     } catch (err) {

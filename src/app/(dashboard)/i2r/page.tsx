@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useMemo } from "react";
+import { useFindFromLink } from "@/hooks/useFindFromLink";
 import { useIsPhone } from "@/hooks/useIsPhone";
 import PhoneStepSelect from "@/components/PhoneStepSelect";
 import { useOpenFromLink } from "@/hooks/useOpenFromLink";
@@ -256,6 +257,8 @@ export default function I2RPage() {
   const isPhone = useIsPhone();
   const [expandedTiles, setExpandedTiles] = useState<Record<string, boolean>>({});
   const [dateFilter, setDateFilter] = useState<string | null>(null);
+  // "Open" in the work-list window lands here with ?find=INDT-xx
+  useFindFromLink((t) => { setSelectedStepFilter("all"); setDateFilter(null); setViewMode("active"); setSearchTerm(t); setCurrentPage(1); });
 
   const [isRemoveFollowUpModalOpen, setIsRemoveFollowUpModalOpen] = useState(false);
   const [targetItemForRemoveFollowUp, setTargetItemForRemoveFollowUp] = useState<I2R | null>(null);

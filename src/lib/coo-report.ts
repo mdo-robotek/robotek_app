@@ -17,7 +17,7 @@ import { getItemLedgerEntries } from "@/lib/item-ledger-sheets";
 import { getWorkingHoursGapMs } from "@/lib/workingHours";
 
 
-function normalizeDate(dateVal: string | undefined | null): string {
+export function normalizeDate(dateVal: string | undefined | null): string {
   if (!dateVal) return "";
   let dateStr = dateVal.split("T")[0];
   if (/^\d{2}\/\d{2}\/\d{4}$/.test(dateStr)) {
@@ -29,7 +29,7 @@ function normalizeDate(dateVal: string | undefined | null): string {
   return dateStr;
 }
 
-function getISTDateString(): string {
+export function getISTDateString(): string {
   const now = new Date();
   const istOffset = 5.5 * 60 * 60 * 1000;
   return new Date(now.getTime() + istOffset).toISOString().split("T")[0];
@@ -678,6 +678,15 @@ export async function buildCooReport(searchParams: URLSearchParams): Promise<any
         mtdOrders: mtdOrders.length,
         mtdDispatched,
         otdRate,
+        // Orders dispatched this month but not on time — the list behind
+        // "On-time this month" (Sahil, 2026-10-28).
+        lateDispatchList: mtdOrders.filter((o: any) => o.isDispatched && !o.isOTD).map((o: any) => ({
+          id: o.orderNo,
+          party: o.party,
+          amount: o.totalAmount,
+          created: o.createdAt?.toISOString?.() || "",
+          dispatched: o.actual7?.toISOString?.() || "",
+        })),
         delayAging: {
           gt7: { count: delayAging.gt7.length, revenueAtRisk },
           d4to7: { count: delayAging.d4to7.length },
@@ -697,6 +706,11 @@ export async function buildCooReport(searchParams: URLSearchParams): Promise<any
             date: o.createdAt.toISOString().split('T')[0],
             step: o.pendingStepName || "",
             remark: remarkByOrder[String(o.orderNo || "").toLowerCase()]?.remark || "",
+            // For the work-list window (Sahil, 2026-10-28): same day count as Delay Aging,
+            // and the waiting step's planned time.
+            days: Math.floor((today.getTime() - new Date(normalizeDate(o.createdAt?.toISOString?.() || o.createdAt || "")).getTime()) / 86400000),
+            stepNo: o.pendingStepIdx,
+            planned: o.firstItem?.[`planned_${o.pendingStepIdx}`] || "",
           })),
           postDispatchCount: allOrders.filter((o: any) => o.isPostDispatchPending).length,
           postDispatchList: allOrders.filter((o: any) => o.isPostDispatchPending).map((o: any) => ({
@@ -706,6 +720,8 @@ export async function buildCooReport(searchParams: URLSearchParams): Promise<any
             date: o.createdAt.toISOString().split('T')[0],
             step: o.pendingStepName || "",
             remark: remarkByOrder[String(o.orderNo || "").toLowerCase()]?.remark || "",
+            stepNo: o.pendingStepIdx,
+            planned: o.firstItem?.[`planned_${o.pendingStepIdx}`] || "",
           }))
         },
         topDelayedOrders: delayAging.gt7.slice(0, 5),

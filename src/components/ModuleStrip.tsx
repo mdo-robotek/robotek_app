@@ -6,6 +6,15 @@ import { useSession } from "next-auth/react";
 import { ChartBarIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import dynamic from "next/dynamic";
 import type { Figure, ModuleKey, ModuleSummary, Tone } from "@/lib/module-summary";
+import WorkListPanel from "./WorkListPanel";
+
+/** Figures that open a window listing their items (Sahil, 2026-10-28). */
+export const LISTABLE: Partial<Record<ModuleKey, string[]>> = {
+  o2d: ["waiting", "over7", "paperwork", "otd"],
+  i2r: ["open", "late", "tbd", "done"],
+  grn: ["open", "late", "payment", "done"],
+  tasks: ["overdue", "pending", "revision", "done"],
+};
 
 // The detailed report (charts) loads only when someone opens Performance.
 const CooReport = dynamic(() => import("./CooReport"), { ssr: false });
@@ -50,6 +59,7 @@ export default function ModuleStrip({
     { refreshInterval: 120000, revalidateOnFocus: false, keepPreviousData: true }
   );
   const [open, setOpen] = useState(false);
+  const [list, setList] = useState<Figure | null>(null);
 
   if (!allowed || error) return null;
   const m = data?.module;
@@ -61,12 +71,13 @@ export default function ModuleStrip({
           if (!f) {
             return <div key={i} className="md:min-w-[140px] flex-1 h-[64px] rounded-xl bg-[#F1F3F6] dark:bg-navy-800 animate-pulse" />;
           }
-          const tappable = !!onFigure && f.step !== undefined;
+          const listable = !!LISTABLE[module]?.includes(f.key);
+          const tappable = listable || (!!onFigure && f.step !== undefined);
           const Tag = tappable ? "button" : "div";
           return (
             <Tag
               key={f.key}
-              {...(tappable ? { type: "button", onClick: () => onFigure!(f) } : {})}
+              {...(tappable ? { type: "button", onClick: () => (listable ? setList(f) : onFigure!(f)) } : {})}
               className={`min-w-0 md:min-w-[140px] flex-1 text-left rounded-xl bg-white dark:bg-navy-900 border border-[#E5E7EB] dark:border-navy-800 px-3 py-2 ${
                 tappable ? "hover:border-[#2563EB] transition-colors" : ""
               }`}
@@ -94,6 +105,16 @@ export default function ModuleStrip({
         <p className="text-[13px] text-[#5B6472] dark:text-gray-400 mt-1.5 px-1">
           Most work is waiting at <span className="font-semibold text-[#1A1D21] dark:text-white">Step {m.stuckAt.step} · {m.stuckAt.name}</span> ({m.stuckAt.count})
         </p>
+      )}
+
+      {list && (
+        <WorkListPanel
+          module={module}
+          filter={list.key}
+          onPage
+          onClose={() => setList(null)}
+          onShowOnPage={onFigure && list.step !== undefined ? () => onFigure(list) : undefined}
+        />
       )}
 
       {open && data?.detail && (

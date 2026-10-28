@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import useSWR from "swr";
+import { useState } from "react";
 import { ChevronRightIcon } from "@heroicons/react/24/outline";
+import WorkListPanel from "./WorkListPanel";
 import PendingApprovalsCard from "./PendingApprovalsCard";
 import type { ModuleSummary, Tone } from "@/lib/module-summary";
 
@@ -28,13 +30,17 @@ const toneDot: Record<Tone, string> = {
   neutral: "bg-transparent",
 };
 
-function Tile({ m }: { m: ModuleSummary }) {
-  return (
-    <Link
-      href={m.href}
-      className="group flex flex-col rounded-2xl bg-white dark:bg-navy-900 border border-[#E5E7EB] dark:border-navy-800 p-4 min-h-[136px] hover:border-[#2563EB] transition-colors"
-    >
-      <div className="flex items-center gap-2">
+/** Tiles that open their work list in a window instead of leaving the home page. */
+const TILE_LIST: Record<string, string> = { o2d: "waiting", i2r: "open", grn: "open", tasks: "overdue" };
+type ListRef = { module: string; filter: string };
+
+function Tile({ m, onList }: { m: ModuleSummary; onList: (l: ListRef) => void }) {
+  const filter = TILE_LIST[m.key];
+  const cls =
+    "group flex flex-col text-left rounded-2xl bg-white dark:bg-navy-900 border border-[#E5E7EB] dark:border-navy-800 p-4 min-h-[136px] hover:border-[#2563EB] transition-colors";
+  const body = (
+    <>
+      <div className="flex items-center gap-2 w-full">
         <span className={`w-2 h-2 rounded-full shrink-0 ${toneDot[m.headline.tone]}`} />
         <span className="text-[15px] font-semibold text-[#1A1D21] dark:text-white">{m.title}</span>
         <ChevronRightIcon className="w-4 h-4 ml-auto text-[#5B6472] group-hover:text-[#2563EB] transition-colors" />
@@ -44,6 +50,18 @@ function Tile({ m }: { m: ModuleSummary }) {
       </p>
       <p className="mt-1.5 text-[14px] text-[#5B6472] dark:text-gray-400">{m.headline.label}</p>
       <p className="mt-auto pt-2 text-[13px] leading-snug text-[#5B6472] dark:text-gray-400 line-clamp-2">{m.note}</p>
+    </>
+  );
+  if (filter) {
+    return (
+      <button type="button" onClick={() => onList({ module: m.key, filter })} className={cls}>
+        {body}
+      </button>
+    );
+  }
+  return (
+    <Link href={m.href} className={cls}>
+      {body}
     </Link>
   );
 }
@@ -54,6 +72,7 @@ function Tile({ m }: { m: ModuleSummary }) {
  * module's own page, which carries its detailed figures.
  */
 export default function CeoOverview() {
+  const [list, setList] = useState<ListRef | null>(null);
   const { data, error } = useSWR("/api/summary", fetcher, {
     refreshInterval: 120000,
     revalidateOnFocus: false,
@@ -73,9 +92,9 @@ export default function CeoOverview() {
 
   const alerts = ov
     ? [
-        { label: "Orders waiting over 7 days", count: ov.alerts.ordersOver7Days, href: "/o2d" },
-        { label: "Tasks overdue", count: ov.alerts.overdueTasks, href: "/delegations" },
-        { label: "Stock entries that don't match", count: ov.alerts.stockMismatches, href: "/item-ledger" },
+        { label: "Orders waiting over 7 days", count: ov.alerts.ordersOver7Days, href: "/o2d", list: { module: "o2d", filter: "over7" } as ListRef },
+        { label: "Tasks overdue", count: ov.alerts.overdueTasks, href: "/delegations", list: { module: "tasks", filter: "overdue" } as ListRef },
+        { label: "Stock entries that don't match", count: ov.alerts.stockMismatches, href: "/item-ledger", list: null as ListRef | null },
       ].filter((a) => a.count > 0)
     : [];
   const busyStale = (busy?.daysOld ?? 0) >= 2;
@@ -125,13 +144,21 @@ export default function CeoOverview() {
                 </span>
               </div>
             )}
-            {alerts.map((a) => (
-              <Link key={a.label} href={a.href} className="flex items-center gap-4 px-4 min-h-[52px] hover:bg-[#F7F8FA] dark:hover:bg-navy-800/50 transition-colors">
-                <span className="min-w-[48px] text-right text-[22px] font-semibold text-[#DC2626] tabular-nums">{a.count}</span>
-                <span className="flex-1 text-[15px] font-semibold text-[#1A1D21] dark:text-white">{a.label}</span>
-                <ChevronRightIcon className="w-4 h-4 text-[#5B6472]" />
-              </Link>
-            ))}
+            {alerts.map((a) => {
+              const inner = (
+                <>
+                  <span className="min-w-[48px] text-right text-[22px] font-semibold text-[#DC2626] tabular-nums">{a.count}</span>
+                  <span className="flex-1 text-left text-[15px] font-semibold text-[#1A1D21] dark:text-white">{a.label}</span>
+                  <ChevronRightIcon className="w-4 h-4 text-[#5B6472]" />
+                </>
+              );
+              const cls = "w-full flex items-center gap-4 px-4 min-h-[52px] hover:bg-[#F7F8FA] dark:hover:bg-navy-800/50 transition-colors";
+              return a.list ? (
+                <button key={a.label} type="button" onClick={() => setList(a.list)} className={cls}>{inner}</button>
+              ) : (
+                <Link key={a.label} href={a.href} className={cls}>{inner}</Link>
+              );
+            })}
           </div>
         </div>
       )}
@@ -169,7 +196,7 @@ export default function CeoOverview() {
       {/* 3. One tile per area — tap to open that module */}
       <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3">
         {modules.map((m) => (
-          <Tile key={m.key} m={m} />
+          <Tile key={m.key} m={m} onList={setList} />
         ))}
         <Link
           href="/party-management"
@@ -204,6 +231,8 @@ export default function CeoOverview() {
 
       {/* 4. My approvals — hides itself when nothing is waiting */}
       <PendingApprovalsCard />
+
+      {list && <WorkListPanel module={list.module} filter={list.filter} onClose={() => setList(null)} />}
     </div>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useMemo } from "react";
+import { useFindFromLink } from "@/hooks/useFindFromLink";
 import { useSession } from "next-auth/react";
 import {
   O2D,
@@ -432,6 +433,8 @@ export default function O2DPage() {
   const [tableFilterPending, setTableFilterPending] = useState(false);
   const [selectedDateFilters, setSelectedDateFilters] = useState<string[]>([]);
   const [selectedStepFilters, setSelectedStepFilters] = useState<number[]>([]);
+  // "Open" in the work-list window lands here with ?find=OR-xxxxx
+  useFindFromLink((t) => { setSelectedStepFilters([]); setSelectedDateFilters([]); setSearchTerm(t); });
 
   const [allO2Ds, setAllO2Ds] = useState<O2D[]>([]);
   const [isAllLoading, setIsAllLoading] = useState(false);

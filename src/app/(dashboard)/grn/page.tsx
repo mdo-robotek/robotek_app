@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useMemo } from "react";
+import { useFindFromLink } from "@/hooks/useFindFromLink";
 import { useIsPhone } from "@/hooks/useIsPhone";
 import PhoneStepSelect from "@/components/PhoneStepSelect";
 import { useSession } from "next-auth/react";
@@ -203,6 +204,8 @@ export default function GRNDashboard() {
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
+  // "Open" in the work-list window lands here with ?find=GRN-xxx
+  useFindFromLink((t) => { setSelectedStepFilter("all"); setDateFilter(null); setViewMode("active"); setSearchTerm(t); setCurrentPage(1); });
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
   // Modals

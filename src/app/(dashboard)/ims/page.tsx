@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import useSWR from "swr";
 import { 
   ClipboardDocumentListIcon, 
@@ -303,7 +304,16 @@ export default function IMSHub() {
           </p>
         </div>
         {/* Key figures — same numbers as the Stock tile on the CEO home */}
-        <div className="mb-6 -mx-2"><ModuleStrip module="ims" /></div>
+        <div className="mb-3 -mx-2"><ModuleStrip module="ims" /></div>
+
+        {/* Stock Tally — bought (GRN) vs sold (Busy), to check the warehouse count */}
+        <Link href="/ims/tally" className="mb-6 flex items-center gap-3 rounded-xl bg-white dark:bg-navy-900 border border-[#E5E7EB] dark:border-navy-800 px-4 min-h-[56px] hover:border-[#2563EB] transition-colors">
+          <span className="flex-1">
+            <span className="block text-[15px] font-semibold text-[#1A1D21] dark:text-white">Stock Tally</span>
+            <span className="block text-[13px] text-[#5B6472] dark:text-gray-400">Bought (GRN) minus sold (Busy), item by item — check it against the warehouse count</span>
+          </span>
+          <span className="text-[14px] font-semibold text-[#2563EB]">Open</span>
+        </Link>
 
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
           {renderTile(

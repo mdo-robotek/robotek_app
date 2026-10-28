@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
+import { canSeeActionBoard } from "@/lib/action-board";
 import SarthiMark from "./SarthiMark";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -146,6 +147,11 @@ export default function Sidebar({ mobileOpen, setMobileOpen }: SidebarProps) {
   const { permissions: userPermissions, isAdmin } = usePermissions();
 
   const filteredNavigation = navigation.filter(item => {
+    // Action Board: Admin, EA and the Process Coordinator (Sahil, 2026-10-28)
+    if (item.id === 'action-board' || item.id === 'team-board') {
+      const u = session?.user as any;
+      return isAdmin || canSeeActionBoard({ username: u?.username, role: u?.role, designation: u?.designation });
+    }
     // Dashboard is the system home, visible to all authenticated users, Chat is available to all, Scheduler set to visible
     if (item.id === 'dashboard' || item.id === 'chat' || item.id === 'scheduler' || item.id === 'grn' || item.id === 'payment-vendor-approval' || item.id === 'field-driver' || item.id === 'stationary' || item.id === 'attendance' || item.id === 'leave' || item.id === 'scot' || item.id === 'scot-kb' || item.id === 'customer-target') return true;
 

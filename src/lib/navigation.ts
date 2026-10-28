@@ -17,6 +17,8 @@ import {
   BriefcaseIcon,
   IdentificationIcon,
   MegaphoneIcon,
+  BoltIcon,
+  UserGroupIcon as TeamBoardIcon,
   UserPlusIcon,
   UserMinusIcon,
   CurrencyRupeeIcon,
@@ -47,6 +49,8 @@ export const navigation = [
   { name: 'Home', id: 'dashboard', href: '/', icon: HomeIcon, section: 'Dashboard' },
   { name: 'Metrix', id: 'metrix', href: '/metrix', icon: PresentationChartBarIcon, section: 'Dashboard' },
   { name: 'Score', id: 'score', href: '/score', icon: TrophyIcon, section: 'Dashboard' },
+  { name: 'Action Board', id: 'action-board', href: '/action-board', icon: BoltIcon, section: 'Dashboard' },
+  { name: 'Performance Board', id: 'team-board', href: '/team-board', icon: TeamBoardIcon, section: 'Dashboard' },
   { name: 'EA-MD Hub', id: 'ea-md-hub', href: '/ea-md-hub', icon: RectangleGroupIcon, section: 'Dashboard' },
 
   // Task Section

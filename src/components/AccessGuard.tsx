@@ -30,8 +30,9 @@ export default function AccessGuard({ children }: { children: React.ReactNode })
       return;
     }
 
-    // Skip check for universally accessible core features
-    if (pathname === "/login" || pathname === "/" || pathname.startsWith("/chat") || pathname.startsWith("/grn") || pathname.startsWith("/scheduler") || pathname.startsWith("/field-driver") || pathname.startsWith("/inventory/stationary") || pathname.startsWith("/attendance") || pathname.startsWith("/leave") || pathname.startsWith("/customer-target")) {
+    // Skip check for universally accessible core features.
+    // Action Board / Performance Board check access on the server (Admin, EA, Process Coordinator).
+    if (pathname === "/login" || pathname === "/" || pathname.startsWith("/chat") || pathname.startsWith("/grn") || pathname.startsWith("/scheduler") || pathname.startsWith("/field-driver") || pathname.startsWith("/inventory/stationary") || pathname.startsWith("/attendance") || pathname.startsWith("/leave") || pathname.startsWith("/customer-target") || pathname.startsWith("/action-board") || pathname.startsWith("/team-board")) {
       setIsAuthorized(true);
       return;
     }

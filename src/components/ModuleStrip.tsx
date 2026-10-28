@@ -15,6 +15,8 @@ export const LISTABLE: Partial<Record<ModuleKey, string[]>> = {
   grn: ["open", "late", "payment", "done"],
   tasks: ["overdue", "pending", "revision", "done"],
 };
+const STD = ["open", "late", "today", "done"];
+for (const k of ["i2r-packing", "item-receive-packing", "replace", "recruitment", "candidate", "sales", "onboard", "offboard", "new-launch", "checklists"] as ModuleKey[]) LISTABLE[k] = STD;
 
 // The detailed report (charts) loads only when someone opens Performance.
 const CooReport = dynamic(() => import("./CooReport"), { ssr: false });

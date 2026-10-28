@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useMemo } from "react";
+import ModuleStrip from "@/components/ModuleStrip";
+import { useFindFromLink } from "@/hooks/useFindFromLink";
 import { useIsPhone } from "@/hooks/useIsPhone";
 import PhoneStepSelect from "@/components/PhoneStepSelect";
 import { useSession } from "next-auth/react";
@@ -262,6 +264,8 @@ export default function ItemReceivePackingPage() {
   const isPhone = useIsPhone();
   const [expandedTiles, setExpandedTiles] = useState<Record<string, boolean>>({});
   const [dateFilter, setDateFilter] = useState<string | null>(null);
+  // "Open" in the work-list window lands here with ?find=<number>
+  useFindFromLink((t) => { setSelectedStepFilter("all"); setViewMode("active"); setDateFilter(null); setSearchTerm(t); setCurrentPage(1); });
 
   // Bulk specific states
   const [bulkToggles, setBulkToggles] = useState<Record<string, boolean>>({});
@@ -684,6 +688,8 @@ export default function ItemReceivePackingPage() {
         </div>
       </div>
 
+      {/* Standard tiles — tap one to see those items (Sahil, 2026-10-28) */}
+      <div className="pt-2 -mx-2"><ModuleStrip module={"item-receive-packing"} /></div>
       <div className="flex gap-4 flex-1 overflow-hidden mt-1 px-1">
         {/* Sidebar */}
         <div className="w-60 hidden md:flex flex-col shrink-0 h-full overflow-y-auto custom-scrollbar border-r border-slate-100 dark:border-navy-800 pr-3 py-0.5">

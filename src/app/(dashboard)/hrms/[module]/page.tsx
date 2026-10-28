@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useState, useEffect, useMemo, useRef } from "react";
+import ModuleStrip from "@/components/ModuleStrip";
+import { useFindFromLink } from "@/hooks/useFindFromLink";
 import { useIsPhone } from "@/hooks/useIsPhone";
 import PhoneStepSelect from "@/components/PhoneStepSelect";
 import { useSession } from "next-auth/react";
@@ -220,6 +222,8 @@ export default function HRMSModulePage({ params }: { params: Promise<{ module: s
   const isPhone = useIsPhone();
   const [selectedStepFilter, setSelectedStepFilter] = useState<number | "all" | "completed">("all");
   const [currentPage, setCurrentPage] = useState(1);
+  // "Open" in the work-list window lands here with ?find=<number>
+  useFindFromLink((t) => { setSelectedStepFilter("all"); setViewMode("active"); setSearchTerm(t); setCurrentPage(1); });
   const itemsPerPage = 10;
   const [expandedTiles, setExpandedTiles] = useState<Record<string, boolean>>({});
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -813,6 +817,8 @@ export default function HRMSModulePage({ params }: { params: Promise<{ module: s
         </div>
       </div>
 
+      {/* Standard tiles — tap one to see those items (Sahil, 2026-10-28) */}
+      {["recruitment", "candidate", "sales", "onboard", "offboard"].includes(module) && <div className="pt-2 -mx-2"><ModuleStrip module={module as any} /></div>}
       <div className="flex gap-4 flex-1 overflow-hidden mt-1 px-1">
         {/* Sidebar */}
         <div className="w-64 hidden md:flex flex-col shrink-0 h-full overflow-y-auto custom-scrollbar border-r border-slate-100 dark:border-navy-800 pr-3 py-0.5">

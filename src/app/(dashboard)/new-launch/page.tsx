@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
+import ModuleStrip from "@/components/ModuleStrip";
+import { useFindFromLink } from "@/hooks/useFindFromLink";
 import useSWR from "swr";
 import { useSession } from "next-auth/react";
 import {
@@ -123,6 +125,8 @@ export default function NewLaunchFmsPage() {
 
   const [filter, setFilter] = useState<Filter>({ kind: "all" });
   const [search, setSearch] = useState("");
+  // "Open" in the work-list window lands here with ?find=<launch no.>
+  useFindFromLink((t) => { setFilter({ kind: "all" }); setSearch(t); });
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const [openPhases, setOpenPhases] = useState<Record<string, boolean>>({});
   const [createOpen, setCreateOpen] = useState(false);
@@ -259,27 +263,8 @@ export default function NewLaunchFmsPage() {
         </div>
       </div>
 
-      {/* KPI tiles */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-        {[
-          { label: "Active launches", value: counts.all, f: { kind: "all" } as Filter, cls: "text-slate-800 dark:text-white" },
-          { label: "My tasks", value: counts.mine, f: { kind: "mine" } as Filter, cls: "text-[#2563EB]" },
-          { label: "Overdue", value: counts.overdue, f: { kind: "overdue" } as Filter, cls: counts.overdue ? "text-red-600" : "text-slate-800 dark:text-white" },
-          { label: "Waiting approval", value: counts.approval, f: { kind: "approval" } as Filter, cls: "text-amber-600" },
-          { label: "Launched", value: counts.launched, f: null, cls: "text-emerald-600" },
-          { label: "Completed", value: counts.completed, f: { kind: "completed" } as Filter, cls: "text-emerald-600" },
-        ].map((k) => (
-          <button
-            key={k.label}
-            disabled={!k.f}
-            onClick={() => k.f && setFilter(k.f)}
-            className={`${card} p-3 text-left ${k.f ? "hover:border-[#2563EB]/40 cursor-pointer" : "cursor-default"} ${k.f && sameFilter(k.f) ? "ring-2 ring-[#2563EB]/30" : ""}`}
-          >
-            <p className="text-[13px] text-slate-500 dark:text-slate-400">{k.label}</p>
-            <p className={`text-2xl font-semibold mt-0.5 ${k.cls}`}>{k.value}</p>
-          </button>
-        ))}
-      </div>
+      {/* Standard tiles (same on every process) — tap one to see those launches */}
+      <div className="-mx-2"><ModuleStrip module="new-launch" /></div>
 
       {error && (
         <div className="p-3 rounded-lg bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 text-[14px]">

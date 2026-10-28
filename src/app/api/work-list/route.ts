@@ -11,6 +11,9 @@ import {
   type WorkList,
 } from "@/lib/work-list";
 
+import { isStdKey, STD_MODULES, STD_FILTERS, stdFilter, scopeTo } from "@/lib/fms-standard";
+import { loadStd } from "@/lib/fms-standard-load";
+
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
@@ -35,6 +38,19 @@ export async function GET(request: Request) {
   const q = new URL(request.url).searchParams;
   const module = q.get("module") || "";
   const filter = q.get("filter") || "";
+  if (isStdKey(module)) {
+    if (!STD_FILTERS[filter]) return NextResponse.json({ error: "Unknown list" }, { status: 400 });
+    try {
+      const username = (session?.user as { username?: string } | undefined)?.username || "";
+      const items = scopeTo(await loadStd(module), isAdmin ? null : username);
+      const sm = STD_MODULES[module];
+      const body: WorkList = { module, filter, title: `${sm.title} · ${isAdmin ? "" : "My "}${STD_FILTERS[filter]}`, href: sm.href, rows: stdFilter(items, filter) };
+      return NextResponse.json(body);
+    } catch (error: any) {
+      console.error("work-list API error:", module, filter, error);
+      return NextResponse.json({ error: "Couldn't load the list" }, { status: 500 });
+    }
+  }
   const m = MODULES[module];
   if (!m || !m.filters[filter]) return NextResponse.json({ error: "Unknown list" }, { status: 400 });
   if (m.adminOnly && !isAdmin) return NextResponse.json({ error: "Only for admins" }, { status: 403 });

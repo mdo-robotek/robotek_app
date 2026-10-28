@@ -223,7 +223,7 @@ export default function WorkListPanel({
                       <p className="flex-1 text-[13px] text-[#5B6472] dark:text-gray-400">
                         {r.doer && <>With <span className="font-semibold text-[#1A1D21] dark:text-white">{r.doer}</span></>}
                         {r.doer && r.planned != null && " · "}
-                        {r.planned != null && <>{module === "tasks" ? "Due" : doneList ? "Started" : "Planned"} {plannedText(r.planned)}</>}
+                        {r.planned != null && <>{module === "tasks" || module === "checklists" ? "Due" : doneList ? "Started" : "Planned"} {plannedText(r.planned)}</>}
                       </p>
                       {r.link && (
                         <Link
@@ -257,9 +257,9 @@ export default function WorkListPanel({
                 <tr className="text-left text-[13px] font-semibold text-[#5B6472]">
                   <th className="px-4 py-2.5">No.</th>
                   <th className="px-3 py-2.5">{module === "o2d" ? "Party" : module === "tasks" ? "Task" : "Item"}</th>
-                  <th className="px-3 py-2.5">{module === "tasks" ? "Given by" : doneList ? "Finished" : "Waiting at"}</th>
+                  <th className="px-3 py-2.5">{module === "tasks" ? "Given by" : module === "checklists" ? "How often" : doneList ? "Finished" : "Waiting at"}</th>
                   <th className="px-3 py-2.5">{module === "tasks" ? "Doing" : "With"}</th>
-                  <th className="px-3 py-2.5">{module === "tasks" ? "Due" : doneList ? "Started" : "Planned"}</th>
+                  <th className="px-3 py-2.5">{module === "tasks" || module === "checklists" ? "Due" : doneList ? "Started" : "Planned"}</th>
                   <th className="px-3 py-2.5 text-right">Status</th>
                   <th className="px-4 py-2.5"><span className="sr-only">Open</span></th>
                 </tr>

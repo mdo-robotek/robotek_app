@@ -33,7 +33,12 @@ export interface ModuleSummary {
   stuckAt?: { step: number; name: string; count: number } | null;
 }
 
-export type ModuleKey = "o2d" | "i2r" | "grn" | "ims" | "tasks" | "people";
+export type ModuleKey =
+  | "o2d" | "i2r" | "grn" | "ims" | "tasks" | "people"
+  // Standard processes (src/lib/fms-standard.ts)
+  | "i2r-packing" | "item-receive-packing" | "replace"
+  | "recruitment" | "candidate" | "sales" | "onboard" | "offboard"
+  | "new-launch" | "checklists";
 
 const toneCount = (n: number, bad = false): Tone => (n > 0 ? (bad ? "bad" : "warn") : "good");
 

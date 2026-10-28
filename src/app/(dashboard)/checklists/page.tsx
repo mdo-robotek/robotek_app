@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import ModuleStrip from "@/components/ModuleStrip";
+import { useFindFromLink } from "@/hooks/useFindFromLink";
 import { useIsPhone } from "@/hooks/useIsPhone";
 import { useSession } from "next-auth/react";
 import { Checklist, ChecklistOccurrence } from "@/types/checklist";
@@ -88,6 +90,8 @@ export default function ChecklistsPage() {
   // Filters
   const [activeStatusFilters, setActiveStatusFilters] = useState<string[]>([]);
   const [dateFilters, setDateFilters] = useState<string[]>([]);
+  // "Open" in the work-list window lands here with ?find=<task text>
+  useFindFromLink((t) => { setActiveTab("tasks"); setDateFilters([]); setSearchTerm(t); setCurrentPage(1); });
   const [assignmentFilter, setAssignmentFilter] = useState<'All' | 'ToMe' | 'ByMe'>('All');
 
   const [formData, setFormData] = useState<Partial<Checklist>>({
@@ -911,6 +915,8 @@ export default function ChecklistsPage() {
 
   return (
     <div className="space-y-6">
+      {/* Standard tiles (same on every process) — tap one to see those tasks */}
+      <div className="-mx-2"><ModuleStrip module="checklists" /></div>
       {/* Sticky Top Header & Filters */}
       <div className="sticky top-0 z-10 bg-[var(--panel-bg)] -mx-2 -mt-2 p-2 pt-0.5 md:-mx-4 md:-mt-4 md:p-4 md:pt-1 border-b border-gray-100 dark:border-white/5 shadow-sm space-y-4">
         {/* Responsive Title Row */}

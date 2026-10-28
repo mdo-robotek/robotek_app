@@ -9,6 +9,9 @@ import {
   type ModuleKey, type ModuleSummary,
 } from "@/lib/module-summary";
 
+import { isStdKey, stdSummary, scopeTo } from "@/lib/fms-standard";
+import { loadStd } from "@/lib/fms-standard-load";
+
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
@@ -25,6 +28,7 @@ async function build(key: ModuleKey, coo: any | null): Promise<ModuleSummary> {
     case "people": return peopleSummary(coo);
     case "i2r": return i2rSummary(await getI2RItems());
     case "grn": return grnSummary(await getGRNItems());
+    default: throw new Error(`No summary for ${key}`);
   }
 }
 
@@ -42,6 +46,13 @@ export async function GET(request: Request) {
   const one = new URL(request.url).searchParams.get("module") as ModuleKey | null;
 
   try {
+    if (one && isStdKey(one)) {
+      // Standard process strip (Sahil, 2026-10-28): admin/EA see everyone's
+      // work, everyone else sees only the work that is theirs.
+      const username = (session?.user as { username?: string } | undefined)?.username || "";
+      const items = scopeTo(await loadStd(one), isAdmin ? null : username);
+      return NextResponse.json({ module: stdSummary(one, items, !isAdmin), detail: null });
+    }
     if (one) {
       if (!ORDER.includes(one)) return NextResponse.json({ error: "Unknown module" }, { status: 400 });
       // Company-wide people/task figures, and I2R (whose page shows non-admins

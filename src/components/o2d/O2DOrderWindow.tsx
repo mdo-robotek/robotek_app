@@ -35,7 +35,6 @@ type Props = {
   onRestore: () => void;
   onDelete: () => void;
   fileUrl: (path: string) => string;
-  onRefresh: () => void; // reload the order after the system changes it
 };
 
 const btnBase = "h-11 px-3.5 items-center justify-center gap-1.5 rounded-xl border border-[#E5E7EB] dark:border-navy-700 bg-white dark:bg-navy-800 text-[14px] font-semibold text-[#1A1D21] dark:text-white whitespace-nowrap hover:bg-[#F7F8FA] dark:hover:bg-navy-700";
@@ -183,7 +182,7 @@ export default function O2DOrderWindow(p: Props) {
           )}
 
           {/* Automatic SO check (Step 2) */}
-          {!s.cancel && <O2DSoCheck orderNo={p.orderNo} row={f} step={s.step} onRefresh={p.onRefresh} />}
+          {!s.cancel && <O2DSoCheck orderNo={p.orderNo} row={f} step={s.step} />}
 
           {/* Next step */}
           {active && (

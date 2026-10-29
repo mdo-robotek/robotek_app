@@ -2181,14 +2181,6 @@ export default function O2DPage() {
       });
 
       if (!res.ok) throw new Error("Step update failed");
-      // Step 1 done with an SO file → the system checks the SO and, if it
-      // matches, completes Step 2 on its own (Sahil, 2026-10-29)
-      if (currentStepToUpdate === 1 && stepUpdateFields.status === "Yes") {
-        const soNo = selectedOrderNo;
-        fetch("/api/o2d/so-check", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ orderNo: soNo, force: true }) })
-          .then(() => { globalMutate(sidebarQueryKey); globalMutate(tableQueryKey); globalMutate("/api/o2d/summary"); })
-          .catch(() => {});
-      }
       setActionStatus("success");
       setActionMessage("Step Updated Successfully");
       if (mergedOrder) {
@@ -2474,7 +2466,6 @@ export default function O2DPage() {
           onRestore={() => handleToggleStatus(selectedOrderNo, "cancelled", selectedOrder[0]?.cancelled, "")}
           onDelete={() => handleDeleteClick(selectedOrderNo)}
           fileUrl={getPreviewUrl}
-          onRefresh={() => { globalMutate(sidebarQueryKey); globalMutate(tableQueryKey); globalMutate("/api/o2d/summary"); }}
         />
       )}
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useSWRConfig } from "swr";
 import { CheckCircleIcon, ExclamationTriangleIcon, ArrowPathIcon, QuestionMarkCircleIcon } from "@heroicons/react/24/outline";
 import { diffText, parseCheck, type SoCheck } from "@/lib/so-check";
 
@@ -9,11 +10,14 @@ import { diffText, parseCheck, type SoCheck } from "@/lib/so-check";
  * The system reads the uploaded SO PDF and compares it with the order.
  * Match → Step 2 is done by the system. Difference → CRM sees what differs.
  */
-type Props = { orderNo: string; row: any; step: number; onRefresh: () => void };
+type Props = { orderNo: string; row: any; step: number };
 
 const btn = "h-11 px-3.5 inline-flex items-center justify-center gap-1.5 rounded-xl border border-[#E5E7EB] bg-white text-[14px] font-semibold text-[#1A1D21] whitespace-nowrap hover:bg-[#F7F8FA] disabled:opacity-50";
 
-export default function O2DSoCheck({ orderNo, row, step, onRefresh }: Props) {
+export default function O2DSoCheck({ orderNo, row, step }: Props) {
+  const { mutate } = useSWRConfig();
+  // reload the O2D list and counts after the system changes the order
+  const onRefresh = () => mutate((k) => typeof k === "string" && k.startsWith("/api/o2d"));
   const saved = parseCheck(row?.so_check);
   const [check, setCheck] = useState<SoCheck | null>(saved);
   const [busy, setBusy] = useState(false);

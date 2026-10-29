@@ -62,6 +62,8 @@ export interface O2D {
 
   hold?: string;
   cancelled?: string;
+  /** Working hours this order spent on hold so far (added up on every release). */
+  hold_hours?: string;
 }
 
 export interface O2DItem {

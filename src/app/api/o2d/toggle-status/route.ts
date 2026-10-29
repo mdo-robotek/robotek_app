@@ -3,6 +3,7 @@ import { auth } from "@/auth";
 import { updateOrderToggleStatus, o2dService, getPendingStepIdx } from "@/lib/o2d-sheets";
 import { sendO2DRemarkNotification } from "@/lib/o2d-notifications";
 import { parseHold } from "@/lib/o2d-hold";
+import { getWorkingHoursGapMs } from "@/lib/workingHours";
 
 export async function POST(req: NextRequest) {
   try {
@@ -22,6 +23,13 @@ export async function POST(req: NextRequest) {
         const step = rows.length ? getPendingStepIdx(rows) : -1;
         const plannedRaw = step > 0 ? String((rows[0] as any)[`planned_${step}`] || "") : "";
         const planned = new Date(plannedRaw);
+        if (h?.since) {
+          // Keep a running total of working hours on hold, so on-time
+          // dispatch % leaves this time out.
+          const prev = parseFloat(String((rows[0] as any)?.hold_hours || "")) || 0;
+          const add = getWorkingHoursGapMs(h.since, new Date()) / 3600000;
+          await o2dService.updateOrderColumn(orderNo, "hold_hours", (Math.round((prev + add) * 100) / 100).toString());
+        }
         if (h?.since && step > 0 && plannedRaw && !isNaN(planned.getTime())) {
           const held = Date.now() - h.since.getTime();
           if (held > 0) {

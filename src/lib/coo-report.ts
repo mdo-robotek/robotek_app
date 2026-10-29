@@ -15,6 +15,7 @@ import { rollupCategory } from "@/lib/category-rollup";
 import { getBusySales } from "@/lib/busy-sale-sheets";
 import { getItemLedgerEntries } from "@/lib/item-ledger-sheets";
 import { getWorkingHoursGapMs } from "@/lib/workingHours";
+import { heldWorkingMs } from "@/lib/o2d-hold";
 
 
 export function normalizeDate(dateVal: string | undefined | null): string {
@@ -116,13 +117,16 @@ export async function buildCooReport(searchParams: URLSearchParams): Promise<any
       let targetDateForOTD = createdAt;
       
       if (targetDateForOTD) {
+        // Time on hold (e.g. waiting for payment) is not the team's delay —
+        // leave it out of on-time dispatch (Sahil, 2026-10-29).
+        const heldMs = heldWorkingMs(firstItem as any, getWorkingHoursGapMs, actual7 || new Date());
         if (actual7) {
-          const gapMs = getWorkingHoursGapMs(targetDateForOTD, actual7);
+          const gapMs = Math.max(0, getWorkingHoursGapMs(targetDateForOTD, actual7) - heldMs);
           isOTD = gapMs <= 9 * 60 * 60 * 1000;
           isDelayed = gapMs > 9 * 60 * 60 * 1000;
         } else {
-          const gapMs = getWorkingHoursGapMs(targetDateForOTD, new Date());
-          isDelayed = gapMs > 9 * 60 * 60 * 1000;
+          const gapMs = Math.max(0, getWorkingHoursGapMs(targetDateForOTD, new Date()) - heldMs);
+          isDelayed = !firstItem.hold && gapMs > 9 * 60 * 60 * 1000;
         }
       }
 
@@ -331,7 +335,7 @@ export async function buildCooReport(searchParams: URLSearchParams): Promise<any
       if (o.isDispatched && o.actual7 && o.targetDateForOTD) {
         const dispatchDateStr = normalizeDate(o.actual7.toISOString());
         if (last10DaysStats[dispatchDateStr]) {
-          const gapMs = getWorkingHoursGapMs(o.targetDateForOTD, o.actual7);
+          const gapMs = Math.max(0, getWorkingHoursGapMs(o.targetDateForOTD, o.actual7) - heldWorkingMs(o.firstItem, getWorkingHoursGapMs, o.actual7));
           const gapHours = Math.round(gapMs / (1000 * 60 * 60));
           last10DaysStats[dispatchDateStr].totalGapMs += gapMs;
           last10DaysStats[dispatchDateStr].count += 1;

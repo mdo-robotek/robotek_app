@@ -5,6 +5,7 @@ import { getOrderFollowupRemarks, latestRemarkByOrder } from "@/lib/o2d-remarks-
 import { imsService } from "@/lib/ims-sheets";
 import { auth } from "@/auth";
 import { getWorkingHoursGapMs } from "@/lib/workingHours";
+import { heldWorkingMs } from "@/lib/o2d-hold";
 import { rollupCategory } from "@/lib/category-rollup";
 
 export const dynamic = 'force-dynamic';
@@ -104,13 +105,16 @@ export async function GET(req: NextRequest) {
       let targetDateForOTD = createdAt;
       
       if (targetDateForOTD) {
+        // Time on hold (e.g. waiting for payment) is not the team's delay —
+        // leave it out of on-time dispatch (Sahil, 2026-10-29).
+        const heldMs = heldWorkingMs(firstItem as any, getWorkingHoursGapMs, actual7 || new Date());
         if (actual7) {
-          const gapMs = getWorkingHoursGapMs(targetDateForOTD, actual7);
+          const gapMs = Math.max(0, getWorkingHoursGapMs(targetDateForOTD, actual7) - heldMs);
           isOTD = gapMs <= 9 * 60 * 60 * 1000;
           isDelayed = gapMs > 9 * 60 * 60 * 1000;
         } else {
-          const gapMs = getWorkingHoursGapMs(targetDateForOTD, new Date());
-          isDelayed = gapMs > 9 * 60 * 60 * 1000;
+          const gapMs = Math.max(0, getWorkingHoursGapMs(targetDateForOTD, new Date()) - heldMs);
+          isDelayed = !firstItem.hold && gapMs > 9 * 60 * 60 * 1000;
         }
       }
 

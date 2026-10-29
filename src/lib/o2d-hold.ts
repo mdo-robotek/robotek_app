@@ -40,3 +40,17 @@ export function holdCheckState(h: HoldInfo | null, now = Date.now()): "none" | "
   const t = istToday(now);
   return h.checkOn < t ? "overdue" : h.checkOn === t ? "due" : "later";
 }
+
+/**
+ * Working time (9:30–6:30) an order has spent on hold: the hours saved on
+ * earlier releases plus the current hold, if it is on hold now. The on-time
+ * dispatch % and step times leave this time out (Sahil, 2026-10-29).
+ */
+export function heldWorkingMs(row: { hold?: unknown; hold_hours?: unknown } | undefined, gap: (a: Date, b: Date) => number, now = new Date()): number {
+  if (!row) return 0;
+  const saved = parseFloat(String(row.hold_hours ?? "").trim());
+  let ms = isFinite(saved) && saved > 0 ? saved * 3600000 : 0;
+  const h = parseHold(row.hold);
+  if (h?.since && h.since < now) ms += gap(h.since, now);
+  return ms;
+}

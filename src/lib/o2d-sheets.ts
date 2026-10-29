@@ -26,7 +26,7 @@ class O2DService extends BaseSheetsService<O2D> {
 
   protected spreadsheetId = GOOGLE_SHEET_ID;
   protected sheetName: string;
-  protected range = "A:BI";
+  protected range = "A:BZ"; // BJ = Hold_Hours (2026-10-29)
   protected idColumnIndex = 0;
 
   constructor(sheetName: string = SHEET_NAME) {
@@ -67,6 +67,7 @@ class O2DService extends BaseSheetsService<O2D> {
       updated_at: get("updated_at"),
       hold: get("hold"),
       cancelled: get("cancelled"),
+      hold_hours: get("hold_hours"),
     };
 
     for (let i = 1; i <= 11; i++) {
@@ -129,6 +130,7 @@ class O2DService extends BaseSheetsService<O2D> {
     set("updated_at", o2d.updated_at);
     set("hold", o2d.hold || "");
     set("cancelled", o2d.cancelled || "");
+    set("hold_hours", o2d.hold_hours || "");
     for (let i = 1; i <= 11; i++) {
       set(`planned_${i}`, (o2d as any)[`planned_${i}`]);
       set(`actual_${i}`, (o2d as any)[`actual_${i}`]);
@@ -351,6 +353,7 @@ class O2DService extends BaseSheetsService<O2D> {
 
   /** Write one value into a column (e.g. "planned_5") on every row of an order. */
   async updateOrderColumn(orderNo: string, column: string, value: string): Promise<boolean> {
+    if (column === "hold_hours") await this.ensureColumns(["Hold_Hours"]);
     return this.updateOrderToggleStatus(orderNo, column as any, value);
   }
 

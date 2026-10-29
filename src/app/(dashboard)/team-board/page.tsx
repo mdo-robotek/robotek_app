@@ -4,7 +4,7 @@ import { useState } from "react";
 import useSWR from "swr";
 import { ArrowsPointingOutIcon, ArrowTrendingDownIcon, ArrowTrendingUpIcon } from "@heroicons/react/24/outline";
 import type { CompanyScore, ModulePull, PersonScore, BoardPeriod } from "@/lib/action-board";
-import { MIN_TO_RANK, neg, scoreBand, BAND_TEXT, BAND_BG, BAND_RING, SCORE_LEGEND } from "@/lib/action-board";
+import { MIN_TO_RANK, neg, scoreBand, worstBand, BAND_TEXT, BAND_BG, BAND_RING, SCORE_LEGEND } from "@/lib/action-board";
 
 const fetcher = (url: string) =>
   fetch(url).then((r) => {
@@ -18,7 +18,7 @@ type Board = {
   previous: CompanyScore;
   people: PersonScore[];
   pull: ModulePull[];
-  trend: { label: string; notOnTimePct: number; due: number }[];
+  trend: { label: string; notDonePct: number; notOnTimePct: number; totalPct: number; due: number }[];
   failedSources: string[];
 };
 
@@ -36,9 +36,35 @@ const pretty = (n: string) => n.toLowerCase().split(/\s+/).map((w) => (w ? w[0].
 
 function Photo({ p, size }: { p: PersonScore; size: "lg" | "md" }) {
   const cls = size === "lg" ? "w-24 h-24 text-[28px]" : "w-14 h-14 text-[18px]";
-  const r = p.ranked ? ring(p.notOnTimePct) : "ring-[#E5E7EB]";
+  const r = p.ranked ? BAND_RING[worstBand(p.notDonePct, p.notOnTimePct)] : "ring-[#E5E7EB]";
   if (p.image) return <img src={p.image} alt="" className={`${cls} rounded-full object-cover ring-4 ${r}`} />;
   return <span className={`${cls} rounded-full bg-[#EFF4FF] text-[#2563EB] font-semibold flex items-center justify-center ring-4 ${r}`}>{initials(p.username)}</span>;
+}
+
+/** The two MIS scores side by side: work not done, and work done but late. */
+function TwoScores({ p, big }: { p: { notDonePct: number; notOnTimePct: number }; big?: boolean }) {
+  const n = "text-[18px]";
+  if (big) {
+    // Top-3 cards are narrow: one score per line, label left, number right
+    return (
+      <div className="mt-2 w-full max-w-[220px] mx-auto space-y-1 text-left">
+        <div className="flex items-baseline justify-between gap-2"><span className="text-[13px] text-[#5B6472]">Not done</span><span className={`text-[20px] leading-none font-semibold tabular-nums ${tone(p.notDonePct)}`}>{neg(p.notDonePct)}</span></div>
+        <div className="flex items-baseline justify-between gap-2"><span className="text-[13px] text-[#5B6472]">Done late</span><span className={`text-[20px] leading-none font-semibold tabular-nums ${tone(p.notOnTimePct)}`}>{neg(p.notOnTimePct)}</span></div>
+      </div>
+    );
+  }
+  return (
+    <div className="mt-2 grid grid-cols-2 gap-x-3 w-full whitespace-nowrap">
+      <div>
+        <p className={`${n} leading-none font-semibold tabular-nums ${tone(p.notDonePct)}`}>{neg(p.notDonePct)}</p>
+        <p className="mt-1 text-[12px] text-[#5B6472]">Not done</p>
+      </div>
+      <div>
+        <p className={`${n} leading-none font-semibold tabular-nums ${tone(p.notOnTimePct)}`}>{neg(p.notOnTimePct)}</p>
+        <p className="mt-1 text-[12px] text-[#5B6472]">Done late</p>
+      </div>
+    </div>
+  );
 }
 
 function Hero({ p, rank, kind }: { p: PersonScore; rank: number; kind: "best" | "low" }) {
@@ -50,8 +76,8 @@ function Hero({ p, rank, kind }: { p: PersonScore; rank: number; kind: "best" | 
       </div>
       <p className="mt-3 text-[17px] font-semibold text-[#1A1D21] dark:text-white">{pretty(p.username)}</p>
       <p className="text-[13px] text-[#5B6472] min-h-[20px]">{p.designation || p.department}</p>
-      <p className={`mt-2 text-[30px] leading-none font-semibold tabular-nums ${tone(p.notOnTimePct)}`}>{neg(p.notOnTimePct)}</p>
-      <p className="text-[13px] text-[#5B6472]">not done on time · not done {neg(p.notDonePct)} · {p.due} planned</p>
+      <TwoScores p={p} big />
+      <p className="mt-1 text-[13px] text-[#5B6472]">{p.due} planned</p>
     </div>
   );
 }
@@ -73,7 +99,7 @@ export default function TeamBoardPage() {
   const best = ranked.slice(0, 3);
   const low = ranked.length > 3 ? [...ranked].reverse().slice(0, 3).filter((p) => !best.includes(p)) : [];
   const c = data?.company;
-  const diff = c && data ? Math.round((c.notOnTimePct - data.previous.notOnTimePct) * 10) / 10 : 0;
+  const diff = c && data ? Math.round((c.totalPct - data.previous.totalPct) * 10) / 10 : 0;
   const card = "rounded-2xl bg-white dark:bg-navy-900 border border-[#E5E7EB] dark:border-navy-800";
 
   return (
@@ -81,7 +107,7 @@ export default function TeamBoardPage() {
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="text-[22px] font-semibold text-[#1A1D21] dark:text-white">Performance Board</h1>
-          <p className="text-[14px] text-[#5B6472] dark:text-gray-400">Work planned in the period — work not done and work not done on time, shown as minus. {SCORE_LEGEND}.</p>
+          <p className="text-[14px] text-[#5B6472] dark:text-gray-400">Two scores, like our MIS: work not done, and work done but late. Ranking uses both together. {SCORE_LEGEND}.</p>
         </div>
         <button type="button" onClick={() => document.documentElement.requestFullscreen?.().catch(() => {})} className="h-11 px-3 inline-flex items-center gap-1.5 rounded-xl border border-[#E5E7EB] dark:border-navy-700 bg-white dark:bg-navy-900 text-[14px] font-semibold text-[#1A1D21] dark:text-white">
           <ArrowsPointingOutIcon className="w-5 h-5" /> Full screen
@@ -104,28 +130,29 @@ export default function TeamBoardPage() {
           {/* Company score */}
           <div className={`${card} p-5 grid grid-cols-1 md:grid-cols-3 gap-5`}>
             <div>
-              <p className="text-[14px] font-semibold text-[#5B6472]">Company · work not done on time · {data.period}</p>
-              <p className={`mt-1 text-[48px] leading-none font-semibold tabular-nums ${tone(c.notOnTimePct)}`}>{neg(c.notOnTimePct)}</p>
-              <p className="mt-2 text-[14px] text-[#5B6472] flex items-center gap-1">
-                {diff === 0 ? "Same as before" : diff < 0 ? <><ArrowTrendingDownIcon className="w-4 h-4 text-[#15803D]" /> {Math.abs(diff)} points better than before</> : <><ArrowTrendingUpIcon className="w-4 h-4 text-[#DC2626]" /> {diff} points worse than before</>}
-              </p>
+              <p className="text-[14px] font-semibold text-[#5B6472]">Company · work not done · {data.period}</p>
+              <p className={`mt-1 text-[44px] leading-none font-semibold tabular-nums ${tone(c.notDonePct)}`}>{neg(c.notDonePct)}</p>
+              <p className="mt-2 text-[14px] text-[#5B6472]">{c.notDone} not done, of {c.due} planned</p>
             </div>
             <div>
-              <p className="text-[14px] font-semibold text-[#5B6472]">Company · work not done</p>
-              <p className={`mt-1 text-[36px] leading-none font-semibold tabular-nums ${tone(c.notDonePct)}`}>{neg(c.notDonePct)}</p>
-              <p className="mt-2 text-[14px] text-[#5B6472]">{c.notDone} not done · {c.doneLate} done late · of {c.due} planned</p>
+              <p className="text-[14px] font-semibold text-[#5B6472]">Company · work not done on time</p>
+              <p className={`mt-1 text-[44px] leading-none font-semibold tabular-nums ${tone(c.notOnTimePct)}`}>{neg(c.notOnTimePct)}</p>
+              <p className="mt-2 text-[14px] text-[#5B6472]">{c.doneLate} done but late, of {c.due} planned</p>
             </div>
             <div>
-              <p className="text-[14px] font-semibold text-[#5B6472]">Last 6 weeks · work not done on time</p>
+              <p className="text-[14px] font-semibold text-[#5B6472]">Last 6 weeks · both together</p>
               <div className="mt-2 flex items-end gap-2 h-[64px]">
                 {data.trend.map((t, i) => (
                   <div key={i} className="flex-1 flex flex-col items-center justify-end gap-1">
-                    <span className={`text-[12px] font-semibold tabular-nums ${tone(t.notOnTimePct)}`}>{t.due ? neg(Math.round(t.notOnTimePct)) : "—"}</span>
-                    <div className={`w-full rounded-t ${BAND_BG[scoreBand(t.notOnTimePct)]}`} style={{ height: `${Math.max(4, Math.min(40, t.notOnTimePct * 0.6))}px` }} />
+                    <span className={`text-[12px] font-semibold tabular-nums ${BAND_TEXT[worstBand(t.notDonePct, t.notOnTimePct)]}`}>{t.due ? neg(Math.round(t.totalPct)) : "—"}</span>
+                    <div className={`w-full rounded-t ${BAND_BG[worstBand(t.notDonePct, t.notOnTimePct)]}`} style={{ height: `${Math.max(4, Math.min(40, t.totalPct * 0.6))}px` }} />
                   </div>
                 ))}
               </div>
               <div className="flex gap-2 mt-1">{data.trend.map((t, i) => <span key={i} className="flex-1 text-center text-[11px] text-[#5B6472]">{t.label}</span>)}</div>
+              <p className="mt-2 text-[14px] text-[#5B6472] flex items-center gap-1">
+                {diff === 0 ? "Same as before" : diff < 0 ? <><ArrowTrendingDownIcon className="w-4 h-4 text-[#15803D]" /> {Math.abs(diff)} points better than before</> : <><ArrowTrendingUpIcon className="w-4 h-4 text-[#DC2626]" /> {diff} points worse than before</>}
+              </p>
             </div>
           </div>
 
@@ -171,8 +198,8 @@ export default function TeamBoardPage() {
                   <Photo p={p} size="md" />
                   <p className="mt-2 text-[15px] font-semibold text-[#1A1D21] dark:text-white leading-tight">{pretty(p.username)}</p>
                   <p className="text-[12px] text-[#5B6472] min-h-[18px] truncate max-w-full">{p.designation || p.department}</p>
-                  <p className={`mt-1 text-[22px] leading-none font-semibold tabular-nums ${p.ranked ? tone(p.notOnTimePct) : "text-[#5B6472]"}`}>{neg(p.notOnTimePct)}</p>
-                  <p className="text-[12px] text-[#5B6472]">{p.ranked ? `not done on time · ${p.due} planned` : `only ${p.due} planned — not ranked`}</p>
+                  <TwoScores p={p} />
+                  <p className="mt-1 text-[12px] text-[#5B6472]">{p.ranked ? `${p.due} planned` : `only ${p.due} planned — not ranked`}</p>
                 </div>
               ))}
             </div>

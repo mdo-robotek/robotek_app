@@ -106,7 +106,7 @@ export default function ActionBoardPage() {
             <div className={`${card} p-4`}>
               <p className="text-[14px] font-semibold text-[#5B6472]">Work not done on time · this week</p>
               <p className={`mt-1 text-[34px] leading-none font-semibold tabular-nums ${tone(w.notOnTimePct)}`}>{neg(w.notOnTimePct)}</p>
-              <p className="mt-1.5 text-[13px] text-[#5B6472]">Last week {neg(data.score.lastWeek.notOnTimePct)} · this month {neg(data.score.month.notOnTimePct)}</p>
+              <p className="mt-1.5 text-[13px] text-[#5B6472]">{w.doneLate} done but late · last week {neg(data.score.lastWeek.notOnTimePct)}</p>
             </div>
             <div className={`${card} p-4`}>
               <p className="text-[14px] font-semibold text-[#5B6472]">Late right now</p>

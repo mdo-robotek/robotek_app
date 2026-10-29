@@ -49,8 +49,9 @@ export interface CompanyScore {
   due: number;          // work planned in the period up to now
   notDone: number;      // still not done, planned time passed
   doneLate: number;
-  notDonePct: number;   // target 0
-  notOnTimePct: number; // (not done + done late) / due, target 0
+  notDonePct: number;   // not done / due, target 0
+  notOnTimePct: number; // done but late / due, target 0 (not-done work is NOT counted again here)
+  totalPct: number;     // both together — used for ranking and the trend
 }
 
 const IST = 330 * 60000;
@@ -81,7 +82,8 @@ export function companyScore(work: RawWork[], from: number, to: number, now: num
     else if (w.actual && w.actual.getTime() > p) doneLate++;
   }
   const pct = (x: number) => (due ? Math.round((x / due) * 1000) / 10 : 0);
-  return { label, due, notDone, doneLate, notDonePct: pct(notDone), notOnTimePct: pct(notDone + doneLate) };
+  const a = pct(notDone), b = pct(doneLate);
+  return { label, due, notDone, doneLate, notDonePct: a, notOnTimePct: b, totalPct: Math.round((a + b) * 10) / 10 };
 }
 
 const q = (s: string) => encodeURIComponent(s);
@@ -229,6 +231,7 @@ export interface PersonScore {
   doneLate: number;
   notDonePct: number;
   notOnTimePct: number;
+  totalPct: number;
   ranked: boolean; // enough work in the period to be ranked fairly
 }
 
@@ -272,11 +275,12 @@ export function personScores(
         notDone: a.notDone,
         doneLate: a.doneLate,
         notDonePct: pct(a.notDone, a.due),
-        notOnTimePct: pct(a.notDone + a.doneLate, a.due),
+        notOnTimePct: pct(a.doneLate, a.due),
+        totalPct: Math.round((pct(a.notDone, a.due) + pct(a.doneLate, a.due)) * 10) / 10,
         ranked: a.due >= MIN_TO_RANK,
       };
     })
-    .sort((x, y) => Number(y.ranked) - Number(x.ranked) || x.notOnTimePct - y.notOnTimePct || y.due - x.due);
+    .sort((x, y) => Number(y.ranked) - Number(x.ranked) || x.totalPct - y.totalPct || x.notDonePct - y.notDonePct || y.due - x.due);
 }
 
 export function modulePull(work: RawWork[], from: number, to: number, now: number): ModulePull[] {
@@ -326,6 +330,10 @@ export function neg(pct: number): string {
 export type ScoreBand = "great" | "okay" | "bad";
 export function scoreBand(pct: number): ScoreBand {
   return pct <= 5 ? "great" : pct <= 10 ? "okay" : "bad";
+}
+/** The worse of several scores decides the colour of a person's photo ring. */
+export function worstBand(...pcts: number[]): ScoreBand {
+  return scoreBand(Math.max(0, ...pcts));
 }
 export const BAND_TEXT: Record<ScoreBand, string> = { great: "text-[#15803D]", okay: "text-[#B45309]", bad: "text-[#DC2626]" };
 export const BAND_BG: Record<ScoreBand, string> = { great: "bg-[#15803D]", okay: "bg-[#D97706]", bad: "bg-[#DC2626]" };

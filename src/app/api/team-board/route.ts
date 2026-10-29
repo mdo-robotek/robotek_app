@@ -30,13 +30,13 @@ export async function GET(request: Request) {
     const people = personScores(work, range.from, range.to, now, resolve, active.map((u) => ({
       username: String(u.username).trim(), designation: u.designation, department: u.department, image_url: u.image_url,
     })));
-    // Company trend: last 6 weeks, not-on-time %
+    // Company trend: last 6 weeks, both scores together
     const wk = istWeekStart(now);
     const trend = Array.from({ length: 6 }, (_, i) => {
       const from = wk - (5 - i) * 7 * 86400000;
       const s = companyScore(work, from, from + 7 * 86400000 - 1, now, "");
       const d = new Date(from + 330 * 60000);
-      return { label: d.toLocaleDateString("en-IN", { day: "numeric", month: "short", timeZone: "UTC" }), notOnTimePct: s.notOnTimePct, due: s.due };
+      return { label: d.toLocaleDateString("en-IN", { day: "numeric", month: "short", timeZone: "UTC" }), notDonePct: s.notDonePct, notOnTimePct: s.notOnTimePct, totalPct: s.totalPct, due: s.due };
     });
     return NextResponse.json({
       period: range.label,

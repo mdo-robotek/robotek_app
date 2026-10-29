@@ -5,6 +5,7 @@ import Sidebar from "@/components/Sidebar";
 import Header from "@/components/Header";
 import AccessGuard from "@/components/AccessGuard";
 import QuickNew from "@/components/QuickNew";
+import { FileViewerProvider } from "@/components/FileViewer";
 
 export default function DashboardLayout({
   children,
@@ -14,6 +15,7 @@ export default function DashboardLayout({
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
+    <FileViewerProvider>
     <div style={{ background: 'var(--background)' }} className="h-screen flex overflow-hidden">
       <Sidebar mobileOpen={isMobileMenuOpen} setMobileOpen={setIsMobileMenuOpen} />
 
@@ -37,5 +39,6 @@ export default function DashboardLayout({
       {/* Phones: round "+ New" button bottom-right (desktop has it in the header) */}
       <QuickNew variant="fab" />
     </div>
+    </FileViewerProvider>
   );
 }

@@ -155,3 +155,24 @@ export async function getFileStream(fileId: string) {
 }
 
 export { getDriveImageUrl };
+
+/**
+ * Name / type / size of an uploaded file, and whether it is shared by link
+ * (every upload except private employee documents). Used by the file viewer.
+ */
+export async function getFileMeta(fileId: string): Promise<{ name: string; mimeType: string; size: number; isPublic: boolean } | null> {
+  try {
+    const drive = await getDriveClient();
+    const res = await drive.files.get({ fileId, fields: "name, mimeType, size, permissions(type, role)" });
+    const perms = (res.data.permissions || []) as { type?: string }[];
+    return {
+      name: res.data.name || "file",
+      mimeType: res.data.mimeType || "",
+      size: Number(res.data.size || 0),
+      isPublic: perms.some((p) => p.type === "anyone"),
+    };
+  } catch (error) {
+    console.error("getFileMeta failed", fileId, error);
+    return null;
+  }
+}

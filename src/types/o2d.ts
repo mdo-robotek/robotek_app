@@ -64,6 +64,8 @@ export interface O2D {
   cancelled?: string;
   /** Working hours this order spent on hold so far (added up on every release). */
   hold_hours?: string;
+  /** Result of the automatic SO check (JSON, see lib/so-check.ts). */
+  so_check?: string;
 }
 
 export interface O2DItem {

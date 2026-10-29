@@ -1,6 +1,7 @@
 import type { O2D, O2DStepConfig } from "@/types/o2d";
 import { O2D_STEP_LABELS } from "@/types/o2d";
 import { parseHold, holdCheckState, type HoldInfo } from "@/lib/o2d-hold";
+import { parseCheck, type SoCheck } from "@/lib/so-check";
 
 /** Shared helpers for the O2D list and the order window. */
 
@@ -80,6 +81,7 @@ export interface OrderState {
   hold: HoldInfo | null;
   holdCheck: ReturnType<typeof holdCheckState>;
   cancel: HoldInfo | null;
+  soCheck: SoCheck | null;
   status: { text: string; tone: Tone };
 }
 
@@ -105,6 +107,7 @@ export function orderState(items: O2D[], configs: O2DStepConfig[], now = Date.no
     hold,
     holdCheck,
     cancel,
+    soCheck: parseCheck(f?.so_check),
     status,
   };
 }

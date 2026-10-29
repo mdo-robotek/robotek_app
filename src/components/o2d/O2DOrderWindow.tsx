@@ -9,6 +9,8 @@ import {
 import type { O2D, O2DStepConfig } from "@/types/o2d";
 import { O2D_STEP_LABELS } from "@/types/o2d";
 import { istToday } from "@/lib/o2d-hold";
+import { parseCheck } from "@/lib/so-check";
+import O2DSoCheck from "./O2DSoCheck";
 import { amountOf, fmtDay, fmtWhen, orderState, rupees, toDate, whoFor, TONE_PILL, TONE_TEXT } from "./o2d-view";
 
 /**
@@ -33,6 +35,7 @@ type Props = {
   onRestore: () => void;
   onDelete: () => void;
   fileUrl: (path: string) => string;
+  onRefresh: () => void; // reload the order after the system changes it
 };
 
 const btnBase = "h-11 px-3.5 items-center justify-center gap-1.5 rounded-xl border border-[#E5E7EB] dark:border-navy-700 bg-white dark:bg-navy-800 text-[14px] font-semibold text-[#1A1D21] dark:text-white whitespace-nowrap hover:bg-[#F7F8FA] dark:hover:bg-navy-700";
@@ -179,6 +182,9 @@ export default function O2DOrderWindow(p: Props) {
             </div>
           )}
 
+          {/* Automatic SO check (Step 2) */}
+          {!s.cancel && <O2DSoCheck orderNo={p.orderNo} row={f} step={s.step} onRefresh={p.onRefresh} />}
+
           {/* Next step */}
           {active && (
             <div className="rounded-xl border border-[#C7D7FE] bg-[#EFF4FF] dark:bg-navy-800 dark:border-navy-700 p-3.5 flex flex-col sm:flex-row sm:items-center gap-3">
@@ -231,7 +237,7 @@ export default function O2DOrderWindow(p: Props) {
                       </p>
                       <p className="text-[13px] text-[#5B6472]">
                         {done
-                          ? `Done${actual ? ` ${fmtWhen(actual)}` : ""}${planned && actual && actual.getTime() > planned.getTime() ? " · late" : ""}${who ? ` · ${who}` : ""}`
+                          ? `Done${actual ? ` ${fmtWhen(actual)}` : ""}${planned && actual && actual.getTime() > planned.getTime() ? " · late" : ""}${i === 2 && parseCheck(f.so_check)?.auto ? " · checked by system" : who ? ` · ${who}` : ""}`
                           : isCurrent
                             ? `${who || "No one set"}${planned ? ` · due ${fmtWhen(planned)}` : ""}`
                             : notNeeded ? "Not needed" : who}

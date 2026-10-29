@@ -126,6 +126,7 @@ export default function O2DOrderList(p: Props) {
                           ? <span className={`px-2 py-1 rounded-md text-[13px] font-semibold ${TONE_PILL[s.status.tone]}`}>{s.status.text}</span>
                           : <span className="px-2 py-1 rounded-md text-[13px] font-semibold bg-[#F1F3F6] dark:bg-navy-800 text-[#1A1D21] dark:text-white">{s.step} · {s.stepLabel}</span>}
                         {s.hold?.reason && !s.cancel && <p className="mt-1 text-[13px] text-[#5B6472] truncate max-w-[240px]">{s.hold.reason}</p>}
+                        {s.step === 2 && !s.hold && !s.cancel && s.soCheck && s.soCheck.status !== "ok" && <p className={`mt-1 text-[13px] font-semibold ${s.soCheck.status === "diff" ? "text-[#DC2626]" : "text-[#B45309]"}`}>{s.soCheck.status === "diff" ? "SO does not match" : s.soCheck.status === "party" ? "Confirm party once" : "Check SO by hand"}</p>}
                       </td>
                       <td className="px-3 py-2.5 text-[14px] text-[#1A1D21] dark:text-gray-200">{s.cancel || s.step === -1 ? "—" : s.hold ? (s.hold.by || "—") : (s.who || "—")}</td>
                       <td className={`px-4 py-2.5 text-[14px] font-semibold whitespace-nowrap ${s.cancel || s.step === -1 ? "text-[#5B6472]" : s.hold ? TONE_TEXT[s.holdCheck === "overdue" ? "late" : "hold"] : TONE_TEXT[s.due.tone]}`}>

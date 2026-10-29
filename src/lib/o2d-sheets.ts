@@ -349,6 +349,11 @@ class O2DService extends BaseSheetsService<O2D> {
     return true;
   }
 
+  /** Write one value into a column (e.g. "planned_5") on every row of an order. */
+  async updateOrderColumn(orderNo: string, column: string, value: string): Promise<boolean> {
+    return this.updateOrderToggleStatus(orderNo, column as any, value);
+  }
+
   async removeFollowUp(orderNo: string, startStep: number, onlyThisStep: boolean): Promise<boolean> {
     await this.ensureHeaders();
     try {

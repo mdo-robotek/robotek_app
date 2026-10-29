@@ -8,6 +8,7 @@ import {
   O2DItem,
   O2D_STEPS,
   O2D_STEP_SHORTS,
+  O2D_STEP_LABELS,
   O2DStepConfig,
 } from "@/types/o2d";
 import { PartyManagement } from "@/types/party-management";
@@ -103,6 +104,7 @@ import {
   CheckCircleIcon,
   GiftIcon,
   TagIcon,
+  EllipsisHorizontalIcon,
 } from "@heroicons/react/24/solid";
 import ActionStatusModal from "@/components/ActionStatusModal";
 import ConfirmModal from "@/components/ConfirmModal";
@@ -110,6 +112,9 @@ import PartyFormModal from "@/components/PartyFormModal";
 import ItemFormModal from "@/components/ItemFormModal";
 import PremiumDatePicker from "@/components/PremiumDatePicker";
 import ModuleStrip from "@/components/ModuleStrip";
+import O2DOrderList, { type ListChip } from "@/components/o2d/O2DOrderList";
+import O2DOrderWindow from "@/components/o2d/O2DOrderWindow";
+import { makeHold, parseHold } from "@/lib/o2d-hold";
 
 // --- Searchable Dropdown ---
 interface SearchableDropdownProps {
@@ -430,11 +435,19 @@ export default function O2DPage() {
         });
     }, 100);
   };
-  const [tableFilterPending, setTableFilterPending] = useState(false);
+  // One list for O2D (Sahil, 2026-10-29): chips on top pick which orders show.
+  // Open = not finished, not on hold, not cancelled (default).
+  const [listChip, setListChip] = useState<ListChip>("open");
+  const [tableFilterPending, setTableFilterPending] = useState(true);
   const [selectedDateFilters, setSelectedDateFilters] = useState<string[]>([]);
   const [selectedStepFilters, setSelectedStepFilters] = useState<number[]>([]);
+  const pickChip = (c: ListChip) => {
+    setListChip(c);
+    setTableFilterPending(c === "open" || c === "late" || c === "today");
+    setSelectedDateFilters(c === "late" ? ["Delayed"] : c === "today" ? ["Today"] : c === "hold" ? ["Hold"] : c === "cancelled" ? ["Cancelled"] : []);
+  };
   // "Open" in the work-list window lands here with ?find=OR-xxxxx
-  useFindFromLink((t) => { setSelectedStepFilters([]); setSelectedDateFilters([]); setSearchTerm(t); });
+  useFindFromLink((t) => { setSelectedStepFilters([]); setListChip("all"); setTableFilterPending(false); setSelectedDateFilters([]); setSearchTerm(t); });
 
   const [allO2Ds, setAllO2Ds] = useState<O2D[]>([]);
   const [isAllLoading, setIsAllLoading] = useState(false);
@@ -482,7 +495,7 @@ export default function O2DPage() {
 
   // --- SIDEBAR/PANELS view: 10 orders per page, lazy server-side ---
   const [sidebarCurrentPage, setSidebarCurrentPage] = useState(1);
-  const [sidebarItemsPerPage] = useState(10);
+  const [sidebarItemsPerPage] = useState(25);
   const sidebarQueryKey = `/api/o2d?page=${sidebarCurrentPage}&limit=${sidebarItemsPerPage}&search=${debouncedSearch}&dateFilters=${encodeURIComponent(JSON.stringify(selectedDateFilters))}&stepFilters=${encodeURIComponent(JSON.stringify(selectedStepFilters))}&partyFilter=${tableFilterParty}&orderFilter=${tableFilterOrderNo}&itemNameFilter=${tableFilterItemName}&pendingFilter=${tableFilterPending}&startDate=${filterStartDate}&endDate=${filterEndDate}`;
   const { data: sidebarResponse, isLoading: isSidebarLoading } = useSWR(
     sidebarQueryKey,
@@ -804,6 +817,7 @@ export default function O2DPage() {
   const [detailViewMode, setDetailViewMode] = useState<"full" | "table">(
     "full",
   );
+  const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
   const [pageViewMode, setPageViewMode] = useState<"panels" | "table">(
     "panels",
   );
@@ -1679,10 +1693,11 @@ export default function O2DPage() {
     orderNo: string,
     action: "hold" | "cancelled",
     currentValue: string | undefined,
+    valueOverride?: string,
   ) => {
     if (!orderNo) return;
 
-    const newValue = !currentValue ? new Date().toISOString() : "";
+    const newValue = valueOverride !== undefined ? valueOverride : !currentValue ? new Date().toISOString() : "";
     setConfirmPayload(null);
     setConfirmPayload(null);
     setIsConfirmOpen(false);
@@ -2212,64 +2227,33 @@ export default function O2DPage() {
             Order to dispatch
           </p>
         </div>
-        <div className="flex justify-end flex-shrink-0 min-w-0 lg:ml-auto">
-          <div className="flex items-center gap-1 rounded-full border-2 border-[#2563EB] dark:border-[#60A5FA] bg-white dark:bg-navy-800 shadow-lg p-0.5 overflow-x-auto no-scrollbar max-w-full">
+        <div className="flex items-center gap-2 lg:ml-auto">
+          <button
+            onClick={() => {
+              resetForm();
+              setIsModalOpen(true);
+            }}
+            className="h-11 px-4 inline-flex items-center gap-1.5 rounded-xl bg-[#2563EB] text-white text-[14px] font-semibold hover:bg-[#1D4ED8]"
+          >
+            <PlusIcon className="w-5 h-5" /> New Order
+          </button>
+          <div className="relative">
             <button
-              onClick={() => {
-                resetForm();
-                setIsModalOpen(true);
-              }}
-              className="flex items-center gap-2 text-[#2563EB] dark:text-[#60A5FA] px-2 sm:px-4 py-1.5 font-semibold text-[14px] rounded-full hover:bg-[#2563EB]/5 dark:hover:bg-navy-700 transition-all"
+              onClick={() => setIsMoreMenuOpen(!isMoreMenuOpen)}
+              className="h-11 px-3.5 inline-flex items-center gap-1.5 rounded-xl border border-[#E5E7EB] dark:border-navy-700 bg-white dark:bg-navy-800 text-[14px] font-semibold text-[#1A1D21] dark:text-white"
             >
-              <PlusIcon className="w-4 h-4 stroke-[3]" />
-              <span className="hidden sm:inline">New Order</span>
+              <EllipsisHorizontalIcon className="w-5 h-5" /> More
             </button>
-            <div className="h-4 w-[1px] bg-[#2563EB]/10 dark:bg-[#60A5FA]/10 mx-0.5" />
-
-            {/* View Mode Switcher - Prominent in pill as requested */}
-            <button
-              onClick={() =>
-                setPageViewMode(pageViewMode === "panels" ? "table" : "panels")
-              }
-              className={`flex items-center gap-2 px-2 sm:px-3 py-1.5 font-semibold text-[14px]   rounded-full transition-all border-2 ${pageViewMode === "table"
-                  ? "bg-[#2563EB] text-white border-[#2563EB]"
-                  : "text-[#2563EB] dark:text-[#60A5FA] border-transparent hover:bg-[#2563EB]/5 dark:hover:bg-navy-700"
-                }`}
-            >
-              {pageViewMode === "panels" ? (
-                <Squares2X2Icon className="w-4 h-4 stroke-[3]" />
-              ) : (
-                <ListBulletIcon className="w-4 h-4 stroke-[3]" />
-              )}
-              <span className="hidden sm:inline">
-                {pageViewMode === "panels" ? "Table View" : "Panel View"}
-              </span>
-            </button>
-            <div className="h-4 w-[1px] bg-[#2563EB]/10 dark:bg-[#60A5FA]/10 mx-0.5" />
-
-            <button
-              onClick={() => setIsExportModalOpen(true)}
-              className="flex items-center gap-2 text-[#2563EB] dark:text-[#60A5FA] px-2 sm:px-3 py-1.5 font-semibold text-[14px] rounded-full hover:bg-[#2563EB]/5 dark:hover:bg-navy-700 transition-all"
-            >
-              <ArrowDownTrayIcon className="w-4 h-4 stroke-[3]" />
-              <span className="hidden sm:inline">Export</span>
-            </button>
-            <div className="h-4 w-[1px] bg-[#2563EB]/10 dark:bg-[#60A5FA]/10 mx-0.5" />
-            <button
-              onClick={handleOpenSetup}
-              className="flex items-center gap-2 text-[#2563EB] dark:text-[#60A5FA] px-2 sm:px-3 py-1.5 font-semibold text-[14px] rounded-full hover:bg-[#2563EB]/5 dark:hover:bg-navy-700 transition-all"
-            >
-              <Cog6ToothIcon className="w-4 h-4 stroke-[3]" />
-              <span className="hidden sm:inline">Setup</span>
-            </button>
-            <div className="h-4 w-[1px] bg-[#2563EB]/10 dark:bg-[#60A5FA]/10 mx-0.5" />
-            <button
-              onClick={() => setIsBusyModalOpen(true)}
-              className="flex items-center gap-2 text-[#2563EB] dark:text-[#60A5FA] px-2 sm:px-3 py-1.5 font-semibold text-[14px] rounded-full hover:bg-[#2563EB]/5 dark:hover:bg-navy-700 transition-all"
-            >
-              <ClipboardDocumentCheckIcon className="w-4 h-4 stroke-[3]" />
-              <span className="hidden sm:inline">For Busy</span>
-            </button>
+            {isMoreMenuOpen && (
+              <>
+                <div className="fixed inset-0 z-[60]" onClick={() => setIsMoreMenuOpen(false)} />
+                <div className="absolute right-0 top-12 z-[61] w-52 rounded-xl border border-[#E5E7EB] dark:border-navy-700 bg-white dark:bg-navy-800 shadow-xl py-1">
+                  <button onClick={() => { setIsMoreMenuOpen(false); setIsExportModalOpen(true); }} className="w-full h-11 px-4 flex items-center gap-2 text-[14px] font-semibold text-left text-[#1A1D21] dark:text-white hover:bg-[#F7F8FA] dark:hover:bg-navy-700"><ArrowDownTrayIcon className="w-5 h-5 text-[#5B6472]" /> Export</button>
+                  <button onClick={() => { setIsMoreMenuOpen(false); setIsBusyModalOpen(true); }} className="w-full h-11 px-4 flex items-center gap-2 text-[14px] font-semibold text-left text-[#1A1D21] dark:text-white hover:bg-[#F7F8FA] dark:hover:bg-navy-700"><ClipboardDocumentCheckIcon className="w-5 h-5 text-[#5B6472]" /> For Busy</button>
+                  <button onClick={() => { setIsMoreMenuOpen(false); handleOpenSetup(); }} className="w-full h-11 px-4 flex items-center gap-2 text-[14px] font-semibold text-left text-[#1A1D21] dark:text-white hover:bg-[#F7F8FA] dark:hover:bg-navy-700"><Cog6ToothIcon className="w-5 h-5 text-[#5B6472]" /> Setup</button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -2277,29 +2261,45 @@ export default function O2DPage() {
       <ModuleStrip module="o2d" />
 
       {/* Main Master-Detail View Wrapper */}
-      <div className="flex-1 flex flex-col relative">
-        {/* Toggle Filters Button - Floating at the top edge */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[50]">
-          <button
-            onClick={() => setShowFilters(!showFilters)}
-            className="flex items-center gap-1.5 px-3 py-1 bg-white dark:bg-navy-800 border border-gray-100 dark:border-navy-700 rounded-full shadow-md hover:shadow-lg transition-all text-[#2563EB] dark:text-[#60A5FA] group"
-          >
-            <FunnelIcon
-              className={`w-3 h-3 transition-transform duration-300 ${showFilters ? "rotate-180" : ""}`}
-            />
-            <span className="text-[13px] font-semibold">
-              {showFilters ? "Hide Filters" : "Show Filters"}
-            </span>
-            {showFilters ? (
-              <ChevronUpIcon className="w-3 h-3 opacity-50 group-hover:opacity-100" />
-            ) : (
-              <ChevronDownIcon className="w-3 h-3 opacity-50 group-hover:opacity-100" />
-            )}
-          </button>
-        </div>
+      <div className="flex-1 flex flex-col relative min-w-0">
+        <div className="flex-1 flex flex-col overflow-hidden min-w-0 rounded-2xl border border-[#E5E7EB] dark:border-navy-800 bg-white dark:bg-navy-900">
+          {/* Loading Bar Indicator */}
+          {(isAllLoading || isTransitioning) && (
+            <div className="h-1 bg-gradient-to-r from-[#2563EB] via-[#2563EB] to-[#2563EB] animate-pulse shrink-0" />
+          )}
 
-        <div className="flex-1 flex flex-col overflow-hidden rounded-2xl border border-gray-100 dark:border-navy-800 bg-white dark:bg-navy-900 shadow-xl">
-          {showFilters && (
+          {/* One list for every order (Table View and Panel View are gone) */}
+          <div className="flex-1 flex overflow-hidden relative min-w-0">
+            <O2DOrderList
+              orderNos={filteredOrderNumbers}
+              grouped={sidebarGroupedOrders as Record<string, O2D[]>}
+              configs={globalConfigs}
+              chip={listChip}
+              onChip={pickChip}
+              total={sidebarTotalOrders}
+              holdCount={summaryData?.stepCounts?.[11]}
+              search={searchTerm}
+              onSearch={setSearchTerm}
+              filtersOn={showFilters}
+              onFilters={() => setShowFilters(!showFilters)}
+              page={sidebarCurrentPage}
+              pages={sidebarTotalPages}
+              onPage={setSidebarCurrentPage}
+              loading={isSidebarLoading}
+              selected={selectedOrderNo}
+              onOpen={(no) => {
+                const items = (sidebarGroupedOrders as Record<string, O2D[]>)[no];
+                setSelectedOrderNo(no);
+                if (items && items.length > 0) {
+                  setMasterOrderMap((prev) => {
+                    const existing = prev[no];
+                    if (!existing || items.length >= existing.length || !tableFilterItemName) return { ...prev, [no]: items };
+                    return prev;
+                  });
+                }
+              }}
+              extra={showFilters ? (
+                <>
             <div className="flex flex-col shrink-0 border-b border-gray-100 dark:border-navy-800 animate-in slide-in-from-top duration-300">
               <div className="flex items-center gap-2 overflow-x-auto no-scrollbar px-3 py-2 bg-white dark:bg-navy-900">
                 {O2D_STEP_SHORTS.map((stepName, idx) => {
@@ -2438,448 +2438,36 @@ export default function O2DPage() {
                 </button>
               </div>
             </div>
-          )}
-
-          {/* Loading Bar Indicator */}
-          {(isAllLoading || isTransitioning) && (
-            <div className="h-1 bg-gradient-to-r from-[#2563EB] via-[#2563EB] to-[#2563EB] animate-pulse shrink-0" />
-          )}
-
-          {/* Simple Table vs Master-Detail Panels Row */}
-          <div className="flex-1 flex overflow-hidden relative">
-            {pageViewMode === "table" ? (
-              <div className="flex-1 flex flex-col overflow-hidden bg-white dark:bg-navy-900">
-                <div className="flex-1 overflow-auto no-scrollbar pb-10">
-                  <table className="w-full text-left border-collapse min-w-[1000px]">
-                    <thead className="sticky top-0 z-20 shadow-sm">
-                      <tr className="bg-gray-50 dark:bg-navy-950 text-[13px] font-semibold text-gray-500 dark:text-gray-400 border-b border-gray-100 dark:border-navy-800">
-                        <th className="px-6 py-4">Order ID</th>
-                        <th className="px-6 py-4">Party Name</th>
-                        <th className="px-6 py-4">Item Name</th>
-                        <th className="px-6 py-4">Item Spec</th>
-                        <th className="px-6 py-4 text-center">Item Qty</th>
-                        <th className="px-6 py-4">Created At</th>
-                        <th className="px-6 py-4">Filled By</th>
-                        <th className="px-6 py-4">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-50 dark:divide-navy-800/20">
-                      {tableData.length > 0 ? (
-                        tableData.map((item: O2D, idx: number) => (
-                          <tr
-                            key={idx}
-                            className="group hover:bg-[#2563EB]/[0.02] dark:hover:bg-white/5 transition-colors"
-                          >
-                            <td className="px-6 py-4">
-                              <div className="flex flex-col">
-                                <span className="text-[13px] font-semibold text-[#2563EB] dark:text-[#60A5FA]">
-                                  {item.order_no}
-                                </span>
-                                {item.hold && (
-                                  <span className="text-[14px] text-[#D97706] font-semibold tracking-tighter">
-                                    On Hold
-                                  </span>
-                                )}
-                                {item.cancelled && (
-                                  <span className="text-[14px] text-red-500 font-semibold tracking-tighter">
-                                    Cancelled
-                                  </span>
-                                )}
-                              </div>
-                            </td>
-                            <td
-                              className="px-6 py-4 text-[14px] font-semibold text-gray-700 dark:text-gray-200 max-w-[200px] truncate"
-                              title={item.party_name}
-                            >
-                              {item.party_name}
-                            </td>
-                            <td
-                              className="px-6 py-4 text-[14px] font-bold text-gray-600 dark:text-gray-300 max-w-[250px] truncate"
-                              title={item.item_name}
-                            >
-                              {item.item_name}
-                            </td>
-                            <td
-                              className="px-6 py-4 text-[14px] font-bold text-gray-500 dark:text-gray-400 max-w-[200px] truncate"
-                              title={item.item_specification}
-                            >
-                              {item.item_specification || "-"}
-                            </td>
-                            <td className="px-6 py-4 text-center font-semibold text-[#2563EB] dark:text-[#60A5FA] text-[13px]">
-                              {item.item_qty}
-                            </td>
-                            <td className="px-6 py-4 text-[14px] font-bold text-[#5B6472] tracking-tight">
-                              {item.created_at ? (
-                                <div className="flex flex-col">
-                                  <span className="text-gray-700 dark:text-gray-200">
-                                    {new Date(
-                                      item.created_at,
-                                    ).toLocaleDateString("en-GB")}
-                                  </span>
-                                  <span className="text-[13px] text-[#2563EB] dark:text-[#60A5FA] font-semibold opacity-70">
-                                    {new Date(
-                                      item.created_at,
-                                    ).toLocaleTimeString([], {
-                                      hour: "2-digit",
-                                      minute: "2-digit",
-                                      second: "2-digit",
-                                      hour12: false,
-                                    })}
-                                  </span>
-                                </div>
-                              ) : (
-                                "-"
-                              )}
-                            </td>
-                            <td className="px-6 py-4 text-[14px] font-semibold text-gray-500 tracking-tighter">
-                              {item.filled_by || "-"}
-                            </td>
-                            <td className="px-6 py-4">
-                              <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <button
-                                  onClick={() => {
-                                    setSelectedOrderNo(item.order_no);
-                                    setPageViewMode("panels");
-                                  }}
-                                  className="p-1.5 bg-[#2563EB]/5 text-[#2563EB] rounded-lg hover:bg-[#2563EB] hover:text-white transition-all"
-                                >
-                                  <EyeIcon className="w-3.5 h-3.5" />
-                                </button>
-                                <button
-                                  onClick={() => handleEdit(item.order_no)}
-                                  className="p-1.5 bg-amber-50 text-amber-600 rounded-lg hover:bg-amber-500 hover:text-white transition-all"
-                                >
-                                  <PencilSquareIcon className="w-3.5 h-3.5" />
-                                </button>
-                              </div>
-                            </td>
-                          </tr>
-                        ))
-                      ) : (
-                        <tr>
-                          <td colSpan={7} className="px-6 py-20 text-center">
-                            <ArchiveBoxIcon className="w-12 h-12 text-gray-200 mx-auto mb-4" />
-                            <p className="text-[14px] font-semibold text-[#5B6472]">
-                              No data matches your intelligence criteria
-                            </p>
-                          </td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-                {/* Table Pagination Footer */}
-                <div className="p-4 bg-gray-50 dark:bg-navy-950 border-t border-gray-100 dark:border-navy-800 flex items-center justify-between shrink-0">
-                  <div className="text-[14px] font-semibold text-[#5B6472]">
-                    Showing <span className="text-[#2563EB] dark:text-[#60A5FA]">{(tableCurrentPage - 1) * tableItemsPerPage + 1}</span> to <span className="text-[#2563EB] dark:text-[#60A5FA]">{Math.min(tableCurrentPage * tableItemsPerPage, totalOrdersServer)}</span> of <span className="text-[#2563EB] dark:text-[#60A5FA]">{totalOrdersServer}</span> entries
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => setTableCurrentPage(p => Math.max(1, p - 1))}
-                      disabled={tableCurrentPage === 1}
-                      className="flex items-center gap-1.5 px-4 py-2 bg-white dark:bg-black border border-gray-100 dark:border-navy-700 rounded-xl text-[13px] font-semibold hover:border-[#2563EB] disabled:opacity-30 transition-all shadow-sm group"
-                    >
-                      <ChevronLeftIcon className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" />
-                      Prev
-                    </button>
-
-                    <div className="flex items-center gap-1 mx-2">
-                      {/* Show current, first, last, and some relative pages if many exist */}
-                      {(() => {
-                        const totalPages = Math.ceil(totalOrdersServer / tableItemsPerPage);
-                        if (totalPages <= 1) return null;
-
-                        return (
-                          <span className="px-4 py-2 bg-[#2563EB]/5 dark:bg-[#60A5FA]/5 rounded-xl border border-[#2563EB]/10 dark:border-[#60A5FA]/10 text-[14px] font-semibold text-[#2563EB] dark:text-[#60A5FA]">
-                            Page {tableCurrentPage} of {totalPages}
-                          </span>
-                        );
-                      })()}
-                    </div>
-
-                    <button
-                      onClick={() => setTableCurrentPage(p => Math.min(Math.ceil(totalOrdersServer / tableItemsPerPage), p + 1))}
-                      disabled={tableCurrentPage >= Math.ceil(totalOrdersServer / tableItemsPerPage)}
-                      className="flex items-center gap-1.5 px-4 py-2 bg-white dark:bg-black border border-gray-100 dark:border-navy-700 rounded-xl text-[13px] font-semibold hover:border-[#2563EB] disabled:opacity-30 transition-all shadow-sm group"
-                    >
-                      Next
-                      <ChevronRightIcon className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <>
-                {/* Master Pane: Order List */}
-                <div
-                  className={`w-full lg:w-80 flex flex-col border-r border-[#2563EB]/5 dark:border-navy-800 ${selectedOrderNo ? "hidden lg:flex" : "flex"}`}
-                >
-                  <div className="p-2 border-b border-gray-50 dark:border-navy-800 bg-gray-50/30 dark:bg-navy-900/40">
-                    <div className="relative group mb-2">
-                      <MagnifyingGlassIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5B6472] group-focus-within:text-[#2563EB] transition-colors" />
-                      <input
-                        type="text"
-                        placeholder="Search orders..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full pl-10 pr-4 h-[34px] bg-white dark:bg-black border border-gray-100 dark:border-navy-700 focus:border-[#2563EB] outline-none font-bold text-[14px] rounded-xl transition-all shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] focus:shadow-md"
-                      />
-                    </div>
-
-                    {/* Compact Pagination — right under search */}
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-1">
-                        {isSidebarLoading && (
-                          <div className="w-2.5 h-2.5 border-2 border-[#2563EB]/20 border-t-[#2563EB] dark:border-[#60A5FA]/20 dark:border-t-[#60A5FA] rounded-full animate-spin shrink-0" />
-                        )}
-                        <span className="text-[13px] font-semibold text-[#5B6472]">
-                          {sidebarCurrentPage} / {sidebarTotalPages}
-                        </span>
-                      </div>
-                      <div className="flex gap-1">
-                        <button
-                          onClick={() => setSidebarCurrentPage(p => Math.max(1, p - 1))}
-                          disabled={sidebarCurrentPage === 1 || isSidebarLoading}
-                          className="p-1 bg-white dark:bg-black border border-gray-100 dark:border-navy-700 rounded-lg hover:border-[#2563EB] disabled:opacity-30 transition-all shadow-sm"
-                        >
-                          <ChevronLeftIcon className="w-3 h-3" />
-                        </button>
-                        <button
-                          onClick={() => setSidebarCurrentPage(p => Math.min(sidebarTotalPages, p + 1))}
-                          disabled={sidebarCurrentPage >= sidebarTotalPages || isSidebarLoading}
-                          className="p-1 bg-white dark:bg-black border border-gray-100 dark:border-navy-700 rounded-lg hover:border-[#2563EB] disabled:opacity-30 transition-all shadow-sm"
-                        >
-                          <ChevronRightIcon className="w-3 h-3" />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex-1 overflow-y-auto no-scrollbar p-2 space-y-1.5">
-                    {/* Only show full spinner on true first load; keepPreviousData shows stale content while fetching */}
-                    {isSidebarLoading && filteredOrderNumbers.length === 0 ? (
-                      <div className="flex flex-col items-center justify-center h-40 space-y-3">
-                        <div className="w-8 h-8 border-3 border-[#2563EB]/20 border-t-[#2563EB] rounded-full animate-spin" />
-                        <p className="text-[13px] font-semibold text-[#5B6472]">
-                          Loading Orders...
-                        </p>
-                      </div>
-                    ) : filteredOrderNumbers.length === 0 ? (
-                      <div className="text-center py-20 opacity-50">
-                        <ShoppingBagIcon className="w-10 h-10 text-gray-100 mx-auto mb-2" />
-                        <p className="text-[14px] font-semibold italic text-[#5B6472]">
-                          No records
-                        </p>
-                      </div>
-                    ) : (
-                      <>
-                        {filteredOrderNumbers.map((no: string) => {
-                          const orderItems = sidebarGroupedOrders[no.trim()];
-                          if (!orderItems || orderItems.length === 0) return null;
-                          const first = orderItems[0];
-                          const totalQty = orderItems.reduce(
-                            (sum: number, item: O2D) =>
-                              sum + (parseFloat(item.item_qty) || 0),
-                            0,
-                          );
-                          const totalAmt = orderItems.reduce(
-                            (sum: number, item: O2D) =>
-                              sum + (parseFloat(item.est_amount) || 0),
-                            0,
-                          );
-
-                          // Find current pending stage using the unified helper
-                          const pIdx = getPendingStepIdx(orderItems);
-                          const currentStageIdx = pIdx !== -1 ? pIdx - 1 : -1;
-                          const allDone = currentStageIdx === -1;
-                          const isSelected = selectedOrderNo?.trim() === no.trim();
-                          const isCancelled = !!first?.cancelled;
-                          const isHold = !!first?.hold && !isCancelled;
-
-                          // Extract planned time for current stage
-                          let plannedTimeStr = "";
-                          if (!allDone && first) {
-                            const pVal = (first as any)[`planned_${pIdx}`];
-                            if (pVal && pVal !== "-") {
-                              const d = new Date(pVal);
-                              if (!isNaN(d.getTime())) {
-                                plannedTimeStr = d.toLocaleDateString("en-GB", { day: '2-digit', month: 'short' }) + " " + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                              } else {
-                                plannedTimeStr = pVal;
-                              }
-                            }
-                          }
-
-                          return (
-                            <div
-                              key={no}
-                              onClick={() => {
-                                const trimmedNo = no.trim();
-                                // Set selection first for immediate visual feedback
-                                setSelectedOrderNo(trimmedNo);
-                                // Ensure this specific order's data is immediately in the master map
-                                // We use the same defensive merge logic as the useEffect to avoid overwriting full data with partial data
-                                if (trimmedNo && orderItems && orderItems.length > 0) {
-                                  setMasterOrderMap(prev => {
-                                    const existing = prev[trimmedNo];
-                                    // Only overwrite if we don't have existing data, OR the new data has more items, OR no filter is active
-                                    if (!existing || orderItems.length >= existing.length || !tableFilterItemName) {
-                                      return { ...prev, [trimmedNo]: orderItems };
-                                    }
-                                    return prev;
-                                  });
-                                }
-                              }}
-                              className={`group relative p-2 rounded-xl border transition-all cursor-pointer ${isSelected
-                                  ? "border-[#2563EB] dark:border-[#60A5FA] bg-[#2563EB]/5 dark:bg-[#60A5FA]/5 shadow-xl scale-[1.02] z-10"
-                                  : isCancelled
-                                    ? "border-red-200 dark:border-red-800/40 bg-gradient-to-br from-red-100 via-red-50 to-white dark:from-red-900/30 dark:via-red-900/10 dark:to-navy-800/50 shadow-md hover:shadow-lg hover:scale-[1.01]"
-                                    : isHold
-                                      ? "border-[#E5E7EB] dark:border-[#E5E7EB] bg-gradient-to-br from-[#F7F8FA] via-[#F7F8FA] to-white dark:from-[#F7F8FA] dark:via-[#F7F8FA] dark:to-navy-800/50 shadow-md hover:shadow-lg hover:scale-[1.01]"
-                                      : "border-gray-100 dark:border-navy-700 bg-white dark:bg-navy-800/50 shadow-md hover:shadow-lg dark:hover:border-navy-600 hover:scale-[1.01]"
-                                }`}
-                            >
-                              <div
-                                className={`absolute left-0 top-1 bottom-1 w-0.5 rounded-full transition-all ${isSelected
-                                    ? "bg-[#2563EB]"
-                                    : isCancelled
-                                      ? "bg-red-500"
-                                      : isHold
-                                        ? "bg-[#D97706]"
-                                        : "bg-[#2563EB]/10 group-hover:bg-[#2563EB]/20"
-                                  }`}
-                              />
-
-                              {/* Line 1: Order No & Status Labels */}
-                              <div className="flex justify-between items-start mb-0.5 pl-1.5">
-                                <div className="flex flex-wrap items-center gap-2 min-w-0">
-                                  <span className="text-[13px] font-semibold text-gray-900 dark:text-white truncate tracking-tight flex items-center gap-2">
-                                    {currentStageIdx === 0 &&
-                                      !isCancelled &&
-                                      !isHold && (
-                                        <span className="relative flex h-2 w-2 shrink-0">
-                                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                                          <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.8)] animate-pulse"></span>
-                                        </span>
-                                      )}
-                                    {no}
-                                  </span>
-                                  {first?.cancelled ? (
-                                    <span className="px-1.5 py-0.5 rounded-sm bg-red-100 text-red-600 dark:bg-red-900/40 dark:text-red-400 text-[14px] leading-none font-bold">
-                                      Cancelled
-                                    </span>
-                                  ) : null}
-                                  {first?.hold && !first?.cancelled ? (
-                                    <span className="px-1.5 py-0.5 rounded-sm bg-[#F7F8FA] text-[#D97706] dark:bg-[#FEF3C7] dark:text-[#D97706] text-[14px] leading-none font-bold">
-                                      Hold
-                                    </span>
-                                  ) : null}
-                                </div>
-                                <div className="flex items-center gap-1 shrink-0 ml-1">
-                                  <button
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleEdit(no);
-                                    }}
-                                    className="p-1 px-1.5 bg-[#2563EB]/5 text-[#2563EB] dark:bg-[#60A5FA]/10 dark:text-[#60A5FA] hover:bg-[#2563EB] hover:text-white dark:hover:bg-[#60A5FA] dark:hover:text-black rounded-lg transition-all"
-                                  >
-                                    <PencilSquareIcon className="w-3 h-3" />
-                                  </button>
-                                  <button
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleDeleteClick(no);
-                                    }}
-                                    className="p-1 px-1.5 bg-[#DC2626]/5 text-[#DC2626] hover:bg-[#DC2626] hover:text-white rounded-lg transition-all"
-                                  >
-                                    <TrashIcon className="w-3 h-3" />
-                                  </button>
-                                </div>
-                              </div>
-
-                              {/* Line 2: Party Name */}
-                              <div className="pl-1.5 mb-1 text-[13px] font-bold text-[#5B6472] tracking-wide truncate">
-                                {first?.party_name}
-                              </div>
-
-                              {/* Line 3: Current Stage & Item Details */}
-                              <div className="flex items-end justify-between pl-1.5 min-w-0">
-                                <div className="min-w-0 mr-2">
-                                  {allDone ? (
-                                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[9.5px] font-semibold bg-emerald-50 text-emerald-600 border border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800 truncate">
-                                      <span className="w-1 h-1 rounded-full bg-emerald-500 inline-block" />
-                                      Completed
-                                    </span>
-                                  ) : (
-                                    <span className="inline-flex flex-col items-start px-1.5 py-0.5 rounded-md text-[9.5px] font-semibold bg-amber-100 text-amber-700 border border-amber-200 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800 leading-none">
-                                      <span className="flex items-center gap-1 min-w-0">
-                                        <span className="w-1 h-1 rounded-full bg-amber-400 animate-pulse shrink-0 block" />
-                                        <span className="truncate">
-                                          Step {currentStageIdx + 1}:{" "}
-                                          {O2D_STEP_SHORTS[currentStageIdx]}
-                                        </span>
-                                      </span>
-                                      {plannedTimeStr && (
-                                        <span className="text-[14px] opacity-75 font-semibold pl-2 mt-0.5 flex items-center gap-1 tracking-wider normal-case">
-                                          <ClockIcon className="w-2 h-2" />
-                                          {plannedTimeStr}
-                                        </span>
-                                      )}
-                                    </span>
-                                  )}
-                                </div>
-                                <div className="flex flex-col items-end shrink-0 leading-[1.1]">
-                                  <span className="text-[13px] font-semibold text-[#5B6472] tracking-tighter mb-0.5">
-                                    {orderItems.length} ITEMS
-                                  </span>
-                                  <span className="text-[14px] font-semibold text-[#2563EB] dark:text-[#60A5FA]">
-                                    ₹
-                                    {(totalAmt || 0).toLocaleString(undefined, {
-                                      minimumFractionDigits: 1,
-                                      maximumFractionDigits: 1,
-                                    })}
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </>
-                    )}
-                  </div>
-                </div>
-
-                {/* Thick Dark Blue Divider Line */}
-                <div className="w-[3px] bg-[#2563EB] h-full hidden lg:block opacity-80" />
-
-                {/* Detail Pane: Order Details - Modularized */}
-                <O2DDetailPanel
-                  selectedOrder={selectedOrder}
-                  selectedOrderNo={selectedOrderNo}
-                  setSelectedOrderNo={setSelectedOrderNo}
-                  isAllLoading={isAllLoading}
-                  isTransitioning={isTransitioning}
-                  isSpecialRole={isSpecialRole}
-                  setIsRemoveFollowUpModalOpen={setIsRemoveFollowUpModalOpen}
-                  openStepUpdateModal={openStepUpdateModal}
-                  setConfirmPayload={setConfirmPayload}
-                  setIsConfirmOpen={setIsConfirmOpen}
-                  detailViewMode={detailViewMode}
-                  setDetailViewMode={setDetailViewMode}
-                  lockoutTimeLeft={lockoutTimeLeft}
-                  isStep1Lockout={isStep1Lockout}
-                  getPreviewUrl={getPreviewUrl}
-                  getDownloadUrl={getDownloadUrl}
-                  fullParties={fullParties}
-                />
-              </>
-            )}
+          
+                </>
+              ) : null}
+            />
           </div>
           {/* end Panels Row */}
         </div>
         {/* end Main Container (now inside wrapper) */}
       </div>
       {/* end Main Master-Detail View Wrapper */}
+
+      {selectedOrderNo && selectedOrder.length > 0 && (
+        <O2DOrderWindow
+          orderNo={selectedOrderNo}
+          items={selectedOrder}
+          configs={globalConfigs}
+          canRemoveFollowUp={isSpecialRole}
+          step1Wait={isStep1Lockout ? lockoutTimeLeft : null}
+          onClose={() => setSelectedOrderNo(null)}
+          onUpdateStep={openStepUpdateModal}
+          onEdit={() => handleEdit(selectedOrderNo)}
+          onHold={(reason, checkOn) => handleToggleStatus(selectedOrderNo, "hold", selectedOrder[0]?.hold, makeHold(reason, checkOn, currentUser, parseHold(selectedOrder[0]?.hold)?.since || new Date()))}
+          onRelease={() => handleToggleStatus(selectedOrderNo, "hold", selectedOrder[0]?.hold, "")}
+          onRemoveFollowUp={() => setIsRemoveFollowUpModalOpen(true)}
+          onCancel={(reason) => handleToggleStatus(selectedOrderNo, "cancelled", selectedOrder[0]?.cancelled, makeHold(reason, "", currentUser))}
+          onRestore={() => handleToggleStatus(selectedOrderNo, "cancelled", selectedOrder[0]?.cancelled, "")}
+          onDelete={() => handleDeleteClick(selectedOrderNo)}
+          fileUrl={getPreviewUrl}
+        />
+      )}
 
       {/* Export Selection Modal */}
       {isExportModalOpen && (
@@ -3037,11 +2625,11 @@ export default function O2DPage() {
               <div>
                 <h2 className="text-xl font-semibold text-[#2563EB] dark:text-[#60A5FA] italic">
                   {editingOrderNo
-                    ? `EDIT ORDER: ${editingOrderNo}`
-                    : "CREATE NEW ORDER"}
+                    ? `Edit order ${editingOrderNo}`
+                    : "New order"}
                 </h2>
                 <p className="text-[13px] font-semibold text-[#5B6472] mt-0.5">
-                  Automated Intelligence Protocol
+                  Party, items and order proof
                 </p>
               </div>
               <button
@@ -3062,7 +2650,7 @@ export default function O2DPage() {
                   <div className="flex items-center gap-2 -ml-1">
                     <div className="w-1 h-5 bg-[#2563EB] dark:bg-[#60A5FA] rounded-full" />
                     <h3 className="text-[13px] font-semibold text-gray-600 dark:text-gray-200">
-                      MASTER CLASSIFICATION
+                      Party
                     </h3>
                   </div>
 
@@ -3139,7 +2727,7 @@ export default function O2DPage() {
                       <div className="flex gap-2 items-end">
                         <div className="flex-1 min-w-0">
                           <SearchableDropdown
-                            label="Partner Name *"
+                            label="Party Name *"
                             icon={BuildingOfficeIcon}
                             value={commonData.party_name}
                             onFocus={centerOnFocus}
@@ -3185,7 +2773,7 @@ export default function O2DPage() {
                     <div className="flex items-center gap-2">
                       <div className="w-1 h-5 bg-[#DC2626] rounded-full" />
                       <h3 className="text-[13px] font-semibold text-gray-600 dark:text-gray-200">
-                        ITEMIZED LOGISTICS
+                        Items
                       </h3>
                     </div>
                   </div>
@@ -3251,7 +2839,7 @@ export default function O2DPage() {
                             <div className="flex gap-2 items-end">
                               <div className="flex-1 min-w-0">
                                  <SearchableDropdown
-                                  label="Nomenclature *"
+                                  label="Item *"
                                   icon={ArchiveBoxIcon}
                                   value={item.item_name}
                                   error={Boolean(item.item_name && items.findIndex(i => i.item_name === item.item_name) < index)}
@@ -3368,14 +2956,14 @@ export default function O2DPage() {
                   onClick={() => setIsModalOpen(false)}
                   className="flex-1 h-[48px] rounded-2xl font-semibold text-[#5B6472] hover:text-gray-600 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5 transition-all text-[13px]"
                 >
-                  Abandon
+                  Close
                 </button>
                 <button
                   type="submit"
                   className="flex-[2] h-[48px] bg-[#DC2626] hover:bg-[#8E161D] text-white rounded-2xl font-semibold transition-all shadow-[0_8px_20px_-6px_rgba(206,32,41,0.5)] active:scale-95 text-[14px] flex items-center justify-center gap-2 group"
                 >
                   <PlusIcon className="w-5 h-5 stroke-[2.5] group-hover:rotate-90 transition-transform duration-300" />{" "}
-                  {editingOrderNo ? "PROTOCOL UPDATE" : "EXECUTE ORDER"}
+                  {editingOrderNo ? "Save changes" : "Save order"}
                 </button>
               </div>
             </form>
@@ -3521,10 +3109,10 @@ export default function O2DPage() {
             <div className="p-5 border-b border-[#E5E7EB] dark:border-navy-700 flex items-center justify-between shrink-0 bg-[#EFF4FF] dark:bg-navy-800">
               <div>
                 <h2 className="text-lg font-semibold text-[#DC2626] italic tracking-tight">
-                  Step Update: {O2D_STEP_SHORTS[currentStepToUpdate - 1]}
+                  Step {currentStepToUpdate} · {O2D_STEP_LABELS[currentStepToUpdate - 1]}
                 </h2>
                 <p className="text-[13px] font-semibold text-[#5B6472] mt-0.5">
-                  Execution Protocol {selectedOrderNo}
+                  Order {selectedOrderNo}
                 </p>
               </div>
               <button
@@ -3542,7 +3130,7 @@ export default function O2DPage() {
               <div className="space-y-4">
                 {/* Status Toggle */}
                 <YesNoToggle
-                  label="Mission Completed?"
+                  label="Is this step done?"
                   value={stepUpdateFields.status}
                   onChange={(val) =>
                     setStepUpdateFields({ ...stepUpdateFields, status: val })
@@ -3968,13 +3556,13 @@ export default function O2DPage() {
                   onClick={() => setIsStepUpdateModalOpen(false)}
                   className="flex-1 h-[44px] rounded-xl font-semibold text-[#5B6472] text-[13px] hover:bg-gray-50 transition-all"
                 >
-                  Abort
+                  Go back
                 </button>
                 <button
                   type="submit"
                   className="flex-[2] h-[44px] bg-[#DC2626] text-white rounded-xl font-semibold text-[13px] shadow-lg shadow-red-500/20 active:scale-95 transition-all"
                 >
-                  Deploy Update
+                  Save
                 </button>
               </div>
             </form>
@@ -4004,7 +3592,7 @@ export default function O2DPage() {
         }}
         title={
           confirmPayload?.type === "delete"
-            ? "Terminate Protocol?"
+            ? "Delete this order?"
             : confirmPayload?.type === "hold"
               ? confirmPayload?.currentValue
                 ? "Release Hold?"
@@ -4013,15 +3601,15 @@ export default function O2DPage() {
         }
         message={
           confirmPayload?.type === "delete"
-            ? "This action will permanently purge this record from the grid. Are you sure you want to execute this command?"
+            ? "The order will be deleted for everyone. This cannot be undone."
             : confirmPayload?.type === "hold"
               ? confirmPayload?.currentValue
                 ? "Do you want to release this order from the hold status?"
                 : "Do you want to place this order on hold?"
               : "Are you sure you want to cancel this order? This action will mark it as cancelled."
         }
-        confirmLabel="Yes, Execute"
-        cancelLabel="No, Abort"
+        confirmLabel="Yes"
+        cancelLabel="Go back"
         type={
           confirmPayload?.type === "delete" ||
             confirmPayload?.type === "cancelled"
@@ -4115,10 +3703,10 @@ export default function O2DPage() {
             <div className="p-5 border-b border-gray-100 dark:border-navy-700 flex items-center justify-between bg-gray-50/50 dark:bg-navy-800">
               <div>
                 <h2 className="text-lg font-semibold text-gray-900 dark:text-white italic tracking-tight">
-                  Revision Protocol
+                  Remove follow-up
                 </h2>
                 <p className="text-[13px] font-semibold text-[#5B6472] mt-0.5">
-                  Clear Operational Data: {selectedOrderNo}
+                  Order {selectedOrderNo}
                 </p>
               </div>
               <button
@@ -4194,7 +3782,7 @@ export default function O2DPage() {
                   onClick={() => setIsRemoveFollowUpModalOpen(false)}
                   className="flex-1 h-[48px] rounded-xl font-semibold text-[#5B6472] text-[13px] hover:bg-gray-100 transition-all underline decoration-dotted"
                 >
-                  Abort
+                  Go back
                 </button>
                 <button
                   onClick={handleRemoveFollowUp}

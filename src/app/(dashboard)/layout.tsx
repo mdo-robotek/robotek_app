@@ -3,7 +3,6 @@
 import { ReactNode, useState } from "react";
 import Sidebar from "@/components/Sidebar";
 import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 import AccessGuard from "@/components/AccessGuard";
 import QuickNew from "@/components/QuickNew";
 
@@ -32,7 +31,6 @@ export default function DashboardLayout({
             </div>
           </main>
 
-          <Footer />
         </div>
       </div>
 

@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import ModuleStrip from "@/components/ModuleStrip";
+import ProcessScreen from "@/components/process/ProcessScreen";
+import { autoDetails, autoFacts, type ProcessConfig } from "@/components/process/process-view";
 import { useFindFromLink } from "@/hooks/useFindFromLink";
 import { useIsPhone } from "@/hooks/useIsPhone";
 import PhoneStepSelect from "@/components/PhoneStepSelect";
@@ -659,13 +661,15 @@ export default function HRMSModulePage({ params }: { params: Promise<{ module: s
     link.click();
   };
 
-  const openBulkModal = () => {
+  const openBulkModal = (only?: string[]) => {
+    const ids = only ? new Set(only) : selectedIds;
+    if (only) setSelectedIds(ids);
     const rmks: Record<string, string> = {};
     const ts: Record<string, boolean> = {};
     const sm: Record<string, string[]> = {};
     const lt: Record<string, string> = {};
     const ob: Record<string, Record<string, string>> = {};
-    selectedIds.forEach(id => {
+    ids.forEach(id => {
       rmks[id] = "";
       ts[id] = true;
       sm[id] = [];
@@ -772,17 +776,45 @@ export default function HRMSModulePage({ params }: { params: Promise<{ module: s
   const fmtDt = (iso: string) => iso ? new Date(iso).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "—";
   const fmtTm = (iso: string) => iso ? new Date(iso).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", hour12: true }) : "";
 
+  // One list + window, same as O2D (Sahil, 2026-10-29). Non-admins see only
+  // the work at their step (and finished ones) — same rule as before.
+  const screenItems: AnyHrmsRecord[] = isAdmin ? items : items.filter((it) => {
+    if (String((it as any).cancelled || "").trim()) return false;
+    const st = getActiveStep(it);
+    if (st === 0) return true;
+    return !!globalConfigs[st - 1]?.responsible_person?.split(",").map((x: string) => x.trim()).includes(currentUser);
+  });
+  const procCfg: ProcessConfig<AnyHrmsRecord> = {
+    unit: ({ recruitment: "openings", candidate: "candidates", sales: "candidates", onboard: "joinings", offboard: "exits" } as Record<string, string>)[module] || "records",
+    steps: (Array.from({ length: stepCount }, (_: unknown, i: number) => globalConfigs[i]?.step_name || `Step ${i + 1}`)),
+    doers: (Array.from({ length: stepCount }, (_: unknown, i: number) => globalConfigs[i]?.step_name || `Step ${i + 1}`)).map((_: unknown, i: number) => globalConfigs[i]?.responsible_person || ""),
+    id: (r) => String(r.id),
+    ref: (r) => String(r.id || ""),
+    title: (r) => String((module === 'recruitment' ? (r as any).post_for_recruitment : module === 'offboard' ? (r as any).emp_name : (r as any).candidate_name) || ""),
+    sub: (r) => String((module === 'recruitment' ? (r as any).for_which_location : module === 'offboard' ? (r as any).emp_designation : (r as any).whatsapp_number) || ""),
+    amount: undefined,
+    step: (r) => getActiveStep(r),
+    planned: (r, n) => (r as any)[`planned_${n}`] || "",
+    actual: (r, n) => (r as any)[`actual_${n}`] || "",
+    isCancelled: (r) => !!String((r as any).cancelled || "").trim(),
+    search: (r) => Object.values(r as any).filter((v) => typeof v === "string").join(" "),
+    created: (r) => String((r as any).created_at || ""),
+    stepFacts: (r, n) => autoFacts(r, n),
+    details: (r) => autoDetails(r, ["post_for_recruitment","emp_name","candidate_name","for_which_location","emp_designation","whatsapp_number"]),
+    extra: (r) => (showsDocs && docsVisibleFor(r) ? <EmployeeDocs record={r as any} module={module} uploads={docsByPerson?.[personKey(r as any, module)]} onUploaded={() => mutateDocs()} /> : null),
+  };
+
   return (
     <div className="flex flex-col h-[calc(100vh-100px)] overflow-hidden">
       {/* ─── Header ─── */}
       <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between px-2 py-0.5 shrink-0">
         <div>
-          <h1 className="text-xl font-semibold text-[#2563EB] dark:text-white tracking-tight">{moduleName} Dashboard</h1>
-          <p className="text-[13px] font-bold text-[#5B6472] dark:text-slate-400">Human Resource Management System</p>
+          <h1 className="text-[22px] font-semibold text-[#1A1D21] dark:text-white">{moduleName}</h1>
+          <p className="text-[14px] text-[#5B6472]">Hiring and joining — step by step</p>
         </div>
 
         <div className="flex items-center gap-4">
-          <div className="self-start flex flex-wrap items-center gap-1 rounded-2xl md:rounded-full border-2 border-[#2563EB] dark:border-[#60A5FA] bg-white dark:bg-navy-900 shadow-xl p-0.5">
+          <div className="self-start flex flex-wrap items-center gap-1 rounded-xl border border-[#E5E7EB] dark:border-navy-700 bg-white dark:bg-navy-900 p-0.5">
             <button onClick={handleExport} className="flex items-center gap-2 px-4 py-1 font-semibold text-[13px] text-[#2563EB] dark:text-[#60A5FA] hover:bg-slate-50 dark:hover:bg-navy-800 transition-all rounded-full">
               <ArrowDownTrayIcon className="w-3.5 h-3.5" /> <span>Export</span>
             </button>
@@ -795,13 +827,10 @@ export default function HRMSModulePage({ params }: { params: Promise<{ module: s
               } else {
                 setEditingItem(null); setFormData({}); setUploadFile(null); setIsModalOpen(true);
               }
-            }} className="px-3 py-1 text-[#2563EB] dark:text-[#60A5FA] hover:bg-slate-50 dark:hover:bg-navy-800 transition-all rounded-full">
-              <PlusIcon className="w-4 h-4 stroke-[2.5]" />
+            }} className="flex items-center gap-1.5 px-3 py-1 font-semibold text-[13px] text-[#2563EB] dark:text-[#60A5FA] hover:bg-slate-50 dark:hover:bg-navy-800 transition-all rounded-full">
+              <PlusIcon className="w-4 h-4 stroke-[2.5]" /> <span>New</span>
             </button>
             <div className="hidden md:block w-[1px] h-5 bg-slate-200 dark:bg-navy-700 mx-1" />
-            <button onClick={() => setViewMode(viewMode === 'cancelled' ? 'active' : 'cancelled')} className={`flex items-center gap-2 px-4 py-1 font-semibold   text-[13px] transition-all rounded-full ${viewMode === 'cancelled' ? 'bg-red-500 text-white shadow-md' : 'text-[#2563EB] dark:text-[#60A5FA] hover:bg-slate-50 dark:hover:bg-navy-800'}`}>
-              <NoSymbolIcon className="w-3.5 h-3.5" /> <span>CANCELLED ({items.filter(i => !!(i.cancelled || "").trim()).length})</span>
-            </button>
           </div>
 
           {(module === 'candidate' || module === 'sales') && (
@@ -810,393 +839,31 @@ export default function HRMSModulePage({ params }: { params: Promise<{ module: s
             </a>
           )}
         </div>
-
-        <div className="hidden md:flex items-center gap-0.5 bg-slate-100 dark:bg-navy-900 rounded-full p-0.5 border border-slate-200 dark:border-navy-800 shadow-inner">
-          <button onClick={() => setLayoutMode("standard")} className={`px-4 py-1 rounded-full text-[13px] font-semibold   transition-all ${layoutMode === "standard" ? "bg-white dark:bg-navy-800 text-[#2563EB] dark:text-[#60A5FA] shadow-md" : "text-[#5B6472] dark:text-navy-600"}`}>Standard</button>
-          <button onClick={() => setLayoutMode("smart")} className={`px-4 py-1 rounded-full text-[13px] font-semibold   transition-all ${(layoutMode === "smart" || isPhone) ? "bg-white dark:bg-navy-800 text-[#2563EB] dark:text-[#60A5FA] shadow-md" : "text-[#5B6472] dark:text-navy-600"}`}>Smart View</button>
-        </div>
       </div>
 
       {/* Standard tiles — tap one to see those items (Sahil, 2026-10-28) */}
       {["recruitment", "candidate", "sales", "onboard", "offboard"].includes(module) && <div className="pt-2 -mx-2"><ModuleStrip module={module as any} /></div>}
-      <div className="flex gap-4 flex-1 overflow-hidden mt-1 px-1">
-        {/* Sidebar */}
-        <div className="w-64 hidden md:flex flex-col shrink-0 h-full overflow-y-auto custom-scrollbar border-r border-slate-100 dark:border-navy-800 pr-3 py-0.5">
-          <p className="text-[14px] font-semibold text-[#5B6472] dark:text-navy-500 mb-2 px-2 mt-1">Filters</p>
-          <div className="space-y-1.5 pb-10">
-            <button onClick={() => setSelectedStepFilter("all")} className={`w-full flex items-center justify-start gap-3 px-5 py-3 rounded-full transition-all border-b-4 ${selectedStepFilter === "all" ? "bg-[#EFF4FF] dark:bg-[#D1D5DB]/20 border-[#D1D5DB] text-[#2563EB] dark:text-[#60A5FA] shadow-md" : "bg-white dark:bg-navy-900 border-slate-100 dark:border-navy-800 text-slate-500 dark:text-navy-400"}`}>
-              <span className="font-semibold text-[14px] text-left">All Records</span>
-            </button>
-            <button onClick={() => setSelectedStepFilter("completed")} className={`w-full flex items-center justify-start gap-3 px-5 py-3 rounded-full transition-all border-b-4 ${selectedStepFilter === "completed" ? "bg-emerald-500 border-emerald-700 text-white shadow-md" : "bg-white dark:bg-navy-900 border-slate-100 dark:border-navy-800 text-slate-500 dark:text-navy-400"}`}>
-              <span className="font-semibold text-[14px] text-left">Completed</span>
-              {stepCounts.completed > 0 && <span className="w-5 h-5 ml-auto flex items-center justify-center rounded-full text-[14px] font-semibold bg-white text-emerald-500">{stepCounts.completed}</span>}
-            </button>
-            {Array.from({ length: stepCount }).map((_, i) => {
-              const getStepIcon = (name: string) => {
-                const n = (name || "").toLowerCase();
-                if (n.includes("call") || n.includes("connect")) return <PhoneIcon className="w-4 h-4" />;
-                if (n.includes("post") || n.includes("social")) return <ShareIcon className="w-4 h-4" />;
-                if (n.includes("resume") || n.includes("form") || n.includes("cv")) return <DocumentTextIcon className="w-4 h-4" />;
-                if (n.includes("interview") || n.includes("filter") || n.includes("check")) return <MagnifyingGlassIcon className="w-4 h-4" />;
-                if (n.includes("done") || n.includes("confirm") || n.includes("join")) return <CheckCircleIcon className="w-4 h-4" />;
-                return <ClipboardDocumentCheckIcon className="w-4 h-4" />;
-              };
-
-              return (
-                <button key={i} onClick={() => setSelectedStepFilter(i + 1)} className={`w-full flex items-center justify-start gap-3 px-3 py-3 rounded-xl transition-all border border-slate-50 dark:border-navy-800 bg-white dark:bg-navy-900 ${selectedStepFilter === i + 1 ? "bg-[#EFF4FF] dark:bg-[#D1D5DB]/20 border-[#D1D5DB] shadow-md" : "text-slate-500 dark:text-navy-400"}`}>
-                  <div className={`p-2 rounded-lg shrink-0 ${selectedStepFilter === i + 1 ? 'bg-[#2563EB] text-white' : 'bg-slate-50 dark:bg-navy-800 text-[#5B6472]'}`}>
-                    {getStepIcon(globalConfigs[i]?.step_name)}
-                  </div>
-                  <span className="text-[14px] font-semibold tracking-tight text-left leading-tight">Step {i + 1} — {globalConfigs[i]?.step_name}</span>
-                  {stepCounts[i + 1] > 0 && <span className="w-5 h-5 ml-auto shrink-0 flex items-center justify-center rounded-full text-[14px] font-semibold bg-blue-500 text-white">{stepCounts[i + 1]}</span>}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Content */}
-        <div className="flex-1 flex flex-col min-w-0 h-full py-0.5">
-          <div className="flex flex-wrap items-center gap-2 md:gap-3 mb-3 shrink-0 px-1">
-            <PhoneStepSelect
-              steps={Array.from({ length: stepCount }, (_, i) => globalConfigs[i]?.step_name || `Step ${i + 1}`)}
-              counts={Array.from({ length: stepCount }, (_, i) => globalConfigs[i]?.step_name || `Step ${i + 1}`).map((_: unknown, i: number) => stepCounts[i + 1] || 0)}
-              value={selectedStepFilter}
-              onChange={setSelectedStepFilter}
-              allLabel="All records"
-              completedCount={stepCounts.completed || 0}
-            />
-            <div className="relative group flex-1 min-w-[160px] md:max-w-xs">
-              <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#5B6472] dark:text-navy-600" />
-              <input type="text" placeholder={`Search ${moduleName}...`} value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="w-full pl-9 pr-3 py-1.5 bg-white dark:bg-navy-900 border border-slate-200 dark:border-navy-800 rounded-xl text-[14px] font-bold text-gray-700 dark:text-white outline-none focus:border-[#2563EB] dark:focus:border-[#60A5FA]" />
-            </div>
-
-            <div className="ml-auto flex items-center gap-3">
-              <p className="text-[13px] font-semibold text-[#5B6472] whitespace-nowrap">Page <span className="text-[#2563EB] dark:text-[#60A5FA]">{currentPage}</span> OF {totalPages || 1}</p>
-              <div className="flex items-center gap-1">
-                <button onClick={() => setCurrentPage(Math.max(1, currentPage - 1))} className="p-1 text-[#5B6472] hover:text-slate-800 transition-colors"><ChevronLeftIcon className="w-3.5 h-3.5" /></button>
-                <button onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))} className="p-1 text-[#5B6472] hover:text-slate-800 transition-colors"><ChevronRightIcon className="w-3.5 h-3.5" /></button>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 space-y-3 pb-20 py-0.5">
-            {isLoading ? (
-              <div className="flex flex-col items-center justify-center p-10 animate-pulse text-slate-200"><ArrowPathIcon className="w-8 h-8 animate-spin mb-4" /><p className="text-[13px] font-semibold">SYNCHRONIZING...</p></div>
-            ) : paginatedItems.length === 0 ? (
-              <div className="flex flex-col items-center justify-center p-10 text-slate-100"><MagnifyingGlassIcon className="w-12 h-12 mb-4" /><p className="text-[13px] font-semibold">No Data Found</p></div>
-            ) : (layoutMode === "smart" || isPhone) ? (
-              paginatedItems.map(item => {
-                const sel = selectedIds.has(item.id); const step = getActiveStep(item); const exp = expandedTiles[item.id];
-                const title = module === 'recruitment' ? (item as any).post_for_recruitment
-                  : module === 'offboard' ? (item as any).emp_name
-                    : (item as any).candidate_name;
-                const subTitle = module === 'recruitment' ? `Loc: ${(item as any).for_which_location}`
-                  : module === 'offboard' ? `Desig: ${(item as any).emp_designation}`
-                    : `Phone: ${(item as any).whatsapp_number}`;
-
-                return (
-                  <div key={item.id} className="px-1">
-                    <div onClick={() => { const n = new Set(selectedIds); if (n.has(item.id)) n.delete(item.id); else n.add(item.id); setSelectedIds(n); }} className={`bg-white dark:bg-navy-800 rounded-2xl border transition-all cursor-pointer overflow-hidden ${sel ? "border-[#2563EB] dark:border-[#60A5FA] border-2 shadow-lg" : "border-slate-100 dark:border-navy-700 shadow-sm"}`}>
-                      <div className="p-3">
-                        <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3 mb-2">
-                          <div className="flex items-start gap-3">
-                            <input type="checkbox" checked={sel} readOnly className="w-4 h-4 mt-1 rounded border-slate-300 text-[#2563EB] dark:text-[#60A5FA]" />
-                            <div>
-                              <div className="flex flex-wrap items-center gap-2">
-                                <span className="px-2 py-0.5 bg-blue-50 dark:bg-blue-900/20 text-[#2563EB] dark:text-blue-400 rounded text-[13px] font-semibold border border-blue-100 dark:border-blue-900/50">ID: {item.id}</span>
-                                <h3 className="text-base font-semibold text-slate-800 dark:text-white tracking-tight leading-none">{title || "—"}</h3>
-                              </div>
-                              <div className="flex flex-wrap items-center gap-4 mt-1.5">
-                                <span className="flex items-center gap-1.5 text-[13px] font-semibold text-blue-500"><UserIcon className="w-3.5 h-3.5" /> {subTitle}</span>
-                                <span className="flex items-center gap-1.5 text-[13px] font-semibold text-[#5B6472]"><CalendarIcon className="w-3.5 h-3.5" /> {fmtDt(item.created_at)}</span>
-                              </div>
-                            </div>
-                          </div>
-
-                          <div className="flex flex-wrap items-center gap-2">
-                            {step > 0 && (
-                              <div className="flex items-center bg-white dark:bg-navy-800 border border-[#2563EB] rounded-full shadow-sm overflow-hidden divide-x divide-[#2563EB]/30 mr-1">
-                                <div className="flex flex-col items-center justify-center px-3 py-1.5 min-w-[120px]">
-                                  <p className="text-[13px] font-semibold text-[#2563EB] dark:text-[#60A5FA] tracking-tighter leading-none whitespace-nowrap">{fmtDt((item as any)[`planned_${step}`])} {fmtTm((item as any)[`planned_${step}`])}</p>
-                                  <p className={`text-[14px] font-semibold   mt-0.5 ${getDelayInfo((item as any)[`planned_${step}`], null)?.color}`}>{getDelayInfo((item as any)[`planned_${step}`], null)?.text}</p>
-                                </div>
-                                <div className="flex items-center gap-1.5 px-4 py-1.5 bg-[#2563EB]/5 dark:bg-[#60A5FA]/10">
-                                  <ClockIcon className="w-3.5 h-3.5 text-[#2563EB] stroke-[3]" />
-                                  <span className="text-[14px] font-semibold text-[#2563EB] dark:text-[#60A5FA] whitespace-nowrap">STEP {step} PENDING</span>
-                                </div>
-                              </div>
-                            )}
-                            {item.cancelled && (
-                              <span className="flex items-center gap-1.5 px-3 py-1 bg-red-50 dark:bg-red-900/10 text-[13px] font-semibold text-red-600 dark:text-red-400 rounded-full border border-red-200 dark:border-red-900/30 mr-1">
-                                <NoSymbolIcon className="w-3.5 h-3.5" /> CANCELLED ON: {fmtDt(item.cancelled)} {fmtTm(item.cancelled)}
-                              </span>
-                            )}
-                            {showsDocs && docsVisibleFor(item) && (
-                              <EmployeeDocs record={item as any} module={module} uploads={docsByPerson?.[personKey(item as any, module)]} onUploaded={() => mutateDocs()} />
-                            )}
-                            <div className="flex items-center gap-1 px-2 py-1 bg-white dark:bg-navy-800 rounded-full border border-slate-100 dark:border-navy-700 shadow-lg">
-                              <button onClick={e => { e.stopPropagation(); setExpandedTiles(p => ({ ...p, [item.id]: !exp })); }} className={`p-1.5 rounded-full transition-all ${exp ? "bg-[#2563EB] text-white" : "text-[#2563EB] dark:text-[#60A5FA] hover:bg-yellow-50"}`}><ChevronDownIcon className={`w-3.5 h-3.5 stroke-[3] transition-transform ${exp ? "rotate-180" : ""}`} /></button>
-                              <button onClick={e => { e.stopPropagation(); setEditingItem(item); setFormData({ ...item }); setUploadFile(null); setIsModalOpen(true); }} className="p-1.5 text-blue-500 hover:bg-blue-50 rounded-full transition-all" title="Edit"><PencilSquareIcon className="w-3.5 h-3.5" /></button>
-                              {(!item.cancelled && Array.from({ length: stepCount }).some((_, i) => (item as any)[`actual_${i + 1}`]?.trim())) && (
-                                <button onClick={e => { e.stopPropagation(); openRemoveFollowUpModal(item); }} className="p-1.5 text-[#D97706] hover:bg-[#F7F8FA] rounded-full transition-all" title="Remove Follow-up"><ArrowUturnLeftIcon className="w-3.5 h-3.5" /></button>
-                              )}
-                              {item.cancelled ? (
-                                <button onClick={e => { e.stopPropagation(); setRestoreTargetId(item.id); setIsConfirmOpen(true); }} className="p-1.5 text-emerald-500 hover:bg-emerald-50 rounded-full transition-all" title="Restore Process"><ArrowPathIcon className="w-3.5 h-3.5" /></button>
-                              ) : (
-                                <button onClick={e => { e.stopPropagation(); setCancelTargetId(item.id); setIsConfirmOpen(true); }} className="p-1.5 text-[#D97706] hover:bg-[#F7F8FA] rounded-full transition-all" title="Cancel Process"><NoSymbolIcon className="w-3.5 h-3.5" /></button>
-                              )}
-                              <button onClick={e => { e.stopPropagation(); handleDeleteClick(item.id); }} className="p-1.5 text-red-500 hover:bg-red-50 rounded-full transition-all" title="Delete"><TrashIcon className="w-3.5 h-3.5" /></button>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="mt-3 border-t border-slate-50 dark:border-navy-700 pt-3">
-                          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 items-start">
-                            {formFields.filter(f => f.type !== "file").map((f, i) => {
-                              const getFieldIcon = (name: string) => {
-                                const n = name.toLowerCase();
-                                if (n.includes("date") || n.includes("time") || n.includes("age") || n.includes("notice") || n.includes("period") || n.includes("lead")) return <CalendarIcon className="w-3 h-3 inline-block mr-1 -mt-0.5" />;
-                                if (n.includes("name") || n.includes("by") || n.includes("male") || n.includes("reference")) return <UserIcon className="w-3 h-3 inline-block mr-1 -mt-0.5" />;
-                                if (n.includes("location") || n.includes("office")) return <MapPinIcon className="w-3 h-3 inline-block mr-1 -mt-0.5" />;
-                                if (n.includes("ctc") || n.includes("salary") || n.includes("price")) return <BanknotesIcon className="w-3 h-3 inline-block mr-1 -mt-0.5" />;
-                                if (n.includes("post") || n.includes("experience") || n.includes("work")) return <BriefcaseIcon className="w-3 h-3 inline-block mr-1 -mt-0.5" />;
-                                if (n.includes("skill") || n.includes("qualification")) return <SparklesIcon className="w-3 h-3 inline-block mr-1 -mt-0.5" />;
-                                if (n.includes("social") || n.includes("share")) return <ShareIcon className="w-3 h-3 inline-block mr-1 -mt-0.5" />;
-                                return <HashtagIcon className="w-3 h-3 inline-block mr-1 -mt-0.5" />;
-                              };
-                              const shortLabel = (l: string) => {
-                                const map: Record<string, string> = {
-                                  "NO. OF POST FOR RECRUITMENT": "NO. OF POSTS",
-                                  "EXPERIENCE NEEDED FOR THE ROLE": "EXPERIENCE",
-                                  "WORK AND RESPONSIBILITIES": "RESPONSIBILITIES",
-                                  "POST FOR RECRUITMENT": "POST",
-                                  "FOR WHICH LOCATION": "LOCATION",
-                                  "REQUIREMENT BY": "REQ. BY",
-                                  "MALE /FEMALE": "GENDER",
-                                  "SKILLS REQUIRED": "SKILLS",
-                                  "WHICH PLATFORM": "PLATFORM",
-                                  "PLAN TO CLOSE": "TAT (DAYS)",
-                                  "NOTICE PERIOD (IN DAYS)": "NOTICE PERIOD",
-                                  "SHARE TWO PROFESSIONAL REFERENCES": "REFERENCES",
-                                  "CURRENT LIVING LOCATION": "LIVING LOCATION",
-                                  "GTK OFFICE COMFORTABLE": "GTK OFFICE",
-                                  "LEAD TIME FOR EMP. JOINING (STEP 7)": "LEAD TIME",
-                                  "LEAD TIME": "LEAD TIME"
-                                };
-                                return map[l.toUpperCase()] || l;
-                              };
-
-                              return (
-                                <div key={f.name} className="space-y-0.5">
-                                  <p className={`text-[13px] font-semibold   truncate ${i % 3 === 0 ? 'text-emerald-500' : i % 3 === 1 ? 'text-blue-500' : 'text-purple-500'}`} title={f.label}>
-                                    {getFieldIcon(f.name)}
-                                    {shortLabel(f.label)}
-                                  </p>
-                                  <p className="text-[14px] font-semibold text-slate-800 dark:text-white truncate">
-                                    {f.type === 'date' && (item as any)[f.name] ? new Date((item as any)[f.name]).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: '2-digit' }) : (item as any)[f.name] || "—"}
-                                  </p>
-                                </div>
-                              );
-                            })}
-                            {(item as any).upload_updated_cv && (
-                              <div className="space-y-0.5">
-                                <p className="text-[13px] font-semibold text-[#D97706] truncate" title="Document">
-                                  <DocumentTextIcon className="w-3 h-3 inline-block mr-1 -mt-0.5" />
-                                  DOCUMENT
-                                </p>
-                                <a href={(item as any).upload_updated_cv} target="_blank" rel="noreferrer" className="text-[14px] font-semibold text-blue-500 hover:underline truncate inline-block">View File</a>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-
-                        {exp && (
-                          <div className="mt-3 flex overflow-x-auto items-stretch gap-2 animate-in slide-in-from-top-2 duration-300 pb-2 custom-scrollbar">
-
-                            {/* Step Tiles */}
-                            {Array.from({ length: stepCount }, (_, i) => {
-                              const n = i + 1; const act = (item as any)[`actual_${n}`]; const pl = (item as any)[`planned_${n}`];
-                              const done = !!act; const isPending = !done && n === getActiveStep(item);
-                              const skipped = done && String((item as any)[`status_${n}`] || "") === NOT_NEEDED;
-                              let statusClasses = "bg-white dark:bg-navy-900 border-slate-200 dark:border-navy-700 text-[#5B6472]";
-                              if (skipped) statusClasses = "bg-[#F7F8FA] dark:bg-navy-900 border-dashed border-slate-300 dark:border-navy-700 text-[#5B6472]";
-                              else if (done) statusClasses = "bg-emerald-50/50 dark:bg-emerald-900/10 border-emerald-500 text-emerald-700 dark:text-emerald-400 shadow-sm";
-                              else if (isPending) statusClasses = "bg-[#F7F8FA] dark:bg-[#FEF3C7] border-[#E5E7EB] text-[#D97706] dark:text-[#D97706] shadow-sm";
-                              return (
-                                <div key={n} className={`flex-none w-64 p-3 rounded-xl border transition-all flex flex-col justify-between ${statusClasses}`}>
-                                  <div>
-                                    <div className="flex items-center justify-between mb-1">
-                                      <p className={`text-[13px] font-semibold   ${skipped ? "text-[#5B6472]" : done ? "text-emerald-600" : isPending ? "text-[#D97706]" : "text-[#5B6472]"}`}>STEP {n}{skipped ? " · Not needed" : ""}</p>
-                                      {done ? <CheckCircleIcon className="w-3.5 h-3.5 text-emerald-600" /> : isPending ? <ClockIcon className="w-3.5 h-3.5 text-[#D97706] animate-pulse" /> : null}
-                                    </div>
-                                    <p className={`text-[14px] font-semibold leading-snug line-clamp-2 ${done ? "text-emerald-900 dark:text-emerald-200" : isPending ? "text-[#D97706] dark:text-[#D97706]" : "text-slate-600"}`}>{globalConfigs[i]?.step_name}</p>
-                                  </div>
-                                  <div className={`mt-3 space-y-1.5 pt-2 border-t ${done ? "border-emerald-100 dark:border-emerald-900/50" : "border-slate-100 dark:border-navy-800"}`}>
-                                    <div className="flex justify-between items-center text-[13px] font-semibold">
-                                      <span className="opacity-50">Planned</span>
-                                      <span>{pl ? (new Date(pl).toLocaleDateString('en-GB') + ' ' + new Date(pl).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })) : "—"}</span>
-                                    </div>
-                                    <div className="flex justify-between items-center text-[13px] font-semibold">
-                                      <span className="opacity-50">Actual</span>
-                                      <span className={done ? "text-emerald-700 dark:text-emerald-400" : "opacity-30"}>{act ? (new Date(act).toLocaleDateString('en-GB') + ' ' + new Date(act).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })) : "—"}</span>
-                                    </div>
-                                    {((item as any)[`status_${n}`] || (item as any)[`remark_${n}`]) && (
-                                      <div className={`mt-1.5 pt-1.5 border-t space-y-1 ${done ? "border-emerald-100 dark:border-emerald-900/50" : "border-slate-100 dark:border-navy-800"}`}>
-                                        {(item as any)[`status_${n}`] && (
-                                          <div className="flex justify-between items-center text-[13px] font-semibold">
-                                            <span className="opacity-50">Status</span>
-                                            <span className="truncate max-w-[120px]" title={(item as any)[`status_${n}`]}>{(item as any)[`status_${n}`]}</span>
-                                          </div>
-                                        )}
-                                        {(item as any)[`remark_${n}`] && (
-                                          <div className="flex justify-between items-start text-[13px] font-semibold">
-                                            <span className="opacity-50 mr-2 mt-0.5">Remark</span>
-                                            <span className="text-right line-clamp-2 max-w-[140px]" title={(item as any)[`remark_${n}`]}>{(item as any)[`remark_${n}`]}</span>
-                                          </div>
-                                        )}
-                                      </div>
-                                    )}
-                                    {module === 'recruitment' && n === RECRUITMENT_POST_STEP && (item as any).social_medias_1 && (
-                                      <div className="flex flex-wrap gap-1 mt-1.5 pt-1.5 border-t border-slate-100 dark:border-navy-800">
-                                        {(() => {
-                                          try {
-                                            const arr = JSON.parse((item as any).social_medias_1);
-                                            if (Array.isArray(arr) && arr.length > 0) {
-                                              return arr.map((sm, idx) => (
-                                                <span key={idx} className="px-1.5 py-0.5 bg-[#2563EB] text-white text-[14px] font-semibold rounded shadow-sm">{sm}</span>
-                                              ));
-                                            }
-                                          } catch (e) { }
-                                          return null;
-                                        })()}
-                                      </div>
-                                    )}
-                                    {module === 'offboard' && (
-                                      <div className={`mt-1.5 pt-1.5 border-t space-y-1 ${done ? "border-emerald-100 dark:border-emerald-900/50" : "border-slate-100 dark:border-navy-800"}`}>
-                                        {n === 1 && (
-                                          <>
-                                            {(item as any).notice_period_in_days_1 && <div className="flex justify-between items-start text-[13px] font-semibold"><span className="opacity-50">Notice Period</span><span className="text-right">{(item as any).notice_period_in_days_1} Days</span></div>}
-                                            {(item as any).lwd_1 && <div className="flex justify-between items-start text-[13px] font-semibold"><span className="opacity-50">LWD</span><span className="text-right">{(item as any).lwd_1}</span></div>}
-                                            {(item as any).handover_name_1 && <div className="flex justify-between items-start text-[13px] font-semibold"><span className="opacity-50">Handover To</span><span className="text-right">{(item as any).handover_name_1}</span></div>}
-                                            {(item as any).reason_of_leaving_1 && <div className="flex justify-between items-start text-[13px] font-semibold"><span className="opacity-50">Reason</span><span className="text-right line-clamp-2 max-w-[120px]" title={(item as any).reason_of_leaving_1}>{(item as any).reason_of_leaving_1}</span></div>}
-                                            {(item as any).remarks_of_management_1 && <div className="flex justify-between items-start text-[13px] font-semibold"><span className="opacity-50">Mgt Remark</span><span className="text-right line-clamp-2 max-w-[120px]" title={(item as any).remarks_of_management_1}>{(item as any).remarks_of_management_1}</span></div>}
-                                          </>
-                                        )}
-                                        {n === 2 && (
-                                          <>
-                                            {(item as any).knowledge_transfer_2 && <div className="space-y-0.5 mt-1"><span className="opacity-50 text-[13px] font-semibold block">Knowledge Transfer:</span><div className="flex flex-wrap gap-1">{(item as any).knowledge_transfer_2.split(',').filter((x: string) => x.trim()).map((k: string, idx: number) => <span key={idx} className="px-1.5 py-0.5 bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-300 text-[14px] font-semibold rounded shadow-sm">{k.trim()}</span>)}</div></div>}
-                                            {(item as any).asset_recovery_2 && <div className="space-y-0.5 mt-1"><span className="opacity-50 text-[13px] font-semibold block">Asset Recovery:</span><div className="flex flex-wrap gap-1">{(item as any).asset_recovery_2.split(',').filter((x: string) => x.trim()).map((k: string, idx: number) => <span key={idx} className="px-1.5 py-0.5 bg-purple-100 dark:bg-purple-900/40 text-purple-800 dark:text-purple-300 text-[14px] font-semibold rounded shadow-sm">{k.trim()}</span>)}</div></div>}
-                                          </>
-                                        )}
-                                        {n === 3 && (
-                                          <>
-                                            {(item as any).discussion_with_hr_3 && <div className="flex justify-between items-start text-[13px] font-semibold"><span className="opacity-50">HR Discussion</span><span className="text-right line-clamp-2 max-w-[120px]" title={(item as any).discussion_with_hr_3}>{(item as any).discussion_with_hr_3}</span></div>}
-                                            {(item as any).conclusion_3 && <div className="flex justify-between items-start text-[13px] font-semibold"><span className="opacity-50">Conclusion</span><span className="text-right line-clamp-2 max-w-[120px]" title={(item as any).conclusion_3}>{(item as any).conclusion_3}</span></div>}
-                                          </>
-                                        )}
-                                        {n === OFFBOARD_CLOSURE_STEP && (
-                                          <div className="flex flex-wrap gap-1 mt-1">
-                                            {['relieving_letter_4', 'experience_letter_4', 'f_and_f_statement_4', 'salary_slips_if_requested_4'].map((doc, idx) => {
-                                              if ((item as any)[doc] === "Done") {
-                                                const label = ['Relieving Ltr', 'Experience Ltr', 'F&F Stmt', 'Salary Slips'][idx];
-                                                return <span key={idx} className="px-1.5 py-0.5 bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-300 text-[14px] font-semibold rounded shadow-sm flex items-center gap-1"><CheckCircleIcon className="w-2.5 h-2.5" /> {label}</span>;
-                                              }
-                                              return null;
-                                            })}
-                                          </div>
-                                        )}
-                                      </div>
-                                    )}
-                                  </div>
-                                </div>
-                              );
-                            })}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })
-            ) : (
-              <div className="overflow-x-auto rounded-xl border border-slate-100 dark:border-navy-800 bg-white dark:bg-navy-800 shadow-sm custom-scrollbar">
-                <table className="w-full text-left border-collapse text-[14px]">
-                  <thead>
-                    <tr className="bg-[#2563EB] dark:bg-navy-950 text-white font-semibold">
-                      <th className="p-3 sticky left-0 z-10 bg-[#2563EB]"><input type="checkbox" checked={selectedIds.size === paginatedItems.length && paginatedItems.length > 0} onChange={() => { if (selectedIds.size === paginatedItems.length) setSelectedIds(new Set()); else setSelectedIds(new Set(paginatedItems.map(i => i.id))); }} className="rounded border-white/20 bg-transparent text-[#2563EB]" /></th>
-                      <th className="p-3 whitespace-nowrap sticky left-10 z-10 bg-[#2563EB]">Actions</th>
-                      <th className="p-3 whitespace-nowrap sticky left-24 z-10 bg-[#2563EB]">ID</th>
-                      {formFields.map(f => <th key={f.name} className="p-3 whitespace-nowrap">{f.label}</th>)}
-                      <th className="p-3 whitespace-nowrap border-l border-white/10">Created At</th>
-                      {Array.from({ length: stepCount }).map((_, i) => <th key={i} className="p-3 whitespace-nowrap border-l border-white/10 min-w-[200px]">STEP {i + 1} — {globalConfigs[i]?.step_name?.toUpperCase() || ''}</th>)}
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100 dark:divide-navy-700">
-                    {paginatedItems.map(item => {
-                      const sel = selectedIds.has(item.id);
-                      return (
-                        <tr key={item.id} className="hover:bg-slate-50/50 dark:hover:bg-navy-900/30 transition-all font-bold">
-                          <td className="p-3 sticky left-0 z-10 bg-white dark:bg-navy-800"><input type="checkbox" checked={sel} onChange={() => { const n = new Set(selectedIds); if (n.has(item.id)) n.delete(item.id); else n.add(item.id); setSelectedIds(n); }} className="rounded border-slate-300 text-[#2563EB] dark:text-[#60A5FA]" /></td>
-                          <td className="p-3 sticky left-10 z-10 bg-white dark:bg-navy-800">
-                            <div className="flex items-center gap-1">
-                              <button onClick={e => { e.stopPropagation(); setEditingItem(item); setFormData({ ...item }); setUploadFile(null); setIsModalOpen(true); }} className="p-1 text-blue-500 hover:bg-blue-50 rounded" title="Edit"><PencilSquareIcon className="w-3.5 h-3.5" /></button>
-                              {item.cancelled ? (
-                                <button onClick={() => setRestoreTargetId(item.id)} className="p-1 text-emerald-500 hover:bg-emerald-50 rounded" title="Restore"><ArrowPathIcon className="w-3.5 h-3.5" /></button>
-                              ) : (
-                                <>
-                                  <button onClick={() => setCancelTargetId(item.id)} className="p-1 text-[#D97706] hover:bg-[#F7F8FA] rounded" title="Cancel"><NoSymbolIcon className="w-3.5 h-3.5" /></button>
-                                  {Array.from({ length: stepCount }).some((_, i) => (item as any)[`actual_${i + 1}`]?.trim()) && (
-                                    <button onClick={e => { e.stopPropagation(); openRemoveFollowUpModal(item); }} className="p-1 text-[#D97706] hover:bg-[#F7F8FA] rounded" title="Remove Follow-up"><ArrowUturnLeftIcon className="w-3.5 h-3.5" /></button>
-                                  )}
-                                </>
-                              )}
-                              <button onClick={() => handleDeleteClick(item.id)} className="p-1 text-red-500 hover:bg-red-50 rounded" title="Delete"><TrashIcon className="w-3.5 h-3.5" /></button>
-                            </div>
-                          </td>
-                          <td className="p-3 sticky left-24 z-10 bg-white dark:bg-navy-800">
-                            <div className="flex flex-col">
-                              <span className="px-2 py-0.5 bg-blue-50 dark:bg-blue-900/20 text-[#2563EB] dark:text-blue-400 rounded border border-blue-100 dark:border-blue-900/50 whitespace-nowrap">{item.id.slice(0, 8).toUpperCase()}</span>
-                              {item.cancelled && <span className="text-[14px] text-red-500 font-semibold mt-0.5" title={`${fmtDt(item.cancelled)} ${fmtTm(item.cancelled)}`}>Cancelled</span>}
-                            </div>
-                          </td>
-                          {formFields.map(f => (
-                            <td key={f.name} className="p-3 max-w-[200px] truncate" title={(item as any)[f.name]}>
-                              {f.type === 'date' && (item as any)[f.name] ? new Date((item as any)[f.name]).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: '2-digit' }) : (item as any)[f.name] || "—"}
-                            </td>
-                          ))}
-                          <td className="p-3 border-l border-slate-100 dark:border-navy-700 whitespace-nowrap text-slate-500">{new Date(item.created_at).toLocaleDateString('en-GB')} {new Date(item.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</td>
-                          {Array.from({ length: stepCount }).map((_, i) => {
-                            const n = i + 1; const act = (item as any)[`actual_${n}`]; const pl = (item as any)[`planned_${n}`];
-                            const done = !!act; const isPending = !done && n === getActiveStep(item);
-                            return (
-                              <td key={i} className={`p-3 border-l ${done ? "bg-emerald-50/30 text-emerald-700" : isPending ? "bg-[#F7F8FA] text-[#D97706]" : "border-slate-100 dark:border-navy-700"}`}>
-                                <div className="space-y-0.5 w-32">
-                                  <div className="flex justify-between items-center text-[13px] font-semibold"><span className="opacity-50">Pl</span><span>{pl ? (new Date(pl).toLocaleDateString('en-GB') + ' ' + new Date(pl).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })) : "—"}</span></div>
-                                  <div className="flex justify-between items-center text-[13px] font-semibold"><span className="opacity-50">Ac</span><span className={done ? "text-emerald-600" : "opacity-30"}>{act ? (new Date(act).toLocaleDateString('en-GB') + ' ' + new Date(act).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })) : "—"}</span></div>
-                                </div>
-                              </td>
-                            );
-                          })}
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
-        </div>
+      {/* One list + window, same as O2D (Sahil, 2026-10-29) */}
+      <div className="flex-1 flex overflow-hidden mt-2 px-1 min-w-0">
+        <ProcessScreen
+          cfg={procCfg}
+          items={screenItems}
+          loading={isLoading}
+          initialSearch={searchTerm}
+          primary={[{ label: "Update step", onClick: (r) => openBulkModal([String(r.id)]) }]}
+          footer={[{ label: "Edit", onClick: (r) => { setEditingItem(r); setFormData({ ...r }); setUploadFile(null); setIsModalOpen(true); }, show: (r) => isAdmin || getActiveStep(r) > 0 }, { label: "Remove follow-up", onClick: (r) => openRemoveFollowUpModal(r), show: (r) => isAdmin && !String((r as any).cancelled || "").trim() }]}
+          menu={[{ label: "Cancel", tone: "danger", onClick: (r) => { setCancelTargetId(String(r.id)); setIsConfirmOpen(true); }, show: (r) => !String((r as any).cancelled || "").trim() && (isAdmin || getActiveStep(r) > 0) }, { label: "Restore", onClick: (r) => { setRestoreTargetId(String(r.id)); setIsConfirmOpen(true); }, show: (r) => !!String((r as any).cancelled || "").trim() }, { label: "Delete", tone: "danger", onClick: (r) => handleDeleteClick(String(r.id)), show: () => isAdmin }]}
+        />
       </div>
 
       {/* Floating Bulk Bar */}
-      {selectedIds.size > 0 && (
+      {false && selectedIds.size > 0 && (
         <div className="fixed bottom-24 md:bottom-10 left-1/2 -translate-x-1/2 bg-[#FFFFFF] dark:bg-navy-800 px-1.5 py-1.5 rounded-full shadow-2xl flex items-center gap-4 border border-[#EFF4FF] dark:border-navy-700 z-[100] animate-in slide-in-from-bottom-12">
           <div className="flex items-center gap-2.5 pl-3">
             <div className="w-8 h-8 bg-[#2563EB] text-white rounded-full flex items-center justify-center font-semibold text-sm">{selectedIds.size}</div>
             <p className="text-[13px] font-semibold text-[#2563EB] dark:text-[#60A5FA]">Selected</p>
           </div>
-          <button onClick={openBulkModal} className="flex items-center gap-2 bg-[#2563EB] text-white px-6 py-2.5 rounded-full font-semibold text-[13px] hover:scale-[1.03] transition-all shadow-md">
+          <button onClick={() => openBulkModal()} className="flex items-center gap-2 bg-[#2563EB] text-white px-6 py-2.5 rounded-full font-semibold text-[13px] hover:scale-[1.03] transition-all shadow-md">
             <SparklesIcon className="w-3.5 h-3.5" /> BULK PROCESS
           </button>
           <button onClick={() => setSelectedIds(new Set())} className="pr-5 text-[#5B6472] hover:text-[#2563EB] text-[13px] font-semibold transition-colors">Clear</button>
@@ -1209,7 +876,7 @@ export default function HRMSModulePage({ params }: { params: Promise<{ module: s
           <div className="absolute inset-0 bg-[#1D4ED8]/60 backdrop-blur-md" onClick={() => setIsBulkModalOpen(false)} />
           <div className="relative bg-[#FFFFFF] dark:bg-navy-800 w-full max-w-4xl rounded-3xl md:rounded-[3.5rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
             <div className="px-5 md:px-10 pt-6 pb-3 flex items-start justify-between border-b border-slate-100 dark:border-navy-700">
-              <div><h2 className="text-[26px] font-semibold italic tracking-tighter text-[#2563EB] dark:text-white leading-none">Bulk Processor</h2><p className="text-[13px] font-semibold mt-1 text-[#5B6472]">Processing {Array.from(selectedIds).length} items</p></div>
+              <div><h2 className="text-[22px] font-semibold text-[#1A1D21] dark:text-white leading-none">Update step</h2><p className="text-[13px] font-semibold mt-1 text-[#5B6472]">Processing {Array.from(selectedIds).length} items</p></div>
               <button onClick={() => setIsBulkModalOpen(false)} className="p-2 hover:bg-slate-100 rounded-full text-[#5B6472]"><XMarkIcon className="w-6 h-6" /></button>
             </div>
             <div className="flex-1 overflow-y-auto px-3 md:px-10 pb-24 pt-4 space-y-3 custom-scrollbar">
@@ -1393,7 +1060,7 @@ export default function HRMSModulePage({ params }: { params: Promise<{ module: s
               <button onClick={() => setIsBulkModalOpen(false)} className="px-6 py-3 text-[14px] font-semibold text-[#5B6472]">Cancel</button>
               <div className="flex flex-wrap items-center justify-end gap-3">
                 {missingDecision && <span className="text-[13px] font-semibold text-amber-600">Choose Selected or Rejected for every step 7 candidate</span>}
-                <button onClick={handleBulkStepSave} disabled={missingDecision} className="bg-[#2563EB] dark:bg-[#60A5FA] text-white dark:text-navy-950 px-10 py-3.5 rounded-2xl font-semibold text-[14px] shadow-lg hover:scale-[1.02] transition-all disabled:opacity-50 disabled:hover:scale-100">Execute Bulk Update</button>
+                <button onClick={handleBulkStepSave} disabled={missingDecision} className="bg-[#2563EB] dark:bg-[#60A5FA] text-white dark:text-navy-950 px-10 py-3.5 rounded-2xl font-semibold text-[14px] shadow-lg hover:scale-[1.02] transition-all disabled:opacity-50 disabled:hover:scale-100">Save</button>
               </div>
             </div>
           </div>

@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import ModuleStrip from "@/components/ModuleStrip";
+import ProcessScreen from "@/components/process/ProcessScreen";
+import type { ProcessConfig } from "@/components/process/process-view";
 import { useFindFromLink } from "@/hooks/useFindFromLink";
 import { useIsPhone } from "@/hooks/useIsPhone";
 import PhoneStepSelect from "@/components/PhoneStepSelect";
@@ -276,6 +278,9 @@ export default function I2RPackingPage() {
   const [viewMode, setViewMode] = useState<"active" | "cancelled">("active");
   const [layoutMode, setLayoutMode] = useState<"smart" | "standard">("smart");
   const isPhone = useIsPhone();
+  const [headerMenuOpen, setHeaderMenuOpen] = useState(false);
+  // the update window works on one record; clear it when the window closes
+  useEffect(() => { if (!isBulkModalOpen) setSelectedIds(new Set()); }, [isBulkModalOpen]);
   const [expandedTiles, setExpandedTiles] = useState<Record<string, boolean>>({});
   const [dateFilter, setDateFilter] = useState<string | null>(null);
   // "Open" in the work-list window lands here with ?find=<number>
@@ -679,12 +684,14 @@ export default function I2RPackingPage() {
     link.click();
   };
 
-  const openBulkModal = () => {
+  const openBulkModal = (only?: string[]) => {
+    const ids = only ? new Set(only) : selectedIds;
+    if (only) setSelectedIds(ids);
     const ts: Record<string, boolean> = {};
     const v3: Record<string, string> = {};
     const lt3: Record<string, string> = {};
     const p4: Record<string, string> = {};
-    selectedIds.forEach(id => {
+    ids.forEach(id => {
       const it = items.find(r => r.id === id); if (!it) return;
       ts[id] = true;
       v3[id] = it.vendor_name_3 || "";
@@ -756,394 +763,105 @@ export default function I2RPackingPage() {
   const totalPages = Math.ceil(sortedItems.length / itemsPerPage);
   const paginatedItems = sortedItems.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
+  // Same rule as before: non-admins see only the work at their step (and finished ones)
+  const screenItems = useMemo(() => isAdmin ? items : items.filter((it) => {
+    if ((it.cancelled || "").trim()) return false;
+    const st = getActiveStep(it);
+    if (st === 0) return true;
+    return !!globalConfigs[st - 1]?.responsible_person?.split(",").map((x) => x.trim()).includes(currentUser);
+  }), [items, isAdmin, globalConfigs, currentUser]);
+
+  const procCfg: ProcessConfig<I2RPacking> = {
+    unit: "packing requests",
+    steps: [...I2R_PACKING_STEPS],
+    doers: I2R_PACKING_STEPS.map((_, i) => globalConfigs[i]?.responsible_person || ""),
+    id: (r) => r.id,
+    ref: (r) => r.ppf_num,
+    title: (r) => r.item_name,
+    sub: (r) => r.packing_design,
+    amount: (r) => (r.total_qty ? `${Number(String(r.total_qty).replace(/[^\d.]/g, "") || 0).toLocaleString("en-IN")} pcs` : ""),
+    step: (r) => getActiveStep(r),
+    planned: (r, n) => (r as any)[`planned_${n}`] || "",
+    actual: (r, n) => (r as any)[`actual_${n}`] || "",
+    isCancelled: (r) => !!(r.cancelled || "").trim(),
+    search: (r) => [r.ppf_num, r.item_name, r.packing_design, r.vendor_name_3, r.po_num_4].join(" "),
+    created: (r) => r.created_at,
+    stepFacts: (r, n) =>
+      n === 3 ? [{ label: "Vendor", value: r.vendor_name_3 }, { label: "Lead time", value: r.lead_time_3 ? `${r.lead_time_3} days` : "" }, ...(r.pi_3 ? [{ label: "PI", href: r.pi_3 }] : [])].filter((x) => x.value || x.href)
+      : n === 4 && r.po_num_4 ? [{ label: "PO no.", value: r.po_num_4 }]
+      : [],
+    details: (r) => {
+      const st = getPOStats(r.po_num_4, r.total_qty);
+      return [
+        { label: "Required by", value: r.required_by },
+        { label: "Last supplier", value: r.last_suppliar },
+        { label: "Vendor", value: r.vendor_name_3 },
+        { label: "PO number", value: r.po_num_4 },
+        ...(st.hasPO ? [{ label: "Received so far", value: `${st.totalReceived} of ${st.totalQty}` }, { label: "Still to come", value: String(st.balance) }] : []),
+      ];
+    },
+  };
+
   return (
     <div className="flex flex-col h-[calc(100vh-100px)] overflow-hidden">
       {/* ─── Header ─── */}
       <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between px-2 py-0.5 shrink-0">
         <div>
-          <h1 className="text-xl font-semibold text-[#2563EB] dark:text-white tracking-tight">I2R Packing Management</h1>
-          <p className="text-[13px] font-bold text-[#5B6472] dark:text-slate-400">PACKING WORKFLOW — DESIGN TO RECEIVE</p>
+          <h1 className="text-[22px] font-semibold text-[#1A1D21] dark:text-white">Packing Purchase</h1>
+          <p className="text-[14px] text-[#5B6472]">Packing material — from design to receiving</p>
         </div>
-
-        <div className="self-start flex flex-wrap items-center gap-1 rounded-2xl md:rounded-full border-2 border-[#2563EB] dark:border-[#60A5FA] bg-white dark:bg-navy-900 shadow-xl p-0.5">
-          <button onClick={handleExport} className="flex items-center gap-2 px-4 py-1 font-semibold text-[13px] text-[#2563EB] dark:text-[#60A5FA] hover:bg-slate-50 dark:hover:bg-navy-800 transition-all rounded-full">
-            <ArrowDownTrayIcon className="w-3.5 h-3.5" /> <span>Export</span>
+        <div className="flex items-center gap-2">
+          <button onClick={() => { setEditingItem(null); setFormData({ ...EMPTY_FORM }); setIsModalOpen(true); }} className="h-11 px-4 inline-flex items-center gap-1.5 rounded-xl bg-[#2563EB] text-white text-[14px] font-semibold hover:bg-[#1D4ED8]">
+            <PlusIcon className="w-5 h-5" /> New request
           </button>
-          <button onClick={() => setIsConfigModalOpen(true)} className="flex items-center gap-2 px-4 py-1 font-semibold text-[13px] text-[#2563EB] dark:text-[#60A5FA] hover:bg-slate-50 dark:hover:bg-navy-800 transition-all rounded-full">
-            <Cog6ToothIcon className="w-3.5 h-3.5" /> <span>Config</span>
-          </button>
-          <button onClick={() => { setEditingItem(null); setFormData({ ...EMPTY_FORM }); setIsModalOpen(true); }} className="px-3 py-1 text-[#2563EB] dark:text-[#60A5FA] hover:bg-slate-50 dark:hover:bg-navy-800 transition-all rounded-full">
-            <PlusIcon className="w-4 h-4 stroke-[2.5]" />
-          </button>
-          <div className="hidden md:block w-[1px] h-5 bg-slate-200 dark:bg-navy-700 mx-1" />
-          <button onClick={() => setViewMode(viewMode === 'cancelled' ? 'active' : 'cancelled')} className={`flex items-center gap-2 px-4 py-1 font-semibold   text-[13px] transition-all rounded-full ${viewMode === 'cancelled' ? 'bg-red-500 text-white shadow-md' : 'text-[#2563EB] dark:text-[#60A5FA] hover:bg-slate-50 dark:hover:bg-navy-800'}`}>
-            <NoSymbolIcon className="w-3.5 h-3.5" /> <span>CANCELLED ({items.filter(i => !!(i.cancelled || "").trim()).length})</span>
-          </button>
-        </div>
-
-        <div className="hidden md:flex items-center gap-0.5 bg-slate-100 dark:bg-navy-900 rounded-full p-0.5 border border-slate-200 dark:border-navy-800 shadow-inner">
-          <button onClick={() => setLayoutMode("standard")} className={`px-4 py-1 rounded-full text-[13px] font-semibold   transition-all ${layoutMode === "standard" ? "bg-white dark:bg-navy-800 text-[#2563EB] dark:text-[#60A5FA] shadow-md" : "text-[#5B6472] dark:text-navy-600"}`}>Standard</button>
-          <button onClick={() => setLayoutMode("smart")} className={`px-4 py-1 rounded-full text-[13px] font-semibold   transition-all ${(layoutMode === "smart" || isPhone) ? "bg-white dark:bg-navy-800 text-[#2563EB] dark:text-[#60A5FA] shadow-md" : "text-[#5B6472] dark:text-navy-600"}`}>Smart View</button>
-        </div>
-      </div>
-
-      {/* Standard tiles — tap one to see those items (Sahil, 2026-10-28) */}
-      <div className="pt-2 -mx-2"><ModuleStrip module={"i2r-packing"} /></div>
-      <div className="flex gap-4 flex-1 overflow-hidden mt-1 px-1">
-        {/* Sidebar */}
-        <div className="w-60 hidden md:flex flex-col shrink-0 h-full overflow-y-auto custom-scrollbar border-r border-slate-100 dark:border-navy-800 pr-3 py-0.5">
-          <p className="text-[13px] font-semibold text-[#5B6472] dark:text-navy-500 mb-1.5 px-2">Filters</p>
-          <div className="space-y-1.5 pb-10">
-            <button onClick={() => setSelectedStepFilter("all")} className={`w-full flex items-center justify-start gap-3 px-5 py-2.5 rounded-full transition-all border-b-4 ${selectedStepFilter === "all" ? "bg-[#EFF4FF] dark:bg-[#D1D5DB]/20 border-[#D1D5DB] text-[#2563EB] dark:text-[#60A5FA] shadow-md" : "bg-white dark:bg-navy-900 border-slate-100 dark:border-navy-800 text-slate-500 dark:text-navy-400"}`}>
-              <span className="font-semibold text-[14px] text-left">All Packing</span>
-            </button>
-            <button onClick={() => setSelectedStepFilter("completed")} className={`w-full flex items-center justify-start gap-3 px-5 py-2.5 rounded-full transition-all border-b-4 ${selectedStepFilter === "completed" ? "bg-emerald-500 border-emerald-700 text-white shadow-md" : "bg-white dark:bg-navy-900 border-slate-100 dark:border-navy-800 text-slate-500 dark:text-navy-400"}`}>
-              <span className="font-semibold text-[14px] text-left">Completed</span>
-              {stepCounts.completed > 0 && <span className="w-5 h-5 ml-auto flex items-center justify-center rounded-full text-[13px] font-semibold bg-white text-emerald-500">{stepCounts.completed}</span>}
-            </button>
-            {I2R_PACKING_STEPS.map((name, i) => (
-              <button key={i} onClick={() => setSelectedStepFilter(i + 1)} className={`w-full flex items-center justify-start gap-3 px-3 py-2.5 rounded-xl transition-all border border-slate-50 dark:border-navy-800 bg-white dark:bg-navy-900 ${selectedStepFilter === i + 1 ? "bg-[#EFF4FF] dark:bg-[#D1D5DB]/20 border-[#D1D5DB] shadow-md" : "text-slate-500 dark:text-navy-400"}`}>
-                <span className="text-[13px] font-semibold tracking-tight text-left">Step {i + 1} — {name}</span>
-                {stepCounts[i + 1] > 0 && <span className="w-5 h-5 ml-auto shrink-0 flex items-center justify-center rounded-full text-[13px] font-semibold bg-blue-500 text-white">{stepCounts[i + 1]}</span>}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Content */}
-        <div className="flex-1 flex flex-col min-w-0 h-full py-0.5">
-          <div className="flex flex-wrap items-center gap-2 md:gap-3 mb-3 shrink-0 px-1">
-            <PhoneStepSelect
-              steps={I2R_PACKING_STEPS}
-              counts={I2R_PACKING_STEPS.map((_: unknown, i: number) => stepCounts[i + 1] || 0)}
-              value={selectedStepFilter}
-              onChange={setSelectedStepFilter}
-              allLabel="All packing"
-              completedCount={stepCounts.completed || 0}
-            />
-            <div className="relative group flex-1 min-w-[160px] md:max-w-xs">
-              <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#5B6472] dark:text-navy-600" />
-              <input type="text" placeholder="Search PPF, Item, Design..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="w-full pl-9 pr-3 py-1.5 bg-white dark:bg-navy-900 border border-slate-200 dark:border-navy-800 rounded-xl text-[14px] font-bold text-gray-700 dark:text-white outline-none focus:border-[#2563EB] dark:focus:border-[#60A5FA]" />
-            </div>
-            <div className="ml-auto flex items-center gap-3">
-              <p className="text-[13px] font-semibold text-[#5B6472] whitespace-nowrap">Page <span className="text-[#2563EB] dark:text-[#60A5FA]">{currentPage}</span> OF {totalPages || 1}</p>
-              <div className="flex items-center gap-1">
-                <button onClick={() => setCurrentPage(Math.max(1, currentPage - 1))} className="p-1 text-[#5B6472] hover:text-slate-800 transition-colors"><ChevronLeftIcon className="w-3.5 h-3.5" /></button>
-                <button onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))} className="p-1 text-[#5B6472] hover:text-slate-800 transition-colors"><ChevronRightIcon className="w-3.5 h-3.5" /></button>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 space-y-3 pb-20 py-0.5">
-            {isLoading ? (
-              <div className="flex flex-col items-center justify-center p-10 animate-pulse text-slate-200"><ArrowPathIcon className="w-8 h-8 animate-spin mb-4" /><p className="text-[13px] font-semibold">SYNCHRONIZING...</p></div>
-            ) : paginatedItems.length === 0 ? (
-              <div className="flex flex-col items-center justify-center p-10 text-slate-100"><MagnifyingGlassIcon className="w-12 h-12 mb-4" /><p className="text-[13px] font-semibold">No Data Found</p></div>
-            ) : (layoutMode === "smart" || isPhone) ? (
-              paginatedItems.map(item => {
-                const sel = selectedIds.has(item.id); const step = getActiveStep(item); const exp = expandedTiles[item.id];
-                return (
-                  <div key={item.id} className="px-1">
-                    <div onClick={() => { const n = new Set(selectedIds); if (n.has(item.id)) n.delete(item.id); else n.add(item.id); setSelectedIds(n); }} className={`bg-white dark:bg-navy-800 rounded-2xl border transition-all cursor-pointer overflow-hidden ${sel ? "border-[#2563EB] dark:border-[#60A5FA] border-2 shadow-lg" : "border-slate-100 dark:border-navy-700 shadow-sm"}`}>
-                      <div className="p-3">
-                        <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3 mb-2">
-                          <div className="flex items-start gap-3">
-                            <input type="checkbox" checked={sel} readOnly className="w-4 h-4 mt-1 rounded border-slate-300 text-[#2563EB] dark:text-[#60A5FA]" />
-                            <div>
-                              <div className="flex flex-wrap items-center gap-2">
-                                <span className="px-2 py-0.5 bg-blue-50 dark:bg-blue-900/20 text-[#2563EB] dark:text-blue-400 rounded text-[13px] font-semibold border border-blue-100 dark:border-blue-900/50">{item.ppf_num}</span>
-                                <h3 className="text-base font-semibold text-slate-800 dark:text-white tracking-tight leading-none">{item.item_name}</h3>
-                              </div>
-                              <div className="flex flex-wrap items-center gap-4 mt-1.5">
-                                <span className="flex items-center gap-1.5 text-[13px] font-semibold text-blue-500"><TagIcon className="w-3.5 h-3.5" /> {item.packing_design}</span>
-                                <span className="flex items-center gap-1.5 text-[13px] font-semibold text-purple-500"><CubeIcon className="w-3.5 h-3.5" /> Qty: {item.total_qty}</span>
-                                <span className="flex items-center gap-1.5 text-[13px] font-semibold text-[#5B6472]"><CalendarIcon className="w-3.5 h-3.5" /> {fmtDt(item.created_at)}</span>
-                              </div>
-                            </div>
-                          </div>
-
-                          <div className="flex flex-wrap items-center gap-2">
-                            {step > 0 && (
-                              <div className="flex items-center bg-white dark:bg-navy-800 border border-[#2563EB] rounded-full shadow-sm overflow-hidden divide-x divide-[#2563EB]/30 mr-1">
-                                <div className="flex flex-col items-center justify-center px-3 py-1.5 min-w-[120px]">
-                                  <p className="text-[13px] font-semibold text-[#2563EB] dark:text-[#60A5FA] tracking-tighter leading-none whitespace-nowrap">{fmtDt((item as any)[`planned_${step}`])} {fmtTm((item as any)[`planned_${step}`])}</p>
-                                  <p className={`text-[14px] font-semibold   mt-0.5 ${getDelayInfo((item as any)[`planned_${step}`], null, now)?.color}`}>{getDelayInfo((item as any)[`planned_${step}`], null, now)?.text}</p>
-                                </div>
-                                <div className="flex items-center gap-1.5 px-4 py-1.5 bg-[#2563EB]/5 dark:bg-[#60A5FA]/10">
-                                  <ClockIcon className="w-3.5 h-3.5 text-[#2563EB] stroke-[3]" />
-                                  <span className="text-[14px] font-semibold text-[#2563EB] dark:text-[#60A5FA] whitespace-nowrap">STEP {step} PENDING</span>
-                                </div>
-                              </div>
-                            )}
-                            <div className="flex items-center gap-1 px-2 py-1 bg-white dark:bg-navy-800 rounded-full border border-slate-100 dark:border-navy-700 shadow-lg">
-                              <button onClick={e => { e.stopPropagation(); setExpandedTiles(p => ({ ...p, [item.id]: !exp })); }} className={`p-1.5 rounded-full transition-all ${exp ? "bg-[#2563EB] text-white" : "text-[#2563EB] dark:text-[#60A5FA] hover:bg-yellow-50"}`}><ChevronDownIcon className={`w-3.5 h-3.5 stroke-[3] transition-transform ${exp ? "rotate-180" : ""}`} /></button>
-                              {(isAdmin || step > 0) && (
-                                <>
-                                  <button onClick={e => { e.stopPropagation(); openReceiveModal(item); }} className="p-1.5 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 rounded-full transition-all" title="Inward Item Receive"><PlusIcon className="w-3.5 h-3.5 stroke-[3.5]" /></button>
-                                  <button onClick={e => { e.stopPropagation(); openEditModal(item); }} className="p-1.5 text-blue-500 hover:bg-blue-50 rounded-full transition-all" title="Edit"><PencilSquareIcon className="w-3.5 h-3.5" /></button>
-                                  <button onClick={e => { e.stopPropagation(); openRemoveFollowUpModal(item); }} className="p-1.5 text-purple-500 hover:bg-purple-50 rounded-full transition-all" title="Remove Follow Up"><ArrowUturnLeftIcon className="w-3.5 h-3.5" /></button>
-                                  {item.cancelled ? (
-                                    <button onClick={e => { e.stopPropagation(); setRestoreTargetId(item.id); }} className="p-1.5 text-emerald-500 hover:bg-emerald-50 rounded-full transition-all" title="Restore Process"><ArrowPathIcon className="w-3.5 h-3.5" /></button>
-                                  ) : (
-                                    <button onClick={e => { e.stopPropagation(); setCancelTargetId(item.id); }} className="p-1.5 text-[#D97706] hover:bg-[#F7F8FA] rounded-full transition-all" title="Cancel Process"><NoSymbolIcon className="w-3.5 h-3.5" /></button>
-                                  )}
-                                  <button onClick={e => { e.stopPropagation(); handleDeleteClick(item.id); }} className="p-1.5 text-red-500 hover:bg-red-50 rounded-full transition-all" title="Delete"><TrashIcon className="w-3.5 h-3.5" /></button>
-                                </>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-
-                        {(() => {
-                          const stats = getPOStats(item.po_num_4, item.total_qty);
-                          return (
-                            <div className="mt-3 border-t border-slate-50 dark:border-navy-700 pt-3">
-                              <div className={`grid gap-3 items-start ${stats.hasPO ? "grid-cols-2 md:grid-cols-9" : "grid-cols-2 md:grid-cols-6"}`}>
-                                <div className="space-y-0.5">
-                                  <p className="text-[13px] font-semibold text-emerald-500">Last Suppliar</p>
-                                  <p className="text-[14px] font-semibold text-slate-800 dark:text-white truncate">{item.last_suppliar || "—"}</p>
-                                </div>
-                                <div className="space-y-0.5">
-                                  <p className="text-[13px] font-semibold text-[#D97706]">Required By</p>
-                                  <p className="text-[14px] font-semibold text-slate-800 dark:text-white truncate">{item.required_by || "—"}</p>
-                                </div>
-                                <div className="space-y-0.5">
-                                  <p className="text-[13px] font-semibold text-blue-500">VENDOR (ST3)</p>
-                                  <p className="text-[14px] font-semibold text-slate-800 dark:text-white truncate">{item.vendor_name_3 || "—"}</p>
-                                </div>
-                                <div className="space-y-0.5">
-                                  <p className="text-[13px] font-semibold text-purple-500">LEAD TIME (ST3)</p>
-                                  <p className="text-[14px] font-semibold text-slate-800 dark:text-white truncate">{item.lead_time_3 || "—"}</p>
-                                </div>
-                                <div className="space-y-0.5">
-                                  <p className="text-[13px] font-semibold text-indigo-500">PI (ST3)</p>
-                                  {item.pi_3 ? (
-                                    <a href={item.pi_3} target="_blank" className="text-[14px] font-semibold text-indigo-600 hover:underline flex items-center gap-1"><PhotoIcon className="w-3 h-3" /> VIEW PI</a>
-                                  ) : <p className="text-[14px] font-semibold text-[#5B6472] tracking-tighter">—</p>}
-                                </div>
-                                <div className="space-y-0.5">
-                                  <p className="text-[13px] font-semibold text-rose-500">PO NUM (ST4)</p>
-                                  <p className="text-[14px] font-semibold text-slate-800 dark:text-white truncate">{item.po_num_4 || "—"}</p>
-                                </div>
-                                {stats.hasPO && (
-                                  <>
-                                    <div className="space-y-0.5">
-                                      <p className="text-[13px] font-semibold text-purple-500">QTY Required</p>
-                                      <p className="text-[14px] font-semibold text-purple-600 dark:text-purple-400 truncate">{item.total_qty || "0"}</p>
-                                    </div>
-                                    <div className="space-y-0.5">
-                                      <p className="text-[13px] font-semibold text-emerald-500">Total Received</p>
-                                      <p className="text-[14px] font-semibold text-emerald-600 dark:text-emerald-400 truncate">{stats.totalReceived}</p>
-                                    </div>
-                                    <div className="space-y-0.5">
-                                      <p className="text-[13px] font-semibold text-amber-500">Balance QTY</p>
-                                      <p className={`text-[14px] font-semibold truncate ${stats.balance <= 0 ? "text-blue-500" : "text-amber-500"}`}>{stats.balance}</p>
-                                    </div>
-                                  </>
-                                )}
-                              </div>
-                            </div>
-                          );
-                        })()}
-
-                        {exp && (
-                          <div className="mt-3 grid grid-cols-2 md:grid-cols-6 gap-2 animate-in slide-in-from-top-2 duration-300">
-                            {Array.from({ length: 6 }, (_, i) => {
-                              const n = i + 1; const act = (item as any)[`actual_${n}`]; const pl = (item as any)[`planned_${n}`];
-                              const done = !!act; const isPending = !done && n === getActiveStep(item);
-                              const SHORT_NAMES = ["Brief", "Design", "Vendor", "PO Gen", "KLD Appr", "Receive"];
-                              let statusClasses = "bg-slate-50 dark:bg-navy-900 border-slate-200 dark:border-navy-700 text-[#5B6472]";
-                              if (done) statusClasses = "bg-emerald-50/50 dark:bg-emerald-900/10 border-emerald-500 text-emerald-700 dark:text-emerald-400 shadow-sm";
-                              else if (isPending) statusClasses = "bg-[#F7F8FA] dark:bg-[#FEF3C7] border-[#E5E7EB] text-[#D97706] dark:text-[#D97706] shadow-sm";
-                              return (
-                                <div key={n} className={`p-2 rounded-xl border transition-all ${statusClasses}`}>
-                                  <div className="flex items-center justify-between mb-1">
-                                    <p className={`text-[13px] font-semibold   ${done ? "text-emerald-600" : isPending ? "text-[#D97706]" : "text-[#5B6472]"}`}>ST {n}</p>
-                                    {done ? <CheckCircleIcon className="w-3 h-3 text-emerald-600" /> : isPending ? <ClockIcon className="w-3 h-3 text-[#D97706] animate-pulse" /> : null}
-                                  </div>
-                                  <p className={`text-[13px] font-semibold leading-tight truncate ${done ? "text-emerald-900 dark:text-emerald-200" : isPending ? "text-[#D97706] dark:text-[#D97706]" : "text-slate-600"}`}>{SHORT_NAMES[i]}</p>
-                                  <div className={`mt-1 space-y-0.5 pt-1 border-t ${done ? "border-emerald-100 dark:border-emerald-900/50" : "border-slate-100 dark:border-navy-700"}`}>
-                                    <div className="flex justify-between items-center text-[13px] font-semibold"><span className="opacity-50">Pl</span><span>{fmtDt(pl)}</span></div>
-                                    <div className="flex justify-between items-center text-[13px] font-semibold"><span className="opacity-50">Ac</span><span className={done ? "text-emerald-700 dark:text-emerald-400" : "opacity-30"}>{act ? fmtDt(act) : "—"}</span></div>
-                                  </div>
-                                </div>
-                              );
-                            })}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })
-            ) : (
-              /* Standard Table View */
-              <div className="overflow-x-auto rounded-2xl border border-slate-100 dark:border-navy-800 bg-white dark:bg-navy-900 shadow-xl overflow-hidden custom-scrollbar">
-                <table className="w-full text-left border-collapse text-[14px]">
-                  <thead>
-                    <tr className="bg-[#2563EB] dark:bg-navy-950 text-white font-semibold">
-                      <th className="p-4 sticky left-0 z-20 bg-[#2563EB] w-10">
-                        <input 
-                          type="checkbox" 
-                          checked={selectedIds.size === paginatedItems.length && paginatedItems.length > 0} 
-                          onChange={() => { if (selectedIds.size === paginatedItems.length) setSelectedIds(new Set()); else setSelectedIds(new Set(paginatedItems.map(i => i.id))); }} 
-                          className="w-5 h-5 rounded border-white/20 bg-transparent text-[#2563EB] focus:ring-0 cursor-pointer transition-all" 
-                        />
-                      </th>
-                      <th className="p-4 whitespace-nowrap sticky left-10 z-20 bg-[#2563EB]">Actions</th>
-                      <th className="p-4 whitespace-nowrap sticky left-[120px] z-20 bg-[#2563EB]">Ppf Num</th>
-                      <th className="p-4 whitespace-nowrap min-w-[200px]">Item Name</th>
-                      <th className="p-4 whitespace-nowrap min-w-[150px]">Design</th>
-                      <th className="p-4 whitespace-nowrap">QTY</th>
-                      <th className="p-4 whitespace-nowrap text-emerald-300">Received QTY</th>
-                      <th className="p-4 whitespace-nowrap text-amber-300">Balance QTY</th>
-                      <th className="p-4 whitespace-nowrap min-w-[150px]">Last Suppliar</th>
-                      <th className="p-4 whitespace-nowrap min-w-[120px]">Required By</th>
-                      <th className="p-4 whitespace-nowrap min-w-[150px] text-blue-300">VENDOR (ST3)</th>
-                      <th className="p-4 whitespace-nowrap min-w-[120px] text-purple-300">LEAD TIME (ST3)</th>
-                      <th className="p-4 whitespace-nowrap min-w-[100px] text-indigo-300">PI (ST3)</th>
-                      <th className="p-4 whitespace-nowrap min-w-[120px] text-rose-300">PO NUM (ST4)</th>
-                      <th className="p-4 whitespace-nowrap min-w-[120px]">Created At</th>
-                      {I2R_PACKING_STEPS.map((s, i) => (
-                        <th key={i} className="p-4 whitespace-nowrap border-l border-white/10 min-w-[220px]">STEP {i+1} — {s.toUpperCase()}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-50 dark:divide-navy-800">
-                    {paginatedItems.map(item => {
-                      const step = getActiveStep(item);
-                      const isCancelled = !!item.cancelled;
-                      return (
-                        <tr key={item.id} className="hover:bg-[#FFFFFF]/50 dark:hover:bg-navy-800/50 transition-all group font-bold">
-                          <td className="p-4 sticky left-0 z-10 bg-white dark:bg-navy-900 group-hover:bg-[#FFFFFF] dark:group-hover:bg-navy-800 transition-colors">
-                            <input 
-                              type="checkbox" 
-                              checked={selectedIds.has(item.id)} 
-                              onChange={() => { const n = new Set(selectedIds); if (n.has(item.id)) n.delete(item.id); else n.add(item.id); setSelectedIds(n); }} 
-                              className="w-5 h-5 rounded border-slate-300 text-[#2563EB] dark:text-[#60A5FA] focus:ring-0 cursor-pointer transition-all" 
-                            />
-                          </td>
-                          <td className="p-4 sticky left-10 z-10 bg-white dark:bg-navy-900 group-hover:bg-[#FFFFFF] dark:group-hover:bg-navy-800 transition-colors">
-                            {(isAdmin || step > 0) ? (
-                              <div className="flex items-center gap-1.5">
-                                <button onClick={() => openReceiveModal(item)} className="p-1.5 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/40 rounded-lg transition-all" title="Inward Item Receive"><PlusIcon className="w-4 h-4 stroke-[3]" /></button>
-                                <button onClick={() => openEditModal(item)} className="p-1.5 text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/40 rounded-lg transition-all" title="Edit"><PencilSquareIcon className="w-4 h-4" /></button>
-                                <button onClick={() => openRemoveFollowUpModal(item)} className="p-1.5 text-purple-500 hover:bg-purple-50 dark:hover:bg-purple-900/40 rounded-lg transition-all" title="Remove Follow Up"><ArrowUturnLeftIcon className="w-4 h-4" /></button>
-                                {item.cancelled ? (
-                                  <button onClick={() => setRestoreTargetId(item.id)} className="p-1.5 text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/40 rounded-lg transition-all" title="Restore"><ArrowPathIcon className="w-4 h-4" /></button>
-                                ) : (
-                                  <button onClick={() => setCancelTargetId(item.id)} className="p-1.5 text-[#D97706] hover:bg-[#F7F8FA] dark:hover:bg-[#FEF3C7] rounded-lg transition-all" title="Cancel"><NoSymbolIcon className="w-4 h-4" /></button>
-                                )}
-                                <button onClick={() => handleDeleteClick(item.id)} className="p-1.5 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/40 rounded-lg transition-all" title="Delete"><TrashIcon className="w-4 h-4" /></button>
-                              </div>
-                            ) : (
-                              <span className="text-[13px] font-semibold text-[#5B6472] dark:text-navy-600">View only</span>
-                            )}
-                          </td>
-                          <td className="p-4 sticky left-[120px] z-10 bg-white dark:bg-navy-900 group-hover:bg-[#FFFFFF] dark:group-hover:bg-navy-800 transition-colors">
-                            <div className="flex flex-col">
-                              <span className="px-3 py-1 bg-blue-50 dark:bg-blue-900/20 text-[#2563EB] dark:text-blue-400 rounded-full border border-blue-100 dark:border-blue-900/50 text-[13px] font-semibold italic tracking-tighter">{item.ppf_num}</span>
-                              {isCancelled && <span className="text-[14px] font-semibold text-red-500 mt-1 ml-1">Cancelled</span>}
-                            </div>
-                          </td>
-                          <td className="p-4">
-                            <div className="flex items-center gap-2.5">
-                              <div className="w-7 h-7 rounded-lg bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center">
-                                <CubeIcon className="w-3.5 h-3.5 text-blue-500" />
-                              </div>
-                              <span className="text-slate-800 dark:text-white truncate">{item.item_name}</span>
-                            </div>
-                          </td>
-                          <td className="p-4 text-slate-500 dark:text-navy-300 truncate">{item.packing_design || "—"}</td>
-                          <td className="p-4">
-                            <span className="px-2.5 py-1 bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 rounded-lg font-semibold text-[14px] text-center w-max">{item.total_qty || "0"}</span>
-                          </td>
-                          <td className="p-4">
-                            {(() => {
-                              const stats = getPOStats(item.po_num_4, item.total_qty);
-                              return (
-                                <span className={`px-2.5 py-1 rounded-lg font-semibold text-[14px] whitespace-nowrap ${stats.hasPO ? "bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400" : "text-[#5B6472] dark:text-slate-700"}`}>
-                                  {stats.hasPO ? stats.totalReceived : "—"}
-                                </span>
-                              );
-                            })()}
-                          </td>
-                          <td className="p-4">
-                            {(() => {
-                              const stats = getPOStats(item.po_num_4, item.total_qty);
-                              return (
-                                <span className={`px-2.5 py-1 rounded-lg font-semibold text-[14px] whitespace-nowrap ${
-                                  stats.hasPO 
-                                    ? stats.balance <= 0 
-                                      ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400" 
-                                      : "bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400" 
-                                    : "text-[#5B6472] dark:text-slate-700"
-                                }`}>
-                                  {stats.hasPO ? stats.balance : "—"}
-                                </span>
-                              );
-                            })()}
-                          </td>
-                          <td className="p-4 text-emerald-600 dark:text-emerald-400 truncate">{item.last_suppliar || "—"}</td>
-                          <td className="p-4">
-                            <div className="flex items-center gap-2 text-slate-600 dark:text-navy-400">
-                              <UserIcon className="w-3.5 h-3.5 opacity-50" />
-                              <span className="">{item.required_by || "Admin"}</span>
-                            </div>
-                          </td>
-                          <td className="p-4 text-blue-600 font-bold truncate">{item.vendor_name_3 || "—"}</td>
-                          <td className="p-4 text-purple-600 font-bold truncate">{item.lead_time_3 || "—"}</td>
-                          <td className="p-4">
-                            {item.pi_3 ? (
-                              <a href={item.pi_3} target="_blank" className="text-indigo-600 hover:underline flex items-center gap-1 font-semibold"><PhotoIcon className="w-3.5 h-3.5" /> PI</a>
-                            ) : "—"}
-                          </td>
-                          <td className="p-4 text-rose-600 font-bold truncate">{item.po_num_4 || "—"}</td>
-                          <td className="p-4 text-[#5B6472] font-bold whitespace-nowrap">{fmtDt(item.created_at)}</td>
-                          {Array.from({length: 6}, (_, idx) => {
-                            const n = idx + 1;
-                            const act = (item as any)[`actual_${n}`];
-                            const pl = (item as any)[`planned_${n}`];
-                            const done = !!act;
-                            const isPending = !done && n === step;
-                            return (
-                              <td key={idx} className={`p-4 border-l border-slate-50 dark:border-navy-800/50 ${isPending ? 'bg-[#F7F8FA] dark:bg-[#FEF3C7]' : ''}`}>
-                                {pl ? (
-                                  <div className="space-y-1.5 min-w-[150px]">
-                                    <div className="flex justify-between items-center gap-4 text-[13px] tracking-tighter">
-                                      <span className="text-[#5B6472] font-bold">Planned</span>
-                                      <span className="font-semibold text-slate-600 dark:text-white/70">{fmtDt(pl)}</span>
-                                    </div>
-                                    <div className="flex justify-between items-center gap-4 text-[13px] tracking-tighter">
-                                      <span className="text-[#5B6472] font-bold">Actual</span>
-                                      <span className={`font-semibold ${done ? 'text-emerald-500' : isPending ? 'text-[#D97706] animate-pulse' : 'text-[#5B6472]'}`}>
-                                        {act ? fmtDt(act) : isPending ? 'Pending' : '—'}
-                                      </span>
-                                    </div>
-                                  </div>
-                                ) : "—"}
-                              </td>
-                            );
-                          })}
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
+          <div className="relative">
+            <button onClick={() => setHeaderMenuOpen(!headerMenuOpen)} className="h-11 px-3.5 inline-flex items-center gap-1.5 rounded-xl border border-[#E5E7EB] dark:border-navy-700 bg-white dark:bg-navy-800 text-[14px] font-semibold text-[#1A1D21] dark:text-white">⋯ More</button>
+            {headerMenuOpen && (
+              <>
+                <div className="fixed inset-0 z-[60]" onClick={() => setHeaderMenuOpen(false)} />
+                <div className="absolute right-0 top-12 z-[61] w-48 rounded-xl border border-[#E5E7EB] dark:border-navy-700 bg-white dark:bg-navy-800 shadow-xl py-1">
+                  <button onClick={() => { setHeaderMenuOpen(false); handleExport(); }} className="w-full h-11 px-4 flex items-center gap-2 text-[14px] font-semibold text-left text-[#1A1D21] dark:text-white hover:bg-[#F7F8FA] dark:hover:bg-navy-700"><ArrowDownTrayIcon className="w-5 h-5 text-[#5B6472]" /> Export</button>
+                  <button onClick={() => { setHeaderMenuOpen(false); setIsConfigModalOpen(true); }} className="w-full h-11 px-4 flex items-center gap-2 text-[14px] font-semibold text-left text-[#1A1D21] dark:text-white hover:bg-[#F7F8FA] dark:hover:bg-navy-700"><Cog6ToothIcon className="w-5 h-5 text-[#5B6472]" /> Setup</button>
+                </div>
+              </>
             )}
           </div>
         </div>
       </div>
 
+      {/* Standard tiles — tap one to see those items (Sahil, 2026-10-28) */}
+      <div className="pt-2 -mx-2"><ModuleStrip module={"i2r-packing"} /></div>
+      {/* One list + window, same as O2D (Sahil, 2026-10-29) */}
+      <div className="flex-1 flex overflow-hidden mt-2 px-1 min-w-0">
+        <ProcessScreen
+          cfg={procCfg}
+          items={screenItems}
+          loading={isLoading}
+          initialSearch={searchTerm}
+          primary={[
+            { label: "Update step", onClick: (r) => openBulkModal([r.id]), show: () => true },
+            { label: "Receive items", tone: "plain", onClick: (r) => openReceiveModal(r), show: (r) => getActiveStep(r) === 6 },
+          ]}
+          footer={[
+            { label: "Edit", onClick: (r) => openEditModal(r), show: (r) => isAdmin || getActiveStep(r) > 0 },
+            { label: "Remove follow-up", onClick: (r) => openRemoveFollowUpModal(r), show: (r) => isAdmin && !r.cancelled },
+          ]}
+          menu={[
+            { label: "Cancel request", tone: "danger", onClick: (r) => setCancelTargetId(r.id), show: (r) => !r.cancelled && (isAdmin || getActiveStep(r) > 0) },
+            { label: "Restore", onClick: (r) => setRestoreTargetId(r.id), show: (r) => !!r.cancelled },
+            { label: "Delete", tone: "danger", onClick: (r) => handleDeleteClick(r.id), show: () => isAdmin },
+          ]}
+        />
+      </div>
+
       {/* Floating Bulk Bar */}
-      {selectedIds.size > 0 && (
+      {false && selectedIds.size > 0 && (
         <div className="fixed bottom-24 md:bottom-10 left-1/2 -translate-x-1/2 bg-[#FFFFFF] dark:bg-navy-800 px-1.5 py-1.5 rounded-full shadow-2xl flex items-center gap-4 border border-[#EFF4FF] dark:border-navy-700 z-[100] animate-in slide-in-from-bottom-12">
           <div className="flex items-center gap-2.5 pl-3">
             <div className="w-8 h-8 bg-[#2563EB] text-white rounded-full flex items-center justify-center font-semibold text-sm">{selectedIds.size}</div>
             <p className="text-[13px] font-semibold text-[#2563EB] dark:text-[#60A5FA]">Selected</p>
           </div>
-          <button onClick={openBulkModal} className="flex items-center gap-2 bg-[#2563EB] text-white px-6 py-2.5 rounded-full font-semibold text-[13px] hover:scale-[1.03] transition-all shadow-md">
+          <button onClick={() => openBulkModal()} className="flex items-center gap-2 bg-[#2563EB] text-white px-6 py-2.5 rounded-full font-semibold text-[13px] hover:scale-[1.03] transition-all shadow-md">
             <SparklesIcon className="w-3.5 h-3.5" /> BULK PROCESS
           </button>
           <button onClick={() => setSelectedIds(new Set())} className="pr-5 text-[#5B6472] hover:text-[#2563EB] text-[13px] font-semibold transition-colors">Clear</button>
@@ -1338,8 +1056,8 @@ export default function I2RPackingPage() {
           <div className="relative bg-[#FFFFFF] dark:bg-navy-800 w-full max-w-5xl rounded-3xl md:rounded-[3.5rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-300">
             <div className="px-5 md:px-10 pt-6 pb-3 flex items-start justify-between border-b border-[#E5E7EB] dark:border-navy-700">
               <div>
-                <h2 className="text-[26px] font-semibold italic tracking-tighter text-[#2563EB] dark:text-white leading-none">Bulk Workflow Processor</h2>
-                <p className="text-[13px] font-semibold text-[#5B6472] mt-1 opacity-80">Processing {Array.from(selectedIds).filter(id => bulkToggles[id]).length} active records</p>
+                <h2 className="text-[22px] font-semibold text-[#1A1D21] dark:text-white leading-none">Update step</h2>
+                <p className="text-[13px] font-semibold text-[#5B6472] mt-1 opacity-80">{Array.from(selectedIds).filter(id => bulkToggles[id]).length} selected</p>
               </div>
               <button onClick={() => setIsBulkModalOpen(false)} className="p-2 hover:bg-slate-100 dark:hover:bg-navy-700 rounded-full text-[#5B6472] transition-all"><XMarkIcon className="w-6 h-6" /></button>
             </div>
@@ -1392,7 +1110,7 @@ export default function I2RPackingPage() {
             </div>
             <div className="absolute bottom-0 left-0 right-0 py-3.5 px-4 md:px-10 bg-[#FFFFFF] dark:bg-navy-800 border-t border-[#E5E7EB] dark:border-navy-700 flex items-center justify-between shadow-2xl">
               <button onClick={() => setIsBulkModalOpen(false)} className="px-8 py-3 text-[14px] font-semibold text-[#5B6472] hover:text-slate-600 transition-all">Cancel</button>
-              <button onClick={handleBulkStepSave} className="bg-[#2563EB] dark:bg-[#60A5FA] text-white dark:text-navy-950 px-12 py-3.5 rounded-2xl font-semibold text-[14px] shadow-lg shadow-blue-500/20 active:scale-95 transition-all">Execute Bulk Update</button>
+              <button onClick={handleBulkStepSave} className="bg-[#2563EB] dark:bg-[#60A5FA] text-white dark:text-navy-950 px-12 py-3.5 rounded-2xl font-semibold text-[14px] shadow-lg shadow-blue-500/20 active:scale-95 transition-all">Save</button>
             </div>
           </div>
         </div>

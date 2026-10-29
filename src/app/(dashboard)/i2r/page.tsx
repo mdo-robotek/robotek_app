@@ -49,6 +49,8 @@ import ActionStatusModal from "@/components/ActionStatusModal";
 import ConfirmModal from "@/components/ConfirmModal";
 import IMSFormModal from "@/components/IMSFormModal";
 import ModuleStrip from "@/components/ModuleStrip";
+import ProcessScreen from "@/components/process/ProcessScreen";
+import { autoDetails, autoFacts, type ProcessConfig } from "@/components/process/process-view";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -519,9 +521,11 @@ export default function I2RPage() {
 
   const [bulkPhotoFiles, setBulkPhotoFiles] = useState<Record<string, File>>({});
 
-  const openBulkModal = () => {
+  const openBulkModal = (only?: string[]) => {
+    const ids = only ? new Set(only) : selectedIds;
+    if (only) setSelectedIds(ids);
     const ts: Record<string, boolean> = {}; const ss: Record<string, string> = {}; const ls: Record<string, string> = {}; const ps: Record<string, string> = {}; const qs: Record<string, string> = {}; const os: Record<string, string> = {}; const cs: Record<string, string> = {}; const rs: Record<string, string> = {}; const pvs: Record<string, string> = {};
-    selectedIds.forEach(id => {
+    ids.forEach(id => {
       const it = items.find(r => r.id === id); if (!it) return;
       ts[id] = true;
       ss[id] = it.supplier_name_3 || "";
@@ -803,521 +807,84 @@ export default function I2RPage() {
     }
   };
 
+  // One list + window, same as O2D (Sahil, 2026-10-29). Non-admins see only
+  // the work at their step (and finished ones) — same rule as before.
+  const screenItems: I2R[] = isAdmin ? items : items.filter((it) => {
+    if (String((it as any).cancelled || "").trim()) return false;
+    const st = getActiveStep(it);
+    if (st === 0) return true;
+    return !!globalConfigs[st - 1]?.responsible_person?.split(",").map((x: string) => x.trim()).includes(currentUser);
+  });
+  const procCfg: ProcessConfig<I2R> = {
+    unit: "purchase requests",
+    steps: I2R_STEPS,
+    doers: I2R_STEPS.map((_: unknown, i: number) => globalConfigs[i]?.responsible_person || ""),
+    id: (r) => String(r.id),
+    ref: (r) => String(r.indend_num || ""),
+    title: (r) => String(r.item_name || ""),
+    sub: (r) => String(r.category || ""),
+    amount: (r) => { const v = Number(String(r.quantity || "").replace(/[^\d.]/g, "")); return v ? `${v.toLocaleString("en-IN")} pcs` : ""; },
+    step: (r) => getActiveStep(r),
+    planned: (r, n) => (r as any)[`planned_${n}`] || "",
+    actual: (r, n) => (r as any)[`actual_${n}`] || "",
+    isCancelled: (r) => !!String((r as any).cancelled || "").trim(),
+    search: (r) => Object.values(r as any).filter((v) => typeof v === "string").join(" "),
+    created: (r) => String(r.created_at || ""),
+    stepFacts: (r, n) => autoFacts(r, n),
+    details: (r) => autoDetails(r, ["indend_num","item_name","quantity","category"]),
+  };
+
   return (
     <div className="flex flex-col h-[calc(100vh-100px)] overflow-hidden">
       {/* ─── Header ─── */}
       <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between px-2 py-0.5 shrink-0">
         <div>
-          <h1 className="text-xl font-semibold text-[#1A1D21] dark:text-white">I2R</h1>
-          <p className="text-[14px] text-[#5B6472] dark:text-slate-400">Purchase requests (indents)</p>
+          <h1 className="text-[22px] font-semibold text-[#1A1D21] dark:text-white">I2R</h1>
+          <p className="text-[14px] text-[#5B6472]">Purchase requests (indents)</p>
         </div>
 
         {/* Central Pill Actions */}
-        <div className="self-start flex flex-wrap items-center gap-1 rounded-2xl md:rounded-full border-2 border-[#2563EB] dark:border-[#60A5FA] bg-white dark:bg-navy-900 shadow-xl p-0.5">
+        <div className="self-start flex flex-wrap items-center gap-1 rounded-xl border border-[#E5E7EB] dark:border-navy-700 bg-white dark:bg-navy-900 p-0.5">
           <button onClick={handleExport} className="flex items-center gap-2 px-4 py-1 font-semibold text-[13px] text-[#2563EB] dark:text-[#60A5FA] hover:bg-slate-50 dark:hover:bg-navy-800 transition-all rounded-full">
             <ArrowDownTrayIcon className="w-3.5 h-3.5" /> <span>Export</span>
           </button>
           <button onClick={openConfigModal} className="flex items-center gap-2 px-4 py-1 font-semibold text-[13px] text-[#2563EB] dark:text-[#60A5FA] hover:bg-slate-50 dark:hover:bg-navy-800 transition-all rounded-full">
             <Cog6ToothIcon className="w-3.5 h-3.5" /> <span>Config</span>
           </button>
-          <button onClick={openAddModal} className="px-3 py-1 text-[#2563EB] dark:text-[#60A5FA] hover:bg-slate-50 dark:hover:bg-navy-800 transition-all rounded-full">
-            <PlusIcon className="w-4 h-4 stroke-[2.5]" />
+          <button onClick={openAddModal} className="flex items-center gap-1.5 px-3 py-1 font-semibold text-[13px] text-[#2563EB] dark:text-[#60A5FA] hover:bg-slate-50 dark:hover:bg-navy-800 transition-all rounded-full">
+            <PlusIcon className="w-4 h-4 stroke-[2.5]" /> <span>New</span>
           </button>
           <div className="hidden md:block w-[1px] h-5 bg-slate-200 dark:bg-navy-700 mx-1" />
-          <button onClick={() => setViewMode(viewMode==='cancelled'?'active':'cancelled')} className={`flex items-center gap-2 px-4 py-1 font-semibold   text-[13px] transition-all rounded-full ${viewMode==='cancelled'?'bg-red-500 text-white shadow-md':'text-[#2563EB] dark:text-[#60A5FA] hover:bg-slate-50 dark:hover:bg-navy-800'}`}>
-            <NoSymbolIcon className="w-3.5 h-3.5" /> <span>Cancelled ({items.filter(i => !!(i.cancelled || "").trim()).length})</span>
-          </button>
         </div>
 
         {/* Layout Toggles */}
-        <div className="hidden md:flex items-center gap-0.5 bg-slate-100 dark:bg-navy-900 rounded-full p-0.5 border border-slate-200 dark:border-navy-800 shadow-inner">
-          <button onClick={() => setLayoutMode("standard")} className={`px-4 py-1 rounded-full text-[13px] font-semibold   transition-all ${layoutMode === "standard" ? "bg-white dark:bg-navy-800 text-[#2563EB] dark:text-[#60A5FA] shadow-md" : "text-[#5B6472] dark:text-navy-600"}`}>Standard</button>
-          <button onClick={() => setLayoutMode("smart")} className={`px-4 py-1 rounded-full text-[13px] font-semibold   transition-all ${(layoutMode === "smart" || isPhone) ? "bg-white dark:bg-navy-800 text-[#2563EB] dark:text-[#60A5FA] shadow-md" : "text-[#5B6472] dark:text-navy-600"}`}>Smart View</button>
-        </div>
       </div>
       {/* Key figures — same numbers as the Purchase tile on the CEO home.
           Admins only: other users see just the steps they own, so
           company-wide counts would not match their list. */}
       <ModuleStrip module="i2r" adminOnly onFigure={(f) => { if (f.step !== undefined) setSelectedStepFilter(f.step); }} />
 
-      <div className="flex gap-4 flex-1 overflow-hidden mt-1 px-1">
-        {/* ─── Sidebar ─── */}
-        <div className="w-60 hidden md:flex flex-col shrink-0 h-full overflow-y-auto custom-scrollbar border-r border-slate-100 dark:border-navy-800 pr-3 py-0.5">
-          <p className="text-[13px] font-semibold text-[#5B6472] dark:text-navy-500 mb-1.5 px-2">Filters</p>
-          <div className="space-y-1.5 pb-10">
-            <button
-              onClick={() => setSelectedStepFilter("all")}
-              className={`w-full flex items-center justify-between px-5 py-2.5 rounded-full transition-all border-b-4 ${
-                selectedStepFilter === "all" ? "bg-[#EFF4FF] dark:bg-[#D1D5DB]/20 border-[#D1D5DB] text-[#2563EB] dark:text-[#60A5FA] shadow-md" : "bg-white dark:bg-navy-900 border-slate-100 dark:border-navy-800 text-slate-500 dark:text-navy-400 hover:bg-slate-50 dark:hover:bg-navy-800"
-              }`}
-            >
-              <span className="font-semibold text-[14px]">All Indents</span>
-            </button>
-            {/* Naam-decide step (Sahil, 2026-10-23): indent raise hone ke 5 din
-                ke andar final naam aana hai — ye permanent sidebar entry hai
-                taaki step flow ka hissa dikhe, count ke saath. */}
-            {(() => {
-              const tbdRows = items.filter(it => !it.cancelled && isTbdName(it.item_name));
-              // Sahil (2026-10-23): ye entry sirf tab dikhe jab koi TBD
-              // (to-be-decided) naam wala indent ho — zero par chhupi rahe.
-              if (tbdRows.length === 0) return null;
-              const overdue = tbdRows.filter(it => tbdDaysLeft(it.created_at) < 0).length;
-              const active = selectedStepFilter === "tbd";
-              return (
-                <button
-                  onClick={() => setSelectedStepFilter("tbd")}
-                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-all border ${
-                    active
-                      ? "bg-amber-50 dark:bg-amber-900/20 border-amber-400 shadow-md"
-                      : overdue > 0
-                      ? "bg-white dark:bg-navy-900 border-red-200 dark:border-red-900/50 hover:border-red-400"
-                      : "bg-white dark:bg-navy-900 border-amber-100 dark:border-navy-800 hover:border-amber-300"
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <ClockIcon className={`w-4 h-4 ${overdue > 0 ? "text-red-500" : "text-amber-500"}`} />
-                    <span className={`text-[13px] font-semibold  tracking-tight ${active ? "text-amber-700 dark:text-amber-400" : "text-slate-600 dark:text-navy-300"}`}>Decide Name — 5D TAT</span>
-                  </div>
-                  <span className={`min-w-5 h-5 px-1 flex items-center justify-center rounded-full text-[13px] font-semibold ${overdue > 0 ? "bg-red-500 text-white" : tbdRows.length > 0 ? "bg-amber-500 text-white" : "bg-slate-100 dark:bg-navy-800 text-[#5B6472]"}`}>{tbdRows.length}</span>
-                </button>
-              );
-            })()}
-            <div className="space-y-1">
-              {I2R_STEP_SHORT.map((name, i) => {
-                const n = i + 1; const active = selectedStepFilter === n;
-                const STEP_ICONS = [DocumentTextIcon, CheckCircleIcon, UserIcon, ArrowDownTrayIcon, PhotoIcon, PlusIcon, CubeIcon, PhotoIcon, BuildingOfficeIcon, DocumentTextIcon, ClockIcon];
-                const Icon = STEP_ICONS[i];
-                return (
-                  <div key={n} className="px-1">
-                    <button
-                      onClick={() => setSelectedStepFilter(n)}
-                      className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-all border border-slate-50 dark:border-navy-800 bg-white dark:bg-navy-900 hover:border-[#2563EB]/20 dark:hover:border-[#60A5FA]/20 ${
-                        active ? "bg-[#EFF4FF] dark:bg-[#D1D5DB]/20 border-[#D1D5DB] shadow-md z-10" : "text-slate-500 dark:text-navy-400"
-                      }`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <Icon className={`w-4 h-4 ${active ? "text-[#2563EB] dark:text-[#60A5FA]" : "text-[#2563EB] dark:text-blue-400"}`} />
-                        <span className={`text-[13px] font-semibold  tracking-tight ${active ? "text-[#2563EB] dark:text-[#60A5FA]" : "text-slate-600 dark:text-navy-300"}`}>Step {n} — {name}</span>
-                      </div>
-                      {stepCounts[n] > 0 && (
-                        <span className={`w-5 h-5 flex items-center justify-center rounded-full text-[13px] font-semibold transition-all ${active ? "bg-[#2563EB] text-white" : "bg-blue-500 text-white shadow-sm"}`}>{stepCounts[n]}</span>
-                      )}
-                    </button>
-                  </div>
-                );
-              })}
-            </div>
-            <button
-              onClick={() => setSelectedStepFilter("completed")}
-              className={`w-full flex items-center justify-between px-5 py-2.5 rounded-full mt-3 transition-all border-b-4 ${
-                selectedStepFilter === "completed" ? "bg-emerald-50 dark:bg-emerald-900/20 border-emerald-500 text-emerald-700 dark:text-emerald-400 shadow-md" : "bg-white dark:bg-navy-900 border-slate-100 dark:border-navy-800 text-[#5B6472] dark:text-navy-600 hover:bg-slate-50 dark:hover:bg-navy-800"
-              }`}
-            >
-              <div className="flex items-center gap-3">
-                <CheckCircleIcon className={`w-4 h-4 ${selectedStepFilter === "completed" ? "text-emerald-500" : "text-emerald-600 dark:text-emerald-400"}`} />
-                <span className={`font-semibold text-[14px]   ${selectedStepFilter === "completed" ? "text-emerald-700 dark:text-emerald-400" : "text-emerald-600 dark:text-emerald-500"}`}>Completed</span>
-              </div>
-              {stepCounts.completed > 0 && (
-                <span className={`w-5 h-5 flex items-center justify-center rounded-full text-[13px] font-semibold transition-all ${selectedStepFilter === "completed" ? "bg-emerald-500 text-white" : "bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400"}`}>{stepCounts.completed}</span>
-              )}
-            </button>
-          </div>
-        </div>
-
-        {/* ─── Content Area ─── */}
-        <div className="flex-1 flex flex-col min-w-0 h-full py-0.5">
-          {/* Toolbar */}
-          <div className="flex flex-wrap items-center gap-2 md:gap-3 mb-3 shrink-0 px-1">
-            <PhoneStepSelect
-              steps={I2R_STEP_SHORT}
-              counts={I2R_STEP_SHORT.map((_: unknown, i: number) => stepCounts[i + 1] || 0)}
-              value={selectedStepFilter}
-              onChange={setSelectedStepFilter}
-              allLabel="All indents"
-              completedCount={stepCounts.completed || 0}
-              extra={items.some((it) => !it.cancelled && isTbdName(it.item_name)) ? [{ value: "tbd", label: "Names to decide" }] : []}
-            />
-            <div className="relative group flex-1 min-w-[160px] md:max-w-xs">
-              <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#5B6472] dark:text-navy-600" />
-              <input type="text" placeholder="Search..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="w-full pl-9 pr-3 py-1.5 bg-white dark:bg-navy-900 border border-slate-200 dark:border-navy-800 rounded-xl text-[14px] font-bold text-gray-700 dark:text-white outline-none focus:border-[#2563EB] dark:focus:border-[#60A5FA] transition-all shadow-sm" />
-            </div>
-            <div className="flex items-center gap-1.5">
-              <button onClick={() => setDateFilter(dateFilter==='Yesterday'?null:'Yesterday')} className={`px-4 py-1 rounded-full text-[13px] font-semibold  border-2 transition-all ${dateFilter==='Yesterday'?'bg-[#2563EB] dark:bg-[#60A5FA] text-white dark:text-navy-950 border-[#2563EB] dark:border-[#60A5FA] shadow-md':'bg-white dark:bg-navy-900 border-blue-50 dark:border-navy-800 text-blue-400 dark:text-blue-600 hover:border-blue-200 dark:hover:border-blue-800'}`}>Yesterday <span className="ml-1 opacity-50">{getDateFilterCount('Yesterday')}</span></button>
-              <button onClick={() => setDateFilter(dateFilter==='Today'?null:'Today')} className={`px-4 py-1 rounded-full text-[13px] font-semibold  border-2 transition-all ${dateFilter==='Today'?'bg-[#F7F8FA] dark:bg-[#FEF3C7] text-[#D97706] dark:text-[#D97706] border-[#E5E7EB] dark:border-[#E5E7EB] shadow-sm':'bg-white dark:bg-navy-900 border-[#E5E7EB] dark:border-navy-800 text-[#D97706] dark:text-[#D97706] hover:border-[#E5E7EB] dark:hover:border-[#E5E7EB]'}`}>Today <span className="ml-1 opacity-50">{getDateFilterCount('Today')}</span></button>
-              <button onClick={() => setDateFilter(dateFilter==='Tomorrow'?null:'Tomorrow')} className={`px-4 py-1 rounded-full text-[13px] font-semibold  border-2 transition-all ${dateFilter==='Tomorrow'?'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 border-blue-100 dark:border-blue-900/50 shadow-sm':'bg-white dark:bg-navy-900 border-blue-50 dark:border-navy-800 text-blue-400 dark:text-blue-600 hover:border-blue-200 dark:hover:border-blue-800'}`}>Tomorrow <span className="ml-1 opacity-50">{getDateFilterCount('Tomorrow')}</span></button>
-              {(() => {
-                const tbdRows = items.filter(it => !it.cancelled && isTbdName(it.item_name));
-                if (tbdRows.length === 0) return null;
-                const overdue = tbdRows.filter(it => tbdDaysLeft(it.created_at) < 0).length;
-                return (
-                  <button onClick={() => setSearchTerm("TBD")} title="Naam decide karke update karna hai (HIMANSHI)" className={`px-4 py-1 rounded-full text-[13px] font-semibold  border-2 transition-all ${overdue > 0 ? 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border-red-200 dark:border-red-900/50' : 'bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-900/50'}`}>
-                    NAME PENDING <span className="ml-1 opacity-70">{tbdRows.length}</span>{overdue > 0 && <span className="ml-1">({overdue} OVERDUE)</span>}
-                  </button>
-                );
-              })()}
-            </div>
-            <div className="ml-auto flex items-center gap-3">
-              <p className="text-[13px] font-semibold text-[#5B6472] dark:text-navy-500 whitespace-nowrap">Page <span className="text-[#2563EB] dark:text-[#60A5FA]">{currentPage}</span> OF {totalPages||1}</p>
-              <div className="flex items-center gap-1">
-                <button onClick={() => setCurrentPage(Math.max(1, currentPage-1))} className="p-1 text-[#5B6472] dark:text-navy-700 hover:text-slate-800 dark:hover:text-white transition-colors"><ChevronLeftIcon className="w-3.5 h-3.5" /></button>
-                <button onClick={() => setCurrentPage(Math.min(totalPages, currentPage+1))} className="p-1 text-[#5B6472] dark:text-navy-700 hover:text-slate-800 dark:hover:text-white transition-colors"><ChevronRightIcon className="w-3.5 h-3.5" /></button>
-              </div>
-              <div className="flex items-center gap-1 ml-1">
-                <p className="text-[13px] font-semibold text-[#5B6472] dark:text-navy-700">Show</p>
-                <select value={itemsPerPage} onChange={e => setItemsPerPage(Number(e.target.value))} className="bg-transparent border-none text-[13px] font-semibold text-[#2563EB] dark:text-[#60A5FA] outline-none cursor-pointer">
-                  {[10, 20, 50].map(v => <option key={v} value={v} className="dark:bg-navy-900">{v}</option>)}
-                </select>
-              </div>
-            </div>
-          </div>
-
-          {/* Cards Area */}
-          <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 space-y-3 pb-20 py-0.5">
-            {isLoading ? (
-              <div className="flex flex-col items-center justify-center p-10 animate-pulse text-slate-200 dark:text-navy-800"><ArrowPathIcon className="w-8 h-8 animate-spin mb-4" /><p className="text-[13px] font-semibold">SYNCHRONIZING...</p></div>
-            ) : paginatedItems.length === 0 ? (
-              <div className="flex flex-col items-center justify-center p-10 text-slate-100 dark:text-navy-900"><MagnifyingGlassIcon className="w-12 h-12 mb-4" /><p className="text-[13px] font-semibold">No Data Found</p></div>
-            ) : (layoutMode === "smart" || isPhone) ? (
-              paginatedItems.map(item => {
-                const sel = selectedIds.has(item.id); const step = getActiveStep(item); const exp = expandedTiles[item.id];
-                return (
-                  <div key={item.id} className="px-1">
-                    <div onClick={() => { const n = new Set(selectedIds); if (n.has(item.id)) n.delete(item.id); else n.add(item.id); setSelectedIds(n); }} className={`bg-white dark:bg-navy-800 rounded-2xl border transition-all cursor-pointer overflow-hidden ${sel ? "border-[#2563EB] dark:border-[#60A5FA] border-2 shadow-lg" : "border-slate-100 dark:border-navy-700 shadow-sm hover:border-slate-200 dark:hover:border-navy-600"}`}>
-                      <div className="p-3">
-                        <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3 mb-2">
-                          <div className="flex items-start gap-3">
-                            <input type="checkbox" checked={sel} readOnly className="w-4 h-4 mt-1 rounded border-slate-300 dark:border-navy-700 text-[#2563EB] dark:text-[#60A5FA] focus:ring-[#2563EB] dark:focus:ring-[#60A5FA] dark:bg-navy-900" />
-                            <div>
-                              <div className="flex flex-wrap items-center gap-2">
-                                <span className="px-2 py-0.5 bg-blue-50 dark:bg-blue-900/20 text-[#2563EB] dark:text-blue-400 rounded text-[13px] font-semibold border border-blue-100 dark:border-blue-900/50">INDT - {item.id}</span>
-                                <h3 className="text-base font-semibold text-slate-800 dark:text-white tracking-tight leading-none">{item.item_name}</h3>
-                                {isTbdName(item.item_name) && (
-                                  <span className={`inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded-full text-[13px] font-semibold   border ${tbdDaysLeft(item.created_at) < 0 ? "bg-red-50 text-red-600 border-red-200 dark:bg-red-500/10 dark:border-red-500/30" : "bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-500/10 dark:border-amber-500/30"}`}>
-                                    {tbdDaysLeft(item.created_at) < 0 ? `NAME PENDING — HIMANSHI — OVERDUE ${Math.abs(tbdDaysLeft(item.created_at))}d` : `NAME PENDING — HIMANSHI — ${tbdDaysLeft(item.created_at)}d left`}
-                                  </span>
-                                )}
-                              </div>
-                              <div className="flex flex-wrap items-center gap-4 mt-1.5">
-                                <span className="flex items-center gap-1.5 text-[13px] font-semibold text-blue-500 dark:text-blue-400"><CubeIcon className="w-3.5 h-3.5" /> Qty: {item.quantity}</span>
-                                <span className="flex items-center gap-1.5 text-[13px] font-semibold text-purple-500 dark:text-purple-400"><TagIcon className="w-3.5 h-3.5" /> {item.category}</span>
-                                <span className="flex items-center gap-1.5 text-[13px] font-semibold text-[#5B6472] dark:text-navy-500"><UserIcon className="w-3.5 h-3.5" /> {item.filled_by}</span>
-                                <span className="flex items-center gap-1.5 text-[13px] font-semibold text-[#5B6472] dark:text-navy-500"><CalendarIcon className="w-3.5 h-3.5" /> {fmtDt(item.created_at)}</span>
-                              </div>
-                            </div>
-                          </div>
-                          
-                          <div className="flex flex-wrap items-center gap-2">
-                            {!item.cancelled && step > 0 && (
-                              <div className="flex items-center bg-white dark:bg-navy-800 border border-[#2563EB] rounded-full shadow-sm overflow-hidden divide-x divide-[#2563EB]/30 mr-1">
-                                <div className="flex flex-col items-center justify-center px-3 py-1.5 min-w-[120px]">
-                                  <p className="text-[13px] font-semibold text-[#2563EB] dark:text-[#60A5FA] tracking-tighter leading-none whitespace-nowrap">
-                                    {fmtDt((item as any)[`planned_${step}`])} {fmtTm((item as any)[`planned_${step}`])}
-                                  </p>
-                                  <p className={`text-[12px] font-semibold   mt-0.5 ${getDelayInfo((item as any)[`planned_${step}`], null, now)?.color || "text-[#5B6472]"}`}>
-                                    {getDelayInfo((item as any)[`planned_${step}`], null, now)?.text}
-                                  </p>
-                                </div>
-                                <div className="flex items-center gap-1.5 px-4 py-1.5 bg-[#2563EB]/5 dark:bg-[#60A5FA]/10">
-                                  <ClockIcon className="w-3.5 h-3.5 text-[#2563EB] stroke-[3]" />
-                                  <span className="text-[14px] font-semibold text-[#2563EB] dark:text-[#60A5FA] whitespace-nowrap">
-                                    STEP {step} PENDING
-                                  </span>
-                                </div>
-                              </div>
-                            )}
-                            {item.cancelled ? (
-                              <div className="flex items-center gap-2 px-4 py-1.5 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-900/50 text-red-600 dark:text-red-400 rounded-full text-[14px] font-semibold shadow-sm">
-                                <NoSymbolIcon className="w-3.5 h-3.5 text-red-500 stroke-[3]" />
-                                CANCELLED {fmtDt(item.cancelled)} {fmtTm(item.cancelled)}
-                              </div>
-                            ) : (
-                              step === 0 && (
-                                <button className="flex items-center gap-2 px-4 py-1.5 bg-white dark:bg-navy-800 border border-[#2563EB] text-[#2563EB] dark:text-[#60A5FA] rounded-full text-[14px] font-semibold shadow-sm hover:bg-[#2563EB]/5 transition-all">
-                                  <ClockIcon className="w-3.5 h-3.5 text-[#2563EB] stroke-[3]" />
-                                  DONE
-                                </button>
-                              )
-                            )}
-                            <div className="flex items-center gap-1 px-2 py-1 bg-white dark:bg-navy-800 rounded-full border border-slate-100 dark:border-navy-700 shadow-lg ring-1 ring-slate-100/50 dark:ring-navy-700/50">
-                              <button onClick={e => { e.stopPropagation(); setExpandedTiles(p => ({ ...p, [item.id]: !exp })); }} className={`p-1.5 rounded-full transition-all active:scale-90 ${exp ? "bg-[#2563EB] text-white" : "text-[#2563EB] dark:text-[#60A5FA] hover:bg-yellow-50 dark:hover:bg-yellow-900/20"}`} title={exp ? "Hide Pipeline" : "Show Pipeline"}><ChevronDownIcon className={`w-3.5 h-3.5 stroke-[3] transition-transform ${exp ? "rotate-180" : ""}`} /></button>
-                              {(isAdmin || step > 0) && (
-                                <>
-                                  <button onClick={e => { e.stopPropagation(); openPOModal(item); }} className="p-1.5 text-[#2563EB] dark:text-[#60A5FA] hover:bg-yellow-50 dark:hover:bg-yellow-900/20 rounded-full transition-all active:scale-90" title="Make PO"><PlusIcon className="w-3.5 h-3.5 stroke-[3]" /></button>
-                                  <button onClick={e => { e.stopPropagation(); openEditModal(item); }} className="p-1.5 text-blue-500 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-full transition-all active:scale-90"><PencilSquareIcon className="w-3.5 h-3.5" /></button>
-                                  <button onClick={e => { e.stopPropagation(); openRemoveFollowUpModal(item); }} className="p-1.5 text-purple-500 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-full transition-all active:scale-90" title="Remove Follow Up"><ArrowUturnLeftIcon className="w-3.5 h-3.5" /></button>
-                                  <button onClick={e => { e.stopPropagation(); handleDeleteClick(item.id); }} className="p-1.5 text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-full transition-all active:scale-90"><TrashIcon className="w-3.5 h-3.5" /></button>
-                                  <button onClick={e => { e.stopPropagation(); setCancelTargetId(item.id); }} className="p-1.5 text-[#D97706] dark:text-[#D97706] hover:bg-[#F7F8FA] dark:hover:bg-[#FEF3C7] rounded-full transition-all active:scale-90"><NoSymbolIcon className="w-3.5 h-3.5" /></button>
-                                </>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Card Bottom Grid */}
-                        <div className="-mx-1 px-1">
-                          <div className="flex flex-wrap items-start gap-x-4 gap-y-3 py-2 border-t border-slate-50 dark:border-navy-700 mt-1.5 pr-1">
-                            <div className="flex items-start gap-3 shrink-0">
-                              <div className="min-w-[72px] shrink-0 space-y-0.5">
-                                <div className="flex items-center gap-1 text-emerald-500 dark:text-emerald-400"><BuildingOfficeIcon className="w-3.5 h-3.5 shrink-0" /><p className="text-[13px] font-semibold">Supplier</p></div>
-                                <p className="text-[14px] font-semibold text-slate-800 dark:text-white ml-4 whitespace-normal break-words leading-tight">{item.supplier_name_3 || "—"}</p>
-                              </div>
-                              <div className="w-[76px] shrink-0 space-y-0.5">
-                                <div className="flex items-center gap-1 text-[#D97706] dark:text-[#D97706]"><ClockIcon className="w-3.5 h-3.5 shrink-0" /><p className="text-[13px] font-semibold whitespace-nowrap">Lead Time</p></div>
-                                <p className="text-[14px] font-semibold text-slate-800 dark:text-white truncate">{item.lead_time_acc_to_vendor_4 || "—"}</p>
-                              </div>
-                            </div>
-                            <div className="w-[112px] shrink-0 space-y-0.5">
-                              <div className="flex items-center gap-1 text-blue-400 dark:text-blue-300"><PhotoIcon className="w-3.5 h-3.5 shrink-0" /><p className="text-[13px] font-semibold">Sample</p></div>
-                            {item.sample_pic_5 ? (
-                              <div className="flex items-center gap-1.5 ml-4">
-                                <a href={item.sample_pic_5} target="_blank" className="text-[14px] font-semibold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 whitespace-nowrap">
-                                  <LinkIcon className="w-3 h-3" /> View Pic
-                                </a>
-                                <span className="text-[13px] font-semibold text-[#5B6472] dark:text-navy-500 tracking-tighter">Q:{item.sample_qty_5 || "—"}</span>
-                              </div>
-                            ) : (
-                              <p className="text-[14px] font-semibold text-[#5B6472] dark:text-navy-600 ml-4">Pending</p>
-                            )}
-                          </div>
-                          <div className="w-[118px] shrink-0 space-y-0.5">
-                            <div className="flex items-center gap-1 text-violet-500 dark:text-violet-400"><PhotoIcon className="w-3.5 h-3.5 shrink-0" /><p className="text-[13px] font-semibold leading-tight">Ready Stock</p></div>
-                            {item.photo_video_8 ? (
-                              <div className="ml-4">
-                                <a href={fileLinkUrl(item.photo_video_8)} target="_blank" rel="noopener noreferrer" className="text-[14px] font-semibold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 whitespace-nowrap">
-                                  <LinkIcon className="w-3 h-3" /> View Media
-                                </a>
-                              </div>
-                            ) : (
-                              <p className="text-[14px] font-semibold text-[#5B6472] dark:text-navy-600 ml-4">Pending</p>
-                            )}
-                          </div>
-                          <div className="w-[58px] shrink-0 space-y-0.5">
-                            <div className="flex items-center gap-1 text-blue-500 dark:text-blue-400"><GlobeAltIcon className="w-3.5 h-3.5 shrink-0" /><p className="text-[13px] font-semibold">Country</p></div>
-                            <div className="ml-4">
-                              {(() => {
-                                const stats = getGRNStats(item.po_number_6 || "");
-                                return <p className="text-[14px] font-semibold text-slate-800 dark:text-white truncate">{stats?.country || "—"}</p>;
-                              })()}
-                            </div>
-                          </div>
-
-                          <div className="w-[68px] shrink-0 space-y-0.5">
-                            <div className="flex items-center gap-1 text-rose-500 dark:text-rose-400"><DocumentTextIcon className="w-3.5 h-3.5 shrink-0" /><p className="text-[13px] font-semibold">PO No</p></div>
-                            <p className="text-[14px] font-semibold text-slate-800 dark:text-white ml-4 truncate">{item.po_number_6 || "—"}</p>
-                          </div>
-
-                          <div className="w-[58px] shrink-0 space-y-0.5">
-                            <div className="flex items-center gap-1 text-indigo-500 dark:text-indigo-400"><CubeIcon className="w-3.5 h-3.5 shrink-0" /><p className="text-[13px] font-semibold">Cargo</p></div>
-                            <p className="text-[14px] font-semibold text-slate-800 dark:text-white ml-4 truncate">{(item as any).cargo_9 || "—"}</p>
-                          </div>
-
-                          <div className="w-[68px] shrink-0 space-y-0.5">
-                            <div className="flex items-center gap-1 text-emerald-500 dark:text-emerald-400"><HashtagIcon className="w-3.5 h-3.5 shrink-0" /><p className="text-[13px] font-semibold">Rec QTY</p></div>
-                            <p className="text-[14px] font-semibold text-slate-800 dark:text-white ml-4 truncate">{(item as any).received_qty_10 || "—"}</p>
-                          </div>
-
-                          <div className="shrink-0 space-y-0.5 min-w-[96px]">
-                            <div className="flex items-center gap-1 text-emerald-500 dark:text-emerald-400"><SparklesIcon className="w-3.5 h-3.5 shrink-0" /><p className="text-[13px] font-semibold">Balance</p></div>
-                            <div className="ml-4">
-                              {item.po_number_6 ? (
-                                <div className="animate-in fade-in slide-in-from-left-1 duration-500">
-                                  {(() => {
-                                    const stats = getGRNStats(item.po_number_6);
-                                    if (!stats) return <p className="text-[13px] font-semibold text-[#5B6472] dark:text-navy-600 tracking-tighter">No GRN yet</p>;
-                                    const rem = (parseFloat(item.quantity) || 0) - stats.totalRec;
-                                    return (
-                                      <div className="flex items-center gap-1.5 font-semibold text-[13px] tracking-tighter whitespace-nowrap">
-                                        <span className="text-emerald-600 dark:text-emerald-400">R: {stats.totalRec}</span>
-                                        <span className="text-[#5B6472] dark:text-navy-800">|</span>
-                                        <span className={rem > 0 ? "text-rose-600" : "text-emerald-600"}>B: {rem}</span>
-                                      </div>
-                                    );
-                                  })()}
-                                </div>
-                              ) : <p className="text-[14px] font-semibold text-[#5B6472] dark:text-navy-700">—</p>}
-                            </div>
-                          </div>
-                        </div>
-                        </div>
-                        
-
-
-                        {exp && (
-                          <div className="mt-3 grid grid-cols-2 md:grid-cols-5 gap-2 animate-in slide-in-from-top-2 duration-300">
-                            {Array.from({ length: I2R_STEP_SHORT.length }, (_, i) => {
-                              const n = i + 1; const act = (item as any)[`actual_${n}`]; const pl = (item as any)[`planned_${n}`]; 
-                              const done = !!act;
-                              const isPending = !done && n === getActiveStep(item);
-                              const delayInfo = getDelayInfo(pl, act);
-                              
-                              let statusClasses = "bg-slate-50 dark:bg-navy-900 border-slate-200 dark:border-navy-700 text-[#5B6472] dark:text-navy-600";
-                              if (done) statusClasses = "bg-emerald-50/50 dark:bg-emerald-900/10 border-emerald-500 dark:border-emerald-700 text-emerald-700 dark:text-emerald-400 shadow-sm";
-                              else if (isPending) statusClasses = "bg-[#F7F8FA] dark:bg-[#FEF3C7] border-[#E5E7EB] dark:border-[#E5E7EB] text-[#D97706] dark:text-[#D97706] shadow-sm";
-
-                              return (
-                                <div key={n} className={`p-1.5 rounded-lg border transition-all ${statusClasses}`}>
-                                  <div className="flex items-center justify-between mb-0.5">
-                                    <p className={`text-[13px] font-semibold   ${done ? "text-emerald-600 dark:text-emerald-400" : isPending ? "text-[#D97706] dark:text-[#D97706]" : "text-[#5B6472] dark:text-navy-600"}`}>ST {n}</p>
-                                    {done && <CheckCircleIcon className="w-2.5 h-2.5 text-emerald-600 dark:text-emerald-400" />}
-                                    {isPending && <ClockIcon className="w-2.5 h-2.5 text-[#D97706] animate-pulse" />}
-                                  </div>
-                                  <p className={`text-[14px] font-semibold leading-tight line-clamp-1 ${done ? "text-emerald-900 dark:text-emerald-200" : isPending ? "text-[#D97706] dark:text-[#D97706]" : "text-slate-600 dark:text-navy-400"}`}>{I2R_STEP_SHORT[i]}</p>
-                                  
-                                  <div className={`mt-0.5 space-y-0 pt-0.5 border-t ${done ? "border-emerald-100 dark:border-emerald-900/50" : isPending ? "border-[#E5E7EB] dark:border-[#E5E7EB]" : "border-slate-100 dark:border-navy-700"}`}>
-                                    <div className="flex justify-between items-center text-[13px] font-semibold">
-                                      <span className="opacity-50">Planned</span>
-                                      <span className="dark:text-white/60">{fmtDt(pl)}</span>
-                                    </div>
-                                    <div className="flex justify-between items-center text-[13px] font-semibold">
-                                      <span className="opacity-50">Actual</span>
-                                      <span className={done ? "text-emerald-700 dark:text-emerald-400" : "opacity-30"}>{act ? fmtDt(act) : "—"}</span>
-                                    </div>
-                                    {delayInfo && (
-                                      <div className={`text-[13px] font-semibold  text-right leading-none mt-0.5 ${delayInfo.color}`}>
-                                        {delayInfo.text}
-                                      </div>
-                                    )}
-                                  </div>
-                                </div>
-                              );
-                            })}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })
-            ) : (
-              <div className="overflow-x-auto rounded-xl border border-slate-100 dark:border-navy-800 bg-white dark:bg-navy-800 shadow-sm custom-scrollbar">
-                <table className="w-full text-left border-collapse">
-                  <thead>
-                    <tr className="bg-[#2563EB] dark:bg-navy-950 text-white text-[13px] font-semibold">
-                      <th className="p-3 w-10 text-center sticky left-0 z-10 bg-[#2563EB] dark:bg-navy-950"><input type="checkbox" checked={selectedIds.size === paginatedItems.length && paginatedItems.length > 0} onChange={() => { if (selectedIds.size === paginatedItems.length) setSelectedIds(new Set()); else setSelectedIds(new Set(paginatedItems.map(i => i.id))); }} className="rounded border-white/20 bg-transparent text-[#2563EB] focus:ring-[#2563EB] dark:border-navy-700" /></th>
-                      <th className="p-3 whitespace-nowrap sticky left-10 z-10 bg-[#2563EB] dark:bg-navy-950">Actions</th>
-                      <th className="p-3 whitespace-nowrap sticky left-24 z-10 bg-[#2563EB] dark:bg-navy-950">INDENT NO.</th>
-                      <th className="p-3 whitespace-nowrap">Item Name</th>
-                      <th className="p-3 whitespace-nowrap">Quantity</th>
-                      <th className="p-3 whitespace-nowrap">Category</th>
-                      <th className="p-3 whitespace-nowrap">Filled By</th>
-                      <th className="p-3 whitespace-nowrap">Created At</th>
-                      <th className="p-3 whitespace-nowrap bg-blue-900/40 dark:bg-navy-900/50">SUPPLIER (ST-3)</th>
-                      <th className="p-3 whitespace-nowrap bg-blue-900/40 dark:bg-navy-900/50">LEAD TIME (ST-4)</th>
-                      <th className="p-3 whitespace-nowrap bg-blue-900/40 dark:bg-navy-900/50">SAMPLE PIC (ST-5)</th>
-                      <th className="p-3 whitespace-nowrap bg-blue-900/40 dark:bg-navy-900/50">PO NUMBER (ST-6)</th>
-                      <th className="p-3 whitespace-nowrap bg-blue-900/40 dark:bg-navy-900/50">PHOTO/VIDEO (ST-8)</th>
-                      <th className="p-3 whitespace-nowrap bg-blue-900/40 dark:bg-navy-900/50">CARGO (ST-9)</th>
-                      <th className="p-3 whitespace-nowrap bg-blue-900/40 dark:bg-navy-900/50">REC QTY (ST-10)</th>
-                      <th className="p-3 whitespace-nowrap bg-emerald-900/40 dark:bg-emerald-900/50">Country</th>
-                      <th className="p-3 whitespace-nowrap bg-emerald-900/40 dark:bg-emerald-900/50 text-center">GRN Rec</th>
-                      <th className="p-3 whitespace-nowrap bg-emerald-900/40 dark:bg-emerald-900/50 text-center">Remaining</th>
-                      {I2R_STEP_SHORT.map((s, i) => <th key={i} className="p-3 whitespace-nowrap border-l border-white/10 dark:border-navy-800/50 min-w-[220px]">STEP {i+1} — {s.toUpperCase()}</th>)}
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100 dark:divide-navy-700">
-                    {paginatedItems.map(it => (
-                      <tr key={it.id} className="hover:bg-slate-50/50 dark:hover:bg-navy-900/30 transition-all text-[14px] group">
-                        <td className="p-3 text-center sticky left-0 z-10 bg-white dark:bg-navy-800 group-hover:bg-slate-50 dark:group-hover:bg-navy-900/30 transition-all"><input type="checkbox" checked={selectedIds.has(it.id)} onChange={() => { const n = new Set(selectedIds); if (n.has(it.id)) n.delete(it.id); else n.add(it.id); setSelectedIds(n); }} className="rounded border-slate-300 dark:border-navy-700 text-[#2563EB] dark:text-[#60A5FA] focus:ring-[#2563EB] dark:focus:ring-[#60A5FA] dark:bg-navy-900" /></td>
-                        <td className="p-3 sticky left-10 z-10 bg-white dark:bg-navy-800 group-hover:bg-slate-50 dark:group-hover:bg-navy-900/30 transition-all">
-                          {(isAdmin || getActiveStep(it) > 0) ? (
-                            <div className="flex items-center gap-2">
-                              <button onClick={() => openPOModal(it)} className="p-1.5 text-[#2563EB] dark:text-[#60A5FA] hover:bg-yellow-50 dark:hover:bg-yellow-900/20 rounded-md transition-all" title="Make PO"><PlusIcon className="w-4 h-4 stroke-[3]" /></button>
-                              <button onClick={() => openEditModal(it)} className="p-1.5 text-blue-500 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-md transition-all"><PencilSquareIcon className="w-4 h-4" /></button>
-                              <button onClick={() => openRemoveFollowUpModal(it)} className="p-1.5 text-purple-500 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-md transition-all" title="Remove Follow Up"><ArrowUturnLeftIcon className="w-4 h-4" /></button>
-                              <button onClick={() => handleDeleteClick(it.id)} className="p-1.5 text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-all"><TrashIcon className="w-4 h-4" /></button>
-                            </div>
-                          ) : (
-                            <span className="text-[13px] font-semibold text-[#5B6472] dark:text-navy-600">View only</span>
-                          )}
-                        </td>
-                        <td className="p-3 sticky left-24 z-10 bg-white dark:bg-navy-800 group-hover:bg-slate-50 dark:group-hover:bg-navy-900/30 transition-all">
-                          <div className="flex flex-col gap-1">
-                            <span className="px-3 py-1 bg-blue-50 dark:bg-blue-900/20 text-[#2563EB] dark:text-blue-400 rounded-full font-semibold text-[13px] border border-blue-100 dark:border-blue-900/50 whitespace-nowrap">INDT- {it.id}</span>
-                            {it.cancelled && <span className="px-2 py-0.5 bg-red-50 dark:bg-red-900/10 text-red-600 dark:text-red-400 rounded text-[12px] font-semibold border border-red-100 dark:border-red-900/30 text-center">Cancelled {fmtDt(it.cancelled)} {fmtTm(it.cancelled)}</span>}
-                          </div>
-                        </td>
-                        <td className="p-3 font-semibold text-slate-800 dark:text-white max-w-[200px] truncate">
-                          {it.item_name}
-                          {isTbdName(it.item_name) && (
-                            <span className={`ml-1.5 px-1.5 py-0.5 rounded-full text-[12px] font-semibold  ${tbdDaysLeft(it.created_at) < 0 ? "bg-red-50 text-red-600" : "bg-amber-50 text-amber-600"}`}>
-                              {tbdDaysLeft(it.created_at) < 0 ? "NAME OVERDUE" : `NAME ${tbdDaysLeft(it.created_at)}d`}
-                            </span>
-                          )}
-                        </td>
-                        <td className="p-3 font-bold text-slate-500 dark:text-navy-400">{it.quantity}</td>
-                        <td className="p-3 font-bold text-[#5B6472] dark:text-navy-500">{it.category}</td>
-                        <td className="p-3 font-bold text-slate-500 dark:text-navy-400">{it.filled_by}</td>
-                        <td className="p-3 whitespace-nowrap">
-                          <p className="font-semibold text-slate-800 dark:text-white">{fmtDt(it.created_at)}</p>
-                          <p className="text-[13px] text-[#5B6472] dark:text-navy-600">{fmtTm(it.created_at)}</p>
-                        </td>
-                        <td className="p-3 font-semibold text-[#2563EB] dark:text-blue-400">{it.supplier_name_3 || "—"}</td>
-                        <td className="p-3 font-semibold text-[#D97706] dark:text-[#D97706]">{it.lead_time_acc_to_vendor_4 || "—"}</td>
-                        <td className="p-3">
-                          {it.sample_pic_5 ? (
-                            <div className="flex flex-col gap-1">
-                              <a href={it.sample_pic_5} target="_blank" className="text-blue-500 dark:text-blue-400 hover:underline font-semibold text-[13px] flex items-center gap-1"><PhotoIcon className="w-3 h-3" /> VIEW PIC</a>
-                              <span className="text-[12px] font-semibold text-[#5B6472] dark:text-navy-600 tracking-tighter">QTY: {it.sample_qty_5 || "—"}</span>
-                            </div>
-                          ) : <span className="text-[#5B6472] dark:text-navy-700 font-bold text-[13px]">No Pic</span>}
-                        </td>
-                        <td className="p-3 font-semibold text-rose-600 dark:text-rose-400">{it.po_number_6 || "—"}</td>
-                        <td className="p-3">
-                          {it.photo_video_8 ? (
-                            <a href={fileLinkUrl(it.photo_video_8)} target="_blank" rel="noopener noreferrer" className="text-blue-500 dark:text-blue-400 hover:underline font-semibold text-[13px] flex items-center gap-1">
-                              <LinkIcon className="w-3 h-3" /> VIEW MEDIA
-                            </a>
-                          ) : (
-                            <span className="text-[#5B6472] dark:text-navy-700 font-bold text-[13px]">No Media</span>
-                          )}
-                        </td>
-                        <td className="p-3 font-semibold text-indigo-600 dark:text-indigo-400">{(it as any).cargo_9 || "—"}</td>
-                        <td className="p-3 font-semibold text-emerald-600 dark:text-emerald-400">{(it as any).received_qty_10 || "—"}</td>
-                        {(() => {
-                          const stats = getGRNStats(it.po_number_6 || "");
-                          const rem = (parseFloat(it.quantity) || 0) - (stats?.totalRec || 0);
-                          return (
-                            <>
-                              <td className="p-3 font-bold text-slate-500 dark:text-navy-400 text-[13px]">{stats?.country || "—"}</td>
-                              <td className="p-3 font-semibold text-emerald-500 text-center text-[14px]">{stats?.totalRec || 0}</td>
-                              <td className={`p-3 font-semibold text-center text-[14px] ${rem > 0 ? "text-rose-500" : "text-emerald-500"}`}>{rem}</td>
-                            </>
-                          );
-                        })()}
-                        {I2R_STEP_SHORT.map((_, i) => {
-                          const n = i+1; const act = (it as any)[`actual_${n}`]; const pl = (it as any)[`planned_${n}`];
-                          const done = !!act; const isPending = !done && n === getActiveStep(it);
-                          const dly = getDelayInfo(pl, act, now);
-                          return (
-                            <td key={i} className={`p-3 border-l border-slate-50 dark:border-navy-800 ${isPending ? 'bg-[#F7F8FA] dark:bg-[#FEF3C7]' : ''}`}>
-                              {pl ? (
-                                <div className="space-y-1">
-                                  <div className="flex justify-between gap-4 text-[13px] whitespace-nowrap"><span className="text-[#5B6472] dark:text-navy-600 font-bold">Planned</span><span className="font-semibold text-slate-600 dark:text-white/70">{fmtDt(pl)}, {fmtTm(pl)}</span></div>
-                                  <div className="flex justify-between gap-4 text-[13px] whitespace-nowrap"><span className="text-[#5B6472] dark:text-navy-600 font-bold">Actual</span><span className={`font-semibold ${done ? 'text-emerald-500 dark:text-emerald-400' : isPending ? 'text-[#D97706]' : 'text-[#5B6472]'}`}>{act ? `${fmtDt(act)}, ${fmtTm(act)}` : isPending ? 'Pending >' : '—'}</span></div>
-                                  {dly && <div className="flex justify-between gap-4 text-[13px] whitespace-nowrap"><span className="text-[#5B6472] dark:text-navy-600 font-bold">Delay</span><span className={`font-semibold ${dly.color}`}>{dly.text}</span></div>}
-                                </div>
-                              ) : <span className="text-slate-100 dark:text-navy-950">—</span>}
-                            </td>
-                          );
-                        })}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
-        </div>
+      {/* One list + window, same as O2D (Sahil, 2026-10-29) */}
+      <div className="flex-1 flex overflow-hidden mt-2 px-1 min-w-0">
+        <ProcessScreen
+          cfg={procCfg}
+          items={screenItems}
+          loading={isLoading}
+          initialSearch={searchTerm}
+          primary={[{ label: "Update step", onClick: (r) => openBulkModal([String(r.id)]) }]}
+          footer={[{ label: "Edit", onClick: (r) => openEditModal(r), show: (r) => isAdmin || getActiveStep(r) > 0 }, { label: "Remove follow-up", onClick: (r) => openRemoveFollowUpModal(r), show: (r) => isAdmin && !String((r as any).cancelled || "").trim() }]}
+          menu={[{ label: "Cancel", tone: "danger", onClick: (r) => setCancelTargetId(String(r.id)), show: (r) => !String((r as any).cancelled || "").trim() && (isAdmin || getActiveStep(r) > 0) }, { label: "Delete", tone: "danger", onClick: (r) => handleDeleteClick(String(r.id)), show: () => isAdmin }]}
+        />
       </div>
 
       {/* ─── Floating Bulk Bar ─── */}
-      {selectedIds.size > 0 && (
+      {false && selectedIds.size > 0 && (
         <div className="fixed bottom-24 md:bottom-10 left-1/2 -translate-x-1/2 bg-[#FFFFFF] dark:bg-navy-800 px-1.5 py-1.5 rounded-full shadow-[0_15px_40px_rgba(0,0,0,0.15)] flex items-center gap-4 border border-[#EFF4FF] dark:border-navy-700 z-[100] animate-in slide-in-from-bottom-12 duration-500 ring-4 ring-[#FFFFFF] dark:ring-navy-950">
           <div className="flex items-center gap-2.5 pl-3">
             <div className="w-8 h-8 bg-[#2563EB] text-white rounded-full flex items-center justify-center font-semibold text-sm shadow-sm">{selectedIds.size}</div>
             <p className="text-[13px] font-semibold text-[#2563EB] dark:text-[#60A5FA]">Selected</p>
           </div>
-          <button onClick={openBulkModal} className="flex items-center gap-2 bg-[#2563EB] text-white px-6 py-2.5 rounded-full font-semibold text-[13px] hover:scale-[1.03] active:scale-95 transition-all shadow-md border-b-2 border-[#ccaa00]">
+          <button onClick={() => openBulkModal()} className="flex items-center gap-2 bg-[#2563EB] text-white px-6 py-2.5 rounded-full font-semibold text-[13px] hover:scale-[1.03] active:scale-95 transition-all shadow-md border-b-2 border-[#ccaa00]">
             <SparklesIcon className="w-3.5 h-3.5 stroke-[2.5]" /> BULK PROCESS
           </button>
           <button onClick={() => setSelectedIds(new Set())} className="pr-5 text-[#5B6472] dark:text-navy-500 hover:text-[#2563EB] dark:hover:text-[#60A5FA] text-[13px] font-semibold transition-colors">Clear</button>
@@ -1430,7 +997,7 @@ export default function I2RPage() {
           <div className="absolute inset-0 bg-[#1D4ED8]/60 backdrop-blur-md" onClick={() => setIsBulkModalOpen(false)} />
           <div className="relative bg-[#FFFFFF] dark:bg-navy-800 w-full max-w-5xl rounded-3xl md:rounded-[3.5rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-500">
             <div className="px-5 md:px-10 pt-6 pb-3 bg-[#FFFFFF] dark:bg-navy-800 flex items-start justify-between relative shrink-0 border-b border-slate-100 dark:border-navy-700">
-              <div><h2 className="text-[26px] font-semibold italic tracking-tighter text-[#2563EB] dark:text-white leading-none">Bulk Processor</h2><p className="text-[13px] font-semibold mt-1 text-[#5B6472] dark:text-navy-600">Processing {Array.from(selectedIds).length} selected indents</p></div>
+              <div><h2 className="text-[22px] font-semibold text-[#1A1D21] dark:text-white leading-none">Update step</h2><p className="text-[13px] font-semibold mt-1 text-[#5B6472] dark:text-navy-600">Processing {Array.from(selectedIds).length} selected indents</p></div>
               <button onClick={() => setIsBulkModalOpen(false)} className="p-2 hover:bg-slate-100 dark:hover:bg-navy-700 rounded-full transition-all text-[#5B6472] hover:text-slate-900 dark:hover:text-white absolute top-5 right-8"><XMarkIcon className="w-6 h-6" /></button>
             </div>
             <div className="flex-1 overflow-y-auto px-3 md:px-10 pb-24 pt-4 space-y-3 custom-scrollbar">
@@ -1525,7 +1092,7 @@ export default function I2RPage() {
             </div>
             <div className="absolute bottom-0 left-0 right-0 py-3.5 px-4 md:px-10 bg-[#FFFFFF] dark:bg-navy-800 border-t border-slate-100 dark:border-navy-700 flex items-center justify-between shadow-[0_-10px_30px_rgba(0,0,0,0.05)]">
               <button onClick={() => setIsBulkModalOpen(false)} className="px-6 py-3 text-[14px] font-semibold text-[#5B6472] dark:text-navy-600 hover:text-slate-800 dark:hover:text-white transition-all">Cancel</button>
-              <button onClick={handleBulkStepSave} className="flex items-center gap-2.5 bg-[#2563EB] dark:bg-[#60A5FA] text-white dark:text-navy-950 px-10 py-3.5 rounded-2xl font-semibold text-[14px] shadow-lg hover:scale-[1.02] active:scale-95 transition-all border-b-4 border-[#1D4ED8] dark:border-navy-950"><SparklesIcon className="w-4 h-4" /> Execute Bulk Update</button>
+              <button onClick={handleBulkStepSave} className="flex items-center gap-2.5 bg-[#2563EB] dark:bg-[#60A5FA] text-white dark:text-navy-950 px-10 py-3.5 rounded-2xl font-semibold text-[14px] shadow-lg hover:scale-[1.02] active:scale-95 transition-all border-b-4 border-[#1D4ED8] dark:border-navy-950"><SparklesIcon className="w-4 h-4" /> Save</button>
             </div>
           </div>
         </div>

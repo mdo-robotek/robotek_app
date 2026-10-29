@@ -348,7 +348,7 @@ export default function WeeklyUpdateView() {
 
       <div className="p-4 flex-1 flex flex-col gap-2.5 bg-[#fcfbfa] dark:bg-navy-900/50 overflow-y-auto max-h-[350px]">
         {items.length === 0 ? (
-          <div className="flex-1 flex items-center justify-center text-[14px] text-gray-400 font-bold">No items yet</div>
+          <div className="flex-1 flex items-center justify-center text-[14px] text-[#5B6472] font-bold">No items yet</div>
         ) : (
           items.map(item => (
             <div
@@ -363,7 +363,7 @@ export default function WeeklyUpdateView() {
               <div className="font-medium whitespace-pre-wrap">{item.description}</div>
               {item.date && (
                 <div className="text-[13px] font-bold text-gray-500 mt-2 flex items-center gap-1 border-t border-gray-200/50 dark:border-navy-700 pt-1.5 w-max">
-                  <span className="w-1.5 h-1.5 rounded-full bg-orange-400 block" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#FEF3C7] block" />
                   {formatDate(item.date)}
                 </div>
               )}
@@ -371,14 +371,14 @@ export default function WeeklyUpdateView() {
               <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-all">
                 <button
                   onClick={() => openEditModal(item, type, title)}
-                  className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-white dark:hover:bg-navy-700 rounded-md transition-all shadow-sm"
+                  className="p-1.5 text-[#5B6472] hover:text-blue-600 hover:bg-white dark:hover:bg-navy-700 rounded-md transition-all shadow-sm"
                   title="Edit"
                 >
                   <PencilIcon className="w-3.5 h-3.5 stroke-[2]" />
                 </button>
                 <button
                   onClick={() => setDeleteTarget({ id: item.id, categoryType: type, description: item.description })}
-                  className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-white dark:hover:bg-navy-700 rounded-md transition-all shadow-sm"
+                  className="p-1.5 text-[#5B6472] hover:text-red-500 hover:bg-white dark:hover:bg-navy-700 rounded-md transition-all shadow-sm"
                   title="Delete"
                 >
                   <XMarkIcon className="w-3.5 h-3.5 stroke-[3]" />
@@ -417,7 +417,7 @@ export default function WeeklyUpdateView() {
                 <div>
                   <label className="block text-[13px] font-semibold text-gray-500 mb-1.5">Week Of</label>
                   <div className="relative group/date">
-                    <CalendarDaysIcon className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none group-focus-within/date:text-[#2563EB]" />
+                    <CalendarDaysIcon className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5B6472] pointer-events-none group-focus-within/date:text-[#2563EB]" />
                     <input type="date" value={weekOf} onChange={e => setWeekOf(e.target.value)}
                       className="w-full border border-gray-200 dark:border-navy-600 rounded-md pr-10 pl-3 py-2.5 outline-none focus:border-[#2563EB] text-sm dark:bg-navy-900 dark:text-white transition-colors" />
                   </div>
@@ -439,7 +439,7 @@ export default function WeeklyUpdateView() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {renderCard("Completed this week",        "completed",   "text-emerald-700 dark:text-emerald-500", completedItems)}
               {renderCard("In progress",                "in-progress", "text-[#1D4ED8] dark:text-blue-400",      inProgressItems)}
-              {renderCard("Pending MD action",          "pending",     "text-orange-600",                         pendingItems)}
+              {renderCard("Pending MD action",          "pending",     "text-[#D97706]",                         pendingItems)}
               {renderCard("Upcoming deadlines (14 days)", "deadline", "text-gray-900 dark:text-white",           deadlineItems)}
             </div>
 
@@ -470,13 +470,13 @@ export default function WeeklyUpdateView() {
                     )}
                   </h2>
                   <div className="flex items-center gap-2 mt-1">
-                    <p className="text-gray-400 dark:text-slate-400 font-bold text-[12px]">EA-MD Hub</p>
-                    <span className="px-2 py-0.5 bg-orange-50 dark:bg-navy-800 text-[12px] font-semibold text-[#2563EB] dark:text-[#60A5FA] rounded border border-orange-100 dark:border-navy-700">
+                    <p className="text-[#5B6472] dark:text-slate-400 font-bold text-[14px]">EA-MD Hub</p>
+                    <span className="px-2 py-0.5 bg-[#F7F8FA] dark:bg-navy-800 text-[14px] font-semibold text-[#2563EB] dark:text-[#60A5FA] rounded border border-[#E5E7EB] dark:border-navy-700">
                       Weekly Update
                     </span>
                   </div>
                 </div>
-                <button onClick={closeModal} className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-white transition-colors">
+                <button onClick={closeModal} className="p-2 text-[#5B6472] hover:text-gray-600 dark:hover:text-white transition-colors">
                   <XMarkIcon className="w-8 h-8" />
                 </button>
               </div>
@@ -508,13 +508,13 @@ export default function WeeklyUpdateView() {
                       value={modalTeamMember}
                       onChange={setModalTeamMember}
                       placeholder="Select Team Member"
-                      className="bg-[#FFFFFF] dark:bg-navy-900 border border-orange-100 dark:border-navy-700/50 shadow-sm"
+                      className="bg-[#FFFFFF] dark:bg-navy-900 border border-[#E5E7EB] dark:border-navy-700/50 shadow-sm"
                     />
                   </div>
                 )}
 
                 <div>
-                  <label className="block text-[13px] font-semibold text-gray-400 mb-1.5 px-1">Description *</label>
+                  <label className="block text-[13px] font-semibold text-[#5B6472] mb-1.5 px-1">Description *</label>
                   <textarea
                     required rows={4}
                     value={modalDescription}
@@ -526,7 +526,7 @@ export default function WeeklyUpdateView() {
                       activeModal === 'deadline'    ? "Deadline or event?" :
                       activeModal === 'team-query'  ? "Query for MD?" : "Enter description"
                     }
-                    className="w-full bg-[#FFFFFF] dark:bg-navy-900 px-4 py-3 rounded-xl border border-orange-100 dark:border-navy-700/50 focus:border-[#2563EB] dark:focus:border-[#60A5FA] focus:bg-white outline-none text-[13px] font-bold text-gray-800 dark:text-white transition-all shadow-sm resize-none"
+                    className="w-full bg-[#FFFFFF] dark:bg-navy-900 px-4 py-3 rounded-xl border border-[#E5E7EB] dark:border-navy-700/50 focus:border-[#2563EB] dark:focus:border-[#60A5FA] focus:bg-white outline-none text-[13px] font-bold text-gray-800 dark:text-white transition-all shadow-sm resize-none"
                   />
                 </div>
 
@@ -536,15 +536,15 @@ export default function WeeklyUpdateView() {
                   <div>
                     <label className="block text-[14px] font-semibold text-gray-700 dark:text-slate-300 mb-1.5 px-1">Date / Deadline</label>
                     <div className="relative group/date">
-                      <CalendarDaysIcon className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none group-focus-within/date:text-[#2563EB]" />
+                      <CalendarDaysIcon className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5B6472] pointer-events-none group-focus-within/date:text-[#2563EB]" />
                       <input type="date" value={modalDate} onChange={e => setModalDate(e.target.value)}
-                        className="w-full bg-[#FFFFFF] dark:bg-navy-900 pr-10 pl-3 py-2.5 rounded-xl border border-orange-100 dark:border-navy-700/50 focus:border-[#2563EB] outline-none text-sm text-gray-900 dark:text-white transition-all shadow-sm" />
+                        className="w-full bg-[#FFFFFF] dark:bg-navy-900 pr-10 pl-3 py-2.5 rounded-xl border border-[#E5E7EB] dark:border-navy-700/50 focus:border-[#2563EB] outline-none text-sm text-gray-900 dark:text-white transition-all shadow-sm" />
                     </div>
                   </div>
                 )}
 
                 <div className="pt-4 flex justify-end gap-5">
-                  <button type="button" onClick={closeModal} disabled={isSaving} className="px-8 py-3 rounded-xl text-[13px] font-semibold text-gray-400 hover:text-gray-900 transition-colors">
+                  <button type="button" onClick={closeModal} disabled={isSaving} className="px-8 py-3 rounded-xl text-[13px] font-semibold text-[#5B6472] hover:text-gray-900 transition-colors">
                     Dismiss
                   </button>
                   <button type="submit" disabled={isSaving} 

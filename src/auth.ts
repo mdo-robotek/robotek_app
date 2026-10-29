@@ -1,7 +1,7 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
-import { getUserByUsernameOrEmail } from "@/lib/google-sheets";
+import { findLoginUser } from "@/lib/google-sheets";
 import { authConfig } from "./auth.config";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
@@ -23,7 +23,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       async authorize(credentials: any) {
         if (!credentials?.username || !credentials?.password) return null;
 
-        const user = await getUserByUsernameOrEmail(credentials.username as string);
+        const { user } = await findLoginUser(credentials.username as string);
 
         if (user && user.password === credentials.password) {
           if (user.isActive === false) return null;

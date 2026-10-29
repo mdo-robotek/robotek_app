@@ -74,11 +74,11 @@ export function getFieldsForModule(module: HrmsModuleType): FormField[] {
 
 export function getStepCount(module: HrmsModuleType): number {
   switch (module) {
-    case "recruitment": return 5;
+    case "recruitment": return 6;
     case "candidate": return 7;
-    case "sales": return 8;
-    case "onboard": return 11;
-    case "offboard": return 4;
+    case "sales": return 7;
+    case "onboard": return 14;
+    case "offboard": return 5;
   }
 }
 

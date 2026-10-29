@@ -45,7 +45,7 @@ export default function DateFilterBar({
   };
 
   const accentText =
-    theme === 'orange' ? 'text-orange-600' :
+    theme === 'orange' ? 'text-[#D97706]' :
     theme === 'purple' ? 'text-purple-600' :
     theme === 'emerald' ? 'text-emerald-600' :
     theme === 'black' ? 'text-gray-900 dark:text-gray-300' :
@@ -53,7 +53,7 @@ export default function DateFilterBar({
     'text-[#2563EB]';
 
   const accentBg =
-    theme === 'orange' ? 'bg-orange-600' :
+    theme === 'orange' ? 'bg-[#FEF3C7]' :
     theme === 'purple' ? 'bg-purple-600' :
     theme === 'emerald' ? 'bg-emerald-600' :
     theme === 'black' ? 'bg-black dark:bg-white' :
@@ -61,7 +61,7 @@ export default function DateFilterBar({
     'bg-[#00a86b]';
 
   const selectAccent =
-    theme === 'orange' ? 'border-orange-200 focus:ring-orange-500 text-orange-700' :
+    theme === 'orange' ? 'border-[#E5E7EB] focus:ring-[#E5E7EB] text-[#D97706]' :
     theme === 'purple' ? 'border-purple-200 focus:ring-purple-500 text-purple-700' :
     theme === 'emerald' ? 'border-emerald-200 focus:ring-emerald-500 text-emerald-700' :
     theme === 'black' ? 'border-gray-200 focus:ring-gray-500 text-gray-900 dark:text-gray-200' :
@@ -149,7 +149,7 @@ export default function DateFilterBar({
   const customRangeControl = (
     <div className={`flex items-center gap-1.5 px-2 py-1 rounded-lg border transition-all shrink-0 ${
       period === 'CUSTOM'
-        ? (theme === 'orange' ? 'border-orange-500 bg-orange-50' :
+        ? (theme === 'orange' ? 'border-[#E5E7EB] bg-[#F7F8FA]' :
            theme === 'purple' ? 'border-purple-600 bg-purple-50' :
            theme === 'emerald' ? 'border-emerald-600 bg-emerald-50' :
            theme === 'black' ? 'border-gray-900 bg-gray-100 dark:bg-gray-800 dark:border-gray-700' :
@@ -164,7 +164,7 @@ export default function DateFilterBar({
         onChange={handleCustomStartChange}
         className={`bg-transparent text-[13px] font-semibold outline-none  cursor-pointer w-[108px] ${accentText}`}
       />
-      <span className="text-[13px] font-semibold text-gray-400">TO</span>
+      <span className="text-[13px] font-semibold text-[#5B6472]">TO</span>
       <input
         type="date"
         value={endDate ? format(endDate, 'yyyy-MM-dd') : ''}
@@ -214,7 +214,7 @@ export default function DateFilterBar({
             className={`px-4 py-2 rounded-full text-[13px] font-semibold   transition-all whitespace-nowrap ${
               period === p
                 ? `${accentBg} text-white shadow-md`
-                : (theme === 'orange' ? 'bg-white text-orange-600 border border-gray-200 hover:bg-orange-50' : 
+                : (theme === 'orange' ? 'bg-white text-[#D97706] border border-gray-200 hover:bg-[#F7F8FA]' : 
                    theme === 'purple' ? 'bg-white text-purple-600 border border-gray-200 hover:bg-purple-50' :
                    theme === 'emerald' ? 'bg-white text-emerald-600 border border-gray-200 hover:bg-emerald-50' :
                    theme === 'black' ? 'bg-white text-gray-900 border border-gray-200 hover:bg-gray-100 dark:bg-transparent dark:text-gray-300 dark:border-gray-700 dark:hover:bg-gray-800' :

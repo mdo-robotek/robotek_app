@@ -8,6 +8,7 @@ import { getUsers } from "@/lib/google-sheets";
 import { leaveRequestService } from "@/lib/leave-sheets";
 import { ownsLeaveFollowUp } from "@/lib/leave-access";
 import { auth } from "@/auth";
+import { collectWork, makeNameResolver } from "@/lib/score-misses";
 
 export const dynamic = 'force-dynamic';
 
@@ -237,6 +238,31 @@ export async function GET(request: Request) {
       }
     });
 
+    // Other FMS steps (I2R, I2R Packing, GRN, HRMS FMS, New Launch): each step
+    // counts for the doer set in that module's step setup (Sahil, 2026-10-27).
+    try {
+      const { work: fmsWork } = await collectWork({ skip: ["Delegation", "Checklist", "Help Ticket", "O2D"] });
+      const resolveFms = makeNameResolver(users.map((u: any) => String(u.username || "").trim()).filter(Boolean));
+      fmsWork.forEach((w) => {
+        const owners = resolveFms(w.responsible);
+        if (!owners.length || !w.planned) return;
+        const actual = w.done ? w.actual : null;
+        allTasks.push({
+          category: "fms",
+          user: owners.join(","),
+          plannedDate: w.planned,
+          actualDate: actual,
+          isCompleted: !!actual,
+          isLate: !!(actual && actual > w.planned),
+          title: `${w.module} · ${w.step} — ${w.title}${w.ref ? ` (${w.ref})` : ""}`,
+          id: `${w.module}-${w.ref}-${w.step}`,
+          status: actual ? "Done" : "Pending",
+        });
+      });
+    } catch (err) {
+      console.error("Score: other FMS skipped", err);
+    }
+
     // Process Scot Follow Ops Completed Tracking
     followUps.forEach(f => {
       if (f.lastFollowUpDate && f.createdAt) {
@@ -338,7 +364,7 @@ export async function GET(request: Request) {
 
     const userResult = users.map((u: any) => {
       const userTasks = allTasks.filter(t => {
-        if (t.category === 'o2d' || t.category === 'scot') {
+        if (t.category === 'o2d' || t.category === 'scot' || t.category === 'fms') {
           return t.user.split(",").map((s: string) => s.trim()).includes(u.username);
         }
         return t.user === u.username;
@@ -359,6 +385,7 @@ export async function GET(request: Request) {
       const checklist = calculateMetrics(userTasks.filter(t => t.category === 'checklist'), from, to);
       const o2d = calculateMetrics(userTasks.filter(t => t.category === 'o2d'), from, to);
       const scot = calculateMetrics(userTasks.filter(t => t.category === 'scot'), from, to);
+      const fms = calculateMetrics(userTasks.filter(t => t.category === 'fms'), from, to);
 
       const trendData = periods.map(p => {
         const pMetrics = calculateMetrics(userTasks, p.from, p.to);
@@ -382,6 +409,7 @@ export async function GET(request: Request) {
         checklistStats: { ...checklist, items: userTasks.filter(t => t.category === 'checklist' && (isDateInRange(t.plannedDate, from, to) || (t.actualDate && isDateInRange(t.actualDate, from, to)))).map(minimizeTask) },
         o2dStats: { ...o2d, items: userTasks.filter(t => t.category === 'o2d' && (isDateInRange(t.plannedDate, from, to) || (t.actualDate && isDateInRange(t.actualDate, from, to)))).map(minimizeTask) },
         scotStats: { ...scot, items: userTasks.filter(t => t.category === 'scot' && (isDateInRange(t.plannedDate, from, to) || (t.actualDate && isDateInRange(t.actualDate, from, to)))).map(minimizeTask) },
+        fmsStats: { ...fms, items: userTasks.filter(t => t.category === 'fms' && (isDateInRange(t.plannedDate, from, to) || (t.actualDate && isDateInRange(t.actualDate, from, to)))).map(minimizeTask) },
         trendData
       };
     });

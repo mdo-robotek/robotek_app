@@ -382,7 +382,7 @@ export default function GFloorLedgerModals({
                           <td className={`${tdClass} text-center`}>
                             <button
                               onClick={() => setProductionRows((prev) => prev.filter((r) => r.id !== row.id))}
-                              className="p-1.5 text-gray-400 hover:text-rose-500 rounded-md hover:bg-rose-50 dark:hover:bg-rose-500/10"
+                              className="p-1.5 text-[#5B6472] hover:text-rose-500 rounded-md hover:bg-rose-50 dark:hover:bg-rose-500/10"
                               title="Remove row"
                             >
                               <TrashIcon className="w-4 h-4" />
@@ -488,7 +488,7 @@ export default function GFloorLedgerModals({
                           </td>
                           <td className={`${tdClass} text-center`}>
                             {row.diff_type === "NONE" ? (
-                              <span className="text-[13px] font-bold text-gray-400">—</span>
+                              <span className="text-[13px] font-bold text-[#5B6472]">—</span>
                             ) : (
                               <span className={`text-[13px] font-semibold  ${row.diff_type === "IN" ? "text-emerald-600" : "text-rose-600"}`}>
                                 {row.diff_type} {row.diff_qty}
@@ -498,7 +498,7 @@ export default function GFloorLedgerModals({
                           <td className={`${tdClass} text-center`}>
                             <button
                               onClick={() => setAuditRows((prev) => prev.filter((r) => r.id !== row.id))}
-                              className="p-1.5 text-gray-400 hover:text-rose-500 rounded-md hover:bg-rose-50 dark:hover:bg-rose-500/10"
+                              className="p-1.5 text-[#5B6472] hover:text-rose-500 rounded-md hover:bg-rose-50 dark:hover:bg-rose-500/10"
                               title="Remove row"
                             >
                               <TrashIcon className="w-4 h-4" />

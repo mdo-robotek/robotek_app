@@ -99,7 +99,7 @@ export default function DashboardView({ goToTab }: DashboardViewProps) {
               <h3 className="text-5xl font-bold text-rose-700 dark:text-rose-500" style={{ fontFamily: 'Georgia, serif' }}>
                 {openUrgentLogs.length}
               </h3>
-              <p className="text-[13px] font-semibold text-gray-400 mt-2">Urgent Actions</p>
+              <p className="text-[13px] font-semibold text-[#5B6472] mt-2">Urgent Actions</p>
             </div>
 
             {/* Pending MD Card */}
@@ -107,7 +107,7 @@ export default function DashboardView({ goToTab }: DashboardViewProps) {
               <h3 className="text-5xl font-bold text-blue-700 dark:text-blue-500" style={{ fontFamily: 'Georgia, serif' }}>
                 {pendingMDActions.length}
               </h3>
-              <p className="text-[13px] font-semibold text-gray-400 mt-2">Pending MD Action</p>
+              <p className="text-[13px] font-semibold text-[#5B6472] mt-2">Pending MD Action</p>
             </div>
 
             {/* Done This Week Card */}
@@ -115,7 +115,7 @@ export default function DashboardView({ goToTab }: DashboardViewProps) {
               <h3 className="text-5xl font-bold text-emerald-700 dark:text-emerald-500" style={{ fontFamily: 'Georgia, serif' }}>
                 {doneCount}
               </h3>
-              <p className="text-[13px] font-semibold text-gray-400 mt-2">Done This Week</p>
+              <p className="text-[13px] font-semibold text-[#5B6472] mt-2">Done This Week</p>
             </div>
 
             {/* Open Queries Card */}
@@ -123,7 +123,7 @@ export default function DashboardView({ goToTab }: DashboardViewProps) {
               <h3 className="text-5xl font-bold text-amber-600 dark:text-amber-500" style={{ fontFamily: 'Georgia, serif' }}>
                 {openQueries.length}
               </h3>
-              <p className="text-[13px] font-semibold text-gray-400 mt-2">Open Team Queries</p>
+              <p className="text-[13px] font-semibold text-[#5B6472] mt-2">Open Team Queries</p>
             </div>
 
           </div>
@@ -144,7 +144,7 @@ export default function DashboardView({ goToTab }: DashboardViewProps) {
               </div>
               <div className="flex-1 flex flex-col">
                 {openUrgentLogs.length === 0 ? (
-                  <div className="flex-1 flex items-center justify-center text-[14px] font-medium text-gray-400">
+                  <div className="flex-1 flex items-center justify-center text-[14px] font-medium text-[#5B6472]">
                     No urgent items
                   </div>
                 ) : (
@@ -175,7 +175,7 @@ export default function DashboardView({ goToTab }: DashboardViewProps) {
               </div>
               <div className="flex-1 flex flex-col">
                 {pendingMDActions.length === 0 ? (
-                  <div className="flex-1 flex items-center justify-center text-[14px] font-medium text-gray-400">
+                  <div className="flex-1 flex items-center justify-center text-[14px] font-medium text-[#5B6472]">
                     All clear
                   </div>
                 ) : (
@@ -212,7 +212,7 @@ export default function DashboardView({ goToTab }: DashboardViewProps) {
                     </button>
                   </>
                 ) : (
-                  <div className="w-full text-center text-[14px] font-medium text-gray-400 py-4">
+                  <div className="w-full text-center text-[14px] font-medium text-[#5B6472] py-4">
                     No upcoming meetings
                   </div>
                 )}
@@ -232,7 +232,7 @@ export default function DashboardView({ goToTab }: DashboardViewProps) {
               </div>
               <div className="flex-1 flex flex-col">
                 {openQueries.length === 0 ? (
-                  <div className="flex-1 flex items-center justify-center text-[14px] font-medium text-gray-400">
+                  <div className="flex-1 flex items-center justify-center text-[14px] font-medium text-[#5B6472]">
                     No open queries
                   </div>
                 ) : (

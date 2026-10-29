@@ -122,7 +122,7 @@ export default function AdminTable() {
                     <p className="text-[14px] font-bold text-gray-500">Cross-reference Odometer readings with Live GPS data</p>
                 </div>
                 <div className="flex items-center gap-3">
-                    <label className="text-[14px] font-semibold text-gray-400">Date Filter</label>
+                    <label className="text-[14px] font-semibold text-[#5B6472]">Date Filter</label>
                     <input 
                         type="date" 
                         value={dateStr}
@@ -165,23 +165,23 @@ export default function AdminTable() {
                 {isLoading ? (
                     <div className="w-full h-full flex flex-col items-center justify-center gap-3">
                         <div className="w-8 h-8 border-4 border-[#2563EB] dark:border-[#60A5FA] border-t-transparent rounded-full animate-spin"></div>
-                        <div className="text-[14px] font-bold text-gray-400">Loading Logs...</div>
+                        <div className="text-[14px] font-bold text-[#5B6472]">Loading Logs...</div>
                     </div>
                 ) : enrichedRecords.length === 0 ? (
-                    <div className="w-full h-full flex flex-col items-center justify-center text-gray-400 text-sm font-bold">
+                    <div className="w-full h-full flex flex-col items-center justify-center text-[#5B6472] text-sm font-bold">
                         No check-ins found for this date.
                     </div>
                 ) : (
                     <table className="w-full text-left border-collapse">
                         <thead className="bg-white dark:bg-slate-900 sticky top-0 z-10 shadow-sm">
                             <tr>
-                                <th className="p-4 text-[13px] font-semibold text-gray-400 border-b border-gray-200 dark:border-white/10">Driver</th>
-                                <th className="p-4 text-[13px] font-semibold text-gray-400 border-b border-gray-200 dark:border-white/10">Date</th>
-                                <th className="p-4 text-[13px] font-semibold text-gray-400 border-b border-gray-200 dark:border-white/10">Timeline</th>
-                                <th className="p-4 text-[13px] font-semibold text-gray-400 border-b border-gray-200 dark:border-white/10">Odometer Proof</th>
+                                <th className="p-4 text-[13px] font-semibold text-[#5B6472] border-b border-gray-200 dark:border-white/10">Driver</th>
+                                <th className="p-4 text-[13px] font-semibold text-[#5B6472] border-b border-gray-200 dark:border-white/10">Date</th>
+                                <th className="p-4 text-[13px] font-semibold text-[#5B6472] border-b border-gray-200 dark:border-white/10">Timeline</th>
+                                <th className="p-4 text-[13px] font-semibold text-[#5B6472] border-b border-gray-200 dark:border-white/10">Odometer Proof</th>
                                 <th className="p-4 text-[13px] font-semibold text-[#2563EB] dark:text-[#60A5FA] border-b border-gray-200 dark:border-white/10 text-right">Odometer KM</th>
-                                <th className="p-4 text-[13px] font-semibold text-[#2563EB] dark:text-[#60A5FA] border-b border-gray-200 dark:border-white/10 text-right">GPS KM</th>
-                                <th className="p-4 text-[13px] font-semibold text-gray-400 border-b border-gray-200 dark:border-white/10 text-center">Status</th>
+                                <th className="p-4 text-[13px] font-semibold text-[#2563EB] dark:text-[#60A5FA] border-b border-gray-200 dark:border-white/10 text-right">Gps Km</th>
+                                <th className="p-4 text-[13px] font-semibold text-[#5B6472] border-b border-gray-200 dark:border-white/10 text-center">Status</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100 dark:divide-white/5">
@@ -189,7 +189,7 @@ export default function AdminTable() {
                                 <tr key={r.id || idx} className="hover:bg-gray-50/50 dark:hover:bg-white/[0.02] transition-colors">
                                     <td className="p-4 align-top">
                                         <div className="font-semibold text-sm text-gray-900 dark:text-white">{r.userName}</div>
-                                        <div className="text-[13px] font-bold text-gray-400">{r.userId}</div>
+                                        <div className="text-[13px] font-bold text-[#5B6472]">{r.userId}</div>
                                     </td>
                                     <td className="p-4 align-top">
                                         <div className="text-[14px] font-bold text-gray-500">
@@ -203,14 +203,14 @@ export default function AdminTable() {
                                                     <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
                                                     <span className="text-[14px] font-bold text-gray-600 dark:text-gray-300">In: {formatTime(r.inTime)}</span>
                                                 </div>
-                                                {r.inLocation && <div className="text-[13px] font-medium text-gray-400 pl-3.5 leading-tight">{r.inLocation}</div>}
+                                                {r.inLocation && <div className="text-[13px] font-medium text-[#5B6472] pl-3.5 leading-tight">{r.inLocation}</div>}
                                             </div>
                                             <div>
                                                 <div className="flex items-center gap-2 mb-1">
                                                     <span className="w-1.5 h-1.5 rounded-full bg-red-500"></span>
                                                     <span className="text-[14px] font-bold text-gray-600 dark:text-gray-300">Out: {formatTime(r.outTime)}</span>
                                                 </div>
-                                                {r.outLocation && <div className="text-[13px] font-medium text-gray-400 pl-3.5 leading-tight">{r.outLocation}</div>}
+                                                {r.outLocation && <div className="text-[13px] font-medium text-[#5B6472] pl-3.5 leading-tight">{r.outLocation}</div>}
                                             </div>
                                         </div>
                                     </td>
@@ -227,7 +227,7 @@ export default function AdminTable() {
                                                 </button>
                                             )}
                                         </div>
-                                        <div className="text-[13px] font-bold text-gray-400 mt-2">
+                                        <div className="text-[13px] font-bold text-[#5B6472] mt-2">
                                             {r.odometerIn} → {r.odometerOut || '...'}
                                         </div>
                                     </td>
@@ -235,13 +235,13 @@ export default function AdminTable() {
                                         <div className="text-xl font-semibold font-mono text-gray-900 dark:text-white">
                                             {r.status === 'COMPLETED' ? r.odoKm.toFixed(1) : '--'}
                                         </div>
-                                        <div className="text-[13px] font-bold text-gray-400">Recorded</div>
+                                        <div className="text-[13px] font-bold text-[#5B6472]">Recorded</div>
                                     </td>
                                     <td className="p-4 align-top text-right">
                                         <div className="text-xl font-semibold font-mono text-[#2563EB] dark:text-[#60A5FA]">
                                             {r.gpsKm.toFixed(1)}
                                         </div>
-                                        <div className="text-[13px] font-bold text-gray-400">Tracked</div>
+                                        <div className="text-[13px] font-bold text-[#5B6472]">Tracked</div>
                                     </td>
                                     <td className="p-4 align-top text-center">
                                         {r.verificationStatus === 'VERIFIED' && (
@@ -250,7 +250,7 @@ export default function AdminTable() {
                                             </div>
                                         )}
                                         {r.verificationStatus === 'LOW_GPS' && (
-                                            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-orange-500/10 text-orange-600 border border-orange-500/20 rounded-full text-[13px] font-semibold">
+                                            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#D97706]/10 text-[#D97706] border border-[#E5E7EB] rounded-full text-[13px] font-semibold">
                                                 <ExclamationTriangleIcon className="w-4 h-4" /> GPS Drop
                                             </div>
                                         )}

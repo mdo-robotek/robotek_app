@@ -91,7 +91,7 @@ export default function LiveMap({
     >
       <div className={`${tall ? 'h-[260px] xl:h-[280px]' : 'h-[220px] md:h-[240px]'} rounded-lg overflow-hidden border border-gray-100 dark:border-white/10 relative`}>
         {loading && !liveLocation && (
-          <div className="absolute inset-0 z-10 flex items-center justify-center bg-gray-50 dark:bg-slate-800 text-[14px] font-bold text-gray-400">
+          <div className="absolute inset-0 z-10 flex items-center justify-center bg-gray-50 dark:bg-slate-800 text-[14px] font-bold text-[#5B6472]">
             Loading map...
           </div>
         )}

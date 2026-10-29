@@ -30,8 +30,9 @@ export default function AccessGuard({ children }: { children: React.ReactNode })
       return;
     }
 
-    // Skip check for universally accessible core features
-    if (pathname === "/login" || pathname === "/" || pathname.startsWith("/chat") || pathname.startsWith("/grn") || pathname.startsWith("/scheduler") || pathname.startsWith("/field-driver") || pathname.startsWith("/inventory/stationary") || pathname.startsWith("/attendance") || pathname.startsWith("/leave") || pathname.startsWith("/customer-target")) {
+    // Skip check for universally accessible core features.
+    // Action Board / Performance Board check access on the server (Admin, EA, Process Coordinator).
+    if (pathname === "/login" || pathname === "/" || pathname.startsWith("/chat") || pathname.startsWith("/grn") || pathname.startsWith("/scheduler") || pathname.startsWith("/field-driver") || pathname.startsWith("/inventory/stationary") || pathname.startsWith("/attendance") || pathname.startsWith("/leave") || pathname.startsWith("/customer-target") || pathname.startsWith("/action-board") || pathname.startsWith("/team-board")) {
       setIsAuthorized(true);
       return;
     }
@@ -70,7 +71,7 @@ export default function AccessGuard({ children }: { children: React.ReactNode })
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m0 0v2m0-2h2m-2 0H10m11 3a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
         </div>
-        <h1 className="text-3xl font-semibold text-gray-900 dark:text-white mb-3 tracking-tighter">ACCESS DENIED</h1>
+        <h1 className="text-3xl font-semibold text-gray-900 dark:text-white mb-3 tracking-tighter">Access Denied</h1>
         <p className="text-gray-500 dark:text-slate-400 font-bold text-sm max-w-md leading-relaxed">
           Your account does not have permission to view this section.<br/> Please contact your administrator if this is an error.
         </p>
@@ -96,7 +97,7 @@ export default function AccessGuard({ children }: { children: React.ReactNode })
     return (
         <div className="flex flex-col items-center justify-center min-h-[60vh]">
             <div className="w-10 h-10 border-4 border-gray-100 border-t-[#2563EB] dark:border-t-[#60A5FA] rounded-full animate-spin mb-4" />
-            <p className="text-[13px] font-semibold text-gray-400 animate-pulse font-mono">Verifying Access...</p>
+            <p className="text-[13px] font-semibold text-[#5B6472] animate-pulse font-mono">Verifying Access...</p>
         </div>
     );
   }

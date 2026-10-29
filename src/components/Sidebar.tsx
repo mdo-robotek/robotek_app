@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
+import { canSeeActionBoard } from "@/lib/action-board";
+import SarthiMark from "./SarthiMark";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { navigation } from "@/lib/navigation";
@@ -145,6 +147,11 @@ export default function Sidebar({ mobileOpen, setMobileOpen }: SidebarProps) {
   const { permissions: userPermissions, isAdmin } = usePermissions();
 
   const filteredNavigation = navigation.filter(item => {
+    // Action Board: Admin, EA and the Process Coordinator (Sahil, 2026-10-28)
+    if (item.id === 'action-board' || item.id === 'team-board') {
+      const u = session?.user as any;
+      return isAdmin || canSeeActionBoard({ username: u?.username, role: u?.role, designation: u?.designation });
+    }
     // Dashboard is the system home, visible to all authenticated users, Chat is available to all, Scheduler set to visible
     if (item.id === 'dashboard' || item.id === 'chat' || item.id === 'scheduler' || item.id === 'grn' || item.id === 'payment-vendor-approval' || item.id === 'field-driver' || item.id === 'stationary' || item.id === 'attendance' || item.id === 'leave' || item.id === 'scot' || item.id === 'scot-kb' || item.id === 'customer-target') return true;
 
@@ -241,11 +248,11 @@ export default function Sidebar({ mobileOpen, setMobileOpen }: SidebarProps) {
 
         <div className="flex items-center justify-between h-14 px-4 border-b border-[#E5E7EB] dark:border-navy-800 shrink-0">
           <Link href="/" className="flex items-center gap-3" onClick={() => setMobileOpen?.(false)}>
-            <div className="w-8 h-8 min-w-[32px] rounded-lg overflow-hidden ring-1 ring-black/5 dark:ring-white/10">
-              <img src="/logo_compact.png" alt="Robotek" className="w-full h-full object-cover" />
+            <div className="w-8 h-8 min-w-[32px] rounded-lg bg-[#2563EB] text-white flex items-center justify-center">
+              <SarthiMark className="w-5 h-5" />
             </div>
-            <span className="text-[16px] font-semibold text-[#1A1D21] dark:text-white whitespace-nowrap">
-              Robotek ERP
+            <span className="text-[17px] font-semibold text-[#1A1D21] dark:text-white whitespace-nowrap">
+              Sarthi
             </span>
           </Link>
 

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { isAdminSession, ADMIN_ONLY_MESSAGE } from "@/lib/require-admin";
 import { getUsers, addUser } from "@/lib/google-sheets";
 import { uploadFileToDrive } from "@/lib/google-drive";
 
@@ -20,7 +21,10 @@ function nextEmpCodeFrom(users: { id?: string }[]): string {
 export async function GET() {
   try {
     const allUsers = await getUsers();
-    return NextResponse.json(allUsers);
+    // Passwords never leave the server. Editing a user with the password box
+    // left blank keeps the current password (see updateUser).
+    const safe = allUsers.map(({ password: _password, ...rest }) => ({ ...rest, password: "" }));
+    return NextResponse.json(safe);
   } catch (error: any) {
     console.error("GET Users Error:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
@@ -28,6 +32,11 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
+  // Writes are admin-only (Oct 26): before this any logged-in user could
+  // add users, change roles (even their own to ADMIN) or reset passwords.
+  if (!(await isAdminSession())) {
+    return NextResponse.json({ error: ADMIN_ONLY_MESSAGE }, { status: 403 });
+  }
   try {
     const contentType = req.headers.get("content-type") || "";
     let userData: any;

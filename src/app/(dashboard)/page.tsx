@@ -8,9 +8,7 @@ import {
   MapPinIcon, 
   UserMinusIcon,
   ChatBubbleLeftRightIcon,
-  CalendarIcon,
   ClockIcon,
-  PlusIcon
 } from "@heroicons/react/24/outline";
 import { 
   CompactWelcome,
@@ -24,7 +22,11 @@ import {
   UserAssetsPanel,
   CompactPartyCelebrationCard
 } from "./DashboardComponents";
-import CooReport from "@/components/CooReport";
+import PendingApprovalsCard from "@/components/PendingApprovalsCard";
+import CeoOverview from "@/components/CeoOverview";
+import { QUICK_NEW_ICONS } from "@/components/QuickNew";
+import { quickNewFor } from "@/lib/quick-new";
+import { usePermissions } from "@/hooks/usePermissions";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -41,14 +43,9 @@ export default function Dashboard() {
   const username = (session?.user as any)?.username as string | undefined;
   const userRole = (session?.user as any)?.role || 'User';
   const isAdmin = (session?.user as any)?.role === 'ADMIN' || (session?.user as any)?.role === 'EA';
+  const { permissions, isAdmin: isAdminRole } = usePermissions();
+  const quickActions = quickNewFor({ username, isAdmin: isAdminRole, permissions });
 
-  // Single dashboard: admins/EA get the COO Command Center on top of the personal view.
-  // Fetched only for admins (null key = no request); current month by default.
-  const { data: cooData, isLoading: cooLoading } = useSWR(
-    isAdmin ? '/api/metrix/coo?granularity=month' : null,
-    fetcher,
-    { refreshInterval: 300000, revalidateOnFocus: false, keepPreviousData: true }
-  );
 
   // Busy sale register freshness — reminder for the accounts team to copy
   // Busy -> Transaction -> Sales -> List into the sale sheet.
@@ -68,9 +65,9 @@ export default function Dashboard() {
       >
         <span className={`w-2 h-2 rounded-full shrink-0 ${(busyFresh.daysOld ?? 99) >= 2 ? "bg-rose-500 animate-pulse" : (busyFresh.daysOld ?? 99) >= 1 ? "bg-amber-500" : "bg-emerald-500"}`} />
         {(busyFresh.daysOld ?? 99) >= 2
-          ? `Busy sale data ${busyFresh.daysOld} din purana hai — Busy se sale list copy karo (Transaction → Sales → List)`
+          ? `Busy sale data is ${busyFresh.daysOld} days old — copy the sale list from Busy (Transaction → Sales → List)`
           : (busyFresh.daysOld ?? 99) >= 1
-          ? `Busy sale data: kal tak ka (${busyFresh.lastSaleDate}) — aaj ki copy pending`
+          ? `Busy sale data is up to ${busyFresh.lastSaleDate} — today's copy still pending`
           : `Busy sale data up to date (${busyFresh.lastSaleDate})`}
       </div>
     </div>
@@ -119,20 +116,20 @@ export default function Dashboard() {
       
       {/* ROW 1: MISSION CONTROL HEADER */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-12 gap-4">
-        <div className="xl:col-span-2 self-center">
+        <div className="xl:col-span-2 hidden md:block">
           <CompactWelcome firstName={firstName} role={userRole} />
         </div>
         <div className="xl:col-span-2">
-            {!isLoading && data && <CompactScore score={data.score.score} total={data.score.total} label="FAILURE SCORE (GAP)" isNegative={true} />}
+            {!isLoading && data?.score && <CompactScore score={data.score.score} total={data.score.total} label="Failure score (gap)" isNegative={true} />}
         </div>
         <div className="xl:col-span-2">
-            {!isLoading && data && <CompactScore score={data.score.onTimeRate} total={data.score.completed} label="ACCURACY GAP" isNegative={true} />}
+            {!isLoading && data?.score && <CompactScore score={data.score.onTimeRate} total={data.score.completed} label="Accuracy gap" isNegative={true} />}
         </div>
         <div className="xl:col-span-3">
-            {!isLoading && data && <CompactOccasionCard birthdays={data.birthdays} anniversaries={data.anniversaries} />}
+            {!isLoading && data && <CompactOccasionCard birthdays={data.birthdays || []} anniversaries={data.anniversaries || []} />}
         </div>
         <div className="xl:col-span-3">
-            {!isLoading && data && <CompactPartyCelebrationCard partyBirthdays={data.partyBirthdays} partyAnniversaries={data.partyAnniversaries} />}
+            {!isLoading && data && <CompactPartyCelebrationCard partyBirthdays={data.partyBirthdays || []} partyAnniversaries={data.partyAnniversaries || []} />}
         </div>
       </div>
 
@@ -144,8 +141,10 @@ export default function Dashboard() {
            <StatusTile label="Absent" value={data?.summary?.outOfOffice || 0} icon={MapPinIcon} color="text-rose-600 dark:text-rose-400" bg="bg-rose-50 dark:bg-rose-900/30" />
            <StatusTile label="On Leave" value={data?.summary?.onLeave || 0} icon={UserMinusIcon} color="text-amber-600 dark:text-amber-400" bg="bg-amber-50 dark:bg-amber-900/30" />
            
-           <QuickActionSquare label="New Ticket" href="/tickets?action=new" icon={PlusIcon} color="bg-[#2563EB] dark:bg-[#60A5FA] dark:text-[#60A5FA]" />
-           <QuickActionSquare label="Apply Leave" href="/leave?open=apply" icon={CalendarIcon} color="bg-rose-500" />
+           {/* Same forms as the "+ New" button, so both places always match */}
+           {quickActions.map((item) => (
+             <QuickActionSquare key={item.key} label={item.key === "leave" ? "Apply Leave" : `New ${item.label}`} href={item.href} icon={QUICK_NEW_ICONS[item.key]} />
+           ))}
            <QuickActionSquare label="Attendance" href="/attendance" icon={ClockIcon} color="bg-emerald-500" />
         </div>
 
@@ -168,7 +167,7 @@ export default function Dashboard() {
       {/* ROW 3: DETAILED LOGS */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <CompactTable 
-            title="Today's Logins"
+            title="Today's check-ins"
             icon={UsersIcon}
             headerTheme="emerald"
             data={data?.attendanceToday || []}
@@ -190,40 +189,40 @@ export default function Dashboard() {
         />
 
         <CompactTable 
-            title="Open/Pending Tickets"
+            title="Open tickets"
             icon={ChatBubbleLeftRightIcon}
             headerTheme="blue"
             data={data?.openTickets || []}
             linkHref="/tickets"
             columns={[
-                { label: 'Topic/ID', key: 'id', render: (row: any) => (
+                { label: 'Ticket', key: 'id', render: (row: any) => (
                     <div className="flex flex-col">
                         <span className="block font-semibold text-gray-900 dark:text-white leading-tight text-[14px] break-words">{row.title}</span>
-                        <span className="text-[13px] text-gray-400 font-mono italic mt-0.5">{row.id}</span>
+                        <span className="text-[13px] text-[#5B6472] font-mono italic mt-0.5">{row.id}</span>
                     </div>
                 )},
                 { label: 'Status', key: 'status', className: 'text-right', render: (row: any) => (
                     <span className={`px-2 py-0.5 rounded-full text-[13px]  font-semibold ${
-                        row.status === 'Open' ? 'bg-[#2563EB]/10 text-white' : 'bg-amber-500/10 text-amber-500'
+                        row.status === 'Open' ? 'bg-[#2563EB]/10 text-[#2563EB]' : 'bg-amber-500/10 text-amber-500'
                     }`}>{row.status}</span>
                 )}
             ]}
         />
 
         <CompactTable 
-            title="Team Absence Power"
+            title="Leave requests"
             icon={UserMinusIcon}
             headerTheme="amber"
             data={(data?.recentLeaves || []).filter((l: any) => (l.status || '').toLowerCase() === 'pending')}
             linkHref="/leave"
             columns={[
-                { label: 'User/Reason', key: 'userName', render: (row: any) => (
+                { label: isAdmin ? 'Person' : 'Reason', key: 'userName', render: (row: any) => (
                     <div className="flex flex-col">
                         <span className="text-gray-900 dark:text-white font-semibold text-[14px] leading-tight break-words">{isAdmin ? row.userName : row.reason}</span>
-                        <span className="text-[13px] text-gray-400 font-bold mt-0.5">{new Date(row.startDate).toLocaleDateString()}</span>
+                        <span className="text-[13px] text-[#5B6472] font-bold mt-0.5">{new Date(row.startDate).toLocaleDateString()}</span>
                     </div>
                 )},
-                      { label: 'Involved', key: 'involved', render: (row: any) => (
+                      { label: 'Covering', key: 'involved', render: (row: any) => (
                         <div className="text-[14px] text-gray-600">{(row.involved || []).join(', ')}</div>
                       )},
                 { label: 'Status', key: 'status', className: 'text-right', render: (row: any) => (
@@ -240,10 +239,18 @@ export default function Dashboard() {
     </div>
   );
 
+  // Pending Approvals — only the approvals this user owns; hides itself when empty.
+  const approvalsStrip = (
+    <div className="max-w-[1600px] mx-auto px-4 pb-4">
+      <PendingApprovalsCard />
+    </div>
+  );
+
   // Non-admins: personal dashboard + Busy freshness reminder (accounts team)
   if (!isAdmin) return (
     <div>
       {busyBanner}
+      {approvalsStrip}
       {myDay}
     </div>
   );
@@ -255,7 +262,8 @@ export default function Dashboard() {
 
   return (
     <div>
-      {busyBanner}
+      {/* On the CEO view the Busy reminder sits inside "Needs attention" */}
+      {view !== "coo" && busyBanner}
       <div className="max-w-[1600px] mx-auto px-4 pb-4 flex gap-2 overflow-x-auto">
         {tabs.map((t) => (
           <button
@@ -263,7 +271,7 @@ export default function Dashboard() {
             onClick={() => setView(t.id)}
             className={`shrink-0 rounded-full px-5 py-2 text-[14px] font-semibold   transition-all active:scale-95 ${
               view === t.id
-                ? "bg-[#2563EB] text-white dark:bg-[#60A5FA] dark:text-[#60A5FA] shadow-lg"
+                ? "bg-[#2563EB] text-white dark:bg-[#60A5FA] dark:text-[#0B1120] shadow-lg"
                 : "bg-white text-gray-500 ring-1 ring-black/10 dark:bg-white/5 dark:text-slate-300 dark:ring-white/10"
             }`}
           >
@@ -273,10 +281,13 @@ export default function Dashboard() {
       </div>
       {view === "coo" ? (
         <div className="max-w-[1600px] mx-auto px-4 pb-10">
-          <CooReport data={cooData} loading={cooLoading} />
+          <CeoOverview />
         </div>
       ) : (
-        myDay
+        <>
+          {approvalsStrip}
+          {myDay}
+        </>
       )}
     </div>
   );

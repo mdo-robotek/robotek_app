@@ -10,12 +10,14 @@ import {
 } from "@/lib/new-launch-sheets";
 import {
   NEW_LAUNCH_BRIEF_FIELDS,
+  NEW_LAUNCH_TEAM_ROLES,
   NEW_LAUNCH_TOTAL_STEPS,
   NewLaunchStep,
   NewLaunchStepConfig,
   mergeStepConfig,
 } from "@/lib/new-launch-steps";
 import { calculatePlannedTimeIST } from "@/lib/workingHours";
+import { getUsers } from "@/lib/google-sheets";
 import { NewLaunch, NewLaunchHistoryEntry } from "@/types/new-launch";
 
 export const dynamic = "force-dynamic";
@@ -60,9 +62,14 @@ export async function GET() {
   const session = await auth();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   try {
-    const [items, configs] = await Promise.all([getNewLaunches(), getNewLaunchConfig()]);
+    const [items, configs, users] = await Promise.all([getNewLaunches(), getNewLaunchConfig(), getUsers().catch(() => [])]);
+    // Names for the doer dropdowns — only what the picker needs, never passwords.
+    const people = users
+      .filter((u) => u.isActive !== false && String(u.username || "").trim())
+      .map((u) => ({ username: String(u.username).trim(), role: u.role_name || "", designation: u.designation || "", department: u.department || "" }))
+      .sort((a, b) => a.username.localeCompare(b.username));
     return NextResponse.json(
-      { items, steps: mergeStepConfig(configs), isAdmin: sessionInfo(session).isAdmin },
+      { items, steps: mergeStepConfig(configs), users: people, isAdmin: sessionInfo(session).isAdmin },
       { headers: { "Cache-Control": "no-store, max-age=0" } }
     );
   } catch (error) {
@@ -92,6 +99,10 @@ function readBrief(form: Record<string, string> | undefined): Record<string, str
     if (v && f.type === "number" && !(Number(v) > 0)) throw new HttpError(400, `${f.label} must be a number above 0`);
     if (v && f.options && !f.options.includes(v)) throw new HttpError(400, `${f.label}: pick one of the options`);
     out[`0_${f.key}`] = v;
+  }
+  for (const r of NEW_LAUNCH_TEAM_ROLES) {
+    const v = String(form?.[`team_${r.key}`] ?? "").trim().slice(0, 80);
+    out[`0_team_${r.key}`] = v;
   }
   return out;
 }

@@ -202,19 +202,19 @@ export default function UrgentLogView() {
               <thead>
                 <tr className="bg-[#1D4ED8] text-white text-[13px] tracking-wider font-extrabold">
                   <th className="p-4 rounded-tl-xl w-12 border-b border-[#1D4ED8]">#</th>
-                  <th className="p-4 border-b border-[#1D4ED8]">ISSUE</th>
-                  <th className="p-4 border-b border-[#1D4ED8]">LEVEL</th>
-                  <th className="p-4 border-b border-[#1D4ED8]">CHANNEL</th>
-                  <th className="p-4 border-b border-[#1D4ED8]">REQUIRED FROM MD</th>
-                  <th className="p-4 border-b border-[#1D4ED8]">DEADLINE</th>
-                  <th className="p-4 border-b border-[#1D4ED8]">STATUS</th>
-                  <th className="p-4 rounded-tr-xl border-b border-[#1D4ED8] text-right pr-6">ACTION</th>
+                  <th className="p-4 border-b border-[#1D4ED8]">Issue</th>
+                  <th className="p-4 border-b border-[#1D4ED8]">Level</th>
+                  <th className="p-4 border-b border-[#1D4ED8]">Channel</th>
+                  <th className="p-4 border-b border-[#1D4ED8]">Required From MD</th>
+                  <th className="p-4 border-b border-[#1D4ED8]">Deadline</th>
+                  <th className="p-4 border-b border-[#1D4ED8]">Status</th>
+                  <th className="p-4 rounded-tr-xl border-b border-[#1D4ED8] text-right pr-6">Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 dark:divide-navy-700">
                 {logs.length === 0 ? (
                   <tr>
-                    <td colSpan={8} className="p-8 text-center text-gray-400 text-sm font-bold">
+                    <td colSpan={8} className="p-8 text-center text-[#5B6472] text-sm font-bold">
                       No urgent logs found.
                     </td>
                   </tr>
@@ -283,13 +283,13 @@ export default function UrgentLogView() {
                       Flag urgent matter
                     </h2>
                     <div className="flex items-center gap-2 mt-1">
-                      <p className="text-gray-400 dark:text-slate-400 font-bold text-[12px]">Triage & Escalate Workspace</p>
-                      <span className="px-2 py-0.5 bg-rose-50 dark:bg-navy-800 text-[12px] font-semibold text-rose-700 dark:text-rose-400 rounded border border-rose-100 dark:border-navy-700">
+                      <p className="text-[#5B6472] dark:text-slate-400 font-bold text-[14px]">Triage & Escalate Workspace</p>
+                      <span className="px-2 py-0.5 bg-rose-50 dark:bg-navy-800 text-[14px] font-semibold text-rose-700 dark:text-rose-400 rounded border border-rose-100 dark:border-navy-700">
                         Immediate Action
                       </span>
                     </div>
                   </div>
-                  <button onClick={() => setIsModalOpen(false)} className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-white transition-colors">
+                  <button onClick={() => setIsModalOpen(false)} className="p-2 text-[#5B6472] hover:text-gray-600 dark:hover:text-white transition-colors">
                     <XMarkIcon className="w-8 h-8" />
                   </button>
                 </div>
@@ -309,7 +309,7 @@ export default function UrgentLogView() {
                       value={issueSummary}
                       onChange={e => setIssueSummary(e.target.value)}
                       placeholder="Brief description..."
-                      className="w-full bg-[#FFFFFF] dark:bg-navy-900 border border-orange-100 dark:border-navy-700/50 rounded-xl px-4 py-3 text-[13px] text-gray-800 dark:text-gray-200 outline-none focus:border-[#2563EB] dark:focus:border-[#60A5FA] min-h-[100px] resize-none shadow-sm transition-all"
+                      className="w-full bg-[#FFFFFF] dark:bg-navy-900 border border-[#E5E7EB] dark:border-navy-700/50 rounded-xl px-4 py-3 text-[13px] text-gray-800 dark:text-gray-200 outline-none focus:border-[#2563EB] dark:focus:border-[#60A5FA] min-h-[100px] resize-none shadow-sm transition-all"
                     />
                   </div>
 
@@ -372,7 +372,7 @@ export default function UrgentLogView() {
                         value={requiredFromMD}
                         onChange={e => setRequiredFromMD(e.target.value)}
                         placeholder="Decision / approval / call back..."
-                        className="w-full bg-[#FFFFFF] dark:bg-navy-900 border border-orange-100 dark:border-navy-700/50 rounded-xl px-4 py-2.5 text-[14px] text-gray-800 dark:text-gray-200 outline-none focus:border-[#2563EB] dark:focus:border-[#60A5FA] shadow-sm transition-all"
+                        className="w-full bg-[#FFFFFF] dark:bg-navy-900 border border-[#E5E7EB] dark:border-navy-700/50 rounded-xl px-4 py-2.5 text-[14px] text-gray-800 dark:text-gray-200 outline-none focus:border-[#2563EB] dark:focus:border-[#60A5FA] shadow-sm transition-all"
                       />
                     </div>
                     
@@ -382,7 +382,7 @@ export default function UrgentLogView() {
                         type="datetime-local"
                         value={deadline}
                         onChange={e => setDeadline(e.target.value)}
-                        className="w-full bg-[#FFFFFF] dark:bg-navy-900 border border-orange-100 dark:border-navy-700/50 rounded-xl px-4 py-2.5 text-[14px] font-bold text-gray-800 dark:text-gray-200 outline-none focus:border-[#2563EB] dark:focus:border-[#60A5FA] shadow-sm transition-all"
+                        className="w-full bg-[#FFFFFF] dark:bg-navy-900 border border-[#E5E7EB] dark:border-navy-700/50 rounded-xl px-4 py-2.5 text-[14px] font-bold text-gray-800 dark:text-gray-200 outline-none focus:border-[#2563EB] dark:focus:border-[#60A5FA] shadow-sm transition-all"
                       />
                     </div>
                   </div>
@@ -391,7 +391,7 @@ export default function UrgentLogView() {
 
                 {/* Modal Footer */}
                 <div className="px-8 py-4 bg-white dark:bg-navy-800/50 flex justify-end gap-5">
-                  <button type="button" onClick={() => setIsModalOpen(false)} className="px-8 py-3 rounded-xl text-[13px] font-semibold text-gray-400 hover:text-gray-900 transition-colors">
+                  <button type="button" onClick={() => setIsModalOpen(false)} className="px-8 py-3 rounded-xl text-[13px] font-semibold text-[#5B6472] hover:text-gray-900 transition-colors">
                     Dismiss
                   </button>
                   <button type="button"

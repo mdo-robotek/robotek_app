@@ -411,7 +411,7 @@ export default function LeavePage() {
     const respColors = [
         'text-purple-700 dark:text-purple-300',
         'text-blue-700 dark:text-blue-300',
-        'text-orange-700 dark:text-orange-300',
+        'text-[#D97706] dark:text-[#D97706]',
     ];
 
     return (
@@ -437,12 +437,12 @@ export default function LeavePage() {
                                     type="button"
                                     title="How Leave Management works"
                                     onClick={() => setShowInfoModal(true)}
-                                    className="p-2 rounded-full bg-[#2563EB]/10 hover:bg-[#2563EB]/20 text-white dark:bg-[#60A5FA]/15 dark:hover:bg-[#60A5FA]/25 dark:text-[#60A5FA] transition-colors"
+                                    className="p-2 rounded-full bg-[#2563EB]/10 hover:bg-[#2563EB]/20 text-[#2563EB] dark:bg-[#60A5FA]/15 dark:hover:bg-[#60A5FA]/25 dark:text-[#60A5FA] transition-colors"
                                 >
                                     <InformationCircleIcon className="w-5 h-5" />
                                 </button>
                                 <div className="relative hidden md:block">
-                                    <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                                    <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5B6472]" />
                                     <input
                                         type="text"
                                         placeholder="Search by name, reason, status..."
@@ -489,8 +489,8 @@ export default function LeavePage() {
                         <div className="space-y-2 overflow-auto custom-scrollbar pr-1 flex-1 min-h-0">
                             {pagedLeaves.length === 0 ? (
                                 <div style={{backgroundColor:'var(--panel-card)',borderColor:'var(--panel-border)'}} className="border rounded-2xl p-10 text-center">
-                                    <ClipboardDocumentListIcon className="w-10 h-10 text-gray-300 dark:text-slate-600 mx-auto mb-3" />
-                                    <p className="text-[14px] font-bold text-gray-400">No leave records found</p>
+                                    <ClipboardDocumentListIcon className="w-10 h-10 text-[#5B6472] dark:text-slate-600 mx-auto mb-3" />
+                                    <p className="text-[14px] font-bold text-[#5B6472]">No leave records found</p>
                                 </div>
                             ) : (
                                 <div className="flex flex-col gap-2">
@@ -532,7 +532,7 @@ export default function LeavePage() {
                                         })();
                                         const editFill = () => { setEditingLeave(lv); setLeaveForm({ leaveType: lv.leaveType||'Full Day', halfDaySession: lv.halfDaySession||'First Half', durationType: (lv.startDate===lv.endDate||!lv.endDate||lv.leaveType==='Half Day')?'1day':'multiday', startDate:lv.startDate, endDate:lv.endDate, reason:lv.reason, responsibility1:lv.responsibility1||'', responsibility2:lv.responsibility2||'', responsibility3:lv.responsibility3||'', tasks1:lv.tasks1||'', tasks2:lv.tasks2||'', tasks3:lv.tasks3||'', sharedTask:lv.sharedTask||'', taskMode:(lv.sharedTask&&lv.sharedTask.trim())?'shared':'individual' }); setShowLeaveModal(true); };
                                         const statusBg = lv.status === 'Approved' ? 'bg-emerald-100 text-emerald-700' : lv.status === 'Rejected' ? 'bg-rose-100 text-rose-600' : 'bg-amber-100 text-amber-700';
-                                        const leaveTypeBg = isHalfDay ? 'bg-orange-100 text-orange-700' : 'bg-indigo-100 text-indigo-700';
+                                        const leaveTypeBg = isHalfDay ? 'bg-[#F7F8FA] text-[#D97706]' : 'bg-indigo-100 text-indigo-700';
                                         return (
                                             <div
                                                 key={lv.id}
@@ -557,7 +557,7 @@ export default function LeavePage() {
                                                             <div className="flex-1 min-w-0">
                                                                 <div className="flex items-center gap-2 flex-wrap">
                                                                     <div className="flex flex-col">
-                                                                        <span className="text-[13px] font-semibold text-gray-400">Requester</span>
+                                                                        <span className="text-[13px] font-semibold text-[#5B6472]">Requester</span>
                                                                         <span className="text-sm font-semibold text-gray-900 dark:text-white tracking-tight">{lv.userName}</span>
                                                                     </div>
                                                                     <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[13px] font-semibold  tracking-wider ${leaveTypeBg}`}>
@@ -596,7 +596,7 @@ export default function LeavePage() {
                                                         {/* Row 2: Info chips */}
                                                         <div className="flex flex-wrap items-center gap-3">
                                                             <div className="flex flex-col">
-                                                                <span className="text-[13px] font-semibold text-gray-400">Date</span>
+                                                                <span className="text-[13px] font-semibold text-[#5B6472]">Date</span>
                                                                 <div className="inline-flex items-center gap-1 text-[14px] font-semibold text-gray-700 dark:text-gray-200">
                                                                     <CalendarDaysIcon className="w-3.5 h-3.5 text-[#2563EB]" />
                                                                     {formatDateMMM(lv.startDate)}{lv.endDate && lv.endDate !== lv.startDate ? ` → ${formatDateMMM(lv.endDate)}` : ''}
@@ -605,7 +605,7 @@ export default function LeavePage() {
                                                             {lv.createdAt && <div className="w-px h-7 bg-gray-200 dark:bg-white/10" />}
                                                             {lv.createdAt && (
                                                                 <div className="flex flex-col">
-                                                                    <span className="text-[13px] font-semibold text-gray-400">Applied On</span>
+                                                                    <span className="text-[13px] font-semibold text-[#5B6472]">Applied On</span>
                                                                     <div className="inline-flex items-center gap-1 text-[14px] font-semibold text-gray-700 dark:text-gray-200">
                                                                         <CalendarDaysIcon className="w-3.5 h-3.5 text-emerald-600" />
                                                                         {formatDateMMM(lv.createdAt)}
@@ -614,7 +614,7 @@ export default function LeavePage() {
                                                             )}
                                                             <div className="w-px h-7 bg-gray-200 dark:bg-white/10" />
                                                             <div className="flex flex-col">
-                                                                <span className="text-[13px] font-semibold text-gray-400">Emp ID</span>
+                                                                <span className="text-[13px] font-semibold text-[#5B6472]">Emp ID</span>
                                                                 <div className="inline-flex items-center gap-1 text-[14px] font-semibold text-gray-700 dark:text-gray-200">
                                                                     <UserIcon className="w-3.5 h-3.5 text-[#2563EB]" />
                                                                     {lv.userId}
@@ -623,7 +623,7 @@ export default function LeavePage() {
                                                             {respList.length > 0 && <div className="w-px h-7 bg-gray-200 dark:bg-white/10" />}
                                                             {respList.length > 0 && (
                                                                 <div className="flex flex-col gap-0.5">
-                                                                    <span className="text-[13px] font-semibold text-gray-400">Coverage Status</span>
+                                                                    <span className="text-[13px] font-semibold text-[#5B6472]">Coverage Status</span>
                                                                     <div className="flex flex-wrap gap-2">
                                                                         {respList.map(r => {
                                                                             const usr = masterData?.users?.find((u:any) => String(u.id) === String(r.id));
@@ -631,7 +631,7 @@ export default function LeavePage() {
                                                                             const acceptedBy = (lv as any)[`acceptedBy${r.slot}`];
                                                                             const acceptedAt = (lv as any)[`acceptedAt${r.slot}`];
                                                                             const accepted = Boolean(acceptedBy);
-                                                                            const slotColors = ['bg-purple-50 border-purple-200 text-purple-700','bg-blue-50 border-blue-200 text-blue-700','bg-orange-50 border-orange-200 text-orange-700'];
+                                                                            const slotColors = ['bg-purple-50 border-purple-200 text-purple-700','bg-blue-50 border-blue-200 text-blue-700','bg-[#F7F8FA] border-[#E5E7EB] text-[#D97706]'];
                                                                             const acceptedTime = acceptedAt ? new Date(acceptedAt).toLocaleString('en-IN', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit', hour12:true }) : '';
                                                                             return (
                                                                                 <div key={r.slot} className={`inline-flex flex-col px-2 py-1 rounded-xl border text-[13px] font-semibold ${accepted ? 'bg-emerald-50 border-emerald-200' : slotColors[r.slot-1]}`}>
@@ -640,8 +640,8 @@ export default function LeavePage() {
                                                                                         {name}
                                                                                     </span>
                                                                                     {accepted
-                                                                                        ? <span className="text-[12px] font-semibold text-emerald-600 mt-0.5">✓ {acceptedBy} · {acceptedTime}</span>
-                                                                                        : <span className="text-[12px] font-semibold text-gray-400 mt-0.5">Awaiting acceptance</span>
+                                                                                        ? <span className="text-[14px] font-semibold text-emerald-600 mt-0.5">✓ {acceptedBy} · {acceptedTime}</span>
+                                                                                        : <span className="text-[14px] font-semibold text-[#5B6472] mt-0.5">Awaiting acceptance</span>
                                                                                     }
                                                                                 </div>
                                                                             );
@@ -675,7 +675,7 @@ export default function LeavePage() {
                                                             {/* Task Assignments */}
                                                             {(lv.sharedTask || lv.tasks1 || lv.tasks2 || lv.tasks3) && (
                                                                 <div className={lv.reason ? 'pt-3 border-t border-gray-100 dark:border-white/5' : ''}>
-                                                                    <span className="text-[13px] font-semibold text-gray-400 flex items-center gap-1 mb-1.5">
+                                                                    <span className="text-[13px] font-semibold text-[#5B6472] flex items-center gap-1 mb-1.5">
                                                                         <ClipboardDocumentListIcon className="w-3 h-3" /> Task Assignments
                                                                     </span>
                                                                     <div className="flex flex-col gap-1.5">
@@ -691,7 +691,7 @@ export default function LeavePage() {
                                                                             <div className="flex items-start gap-2">
                                                                                 <div className="flex flex-col shrink-0 gap-0.5">
                                                                                     <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-purple-100 text-purple-700 border border-purple-200 text-[13px] font-semibold rounded-full">① {r1.full_name || r1.username}</span>
-                                                                                    {(lv as any).acceptedBy1 ? <span className="inline-flex items-center gap-0.5 text-[12px] font-semibold text-emerald-600"><CheckCircleIcon className="w-2.5 h-2.5" />Accepted</span> : <span className="inline-flex items-center gap-0.5 text-[12px] font-semibold text-amber-500"><ClockIcon className="w-2.5 h-2.5" />Pending</span>}
+                                                                                    {(lv as any).acceptedBy1 ? <span className="inline-flex items-center gap-0.5 text-[14px] font-semibold text-emerald-600"><CheckCircleIcon className="w-2.5 h-2.5" />Accepted</span> : <span className="inline-flex items-center gap-0.5 text-[14px] font-semibold text-amber-500"><ClockIcon className="w-2.5 h-2.5" />Pending</span>}
                                                                                 </div>
                                                                                 <span className="text-[14px] text-gray-600 dark:text-gray-300 font-medium">{lv.tasks1}</span>
                                                                             </div>
@@ -700,7 +700,7 @@ export default function LeavePage() {
                                                                             <div className="flex items-start gap-2">
                                                                                 <div className="flex flex-col shrink-0 gap-0.5">
                                                                                     <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-100 text-blue-700 border border-blue-200 text-[13px] font-semibold rounded-full">② {r2.full_name || r2.username}</span>
-                                                                                    {(lv as any).acceptedBy2 ? <span className="inline-flex items-center gap-0.5 text-[12px] font-semibold text-emerald-600"><CheckCircleIcon className="w-2.5 h-2.5" />Accepted</span> : <span className="inline-flex items-center gap-0.5 text-[12px] font-semibold text-amber-500"><ClockIcon className="w-2.5 h-2.5" />Pending</span>}
+                                                                                    {(lv as any).acceptedBy2 ? <span className="inline-flex items-center gap-0.5 text-[14px] font-semibold text-emerald-600"><CheckCircleIcon className="w-2.5 h-2.5" />Accepted</span> : <span className="inline-flex items-center gap-0.5 text-[14px] font-semibold text-amber-500"><ClockIcon className="w-2.5 h-2.5" />Pending</span>}
                                                                                 </div>
                                                                                 <span className="text-[14px] text-gray-600 dark:text-gray-300 font-medium">{lv.tasks2}</span>
                                                                             </div>
@@ -708,8 +708,8 @@ export default function LeavePage() {
                                                                         {lv.tasks3 && r3 && (
                                                                             <div className="flex items-start gap-2">
                                                                                 <div className="flex flex-col shrink-0 gap-0.5">
-                                                                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-orange-100 text-orange-700 border border-orange-200 text-[13px] font-semibold rounded-full">③ {r3.full_name || r3.username}</span>
-                                                                                    {(lv as any).acceptedBy3 ? <span className="inline-flex items-center gap-0.5 text-[12px] font-semibold text-emerald-600"><CheckCircleIcon className="w-2.5 h-2.5" />Accepted</span> : <span className="inline-flex items-center gap-0.5 text-[12px] font-semibold text-amber-500"><ClockIcon className="w-2.5 h-2.5" />Pending</span>}
+                                                                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-[#F7F8FA] text-[#D97706] border border-[#E5E7EB] text-[13px] font-semibold rounded-full">③ {r3.full_name || r3.username}</span>
+                                                                                    {(lv as any).acceptedBy3 ? <span className="inline-flex items-center gap-0.5 text-[14px] font-semibold text-emerald-600"><CheckCircleIcon className="w-2.5 h-2.5" />Accepted</span> : <span className="inline-flex items-center gap-0.5 text-[14px] font-semibold text-amber-500"><ClockIcon className="w-2.5 h-2.5" />Pending</span>}
                                                                                 </div>
                                                                                 <span className="text-[14px] text-gray-600 dark:text-gray-300 font-medium">{lv.tasks3}</span>
                                                                             </div>
@@ -770,12 +770,12 @@ export default function LeavePage() {
                                     <h2 className="text-base font-semibold text-gray-900 dark:text-white tracking-tight">
                                         {editingLeave ? 'Edit Leave Request' : 'Apply for Leave'}
                                     </h2>
-                                    <p className="text-[14px] font-bold text-gray-400">Leave Application System</p>
+                                    <p className="text-[14px] font-bold text-[#5B6472]">Leave Application System</p>
                                 </div>
                             </div>
                             <button
                                 onClick={() => { setShowLeaveModal(false); setEditingLeave(null); }}
-                                className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-white/5 transition-all text-gray-400 hover:text-gray-700 dark:hover:text-white"
+                                className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-white/5 transition-all text-[#5B6472] hover:text-gray-700 dark:hover:text-white"
                             >
                                 <XMarkIcon className="w-5 h-5" />
                             </button>
@@ -788,7 +788,7 @@ export default function LeavePage() {
                                 <div>
                                     {/* Leave type toggle */}
                                     <div>
-                                        <label className="flex items-center gap-1.5 text-[14px] font-semibold text-gray-400 mb-2">
+                                        <label className="flex items-center gap-1.5 text-[14px] font-semibold text-[#5B6472] mb-2">
                                             <SunIcon className="w-3.5 h-3.5" />
                                             Leave Duration
                                         </label>
@@ -828,7 +828,7 @@ export default function LeavePage() {
                                                         className={`flex-1 py-2 rounded-xl font-semibold text-[14px]   border-2 transition-all ${
                                                             leaveForm.halfDaySession === session
                                                                 ? 'bg-[#FF9500]/20 border-[#FF9500] text-[#FF9500]'
-                                                                : 'bg-white dark:bg-slate-900 text-gray-400 border-gray-200 dark:border-white/10 hover:border-[#FF9500]/60'
+                                                                : 'bg-white dark:bg-slate-900 text-[#5B6472] border-gray-200 dark:border-white/10 hover:border-[#FF9500]/60'
                                                         }`}
                                                     >
                                                         {session === 'First Half' ? (<span className="inline-flex items-center gap-2"><SunIcon className="w-4 h-4" /> Morning</span>) : (<span className="inline-flex items-center gap-2"><MoonIcon className="w-4 h-4" /> Afternoon</span>)}
@@ -852,7 +852,7 @@ export default function LeavePage() {
                                                         className={`flex-1 py-2 rounded-xl font-semibold text-[14px]   border-2 transition-all ${
                                                             leaveForm.durationType === val
                                                                 ? 'bg-[#5856D6]/15 border-[#5856D6] text-[#5856D6]'
-                                                                : 'bg-white dark:bg-slate-900 text-gray-400 border-gray-200 dark:border-white/10 hover:border-[#5856D6]/60'
+                                                                : 'bg-white dark:bg-slate-900 text-[#5B6472] border-gray-200 dark:border-white/10 hover:border-[#5856D6]/60'
                                                         }`}
                                                     >
                                                         <span className="inline-flex items-center gap-2"><IconComp className="w-4 h-4" /> {label}</span>
@@ -866,7 +866,7 @@ export default function LeavePage() {
                                     {(leaveForm.leaveType === 'Half Day' || leaveForm.durationType === '1day') ? (
                                         // Single date input
                                         <div className="mt-4">
-                                            <label className="flex items-center gap-1.5 text-[14px] font-semibold text-gray-400 mb-2">
+                                            <label className="flex items-center gap-1.5 text-[14px] font-semibold text-[#5B6472] mb-2">
                                                 <CalendarBtnIcon className="w-3.5 h-3.5" />
                                                 {leaveForm.leaveType === 'Half Day' ? 'Leave Date' : 'Date'}
                                             </label>
@@ -882,14 +882,14 @@ export default function LeavePage() {
                                         // Two date inputs for multi-day
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
                                             <div>
-                                                <label className="flex items-center gap-1.5 text-[14px] font-semibold text-gray-400 mb-2">
+                                                <label className="flex items-center gap-1.5 text-[14px] font-semibold text-[#5B6472] mb-2">
                                                     <CalendarBtnIcon className="w-3.5 h-3.5" />
                                                     From Date
                                                 </label>
                                                 <CustomDateTimePicker label="" dateOnly value={leaveForm.startDate} onChange={v => setLeaveForm(prev => ({ ...prev, startDate: v }))} required />
                                             </div>
                                             <div>
-                                                <label className="flex items-center gap-1.5 text-[13px] font-semibold text-gray-400 mb-2">
+                                                <label className="flex items-center gap-1.5 text-[13px] font-semibold text-[#5B6472] mb-2">
                                                     <CalendarBtnIcon className="w-3.5 h-3.5" />
                                                     To Date
                                                 </label>
@@ -900,12 +900,12 @@ export default function LeavePage() {
 
                                     {/* Reason */}
                                     <div className="mt-4">
-                                        <label className="flex items-center gap-1.5 text-[14px] font-semibold text-gray-400 mb-2">
+                                        <label className="flex items-center gap-1.5 text-[14px] font-semibold text-[#5B6472] mb-2">
                                             <DocumentTextIcon className="w-3.5 h-3.5" />
                                             Reason for Leave
                                         </label>
                                         <textarea
-                                            className="w-full h-20 px-3 py-2.5 rounded-lg border border-orange-100 dark:border-zinc-800 bg-[#FFFFFF] dark:bg-zinc-900 focus:border-[#2563EB] focus:bg-white dark:focus:bg-zinc-900 outline-none text-sm font-medium transition-all resize-none text-gray-800 dark:text-zinc-100 shadow-sm"
+                                            className="w-full h-20 px-3 py-2.5 rounded-lg border border-[#E5E7EB] dark:border-zinc-800 bg-[#FFFFFF] dark:bg-zinc-900 focus:border-[#2563EB] focus:bg-white dark:focus:bg-zinc-900 outline-none text-sm font-medium transition-all resize-none text-gray-800 dark:text-zinc-100 shadow-sm"
                                             value={leaveForm.reason}
                                             onChange={e => setLeaveForm({ ...leaveForm, reason: e.target.value })}
                                             required
@@ -917,7 +917,7 @@ export default function LeavePage() {
                                 <div>
                                     {/* Responsibilities + tasks */}
                                     <div>
-                                        <label className="flex items-center gap-1.5 text-[14px] font-semibold text-gray-400 mb-3">
+                                        <label className="flex items-center gap-1.5 text-[14px] font-semibold text-[#5B6472] mb-3">
                                             <UsersIcon className="w-3.5 h-3.5" />
                                             Responsibility Assignment & Tasks
                                         </label>
@@ -932,7 +932,7 @@ export default function LeavePage() {
                                                     className={`flex-1 py-2 rounded-xl font-semibold text-[14px]   border-2 transition-all ${
                                                         leaveForm.taskMode === val
                                                             ? 'bg-[#34C759]/15 border-[#34C759] text-[#34C759]'
-                                                            : 'bg-white dark:bg-slate-900 text-gray-400 border-gray-200 dark:border-white/10 hover:border-[#34C759]/60'
+                                                            : 'bg-white dark:bg-slate-900 text-[#5B6472] border-gray-200 dark:border-white/10 hover:border-[#34C759]/60'
                                                     }`}
                                                 >
                                                         <span className="inline-flex items-center gap-2"><IconComp className="w-4 h-4" /> {label}</span>
@@ -947,7 +947,7 @@ export default function LeavePage() {
                                                     <span className="inline-flex items-center gap-2"><ClipboardDocumentListIcon className="w-4 h-4" /> Common Task — shared with everyone who accepts</span>
                                                 </label>
                                                 <textarea
-                                                    className="w-full h-20 px-3 py-2.5 rounded-lg border border-orange-100 dark:border-zinc-800 bg-[#FFFFFF] dark:bg-zinc-900 focus:border-[#2563EB] focus:bg-white dark:focus:bg-zinc-900 outline-none text-sm font-medium transition-all resize-none text-gray-800 dark:text-zinc-100 shadow-sm"
+                                                    className="w-full h-20 px-3 py-2.5 rounded-lg border border-[#E5E7EB] dark:border-zinc-800 bg-[#FFFFFF] dark:bg-zinc-900 focus:border-[#2563EB] focus:bg-white dark:focus:bg-zinc-900 outline-none text-sm font-medium transition-all resize-none text-gray-800 dark:text-zinc-100 shadow-sm"
                                                     value={leaveForm.sharedTask}
                                                     onChange={e => setLeaveForm(prev => ({ ...prev, sharedTask: e.target.value }))}
                                                     placeholder="Describe the task(s) to be handled in your absence..."
@@ -962,7 +962,7 @@ export default function LeavePage() {
                                                 const colors = [
                                                     'border-purple-200 dark:border-purple-500/30 bg-purple-50/50 dark:bg-purple-500/5',
                                                     'border-blue-200 dark:border-blue-500/30 bg-blue-50/50 dark:bg-blue-500/5',
-                                                    'border-orange-200 dark:border-orange-500/30 bg-orange-50/50 dark:bg-orange-500/5',
+                                                    'border-[#E5E7EB] dark:border-[#E5E7EB] bg-[#F7F8FA] dark:bg-[#D97706]/5',
                                                 ];
                                                 return (
                                                     <div key={num} className={`rounded-2xl border p-3.5 space-y-2.5 ${colors[num - 1]}`}>
@@ -972,7 +972,7 @@ export default function LeavePage() {
                                                             </span>
                                                             {num === 1
                                                                 ? <span className="text-[13px] font-semibold px-1.5 py-0.5 rounded bg-rose-100 text-rose-600 tracking-wider">Required</span>
-                                                                : <span className="text-[13px] font-semibold px-1.5 py-0.5 rounded bg-gray-100 text-gray-400 tracking-wider">Optional</span>
+                                                                : <span className="text-[13px] font-semibold px-1.5 py-0.5 rounded bg-gray-100 text-[#5B6472] tracking-wider">Optional</span>
                                                             }
                                                         </div>
                                                         <div>
@@ -990,7 +990,7 @@ export default function LeavePage() {
                                                                     }
                                                                 }}
                                                                 placeholder={`Select ${num === 1 ? 'primary' : num === 2 ? 'secondary' : 'tertiary'} person...`}
-                                                                className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-3 py-1.5 rounded-lg border border-orange-100 dark:border-zinc-800 focus:border-[#2563EB] outline-none font-bold text-[14px] text-gray-800 dark:text-zinc-100 transition-all shadow-sm"
+                                                                className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-3 py-1.5 rounded-lg border border-[#E5E7EB] dark:border-zinc-800 focus:border-[#2563EB] outline-none font-bold text-[14px] text-gray-800 dark:text-zinc-100 transition-all shadow-sm"
                                                             />
                                                             <datalist id={`resp-options-${num}`}>
                                                                 {masterData?.users
@@ -1003,11 +1003,11 @@ export default function LeavePage() {
                                                         {/* Show per-person task only in individual mode */}
                                                         {leaveForm.taskMode === 'individual' && (leaveForm as any)[respKey] && (
                                                             <div>
-                                                                <label className="text-[14px] font-semibold text-gray-400">
+                                                                <label className="text-[14px] font-semibold text-[#5B6472]">
                                                                     <span className="inline-flex items-center gap-2"><ClipboardDocumentListIcon className="w-4 h-4" /> Tasks for this person</span>
                                                                 </label>
                                                                 <textarea
-                                                                    className="mt-1.5 w-full h-16 px-3 py-2 rounded-lg border border-orange-100 dark:border-zinc-800 bg-[#FFFFFF] dark:bg-zinc-900 focus:border-[#2563EB] focus:bg-white dark:focus:bg-zinc-900 outline-none text-sm font-medium transition-all resize-none text-gray-800 dark:text-zinc-100 shadow-sm"
+                                                                    className="mt-1.5 w-full h-16 px-3 py-2 rounded-lg border border-[#E5E7EB] dark:border-zinc-800 bg-[#FFFFFF] dark:bg-zinc-900 focus:border-[#2563EB] focus:bg-white dark:focus:bg-zinc-900 outline-none text-sm font-medium transition-all resize-none text-gray-800 dark:text-zinc-100 shadow-sm"
                                                                     value={(leaveForm as any)[taskKey]}
                                                                     onChange={e => setLeaveForm(prev => ({ ...prev, [taskKey]: e.target.value }))}
                                                                     placeholder={`List tasks for ${num === 1 ? 'primary' : num === 2 ? 'secondary' : 'tertiary'} person...`}
@@ -1027,7 +1027,7 @@ export default function LeavePage() {
                                 <button
                                     type="button"
                                     onClick={() => { setShowLeaveModal(false); setEditingLeave(null); }}
-                                    className="flex-1 py-3 rounded-2xl font-semibold text-[14px] text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-white/5 border border-gray-200 dark:border-white/10 transition-all"
+                                    className="flex-1 py-3 rounded-2xl font-semibold text-[14px] text-[#5B6472] hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-white/5 border border-gray-200 dark:border-white/10 transition-all"
                                 >
                                     Cancel
                                 </button>
@@ -1051,7 +1051,7 @@ export default function LeavePage() {
                     <div style={{ backgroundColor: 'var(--panel-card)', borderColor: 'var(--panel-border)' }} className="relative w-full max-w-md rounded-3xl shadow-2xl border flex flex-col max-h-[80vh] overflow-hidden animate-in zoom-in-95 duration-200">
                         <div className="p-4 border-b border-gray-100 dark:border-white/5 flex items-center justify-between">
                             <h3 className="font-semibold text-gray-900 dark:text-white tracking-tighter">Discussion</h3>
-                            <button onClick={() => setSelectedLeave(null)} className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-white transition-colors">
+                            <button onClick={() => setSelectedLeave(null)} className="p-1 text-[#5B6472] hover:text-gray-600 dark:hover:text-white transition-colors">
                                 <XMarkIcon className="w-6 h-6" />
                             </button>
                         </div>
@@ -1061,14 +1061,14 @@ export default function LeavePage() {
                             ) : remarks.length > 0 ? (
                                 remarks.map((r) => (
                                     <div key={r.id} className={`flex flex-col ${r.userName === user?.username ? 'items-end' : 'items-start'}`}>
-                                        <div className="text-[14px] font-semibold text-gray-400 mb-1">{r.userName}</div>
+                                        <div className="text-[14px] font-semibold text-[#5B6472] mb-1">{r.userName}</div>
                                         <div className={`px-4 py-2 rounded-2xl max-w-[85%] text-[14px] font-medium ${r.userName === user?.username ? 'bg-[#2563EB] dark:bg-[#60A5FA] text-white dark:text-black rounded-br-none' : 'bg-gray-100 dark:bg-slate-800 text-gray-800 dark:text-slate-200 rounded-bl-none'}`}>
                                             {r.comment}
                                         </div>
                                     </div>
                                 ))
                             ) : (
-                                <p className="text-center text-[14px] font-bold text-gray-400 mt-4">No discussion yet</p>
+                                <p className="text-center text-[14px] font-bold text-[#5B6472] mt-4">No discussion yet</p>
                             )}
                         </div>
                         <div className="p-4 border-t border-gray-100 dark:border-white/5 flex gap-2">
@@ -1078,7 +1078,7 @@ export default function LeavePage() {
                                 onChange={e => setNewRemark(e.target.value)}
                                 placeholder="Type a message..."
                                 onKeyPress={e => e.key === 'Enter' && handleAddRemark()}
-                                className="flex-1 bg-[#FFFFFF] dark:bg-zinc-900 border border-orange-100 dark:border-zinc-800 rounded-full px-4 text-sm font-medium focus:outline-none focus:border-[#2563EB] text-gray-800 dark:text-zinc-100 shadow-sm"
+                                className="flex-1 bg-[#FFFFFF] dark:bg-zinc-900 border border-[#E5E7EB] dark:border-zinc-800 rounded-full px-4 text-sm font-medium focus:outline-none focus:border-[#2563EB] text-gray-800 dark:text-zinc-100 shadow-sm"
                             />
                             <button
                                 onClick={handleAddRemark}
@@ -1119,7 +1119,7 @@ export default function LeavePage() {
 
                         <div className="p-5 overflow-y-auto space-y-5 custom-scrollbar">
                             <div className="rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 px-4 py-3">
-                                <p className="text-[13px] font-semibold text-gray-400 mb-1">End-to-End Flow</p>
+                                <p className="text-[13px] font-semibold text-[#5B6472] mb-1">End-to-End Flow</p>
                                 <p className="text-[14px] font-medium text-gray-700 dark:text-gray-300 leading-relaxed">
                                     Apply Leave → Coverage persons accept responsibility → Admin/EA Approve or Reject → WhatsApp alerts at every step (with ERP deep link).
                                 </p>
@@ -1244,9 +1244,9 @@ export default function LeavePage() {
                                             <tr className="bg-gray-50/80 dark:bg-white/[0.02]"><td className="px-3 py-2 font-bold">Edit</td><td className="px-3 py-2">Requester only</td><td className="px-3 py-2">status = Pending</td></tr>
                                             <tr className="bg-white dark:bg-transparent"><td className="px-3 py-2 font-bold">Delete</td><td className="px-3 py-2">Requester only</td><td className="px-3 py-2">status = Pending</td></tr>
                                             <tr className="bg-gray-50/80 dark:bg-white/[0.02]"><td className="px-3 py-2 font-bold">I&apos;ll Accept</td><td className="px-3 py-2">Coverage person</td><td className="px-3 py-2">Pending + slot rules (shared / individual / no-task)</td></tr>
-                                            <tr className="bg-white dark:bg-transparent"><td className="px-3 py-2 font-bold">Approve</td><td className="px-3 py-2">ADMIN / EA</td><td className="px-3 py-2">Pending + acceptedAll = true</td></tr>
-                                            <tr className="bg-gray-50/80 dark:bg-white/[0.02]"><td className="px-3 py-2 font-bold">Reject</td><td className="px-3 py-2">ADMIN / EA</td><td className="px-3 py-2">Pending + acceptedAll = true</td></tr>
-                                            <tr className="bg-white dark:bg-transparent"><td className="px-3 py-2 font-bold">View all leaves</td><td className="px-3 py-2">ADMIN / EA</td><td className="px-3 py-2">Role check on API</td></tr>
+                                            <tr className="bg-white dark:bg-transparent"><td className="px-3 py-2 font-bold">Approve</td><td className="px-3 py-2">Admin / EA</td><td className="px-3 py-2">Pending + acceptedAll = true</td></tr>
+                                            <tr className="bg-gray-50/80 dark:bg-white/[0.02]"><td className="px-3 py-2 font-bold">Reject</td><td className="px-3 py-2">Admin / EA</td><td className="px-3 py-2">Pending + acceptedAll = true</td></tr>
+                                            <tr className="bg-white dark:bg-transparent"><td className="px-3 py-2 font-bold">View all leaves</td><td className="px-3 py-2">Admin / EA</td><td className="px-3 py-2">Role check on API</td></tr>
                                             <tr className="bg-gray-50/80 dark:bg-white/[0.02]"><td className="px-3 py-2 font-bold">View own / coverage</td><td className="px-3 py-2">Normal user</td><td className="px-3 py-2">Requester or responsibility1/2/3</td></tr>
                                         </tbody>
                                     </table>
@@ -1254,7 +1254,7 @@ export default function LeavePage() {
                             </section>
 
                             <div className="rounded-2xl border border-dashed border-gray-300 dark:border-white/20 px-4 py-3 text-[14px] text-gray-500 dark:text-gray-400">
-                                <p className="font-semibold text-gray-400 mb-1">For developers & clients</p>
+                                <p className="font-semibold text-[#5B6472] mb-1">For developers & clients</p>
                                 <p className="leading-relaxed">
                                     This modal mirrors the live UI conditions in <code className="text-[13px]">leave/page.tsx</code> and API rules in <code className="text-[13px]">api/leave/route.ts</code> + WhatsApp in <code className="text-[13px]">leave-notifications.ts</code>.
                                     If something feels missing (e.g. Admin edit/delete, approve without coverage, MD role), use this checklist to decide what to add next.

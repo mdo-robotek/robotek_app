@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useOpenFromLink } from "@/hooks/useOpenFromLink";
 import { useSession } from "next-auth/react";
 import {
   PlusIcon,
@@ -154,13 +155,17 @@ export default function TicketsPage() {
 
   const categories = ["Software", "Hardware/IT", "HR / Admin", "Finance", "Other"];
 
+  // "+ New" → Help Ticket (and My Day's "New Ticket") open the form: /tickets?action=new
+  useOpenFromLink("action", "new", () => setIsNewModalOpen(true));
+
   useEffect(() => {
     fetchUsers();
 
     if (typeof window !== "undefined") {
       const searchParams = new URLSearchParams(window.location.search);
-      if (searchParams.get('action') === 'new') {
-        setIsNewModalOpen(true);
+      // From the dashboard's "Help tickets for you" row: show only tickets assigned to me.
+      if (searchParams.get('filter') === 'tome') {
+        setAssignmentFilters(['ToMe']);
       }
     }
   }, []);
@@ -194,19 +199,33 @@ export default function TicketsPage() {
     } catch (e) { console.error(e); }
   };
 
+  // Which ticket's log we are waiting for — a slow reply for an older ticket
+  // must never show up under the ticket that is open now.
+  const historyForRef = useRef<string | null>(null);
   const fetchHistory = async (id: string) => {
+    historyForRef.current = id;
     setHistoryLoading(true);
     try {
       const res = await fetch(`/api/tickets/${id}/history`);
-      if (res.ok) setTicketHistory(await res.json());
-    } catch (e) { console.error(e); } finally { setHistoryLoading(false); }
+      const data = res.ok ? await res.json() : [];
+      if (historyForRef.current === id) setTicketHistory(Array.isArray(data) ? data : []);
+    } catch (e) { console.error(e); } finally { if (historyForRef.current === id) setHistoryLoading(false); }
   };
 
+  // Sahil, 2026-10-27: the panel showed remarks from the ticket opened before
+  // (log was never re-loaded) and kept that ticket's status choice. Every
+  // open now starts clean for this ticket.
   const openTicketDetails = (t: Ticket) => {
     setSelectedTicket(t);
     setPendingStatus(t.status);
+    setTicketHistory([]);
+    setNewComment("");
+    setVoiceNoteFile(null);
+    setRefDocFile(null);
     fetchHistory(t.id);
   };
+
+  const [postedNote, setPostedNote] = useState<string | null>(null);
 
   const showStatus = (msg: string) => {
     setStatusMessage(msg);
@@ -357,7 +376,7 @@ export default function TicketsPage() {
 
         // API Update for Ticket
         await fetch(`/api/tickets/${selectedTicket.id}`, {
-          method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(updatedTicket)
+          method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...updatedTicket, notify: false })
         });
         mutateTickets();
       }
@@ -387,6 +406,13 @@ export default function TicketsPage() {
         setNewComment("");
         setVoiceNoteFile(null);
         setRefDocFile(null);
+        // Close the panel and say clearly that it was saved, so nobody posts twice.
+        const label = `#${String(selectedTicket.id).split("-").pop()}`;
+        setPostedNote(hasStatusChange && pendingStatus ? `Saved. Ticket ${label} is now ${pendingStatus}.` : `Saved. Your remark is added to ticket ${label}.`);
+        setTimeout(() => setPostedNote(null), 3500);
+        setSelectedTicket(null);
+      } else {
+        alert("Could not save. Please try again.");
       }
     } catch (err) {
       console.error(err);
@@ -409,7 +435,7 @@ export default function TicketsPage() {
       payload.append("historyData", JSON.stringify(historyData));
 
       await fetch(`/api/tickets/${selectedTicket.id}`, {
-        method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(updatedTicket)
+        method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...updatedTicket, notify: false })
       });
       const historyRes = await fetch(`/api/tickets/${selectedTicket.id}/history`, { method: "POST", body: payload });
 
@@ -481,7 +507,7 @@ export default function TicketsPage() {
 
   const getPriorityColor = (p: string) => {
     if (p === 'Critical') return 'bg-red-600 text-white border-red-700 shadow-sm';
-    if (p === 'High') return 'bg-orange-500 text-white border-orange-600 shadow-sm';
+    if (p === 'High') return 'bg-[#D97706] text-white border-[#E5E7EB] shadow-sm';
     if (p === 'Medium') return 'bg-amber-500 text-white border-amber-600 shadow-sm';
     return 'bg-blue-500 text-white border-blue-600 shadow-sm';
   };
@@ -498,7 +524,7 @@ export default function TicketsPage() {
   const renderUserAvatar = (username: string) => {
     if (!username || username === "System" || username === "Unassigned") {
       return (
-        <div className="w-7 h-7 rounded-full shrink-0 bg-gray-100 dark:bg-navy-800 text-gray-400 flex items-center justify-center shadow-sm border border-gray-200 dark:border-navy-700">
+        <div className="w-7 h-7 rounded-full shrink-0 bg-gray-100 dark:bg-navy-800 text-[#5B6472] flex items-center justify-center shadow-sm border border-gray-200 dark:border-navy-700">
           <UserIcon className="w-3.5 h-3.5" />
         </div>
       );
@@ -524,7 +550,7 @@ export default function TicketsPage() {
         <div className="flex flex-col lg:flex-row items-center gap-4 px-1">
           <div className="w-full lg:w-1/3 text-center lg:text-left min-w-0">
             <h1 className="text-xl md:text-2xl font-semibold text-gray-900 dark:text-white tracking-tight truncate">Help Tickets</h1>
-            <p className="text-gray-500 dark:text-slate-300 font-bold text-[12px] md:text-[10px] tracking-wider">Support Ticketing System</p>
+            <p className="text-gray-500 dark:text-slate-300 font-bold text-[14px] md:text-[10px] tracking-wider">Support Ticketing System</p>
           </div>
 
           <div className="w-full lg:w-1/3 flex justify-center flex-shrink-0 min-w-0">
@@ -584,7 +610,7 @@ export default function TicketsPage() {
           >
             <div className="flex items-center gap-2 w-full">
               <div className="relative group flex-1 min-w-0">
-                <MagnifyingGlassIcon className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 group-focus-within:text-[#2563EB] transition-colors" />
+                <MagnifyingGlassIcon className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#5B6472] group-focus-within:text-[#2563EB] transition-colors" />
                 <input type="text" placeholder="Search database..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full pl-8 pr-2 py-1.5 bg-gray-50 dark:bg-navy-900 border-2 border-gray-100 dark:border-navy-700/50 rounded-xl focus:border-[#2563EB] outline-none font-bold text-[13px] text-gray-700 dark:text-white transition-all shadow-sm"
                 />
@@ -607,7 +633,7 @@ export default function TicketsPage() {
                     >
                       <span className="hidden sm:inline">{btn.full}</span>
                       <span className="sm:hidden">{btn.label}</span>
-                      <span className={`px-1 rounded-md text-[12px] ${isActive ? 'bg-white/20' : 'bg-black/5 dark:bg-white/10'}`}>
+                      <span className={`px-1 rounded-md text-[14px] ${isActive ? 'bg-white/20' : 'bg-black/5 dark:bg-white/10'}`}>
                         {btn.count}
                       </span>
                     </button>
@@ -625,7 +651,7 @@ export default function TicketsPage() {
           <div className="col-span-full py-12 flex justify-center"><ArrowPathIcon className="w-8 h-8 text-[#2563EB] dark:text-[#60A5FA] animate-spin" /></div>
         ) : filteredTickets.length === 0 ? (
           <div className="col-span-full py-20 text-center flex flex-col items-center">
-            <TicketIcon className="w-16 h-16 text-gray-300 dark:text-navy-700 mb-4" />
+            <TicketIcon className="w-16 h-16 text-[#5B6472] dark:text-navy-700 mb-4" />
             <h3 className="text-xl font-semibold text-gray-900 dark:text-white">No tickets found</h3>
             <p className="text-sm font-bold text-gray-500 mt-2">Try adjusting your filters</p>
           </div>
@@ -666,7 +692,7 @@ export default function TicketsPage() {
                   {/* Top Right Actions */}
                   <div className="flex items-center gap-1.5 shrink-0">
                     <button
-                      onClick={() => setSelectedTicket(ticket)}
+                      onClick={() => openTicketDetails(ticket)}
                       className="p-1.5 bg-emerald-100/50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 hover:bg-emerald-600 hover:text-white rounded-lg transition-all border border-emerald-200 dark:border-emerald-800/30"
                       title="Follow Up"
                     >
@@ -677,7 +703,7 @@ export default function TicketsPage() {
                       <>
                         <button
                           onClick={() => setEditingTicket(ticket)}
-                          className="p-1.5 bg-[#2563EB]/10 text-white dark:bg-[#60A5FA]/10 dark:text-[#60A5FA] hover:bg-[#2563EB] hover:text-white dark:hover:bg-[#60A5FA] dark:hover:text-black rounded-lg transition-all border border-[#2563EB]/20 dark:border-[#60A5FA]/20"
+                          className="p-1.5 bg-[#2563EB]/10 text-[#2563EB] dark:bg-[#60A5FA]/10 dark:text-[#60A5FA] hover:bg-[#2563EB] hover:text-white dark:hover:bg-[#60A5FA] dark:hover:text-black rounded-lg transition-all border border-[#2563EB]/20 dark:border-[#60A5FA]/20"
                           title="Edit"
                         >
                           <PencilSquareIcon className="w-4 h-4" />
@@ -710,7 +736,7 @@ export default function TicketsPage() {
                     <div className="flex items-center gap-2 min-w-0">
                       {renderUserAvatar(ticket.raised_by || "System")}
                       <div className="min-w-0">
-                        <p className="text-[12px] font-semibold text-blue-400 dark:text-blue-500 leading-none mb-0.5">Raised By</p>
+                        <p className="text-[14px] font-semibold text-blue-400 dark:text-blue-500 leading-none mb-0.5">Raised By</p>
                         <p className="text-[14px] font-bold text-gray-900 dark:text-gray-100 truncate">{ticket.raised_by || "System"}</p>
                       </div>
                     </div>
@@ -718,7 +744,7 @@ export default function TicketsPage() {
                     <div className="flex items-center gap-2 min-w-0">
                       {renderUserAvatar(ticket.solver_person || "Unassigned")}
                       <div className="min-w-0">
-                        <p className="text-[12px] font-semibold text-emerald-400 dark:text-emerald-500 leading-none mb-0.5">Assignee</p>
+                        <p className="text-[14px] font-semibold text-emerald-400 dark:text-emerald-500 leading-none mb-0.5">Assignee</p>
                         <p className="text-[14px] font-bold text-gray-900 dark:text-gray-100 truncate">{ticket.solver_person || "Unassigned"}</p>
                       </div>
                     </div>
@@ -728,7 +754,7 @@ export default function TicketsPage() {
                         <CalendarIcon className="w-4 h-4" />
                       </div>
                       <div className="min-w-0">
-                        <p className="text-[12px] font-semibold text-amber-400 dark:text-amber-500 leading-none mb-0.5">Due Date</p>
+                        <p className="text-[14px] font-semibold text-amber-400 dark:text-amber-500 leading-none mb-0.5">Due Date</p>
                         <p className="text-[14px] font-bold text-gray-800 dark:text-slate-200 truncate">
                           {ticket.planned_resolution ? new Date(ticket.planned_resolution).toLocaleDateString() : "—"}
                         </p>
@@ -740,7 +766,7 @@ export default function TicketsPage() {
                         <TagIcon className="w-4 h-4" />
                       </div>
                       <div className="min-w-0">
-                        <p className="text-[12px] font-semibold text-purple-400 dark:text-purple-500 leading-none mb-0.5">Category</p>
+                        <p className="text-[14px] font-semibold text-purple-400 dark:text-purple-500 leading-none mb-0.5">Category</p>
                         <p className="text-[14px] font-semibold text-[#2563EB] dark:text-[#60A5FA] truncate">{ticket.category}</p>
                       </div>
                     </div>
@@ -750,8 +776,8 @@ export default function TicketsPage() {
                   {ticket.latest_comment && (
                     <div className="mt-1 pt-3 border-t border-gray-100 dark:border-navy-700/50 flex flex-col gap-1.5">
                       <div className="flex items-center gap-1.5">
-                        <ChatBubbleLeftRightIcon className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500 shrink-0" />
-                        <span className="text-[13px] font-semibold text-gray-400 truncate flex gap-1.5 items-center">
+                        <ChatBubbleLeftRightIcon className="w-3.5 h-3.5 text-[#5B6472] dark:text-gray-500 shrink-0" />
+                        <span className="text-[13px] font-semibold text-[#5B6472] truncate flex gap-1.5 items-center">
                           <span>Latest Comment By {ticket.latest_comment.actor}</span>
                           <span className="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-600"></span>
                           <span>{new Date(ticket.latest_comment.created_at).toLocaleDateString([], { day: '2-digit', month: 'short' })}</span>
@@ -775,17 +801,17 @@ export default function TicketsPage() {
         <Portal>
         <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => { setIsNewModalOpen(false); setEditingTicket(null); }} />
-          <div className="relative bg-[#FFFFFF] dark:bg-navy-900 w-full max-w-2xl rounded-3xl shadow-2xl flex flex-col max-h-[90vh] animate-in fade-in zoom-in-95 duration-300 border border-orange-100/50 dark:border-navy-700 overflow-hidden">
+          <div className="relative bg-[#FFFFFF] dark:bg-navy-900 w-full max-w-2xl rounded-3xl shadow-2xl flex flex-col max-h-[90vh] animate-in fade-in zoom-in-95 duration-300 border border-[#E5E7EB] dark:border-navy-700 overflow-hidden">
             {/* Header */}
-            <div className="p-5 border-b border-orange-100/50 dark:border-navy-800 flex justify-between items-center bg-[#2563EB] dark:bg-navy-900 text-white">
+            <div className="p-5 border-b border-[#E5E7EB] dark:border-navy-800 flex justify-between items-center bg-[#2563EB] dark:bg-navy-900 text-white">
               <div>
                 <h2 className="text-lg font-semibold tracking-tight flex items-center gap-2">
                   <TicketIcon className="w-5 h-5 text-[#2563EB]" /> {editingTicket ? "Edit Ticket" : "New Ticket"}
                 </h2>
                 <div className="flex items-center gap-2 mt-0.5">
-                  <p className="text-[#2563EB] dark:text-slate-400 font-bold text-[12px]">Support Configuration</p>
+                  <p className="text-[#2563EB] dark:text-slate-400 font-bold text-[14px]">Support Configuration</p>
                   {editingTicket && (
-                    <span className="px-2 py-0.5 bg-white/10 text-[12px] font-semibold text-[#2563EB] rounded border border-white/20">
+                    <span className="px-2 py-0.5 bg-white/10 text-[14px] font-semibold text-[#2563EB] rounded border border-white/20">
                       ID: {editingTicket.id}
                     </span>
                   )}
@@ -802,18 +828,18 @@ export default function TicketsPage() {
                   <label className="block text-[13px] font-semibold text-[#2563EB] mb-1.5 px-1">
                     Title <span className="text-red-500 ml-1" aria-hidden="true">*</span>
                   </label>
-                  <input required aria-required="true" type="text" value={editingTicket ? editingTicket.title : newTicket.title} onChange={e => editingTicket ? setEditingTicket({ ...editingTicket, title: e.target.value }) : setNewTicket({ ...newTicket, title: e.target.value })} className="w-full bg-[#FFFFFF] dark:bg-navy-900 px-3 py-2.5 rounded-xl border border-orange-100 dark:border-navy-700 focus:border-[#2563EB] focus:bg-white dark:focus:bg-navy-900 outline-none font-semibold text-[14px] text-gray-900 dark:text-white transition-all shadow-sm" placeholder="Issue summary" />
+                  <input required aria-required="true" type="text" value={editingTicket ? editingTicket.title : newTicket.title} onChange={e => editingTicket ? setEditingTicket({ ...editingTicket, title: e.target.value }) : setNewTicket({ ...newTicket, title: e.target.value })} className="w-full bg-[#FFFFFF] dark:bg-navy-900 px-3 py-2.5 rounded-xl border border-[#E5E7EB] dark:border-navy-700 focus:border-[#2563EB] focus:bg-white dark:focus:bg-navy-900 outline-none font-semibold text-[14px] text-gray-900 dark:text-white transition-all shadow-sm" placeholder="Issue summary" />
                 </div>
                 <div>
-                  <label className="block text-[13px] font-semibold text-gray-400 mb-1.5 px-1">
+                  <label className="block text-[13px] font-semibold text-[#5B6472] mb-1.5 px-1">
                     Description <span className="text-red-500 ml-1" aria-hidden="true">*</span>
                   </label>
-                  <textarea required aria-required="true" rows={3} value={editingTicket ? editingTicket.description : newTicket.description} onChange={e => editingTicket ? setEditingTicket({ ...editingTicket, description: e.target.value }) : setNewTicket({ ...newTicket, description: e.target.value })} className="w-full bg-[#FFFFFF] dark:bg-navy-900 px-3 py-2.5 rounded-xl border border-orange-100 dark:border-navy-700 focus:border-[#2563EB] focus:bg-white dark:focus:bg-navy-900 outline-none font-bold text-[14px] text-gray-800 dark:text-zinc-100 transition-all shadow-sm resize-none min-h-[80px]" placeholder="Provide details..." />
+                  <textarea required aria-required="true" rows={3} value={editingTicket ? editingTicket.description : newTicket.description} onChange={e => editingTicket ? setEditingTicket({ ...editingTicket, description: e.target.value }) : setNewTicket({ ...newTicket, description: e.target.value })} className="w-full bg-[#FFFFFF] dark:bg-navy-900 px-3 py-2.5 rounded-xl border border-[#E5E7EB] dark:border-navy-700 focus:border-[#2563EB] focus:bg-white dark:focus:bg-navy-900 outline-none font-bold text-[14px] text-gray-800 dark:text-zinc-100 transition-all shadow-sm resize-none min-h-[80px]" placeholder="Provide details..." />
                 </div>
                 {/* Suggestions (optional, max 3) — raiser's own ideas to solve the issue */}
                 <div>
-                  <label className="block text-[13px] font-semibold text-gray-400 mb-1.5 px-1">
-                    Your Suggestions <span className="text-red-500" aria-hidden="true">*</span> <span className="normal-case font-bold text-gray-400/70">(Suggestion 1 required · 2 &amp; 3 optional)</span>
+                  <label className="block text-[13px] font-semibold text-[#5B6472] mb-1.5 px-1">
+                    Your Suggestions <span className="text-red-500" aria-hidden="true">*</span> <span className="normal-case font-bold text-[#5B6472]/70">(Suggestion 1 required · 2 &amp; 3 optional)</span>
                   </label>
                   {(() => {
                     const t: any = editingTicket || newTicket;
@@ -834,7 +860,7 @@ export default function TicketsPage() {
                             aria-required={n === 1 && !editingTicket}
                             value={(t as any)[`suggestion_${n}`] || ""}
                             onChange={(e) => setSugg(n, e.target.value)}
-                            className="w-full bg-[#FFFFFF] dark:bg-navy-900 px-3 py-2.5 rounded-xl border border-orange-100 dark:border-navy-700 focus:border-[#2563EB] focus:bg-white dark:focus:bg-navy-900 outline-none font-bold text-[14px] text-gray-800 dark:text-zinc-100 transition-all shadow-sm"
+                            className="w-full bg-[#FFFFFF] dark:bg-navy-900 px-3 py-2.5 rounded-xl border border-[#E5E7EB] dark:border-navy-700 focus:border-[#2563EB] focus:bg-white dark:focus:bg-navy-900 outline-none font-bold text-[14px] text-gray-800 dark:text-zinc-100 transition-all shadow-sm"
                             placeholder={n === 1 ? "Suggestion 1 (required)..." : `Suggestion ${n}...`}
                           />
                         ))}
@@ -853,11 +879,11 @@ export default function TicketsPage() {
                 </div>
               </div>
 
-              <div className="space-y-4 pt-4 border-t border-orange-50 dark:border-navy-800/50">
+              <div className="space-y-4 pt-4 border-t border-[#E5E7EB] dark:border-navy-800/50">
                 <div className="flex items-center justify-between px-1">
                   <p className="text-[13px] font-semibold text-[#2563EB]">Attachments</p>
                   {editingTicket && (editingTicket.attachment_url || editingTicket.voice_note) && (
-                    <span className="text-[12px] font-bold text-green-500 bg-green-500/10 px-2 py-0.5 rounded">Existing Files Preserved</span>
+                    <span className="text-[14px] font-bold text-green-500 bg-green-500/10 px-2 py-0.5 rounded">Existing Files Preserved</span>
                   )}
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -912,12 +938,12 @@ export default function TicketsPage() {
                   <div className="p-4 bg-gray-50 dark:bg-navy-900/50 rounded-xl border border-dashed border-gray-300 dark:border-navy-700 flex flex-col justify-center">
                     <label className="flex items-center gap-3 cursor-pointer group">
                       <div className="relative p-3 bg-white dark:bg-navy-800 rounded-lg shadow-sm group-hover:scale-105 transition-transform">
-                        <PaperClipIcon className="w-5 h-5 text-gray-400 group-hover:text-[#2563EB] dark:group-hover:text-[#60A5FA] transition-colors" />
+                        <PaperClipIcon className="w-5 h-5 text-[#5B6472] group-hover:text-[#2563EB] dark:group-hover:text-[#60A5FA] transition-colors" />
                         {editingTicket?.attachment_url && !refDocFile && <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-white dark:border-navy-950" title="Existing document" />}
                       </div>
                       <div className="min-w-0 flex-1">
                         <p className="text-[14px] font-semibold text-gray-800 dark:text-zinc-200">{refDocFile ? "New Document" : editingTicket?.attachment_url ? "Keep Existing" : "Reference Doc"}</p>
-                        <p className="text-[13px] font-bold text-gray-400 mt-0.5 truncate">{refDocFile ? refDocFile.name : editingTicket?.attachment_url ? "Original file preserved" : "Click to upload document"}</p>
+                        <p className="text-[13px] font-bold text-[#5B6472] mt-0.5 truncate">{refDocFile ? refDocFile.name : editingTicket?.attachment_url ? "Original file preserved" : "Click to upload document"}</p>
                       </div>
                       <input type="file" className="hidden" onChange={(e) => setRefDocFile(e.target.files?.[0] || null)} />
                     </label>
@@ -928,19 +954,19 @@ export default function TicketsPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Searchable Category Dropdown */}
                 <div className="relative">
-                  <label className="text-[13px] font-semibold text-gray-400 block mb-1.5 px-1">Category</label>
-                  <div className="w-full bg-[#FFFFFF] dark:bg-navy-900 border border-orange-100 dark:border-navy-700 rounded-xl shadow-sm cursor-pointer" onClick={() => { setCategoryOpen(!categoryOpen); setAssignedToOpen(false); }}>
+                  <label className="text-[13px] font-semibold text-[#5B6472] block mb-1.5 px-1">Category</label>
+                  <div className="w-full bg-[#FFFFFF] dark:bg-navy-900 border border-[#E5E7EB] dark:border-navy-700 rounded-xl shadow-sm cursor-pointer" onClick={() => { setCategoryOpen(!categoryOpen); setAssignedToOpen(false); }}>
                     <div className="px-3 py-2.5 font-bold text-[14px] text-gray-800 dark:text-zinc-100 flex justify-between items-center transition-colors">
                       <div className="flex items-center gap-2">
-                        <TagIcon className="w-3.5 h-3.5 text-gray-400" />
+                        <TagIcon className="w-3.5 h-3.5 text-[#5B6472]" />
                         <span>{(editingTicket ? editingTicket.category : newTicket.category) || "Select Category..."}</span>
                       </div>
-                      <ChevronDownIcon className="w-3.5 h-3.5 text-gray-400" />
+                      <ChevronDownIcon className="w-3.5 h-3.5 text-[#5B6472]" />
                     </div>
                   </div>
                   {categoryOpen && (
-                    <div className="absolute z-[10000] w-full mt-1 bg-white dark:bg-navy-900 border border-orange-100 dark:border-navy-700 rounded-xl shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-                      <div className="p-2 border-b border-orange-50 dark:border-navy-800">
+                    <div className="absolute z-[10000] w-full mt-1 bg-white dark:bg-navy-900 border border-[#E5E7EB] dark:border-navy-700 rounded-xl shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                      <div className="p-2 border-b border-[#E5E7EB] dark:border-navy-800">
                         <input type="text" placeholder="Search categories..." value={categorySearch} onChange={(e) => setCategorySearch(e.target.value)} onClick={(e) => e.stopPropagation()} className="w-full bg-gray-50 dark:bg-navy-900 px-2 py-1.5 rounded-lg border border-gray-100 dark:border-navy-800 outline-none text-[13px] font-bold text-gray-700 dark:text-gray-300" />
                       </div>
                       <div className="max-h-40 overflow-y-auto">
@@ -954,13 +980,13 @@ export default function TicketsPage() {
 
                 {/* Priority Buttons */}
                 <div>
-                  <label className="text-[13px] font-semibold text-gray-400 block mb-1.5 px-1">Priority</label>
+                  <label className="text-[13px] font-semibold text-[#5B6472] block mb-1.5 px-1">Priority</label>
                   <div className="flex bg-gray-100 dark:bg-navy-900/50 p-1 rounded-xl gap-1">
                     {(['Low', 'Medium', 'High', 'Critical'] as const).map((pri) => (
-                      <button key={pri} type="button" onClick={() => editingTicket ? setEditingTicket({ ...editingTicket, priority: pri }) : setNewTicket({ ...newTicket, priority: pri })} className={`flex-1 py-2 text-[12px] sm:text-[9px] font-semibold   rounded-lg transition-all ${(editingTicket ? editingTicket.priority : newTicket.priority) === pri
+                      <button key={pri} type="button" onClick={() => editingTicket ? setEditingTicket({ ...editingTicket, priority: pri }) : setNewTicket({ ...newTicket, priority: pri })} className={`flex-1 py-2 text-[14px] sm:text-[9px] font-semibold   rounded-lg transition-all ${(editingTicket ? editingTicket.priority : newTicket.priority) === pri
                           ? pri === 'Low' ? 'bg-green-500 text-white shadow-md'
                             : pri === 'Medium' ? 'bg-yellow-500 text-white shadow-md'
-                              : pri === 'High' ? 'bg-orange-500 text-white shadow-md'
+                              : pri === 'High' ? 'bg-[#D97706] text-white shadow-md'
                                 : 'bg-red-600 text-white shadow-md'
                           : 'text-gray-500 dark:text-gray-400 hover:bg-white dark:hover:bg-navy-800 hover:text-gray-900 dark:hover:text-white'
                         }`}>{pri}</button>
@@ -970,19 +996,19 @@ export default function TicketsPage() {
 
                 {/* Searchable Assign To Dropdown */}
                 <div className="relative">
-                  <label className="text-[13px] font-semibold text-gray-400 block mb-1.5 px-1">Assign To</label>
-                  <div className="w-full bg-[#FFFFFF] dark:bg-navy-900 border border-orange-100 dark:border-navy-700 rounded-xl shadow-sm cursor-pointer" onClick={() => { setAssignedToOpen(!assignedToOpen); setCategoryOpen(false); }}>
+                  <label className="text-[13px] font-semibold text-[#5B6472] block mb-1.5 px-1">Assign To</label>
+                  <div className="w-full bg-[#FFFFFF] dark:bg-navy-900 border border-[#E5E7EB] dark:border-navy-700 rounded-xl shadow-sm cursor-pointer" onClick={() => { setAssignedToOpen(!assignedToOpen); setCategoryOpen(false); }}>
                     <div className="px-3 py-2.5 font-bold text-[14px] text-gray-800 dark:text-zinc-100 flex justify-between items-center transition-colors">
                       <div className="flex items-center gap-2">
-                        <UserIcon className="w-3.5 h-3.5 text-gray-400" />
+                        <UserIcon className="w-3.5 h-3.5 text-[#5B6472]" />
                         <span>{(editingTicket ? editingTicket.solver_person : newTicket.solver_person) || "Select Staff..."}</span>
                       </div>
-                      <ChevronDownIcon className="w-3.5 h-3.5 text-gray-400" />
+                      <ChevronDownIcon className="w-3.5 h-3.5 text-[#5B6472]" />
                     </div>
                   </div>
                   {assignedToOpen && (
-                    <div className="absolute z-[10000] w-full mt-1 bg-white dark:bg-navy-900 border border-orange-100 dark:border-navy-700 rounded-xl shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-                      <div className="p-2 border-b border-orange-50 dark:border-navy-800">
+                    <div className="absolute z-[10000] w-full mt-1 bg-white dark:bg-navy-900 border border-[#E5E7EB] dark:border-navy-700 rounded-xl shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                      <div className="p-2 border-b border-[#E5E7EB] dark:border-navy-800">
                         <input type="text" placeholder="Search staff..." value={assignedToSearch} onChange={(e) => setAssignedToSearch(e.target.value)} onClick={(e) => e.stopPropagation()} className="w-full bg-gray-50 dark:bg-navy-900 px-2 py-1.5 rounded-lg border border-gray-100 dark:border-navy-800 outline-none text-[13px] font-bold text-gray-700 dark:text-gray-300" />
                       </div>
                       <div className="max-h-40 overflow-y-auto">
@@ -1008,8 +1034,8 @@ export default function TicketsPage() {
                 </div>
               </div>
 
-              <div className="pt-4 mt-6 border-t border-orange-100/50 dark:border-navy-800 flex gap-3">
-                <button type="button" onClick={() => { setIsNewModalOpen(false); setEditingTicket(null); }} className="flex-1 px-4 py-2.5 rounded-xl font-semibold text-gray-400 hover:text-gray-600 hover:bg-gray-50 dark:hover:bg-navy-800 transition-all text-[14px]">Cancel</button>
+              <div className="pt-4 mt-6 border-t border-[#E5E7EB] dark:border-navy-800 flex gap-3">
+                <button type="button" onClick={() => { setIsNewModalOpen(false); setEditingTicket(null); }} className="flex-1 px-4 py-2.5 rounded-xl font-semibold text-[#5B6472] hover:text-gray-600 hover:bg-gray-50 dark:hover:bg-navy-800 transition-all text-[14px]">Cancel</button>
                 <button type="submit" disabled={submitting} className="flex-1 bg-[#DC2626] hover:bg-[#8E161D] text-white px-4 py-2.5 rounded-xl font-semibold transition-all shadow-lg active:scale-95 text-[14px] flex items-center justify-center gap-2 disabled:opacity-50">
                   {submitting ? <ArrowPathIcon className="w-4 h-4 animate-spin" /> : editingTicket ? <ShieldCheckIcon className="w-4 h-4" /> : <FireIcon className="w-4 h-4" />} {editingTicket ? "Save Changes" : "Create Ticket"}
                 </button>
@@ -1021,6 +1047,13 @@ export default function TicketsPage() {
       )}
 
       {/* Ticket Details Right Sidebar */}
+      {postedNote && (
+        <div role="status" className="fixed z-[400] left-1/2 -translate-x-1/2 bottom-24 md:bottom-8 max-w-[calc(100%-32px)] flex items-center gap-2 px-4 py-3 rounded-xl bg-[#1A1D21] text-white text-[15px] font-semibold shadow-lg">
+          <CheckCircleIcon className="w-5 h-5 text-[#4ADE80] shrink-0" />
+          {postedNote}
+        </div>
+      )}
+
       {selectedTicket && (
         <Portal>
         <div className="fixed inset-0 z-[99999] flex justify-end overflow-hidden">
@@ -1054,7 +1087,7 @@ export default function TicketsPage() {
                 <p className="text-[14px] font-bold text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{selectedTicket.description}</p>
                 {[selectedTicket.suggestion_1, selectedTicket.suggestion_2, selectedTicket.suggestion_3].filter(Boolean).length > 0 && (
                   <div className="mt-3 pt-2 border-t border-red-200/50">
-                    <p className="text-[13px] font-semibold text-gray-400 mb-1.5">💡 Suggestions by {selectedTicket.raised_by}</p>
+                    <p className="text-[13px] font-semibold text-[#5B6472] mb-1.5">💡 Suggestions by {selectedTicket.raised_by}</p>
                     <ul className="space-y-1">
                       {[selectedTicket.suggestion_1, selectedTicket.suggestion_2, selectedTicket.suggestion_3].filter(Boolean).map((s, i) => (
                         <li key={i} className="text-[14px] font-bold text-gray-700 dark:text-gray-300 flex gap-1.5"><span className="text-[#2563EB] dark:text-[#60A5FA] font-semibold">{i + 1}.</span><span className="whitespace-pre-wrap">{s}</span></li>
@@ -1085,21 +1118,21 @@ export default function TicketsPage() {
               {/* Ticket Details Metadata */}
               <div className="grid grid-cols-2 gap-3 px-1">
                 <div className="space-y-1">
-                  <span className="text-[12px] font-semibold text-gray-400 block px-0.5">Raised By</span>
+                  <span className="text-[14px] font-semibold text-[#5B6472] block px-0.5">Raised By</span>
                   <div className="flex items-center gap-1.5 bg-blue-50/50 dark:bg-blue-900/10 px-2 py-1 rounded-lg border border-blue-100/50 dark:border-blue-800/20">
                     <UserIcon className="w-3 h-3 text-blue-500" />
                     <span className="text-[13px] font-semibold text-blue-700 dark:text-blue-400 truncate">{selectedTicket.raised_by}</span>
                   </div>
                 </div>
                 <div className="space-y-1">
-                  <span className="text-[12px] font-semibold text-gray-400 block px-0.5">Assigned To</span>
+                  <span className="text-[14px] font-semibold text-[#5B6472] block px-0.5">Assigned To</span>
                   <div className="flex items-center gap-1.5 bg-purple-50/50 dark:bg-purple-900/10 px-2 py-1 rounded-lg border border-purple-100/50 dark:border-purple-800/20">
                     <UserGroupIcon className="w-3 h-3 text-purple-500" />
                     <span className="text-[13px] font-semibold text-purple-700 dark:text-purple-400 truncate">{selectedTicket.solver_person || 'Unassigned'}</span>
                   </div>
                 </div>
                 <div className="space-y-1">
-                  <span className="text-[12px] font-semibold text-gray-400 block px-0.5">Due Date</span>
+                  <span className="text-[14px] font-semibold text-[#5B6472] block px-0.5">Due Date</span>
                   <div className="flex items-center gap-1.5 bg-amber-50/50 dark:bg-amber-900/10 px-2 py-1 rounded-lg border border-amber-100/50 dark:border-amber-800/20">
                     <CalendarIcon className="w-3 h-3 text-amber-500" />
                     <span className="text-[13px] font-semibold text-amber-700 dark:text-amber-400 truncate">
@@ -1108,7 +1141,7 @@ export default function TicketsPage() {
                   </div>
                 </div>
                 <div className="space-y-1">
-                  <span className="text-[12px] font-semibold text-gray-400 block px-0.5">Category</span>
+                  <span className="text-[14px] font-semibold text-[#5B6472] block px-0.5">Category</span>
                   <div className="flex items-center gap-1.5 bg-emerald-50/50 dark:bg-emerald-900/10 px-2 py-1 rounded-lg border border-emerald-100/50 dark:border-emerald-800/20">
                     <TagIcon className="w-3 h-3 text-emerald-500" />
                     <span className="text-[13px] font-semibold text-emerald-700 dark:text-emerald-400 truncate">{selectedTicket.category}</span>
@@ -1148,7 +1181,7 @@ export default function TicketsPage() {
                 {historyLoading ? (
                   <div className="flex justify-center p-6"><ArrowPathIcon className="w-5 h-5 text-[#2563EB] animate-spin" /></div>
                 ) : ticketHistory.length === 0 ? (
-                  <p className="text-center text-[13px] font-semibold text-gray-400 py-4">No activity yet</p>
+                  <p className="text-center text-[13px] font-semibold text-[#5B6472] py-4">No activity yet</p>
                 ) : (
                   <div className="space-y-3 relative before:absolute before:inset-0 before:ml-[17px] before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-gray-200 dark:before:via-navy-700 before:to-transparent">
                     {ticketHistory.filter(Boolean).map((log) => (
@@ -1159,7 +1192,7 @@ export default function TicketsPage() {
                         <div className="flex-1 p-2.5 rounded-xl bg-gray-50 dark:bg-navy-800 border border-gray-100 dark:border-navy-700 shadow-sm z-10">
                           <div className="flex justify-between items-start mb-1">
                             <span className="text-[13px] font-semibold text-[#2563EB] dark:text-[#60A5FA]">{log.actor_username}</span>
-                            <span className="text-[12px] font-bold text-gray-400">{new Date(log.created_at).toLocaleString([], { hour: '2-digit', minute: '2-digit', day: '2-digit', month: 'short' })}</span>
+                            <span className="text-[14px] font-bold text-[#5B6472]">{new Date(log.created_at).toLocaleString([], { hour: '2-digit', minute: '2-digit', day: '2-digit', month: 'short' })}</span>
                           </div>
                           {log.action_type === 'STATUS_CHANGE' && (
                             <p className="text-[14px] font-bold text-gray-600 dark:text-gray-300 mb-1.5 flex items-center gap-2">

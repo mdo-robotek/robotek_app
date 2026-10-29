@@ -62,7 +62,11 @@ export async function getUsers(): Promise<User[]> {
         id,
         username: row[1] || "",
         email: row[2] || "",
-        password: row[3] || "",
+        // Never carried in the shared user list: many API routes send this
+        // list (or parts of it) to the browser. Login reads the password
+        // through getUserByUsernameOrEmail; updateUser keeps the stored one
+        // when an empty value comes back (Oct 26).
+        password: "",
         phone: row[4] || "",
         role_name: row[5] || "",
         late_long: row[6] || "",
@@ -132,7 +136,7 @@ export async function updateUser(id: string, user: User): Promise<boolean> {
     const sheets = await getSheetsClient();
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId: GOOGLE_SHEET_ID,
-      range: `${SHEET_NAME}!A:A`,
+      range: `${SHEET_NAME}!A:D`,
     });
 
     const rows = response.data.values;
@@ -140,6 +144,13 @@ export async function updateUser(id: string, user: User): Promise<boolean> {
 
     const rowIndex = rows.findIndex(row => row[0] === id);
     if (rowIndex === -1) return false;
+
+    // The browser never receives passwords any more, so an edit (or a
+    // permission toggle, which re-sends the whole user) arrives with an empty
+    // password. Empty means "keep the current one" — never blank it out.
+    const password = String(user.password ?? "").trim()
+      ? user.password
+      : (rows[rowIndex][3] ?? "");
 
     await sheets.spreadsheets.values.update({
       spreadsheetId: GOOGLE_SHEET_ID,
@@ -150,7 +161,7 @@ export async function updateUser(id: string, user: User): Promise<boolean> {
           user.id,
           user.username,
           user.email,
-          user.password,
+          password,
           user.phone,
           user.role_name,
           user.late_long,
@@ -321,56 +332,96 @@ export async function deleteUser(id: string): Promise<boolean> {
   }
 }
 
+function rowToUser(userRow: any[]): User {
+  return {
+    id: userRow[0],
+    username: userRow[1],
+    email: userRow[2],
+    password: userRow[3],
+    phone: userRow[4],
+    role_name: userRow[5],
+    late_long: userRow[6],
+    image_url: userRow[7],
+    dob: userRow[8],
+    office: userRow[9],
+    designation: userRow[10],
+    department: userRow[11],
+    anniversary_date: userRow[12],
+    doj: userRow[13],
+    last_active: "",
+    isActive: userRow[14] === "TRUE" || userRow[14] === true || userRow[14] === undefined || userRow[14] === "",
+    permissions: (() => {
+      try {
+        return userRow[15] ? JSON.parse(userRow[15]) : [];
+      } catch (e) {
+        return [];
+      }
+    })()
+  } as any;
+}
+
+async function getUserRows(): Promise<any[][]> {
+  const sheets = await getSheetsClient();
+  const response = await sheets.spreadsheets.values.get({
+    spreadsheetId: GOOGLE_SHEET_ID,
+    range: `${SHEET_NAME}!A:P`,
+  });
+  const rows = response.data.values;
+  if (!rows || rows.length <= 1) return [];
+  return rows.slice(1);
+}
+
 export async function getUserByUsernameOrEmail(identifier: string): Promise<User | null> {
   try {
-    const sheets = await getSheetsClient();
-    const response = await sheets.spreadsheets.values.get({
-      spreadsheetId: GOOGLE_SHEET_ID,
-      range: `${SHEET_NAME}!A:P`,
-    });
-
-    const rows = response.data.values;
-    if (!rows || rows.length <= 1) return null;
-
-    const dataRows = rows.slice(1);
-    
-    const userRow = dataRows.find(row => 
+    const dataRows = await getUserRows();
+    const userRow = dataRows.find(row =>
       row[1] === identifier || row[2] === identifier
     );
-
     if (!userRow) return null;
-
-    const user: User = {
-      id: userRow[0],
-      username: userRow[1],
-      email: userRow[2],
-      password: userRow[3],
-      phone: userRow[4],
-      role_name: userRow[5],
-      late_long: userRow[6],
-      image_url: userRow[7],
-      dob: userRow[8],
-      office: userRow[9],
-      designation: userRow[10],
-      department: userRow[11],
-      anniversary_date: userRow[12],
-      doj: userRow[13],
-      last_active: "",
-      isActive: userRow[14] === "TRUE" || userRow[14] === true || userRow[14] === undefined || userRow[14] === "",
-      permissions: (() => {
-        try {
-          return userRow[15] ? JSON.parse(userRow[15]) : [];
-        } catch (e) {
-          return [];
-        }
-      })()
-    } as any;
-
-
-    return user;
+    return rowToUser(userRow);
   } catch (error) {
     console.error("Error fetching user from Google Sheets:", error);
     return null;
+  }
+}
+
+/**
+ * Which Users-sheet row a login attempt belongs to.
+ *
+ * Sahil, 2026-10-26: some people share one email (e.g. four Process
+ * Coordinators on one Gmail). With email login the first row always won, so
+ * the others could never sign in that way. Rule now:
+ *   1. Username wins (exact, then ignoring case and extra spaces).
+ *   2. Email works only when exactly one person has it.
+ *   3. A shared email logs nobody in — the login page asks for the username.
+ */
+export function pickLoginRow(
+  dataRows: any[][],
+  identifier: string
+): { row: any[] | null; sharedEmail: boolean } {
+  const raw = String(identifier ?? "");
+  const id = raw.trim().toLowerCase();
+  if (!id) return { row: null, sharedEmail: false };
+  const norm = (v: unknown) => String(v ?? "").trim().toLowerCase();
+
+  const exact = dataRows.find((r) => r[1] === raw);
+  if (exact) return { row: exact, sharedEmail: false };
+  const byName = dataRows.filter((r) => norm(r[1]) === id);
+  if (byName.length === 1) return { row: byName[0], sharedEmail: false };
+
+  const byEmail = dataRows.filter((r) => norm(r[2]) === id);
+  if (byEmail.length === 1) return { row: byEmail[0], sharedEmail: false };
+  if (byEmail.length > 1) return { row: null, sharedEmail: true };
+  return { row: null, sharedEmail: false };
+}
+
+export async function findLoginUser(identifier: string): Promise<{ user: User | null; sharedEmail: boolean }> {
+  try {
+    const { row, sharedEmail } = pickLoginRow(await getUserRows(), identifier);
+    return { user: row ? rowToUser(row) : null, sharedEmail };
+  } catch (error) {
+    console.error("Error finding login user:", error);
+    return { user: null, sharedEmail: false };
   }
 }
 

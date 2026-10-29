@@ -62,6 +62,10 @@ export interface O2D {
 
   hold?: string;
   cancelled?: string;
+  /** Working hours this order spent on hold so far (added up on every release). */
+  hold_hours?: string;
+  /** Result of the automatic SO check (JSON, see lib/so-check.ts). */
+  so_check?: string;
 }
 
 export interface O2DItem {
@@ -90,6 +94,27 @@ export const O2D_STEPS = [
   "SEND BILLTY TO CRM",
   "DELIVERY DOCUMENT",
   "CLEAR PAYMENT"
+];
+
+/**
+ * Display names for the 11 O2D steps, same order as O2D_STEPS.
+ * O2D_STEPS itself stays in capitals because those exact strings are matched
+ * against `step_name` in the step-config sheet — changing them would break
+ * saved TAT and responsible-person settings. Screens read from here instead,
+ * so the team sees "Make SO", not "MAKE SO".
+ */
+export const O2D_STEP_LABELS = [
+  "Make SO",
+  "Cross Check of SO",
+  "Dispatch and Packing Approval",
+  "Reconfirm Approval",
+  "Pack Item",
+  "Share PI to Customer",
+  "Generate Invoice and Dispatch Goods",
+  "Bill Update in 51",
+  "Send Bilty to CRM",
+  "Delivery Document",
+  "Clear Payment",
 ];
 
 export const O2D_STEP_SHORTS = [

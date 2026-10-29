@@ -189,7 +189,7 @@ export default function ItemLedgerPage() {
             <tr>
               <th className="px-3 py-2 text-left font-semibold text-[13px] text-gray-500">Item</th>
               <th className="px-3 py-2 text-left font-semibold text-[13px] text-gray-500">Category</th>
-              <th className="px-3 py-2 text-right font-semibold text-[13px] text-gray-500">GRN IN</th>
+              <th className="px-3 py-2 text-right font-semibold text-[13px] text-gray-500">GRN In</th>
               <th className="px-3 py-2 text-right font-semibold text-[13px] text-gray-500">Floor IN</th>
               <th className="px-3 py-2 text-right font-semibold text-[13px] text-gray-500" title="Record only — not added to stock (stock already comes via GRN/floor)">Local Pack (rec)</th>
               <th className="px-3 py-2 text-right font-semibold text-[13px] text-gray-500" title="Record only — not added to stock (stock already comes via GRN/floor)">Assembled (rec)</th>
@@ -200,10 +200,10 @@ export default function ItemLedgerPage() {
           </thead>
           <tbody>
             {isLoading && (
-              <tr><td colSpan={9} className="px-3 py-6 text-center text-gray-400 font-bold">Loading...</td></tr>
+              <tr><td colSpan={9} className="px-3 py-6 text-center text-[#5B6472] font-bold">Loading...</td></tr>
             )}
             {!isLoading && rows.length === 0 && (
-              <tr><td colSpan={9} className="px-3 py-6 text-center text-gray-400 font-bold">No items to show.</td></tr>
+              <tr><td colSpan={9} className="px-3 py-6 text-center text-[#5B6472] font-bold">No items to show.</td></tr>
             )}
             {rows.map((r) => (
               <tr
@@ -219,8 +219,8 @@ export default function ItemLedgerPage() {
                 <td className="px-3 py-2 text-gray-500">{r.category || "—"}</td>
                 <td className="px-3 py-2 text-right font-bold">{r.in_grn || "—"}</td>
                 <td className="px-3 py-2 text-right font-bold">{r.in_floor || "—"}</td>
-                <td className="px-3 py-2 text-right font-bold text-gray-400">{r.in_locally_packed || "—"}</td>
-                <td className="px-3 py-2 text-right font-bold text-gray-400">{r.in_assembled || "—"}</td>
+                <td className="px-3 py-2 text-right font-bold text-[#5B6472]">{r.in_locally_packed || "—"}</td>
+                <td className="px-3 py-2 text-right font-bold text-[#5B6472]">{r.in_assembled || "—"}</td>
                 <td className="px-3 py-2 text-right font-semibold">{r.total_in}</td>
                 <td className="px-3 py-2 text-right font-semibold">{r.total_out}</td>
                 <td className={`px-3 py-2 text-right font-semibold ${r.net < 0 ? "text-red-600" : "text-emerald-600"}`}>{r.net}</td>
@@ -239,8 +239,8 @@ export default function ItemLedgerPage() {
                 <span className="font-bold">{e.item_name}</span>
                 <span className="text-gray-500">{e.source_type}</span>
                 <span className="font-semibold">+{e.qty}</span>
-                <span className="text-gray-400">{e.date}</span>
-                <span className="text-gray-400">{e.entered_by}</span>
+                <span className="text-[#5B6472]">{e.date}</span>
+                <span className="text-[#5B6472]">{e.entered_by}</span>
               </div>
             ))}
           </div>
@@ -279,19 +279,19 @@ export default function ItemLedgerPage() {
                 </thead>
                 <tbody>
                   {statementLoading && (
-                    <tr><td colSpan={6} className="px-3 py-6 text-center text-gray-400 font-bold">Loading statement...</td></tr>
+                    <tr><td colSpan={6} className="px-3 py-6 text-center text-[#5B6472] font-bold">Loading statement...</td></tr>
                   )}
                   {!statementLoading && (statement?.entries || []).length === 0 && (
-                    <tr><td colSpan={6} className="px-3 py-6 text-center text-gray-400 font-bold">No movement entries found.</td></tr>
+                    <tr><td colSpan={6} className="px-3 py-6 text-center text-[#5B6472] font-bold">No movement entries found.</td></tr>
                   )}
                   {(statement?.entries || []).map((e, i) => (
                     <tr key={i} className={`border-t border-gray-50 dark:border-navy-800 ${e.recordOnly ? "opacity-50" : ""} ${e.balance < 0 && !e.recordOnly ? "bg-red-50/60 dark:bg-red-950/20" : ""}`}>
                       <td className="px-3 py-1.5 font-bold text-gray-600 dark:text-zinc-300 whitespace-nowrap">{e.date || "—"}</td>
                       <td className="px-3 py-1.5 font-bold">
-                        <span className={e.type.includes("IN") ? "text-emerald-600" : e.type.startsWith("Record") ? "text-gray-400" : "text-blue-600"}>{e.type}</span>
-                        {e.recordOnly && <span className="ml-1 text-[12px] font-semibold text-gray-400">(record only)</span>}
+                        <span className={e.type.includes("IN") ? "text-emerald-600" : e.type.startsWith("Record") ? "text-[#5B6472]" : "text-blue-600"}>{e.type}</span>
+                        {e.recordOnly && <span className="ml-1 text-[12px] font-semibold text-[#5B6472]">(record only)</span>}
                       </td>
-                      <td className="px-3 py-1.5 text-gray-400">{e.ref || "—"}</td>
+                      <td className="px-3 py-1.5 text-[#5B6472]">{e.ref || "—"}</td>
                       <td className="px-3 py-1.5 text-right font-semibold text-emerald-600">{e.inQty ? `+${Math.round(e.inQty)}` : ""}</td>
                       <td className="px-3 py-1.5 text-right font-semibold text-blue-600">{e.outQty ? `-${Math.round(e.outQty)}` : ""}</td>
                       <td className={`px-3 py-1.5 text-right font-semibold ${e.balance < 0 ? "text-red-600" : "text-gray-800 dark:text-zinc-100"}`}>{e.balance}</td>
@@ -300,7 +300,7 @@ export default function ItemLedgerPage() {
                 </tbody>
               </table>
             </div>
-            <p className="text-[13px] font-bold text-gray-400 mt-2">Balance jis din negative hua, usi ke aas-paas ki entry mein galti hai — wahi se investigate karein. "Record only" rows stock mein count nahi hote.</p>
+            <p className="text-[13px] font-bold text-[#5B6472] mt-2">The mistake is near the entry where the balance first went negative — start checking from there. "Record only" rows do not count towards stock.</p>
           </div>
         </div>
       )}
@@ -317,7 +317,7 @@ export default function ItemLedgerPage() {
               <button type="button" onClick={() => setIsFormOpen(false)}><XMarkIcon className="w-5 h-5" /></button>
             </div>
             <div>
-              <label className="text-[13px] font-semibold text-gray-400 block mb-1">Item Name</label>
+              <label className="text-[13px] font-semibold text-[#5B6472] block mb-1">Item Name</label>
               <input
                 list="item-ledger-names"
                 value={form.item_name}
@@ -331,7 +331,7 @@ export default function ItemLedgerPage() {
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="text-[13px] font-semibold text-gray-400 block mb-1">Quantity</label>
+                <label className="text-[13px] font-semibold text-[#5B6472] block mb-1">Quantity</label>
                 <input
                   type="number"
                   min={1}
@@ -341,7 +341,7 @@ export default function ItemLedgerPage() {
                 />
               </div>
               <div>
-                <label className="text-[13px] font-semibold text-gray-400 block mb-1">Date</label>
+                <label className="text-[13px] font-semibold text-[#5B6472] block mb-1">Date</label>
                 <input
                   type="date"
                   value={form.date}
@@ -351,7 +351,7 @@ export default function ItemLedgerPage() {
               </div>
             </div>
             <div>
-              <label className="text-[13px] font-semibold text-gray-400 block mb-1">Source Type</label>
+              <label className="text-[13px] font-semibold text-[#5B6472] block mb-1">Source Type</label>
               <select
                 value={form.source_type}
                 onChange={(e) => setForm({ ...form, source_type: e.target.value as "Locally Packed" | "Assembled" })}
@@ -362,7 +362,7 @@ export default function ItemLedgerPage() {
               </select>
             </div>
             <div>
-              <label className="text-[13px] font-semibold text-gray-400 block mb-1">Remarks (optional)</label>
+              <label className="text-[13px] font-semibold text-[#5B6472] block mb-1">Remarks (optional)</label>
               <input
                 value={form.remarks}
                 onChange={(e) => setForm({ ...form, remarks: e.target.value })}

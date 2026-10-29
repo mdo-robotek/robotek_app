@@ -109,13 +109,13 @@ export default function PremiumDatePicker({
   return (
     <div>
       {label && (
-        <label className="text-[13px] font-semibold text-gray-400 block mb-2">
+        <label className="text-[13px] font-semibold text-[#5B6472] block mb-2">
           {label}
         </label>
       )}
       <div 
         onClick={() => setIsOpen(true)}
-        className="w-full bg-[#FFFFFF] dark:bg-navy-900 px-3 py-1.5 rounded-lg border border-orange-100 dark:border-navy-700 focus-within:border-[#2563EB] cursor-pointer flex items-center justify-between gap-4 group transition-all shadow-sm"
+        className="w-full bg-[#FFFFFF] dark:bg-navy-900 px-3 py-1.5 rounded-lg border border-[#E5E7EB] dark:border-navy-700 focus-within:border-[#2563EB] cursor-pointer flex items-center justify-between gap-4 group transition-all shadow-sm"
       >
         <div className="flex-1 min-w-0">
           <span className="font-bold text-[14px] text-gray-800 dark:text-zinc-100 block">
@@ -124,8 +124,8 @@ export default function PremiumDatePicker({
         </div>
 
         {multiSelect && selectedDates.length > 1 && (
-          <div className="flex-1 min-w-0 border-l border-orange-100 dark:border-navy-800 pl-3 py-0.5 max-h-[40px] overflow-y-auto custom-scrollbar no-scrollbar">
-            <span className="text-[13px] text-gray-400 font-bold block leading-relaxed">
+          <div className="flex-1 min-w-0 border-l border-[#E5E7EB] dark:border-navy-800 pl-3 py-0.5 max-h-[40px] overflow-y-auto custom-scrollbar no-scrollbar">
+            <span className="text-[13px] text-[#5B6472] font-bold block leading-relaxed">
               {selectedDates.slice(1).map(d => {
                 const [y, m, day] = d.split('-').map(Number);
                 return new Date(y, m - 1, day).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' });
@@ -134,7 +134,7 @@ export default function PremiumDatePicker({
           </div>
         )}
 
-        <CalendarIcon className="w-4 h-4 text-gray-400 group-hover:text-[#DC2626] dark:group-hover:text-[#60A5FA] flex-shrink-0 transition-colors" />
+        <CalendarIcon className="w-4 h-4 text-[#5B6472] group-hover:text-[#DC2626] dark:group-hover:text-[#60A5FA] flex-shrink-0 transition-colors" />
       </div>
 
       {isOpen && (
@@ -145,14 +145,14 @@ export default function PremiumDatePicker({
           />
           <div 
             ref={containerRef}
-            className="relative bg-white dark:bg-navy-900 border border-orange-100 dark:border-navy-700 rounded-2xl shadow-2xl p-4 w-full max-w-[320px] animate-in fade-in zoom-in duration-200"
+            className="relative bg-white dark:bg-navy-900 border border-[#E5E7EB] dark:border-navy-700 rounded-2xl shadow-2xl p-4 w-full max-w-[320px] animate-in fade-in zoom-in duration-200"
           >
             {/* Calendar Header */}
             <div className="flex items-center justify-between mb-4">
               <button 
                 type="button"
                 onClick={handlePrevMonth}
-                className="p-1.5 hover:bg-gray-50 dark:hover:bg-white/5 rounded-lg text-gray-400 hover:text-black dark:hover:text-white transition-all"
+                className="p-1.5 hover:bg-gray-50 dark:hover:bg-white/5 rounded-lg text-[#5B6472] hover:text-black dark:hover:text-white transition-all"
               >
                 <ChevronLeftIcon className="w-4 h-4" />
               </button>
@@ -181,7 +181,7 @@ export default function PremiumDatePicker({
               <button 
                 type="button"
                 onClick={handleNextMonth}
-                className="p-1.5 hover:bg-gray-50 dark:hover:bg-white/5 rounded-lg text-gray-400 hover:text-black dark:hover:text-white transition-all"
+                className="p-1.5 hover:bg-gray-50 dark:hover:bg-white/5 rounded-lg text-[#5B6472] hover:text-black dark:hover:text-white transition-all"
               >
                 <ChevronRightIcon className="w-4 h-4" />
               </button>
@@ -227,7 +227,7 @@ export default function PremiumDatePicker({
             {/* Weekdays */}
             <div className="grid grid-cols-7 mb-2">
               {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map(day => (
-                <div key={day} className="text-center text-[13px] font-semibold text-gray-300 dark:text-gray-600">
+                <div key={day} className="text-center text-[13px] font-semibold text-[#5B6472] dark:text-gray-600">
                   {day}
                 </div>
               ))}
@@ -295,7 +295,7 @@ export default function PremiumDatePicker({
                   onChange("");
                   setIsOpen(false);
                 }}
-                className="text-[13px] font-semibold text-gray-400 hover:underline text-right"
+                className="text-[13px] font-semibold text-[#5B6472] hover:underline text-right"
               >
                 Clear
               </button>

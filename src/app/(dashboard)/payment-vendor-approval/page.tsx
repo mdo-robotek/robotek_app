@@ -74,7 +74,7 @@ function GrnCheckBadge({ actual, status }: { actual?: string; status?: string })
     );
   }
   return (
-    <span className="inline-flex items-center gap-1 px-2 py-1 bg-gradient-to-r from-amber-400 to-orange-500 text-white rounded-md text-[13px] font-semibold shadow-sm">
+    <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#2563EB] text-white rounded-md text-[13px] font-semibold shadow-sm">
       <ClockIcon className="w-3.5 h-3.5 shrink-0" /> Pending
     </span>
   );
@@ -96,7 +96,7 @@ function PaymentStatusPill({ status }: { status: string }) {
         ? "bg-gradient-to-r from-blue-500 to-indigo-600 text-white border-blue-400 shadow-sm shadow-blue-500/20"
         : label === "Rejected"
           ? "bg-gradient-to-r from-rose-500 to-red-600 text-white border-rose-400 shadow-sm shadow-rose-500/20"
-          : "bg-gradient-to-r from-amber-400 to-orange-500 text-white border-amber-400 shadow-sm shadow-amber-500/20";
+          : "bg-[#2563EB] text-white border-amber-400 shadow-sm shadow-amber-500/20";
   return (
     <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[13px] font-semibold  tracking-wide border whitespace-nowrap ${styles}`}>
       {label}
@@ -119,6 +119,170 @@ function getPlannedPeriodLabel(period: FilterPeriod, currentDate: Date) {
     case "CUSTOM": return "Custom Range";
     default: return "";
   }
+}
+
+/**
+ * Phone view (Sahil, 2026-10-27): the wide table needed side-scrolling and
+ * the GRN / vendor / item were not visible together. On phones each GRN is a
+ * card with everything needed to decide, and big Approve / Reject buttons.
+ */
+function CheckChip({ label, actual, status }: { label: string; actual?: string; status?: string }) {
+  const state = getGrnStepCheckState(actual, status);
+  const tone =
+    state === "done"
+      ? "text-[#15803D] bg-[#F0FDF4] border-[#BBF7D0]"
+      : state === "rejected"
+        ? "text-[#DC2626] bg-[#FEF2F2] border-[#FECACA]"
+        : "text-[#D97706] bg-[#FFFBEB] border-[#FDE68A]";
+  const text = state === "done" ? `${label} OK` : state === "rejected" ? `${label} failed` : `${label} pending`;
+  return (
+    <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg border text-[13px] font-semibold whitespace-nowrap ${tone}`}>
+      {state === "done" ? <CheckCircleIcon className="w-4 h-4" /> : state === "rejected" ? <XCircleIcon className="w-4 h-4" /> : <ClockIcon className="w-4 h-4" />}
+      {text}
+    </span>
+  );
+}
+
+function MobileStatusPill({ status }: { status: string }) {
+  const label = getPaymentStatusLabel(status || "");
+  const tone =
+    label === "Paid"
+      ? "text-[#15803D] bg-[#F0FDF4]"
+      : label === "Rejected"
+        ? "text-[#DC2626] bg-[#FEF2F2]"
+        : label === "Pending Approval"
+          ? "text-[#D97706] bg-[#FFFBEB]"
+          : "text-[#2563EB] bg-[#EFF4FF]";
+  return <span className={`shrink-0 px-2.5 py-1 rounded-full text-[13px] font-semibold ${tone}`}>{label}</span>;
+}
+
+function formatQty(q: unknown): string {
+  const n = Number(String(q ?? "").replace(/,/g, ""));
+  if (!String(q ?? "").trim()) return "—";
+  return Number.isFinite(n) ? n.toLocaleString("en-IN") : String(q);
+}
+
+function PaymentCard({
+  item,
+  isAdmin,
+  isUser,
+  busy,
+  highlighted,
+  cardRef,
+  onAction,
+}: {
+  item: any;
+  isAdmin: boolean;
+  isUser: boolean;
+  busy: boolean;
+  highlighted: boolean;
+  cardRef?: React.Ref<HTMLDivElement>;
+  onAction: (grnNo: string, action: string) => void;
+}) {
+  const status = item.vendorRecord.status || "";
+  const remarks = String(item.vendorRecord.remarks || "")
+    .split("|")
+    .map((r: string) => r.trim())
+    .filter(Boolean)
+    .join(" · ");
+  const isPayed = status === "Payed";
+  const isApproved = status === "Approved";
+  const isRejected = status === "Rejected";
+  const late = !isPayed && !isRejected && item.rawPlannedDate && item.rawPlannedDate.getTime() < Date.now();
+  const vendorKnown = item.vendorName && item.vendorName !== "—" && item.vendorName !== item.filled_by;
+
+  return (
+    <div
+      ref={cardRef}
+      className={`rounded-xl border bg-white dark:bg-slate-900 p-4 ${highlighted ? "border-[#2563EB] ring-2 ring-[#2563EB]/30" : "border-[#E5E7EB] dark:border-white/10"}`}
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="text-[13px] font-semibold text-[#5B6472]">
+            {item.GRN_No}
+            {item.PO_Number ? ` · ${item.PO_Number}` : ""}
+          </p>
+          <p className="text-[17px] font-semibold text-[#1A1D21] dark:text-white leading-snug mt-0.5">{item.Item_Name || "—"}</p>
+        </div>
+        <MobileStatusPill status={status} />
+      </div>
+
+      <div className="mt-3 space-y-1.5 text-[15px]">
+        <p className="text-[#1A1D21] dark:text-slate-200">
+          <span className="text-[#5B6472]">Vendor: </span>
+          <span className="font-semibold">{vendorKnown ? item.vendorName : "Not linked"}</span>
+        </p>
+        <p className="text-[#1A1D21] dark:text-slate-200">
+          <span className="text-[#5B6472]">Qty: </span>
+          <span className="font-semibold tabular-nums">{formatQty(item.Qty)}</span>
+          {item.Category ? <span className="text-[#5B6472]"> · {item.Category}</span> : null}
+          {item.Country ? <span className="text-[#5B6472]"> · {item.Country}</span> : null}
+        </p>
+        <p className="text-[#1A1D21] dark:text-slate-200">
+          <span className="text-[#5B6472]">Payment: </span>
+          <span className="font-semibold">
+            {item.Payment_Terms_In_days !== undefined && String(item.Payment_Terms_In_days).trim() !== "" ? `${item.Payment_Terms_In_days} days` : "Terms not set"}
+          </span>
+          {item.calculatedPlannedDate && item.calculatedPlannedDate !== "—" ? (
+            <span className={late ? "text-[#DC2626] font-semibold" : "text-[#5B6472]"}> · pay by {item.calculatedPlannedDate}</span>
+          ) : null}
+        </p>
+        <p className="text-[13px] text-[#5B6472]">GRN date {item.grnDate}</p>
+      </div>
+
+      <div className="flex flex-wrap gap-2 mt-3">
+        <CheckChip label="Qty" actual={item.actual_1} status={item.status_1} />
+        <CheckChip label="Quality" actual={item.actual_3} status={item.status_3} />
+      </div>
+
+      {remarks ? <p className="mt-3 text-[14px] text-[#5B6472] break-words">{remarks}</p> : null}
+
+      {item.Attach_Bill ? (
+        <a
+          href={item.Attach_Bill}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-3 inline-flex items-center gap-1.5 min-h-[44px] text-[15px] font-semibold text-[#2563EB]"
+        >
+          <DocumentTextIcon className="w-5 h-5" />
+          View bill
+        </a>
+      ) : null}
+
+      {!isPayed && !isRejected && isAdmin && !isApproved ? (
+        <div className="grid grid-cols-2 gap-3 mt-3">
+          <button
+            onClick={() => onAction(item.GRN_No, "Rejected")}
+            disabled={busy}
+            className="h-12 rounded-xl border border-[#FECACA] text-[#DC2626] text-[15px] font-semibold bg-white disabled:opacity-50"
+          >
+            Reject
+          </button>
+          <button
+            onClick={() => onAction(item.GRN_No, "Approved")}
+            disabled={busy}
+            className="h-12 rounded-xl bg-[#15803D] text-white text-[15px] font-semibold disabled:opacity-50"
+          >
+            {busy ? "Saving…" : "Approve"}
+          </button>
+        </div>
+      ) : null}
+
+      {isApproved && isUser ? (
+        <button
+          onClick={() => onAction(item.GRN_No, "Payed")}
+          disabled={busy}
+          className="mt-3 w-full h-12 rounded-xl bg-[#15803D] text-white text-[15px] font-semibold disabled:opacity-50"
+        >
+          {busy ? "Saving…" : "Mark Paid"}
+        </button>
+      ) : null}
+
+      {!isPayed && !isRejected && !isAdmin && !isApproved ? (
+        <p className="mt-3 text-[14px] text-[#5B6472]">Waiting for MD approval</p>
+      ) : null}
+    </div>
+  );
 }
 
 export default function PaymentVendorApprovalPage() {
@@ -155,6 +319,15 @@ export default function PaymentVendorApprovalPage() {
   const [modalRemarks, setModalRemarks] = useState("");
   const [highlightGrn, setHighlightGrn] = useState<string | null>(null);
   const highlightRowRef = useRef<HTMLTableRowElement>(null);
+
+  // On a phone, MD/admin opens straight on what needs a decision.
+  const phoneDefaultDone = useRef(false);
+  useEffect(() => {
+    if (phoneDefaultDone.current || !session) return;
+    phoneDefaultDone.current = true;
+    if (new URLSearchParams(window.location.search).get("grn")) return;
+    if (isAdmin && window.innerWidth < 768) setStatusFilter("Pending Approval");
+  }, [session, isAdmin]);
 
   useEffect(() => {
     const grn = new URLSearchParams(window.location.search).get("grn");
@@ -455,12 +628,12 @@ export default function PaymentVendorApprovalPage() {
             Track vendor payments from GRN creation through MD approval to final payment.
           </p>
         </div>
-        <div className="flex flex-wrap items-center gap-2.5">
-          <span className="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-[14px] font-bold shadow-md shadow-emerald-500/25">
+        <div className="hidden md:flex flex-wrap items-center gap-2.5">
+          <span className="hidden md:inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-[14px] font-bold shadow-md shadow-emerald-500/25">
             <DevicePhoneMobileIcon className="w-4 h-4" />
             WhatsApp Alerts On
           </span>
-          <span className="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-[14px] font-bold shadow-md shadow-blue-500/25">
+          <span className="hidden md:inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-[14px] font-bold shadow-md shadow-blue-500/25">
             <ArrowPathIcon className="w-4 h-4 animate-spin" style={{ animationDuration: "3s" }} />
             Auto Refresh · 5s
           </span>
@@ -474,8 +647,8 @@ export default function PaymentVendorApprovalPage() {
         </div>
       </div>
 
-      {/* Workflow step cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+      {/* Workflow step cards (not on phones — too much to scroll past) */}
+      <div className="hidden md:grid grid-cols-1 md:grid-cols-3 gap-3">
         <div className="rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-700 text-white p-4 shadow-lg shadow-blue-500/30 ring-1 ring-white/20">
           <div className="flex items-start gap-3">
             <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
@@ -521,10 +694,10 @@ export default function PaymentVendorApprovalPage() {
       <div className="rounded-2xl border border-blue-200/50 dark:border-blue-500/20 bg-white dark:bg-slate-900 shadow-lg shadow-blue-500/5 overflow-hidden flex flex-col min-h-[520px] flex-1">
           {/* Status tabs with counts */}
           <div className="px-3 md:px-4 pt-3 pb-2 border-b border-blue-100/80 dark:border-white/5 bg-gradient-to-r from-slate-50 via-blue-50/40 to-violet-50/30 dark:from-slate-900 dark:via-blue-950/20 dark:to-violet-950/10 overflow-x-auto no-scrollbar">
-            <div className="flex items-center gap-2 min-w-max">
+            <div className="flex flex-wrap items-center gap-2">
               {([
                 { id: "All", color: "from-slate-600 to-slate-800", ring: "ring-slate-300/50" },
-                { id: "Pending Approval", color: "from-amber-500 to-orange-500", ring: "ring-amber-300/50" },
+                { id: "Pending Approval", color: "from-amber-500 to-[#F7F8FA]", ring: "ring-amber-300/50" },
                 { id: "Pending Payment", color: "from-blue-500 to-indigo-600", ring: "ring-blue-300/50" },
                 { id: "Payed", color: "from-emerald-500 to-teal-600", ring: "ring-emerald-300/50" },
                 { id: "Rejected", color: "from-rose-500 to-red-600", ring: "ring-rose-300/50" },
@@ -534,7 +707,7 @@ export default function PaymentVendorApprovalPage() {
                   onClick={() => { setStatusFilter(tab.id); setCurrentPage(1); }}
                   className={`flex items-center gap-2 px-3 py-2 rounded-xl text-[14px] font-semibold  tracking-wide transition-all whitespace-nowrap ${
                     statusFilter === tab.id
-                      ? `bg-gradient-to-r ${tab.color} text-white shadow-lg ring-2 ${tab.ring}`
+                      ? "bg-[#2563EB] text-white"
                       : "bg-white dark:bg-slate-950/50 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200 dark:border-white/10"
                   }`}
                 >
@@ -550,18 +723,18 @@ export default function PaymentVendorApprovalPage() {
           {/* Filter bar */}
           <div className="px-3 md:px-4 py-3 border-b border-blue-50 dark:border-white/5 bg-gradient-to-r from-white via-sky-50/40 to-white dark:from-slate-900 dark:via-sky-950/10 dark:to-slate-900">
             <div className="flex flex-col xl:flex-row xl:items-end gap-3">
-              <div className="relative flex-1 min-w-[200px]">
+              <div className="relative flex-1 min-w-0 md:min-w-[200px]">
                 <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-sky-500" />
                 <input
                   type="text"
                   placeholder="Search GRN, PO, item, vendor..."
                   value={searchTerm}
                   onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border-2 border-sky-100 dark:border-sky-500/20 bg-white dark:bg-slate-950 text-sm font-semibold outline-none focus:border-sky-400"
+                  className="w-full h-11 pl-10 pr-4 py-2.5 rounded-xl border-2 border-sky-100 dark:border-sky-500/20 bg-white dark:bg-slate-950 text-sm font-semibold outline-none focus:border-sky-400"
                 />
               </div>
 
-              <div className="flex flex-wrap items-end gap-2">
+              <div className="hidden md:flex flex-wrap items-end gap-2">
                 <div>
                   <label className="block text-[13px] font-semibold text-indigo-500 dark:text-indigo-400 mb-1">Planned Date</label>
                   <select
@@ -602,7 +775,7 @@ export default function PaymentVendorApprovalPage() {
                       onChange={(e) => { if (e.target.value) { setStartDate(new Date(e.target.value)); setCurrentPage(1); } }}
                       className="bg-transparent text-[14px] font-bold outline-none dark:text-white"
                     />
-                    <span className="text-[13px] font-semibold text-slate-400">to</span>
+                    <span className="text-[13px] font-semibold text-[#5B6472]">to</span>
                     <input
                       type="date"
                       value={endDate ? format(endDate, "yyyy-MM-dd") : ""}
@@ -610,7 +783,7 @@ export default function PaymentVendorApprovalPage() {
                       className="bg-transparent text-[14px] font-bold outline-none dark:text-white"
                     />
                     {(startDate || endDate) && (
-                      <button type="button" onClick={() => handlePeriodChange("ALL")} className="p-1 text-slate-400 hover:text-rose-500">
+                      <button type="button" onClick={() => handlePeriodChange("ALL")} className="p-1 text-[#5B6472] hover:text-rose-500">
                         <XMarkIcon className="w-3.5 h-3.5" />
                       </button>
                     )}
@@ -618,7 +791,7 @@ export default function PaymentVendorApprovalPage() {
                 )}
               </div>
 
-              <div className="flex items-center gap-2 shrink-0">
+              <div className="hidden md:flex items-center gap-2 shrink-0">
                 <button
                   onClick={() => setCurrentPage(1)}
                   className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-[14px] font-semibold tracking-wide shadow-md shadow-blue-500/25 hover:brightness-105"
@@ -627,7 +800,7 @@ export default function PaymentVendorApprovalPage() {
                 </button>
                 <button
                   onClick={exportToCSV}
-                  className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 text-white text-[14px] font-semibold tracking-wide shadow-md shadow-orange-500/25 hover:brightness-105 flex items-center gap-2"
+                  className="px-4 py-2.5 rounded-xl bg-[#2563EB] text-white text-[14px] font-semibold tracking-wide shadow-md hover:brightness-105 flex items-center gap-2"
                 >
                   <ArrowDownTrayIcon className="w-4 h-4" />
                   Export CSV
@@ -639,125 +812,134 @@ export default function PaymentVendorApprovalPage() {
           {grnLoading || vendorLoading ? (
             <div className="flex flex-col items-center justify-center py-24 flex-1">
               <div className="w-10 h-10 border-3 border-slate-100 border-t-blue-600 rounded-full animate-spin mb-4" />
-              <p className="text-[13px] font-semibold text-slate-400">Loading payments...</p>
+              <p className="text-[13px] font-semibold text-[#5B6472]">Loading payments...</p>
             </div>
           ) : (
-            <div className="overflow-x-auto overflow-y-auto flex-1 min-h-0">
-              <table className="w-full text-left border-collapse min-w-[1240px]">
+            <div className="flex-1 min-h-0">
+              {/* Phone + tablet: one card per GRN, no side scrolling */}
+              <div className="lg:hidden p-3 space-y-3">
+                {paginatedItems.map((item) => {
+                  const isHighlighted = !!highlightGrn && item.GRN_No.toLowerCase() === highlightGrn.toLowerCase();
+                  return (
+                    <PaymentCard
+                      key={item.id}
+                      item={item}
+                      isAdmin={isAdmin}
+                      isUser={isUser}
+                      busy={actionLoading === item.GRN_No}
+                      highlighted={isHighlighted}
+                      cardRef={isHighlighted ? (highlightRowRef as unknown as React.Ref<HTMLDivElement>) : undefined}
+                      onAction={openActionModal}
+                    />
+                  );
+                })}
+                {paginatedItems.length === 0 && (
+                  <p className="py-16 text-center text-[15px] text-[#5B6472]">Nothing here. Try another tab or clear the search.</p>
+                )}
+              </div>
+
+              {/* Laptop: compact table that fits the screen (no side scrolling) */}
+              <div className="hidden lg:block overflow-y-auto">
+              <table className="w-full text-left border-collapse table-fixed">
+                <colgroup>
+                  <col className="w-[13%]" />
+                  <col className="w-[24%]" />
+                  <col className="w-[9%]" />
+                  <col className="w-[14%]" />
+                  <col className="w-[17%]" />
+                  <col className="w-[23%]" />
+                </colgroup>
                 <thead className="sticky top-0 z-10">
-                  <tr className="bg-gradient-to-r from-[#2563EB] via-blue-600 to-indigo-600 text-white">
-                    <th className="px-3 py-3 text-[13px] font-semibold tracking-wider w-10">#</th>
-                    <th className="px-3 py-3 text-[13px] font-semibold tracking-wider">GRN No. / PO No.</th>
-                    <th className="px-3 py-3 text-[13px] font-semibold tracking-wider">Dates</th>
-                    <th className="px-3 py-3 text-[13px] font-semibold tracking-wider">Vendor</th>
-                    <th className="px-3 py-3 text-[13px] font-semibold tracking-wider">Item</th>
-                    <th className="px-3 py-3 text-[13px] font-semibold tracking-wider text-right">Qty</th>
-                    <th className="px-3 py-3 text-[13px] font-semibold tracking-wider">Terms</th>
-                    <th className="px-3 py-3 text-[13px] font-semibold tracking-wider text-center">Qty Check</th>
-                    <th className="px-3 py-3 text-[13px] font-semibold tracking-wider text-center">Quality Check</th>
-                    <th className="px-3 py-3 text-[13px] font-semibold tracking-wider text-center">Status</th>
-                    <th className="px-3 py-3 text-[13px] font-semibold tracking-wider">Remarks</th>
-                    <th className="px-3 py-3 text-[13px] font-semibold tracking-wider text-center">Action</th>
+                  <tr className="bg-[#F7F8FA] dark:bg-slate-800 text-[#5B6472] dark:text-slate-300 border-b border-[#E5E7EB] dark:border-white/10">
+                    <th className="px-3 py-3 text-[13px] font-semibold">GRN / PO</th>
+                    <th className="px-3 py-3 text-[13px] font-semibold">Item &amp; vendor</th>
+                    <th className="px-3 py-3 text-[13px] font-semibold text-right">Qty</th>
+                    <th className="px-3 py-3 text-[13px] font-semibold">Payment</th>
+                    <th className="px-3 py-3 text-[13px] font-semibold">Checks</th>
+                    <th className="px-3 py-3 text-[13px] font-semibold">Status &amp; action</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-white/5">
-                  {paginatedItems.map((item, idx) => {
+                <tbody className="divide-y divide-[#E5E7EB] dark:divide-white/5">
+                  {paginatedItems.map((item) => {
                     const status = item.vendorRecord.status;
-                    const remarks = item.vendorRecord.remarks || "";
-                    const userRemarks = remarks.split("|").find((r: string) => r.includes("User:"))?.replace("User:", "").trim() || "";
-                    const adminRemarks = remarks.split("|").find((r: string) => r.includes("Admin:"))?.replace("Admin:", "").trim() || "";
-                    const combinedRemarks = [adminRemarks && `Admin: ${adminRemarks}`, userRemarks && `User: ${userRemarks}`].filter(Boolean).join(" · ") || "—";
-
+                    const remarks = String(item.vendorRecord.remarks || "").split("|").map((r: string) => r.trim()).filter(Boolean).join(" · ");
                     const isPayed = status === "Payed";
                     const isApproved = status === "Approved";
                     const isRejected = status === "Rejected";
                     const isHighlighted = highlightGrn && item.GRN_No.toLowerCase() === highlightGrn.toLowerCase();
-                    const rowNum = (currentPage - 1) * itemsPerPage + idx + 1;
+                    const late = !isPayed && !isRejected && item.rawPlannedDate && item.rawPlannedDate.getTime() < Date.now();
+                    const vendorKnown = item.vendorName && item.vendorName !== "—" && item.vendorName !== item.filled_by;
 
                     return (
                       <tr
                         key={item.id}
                         ref={isHighlighted ? highlightRowRef : undefined}
-                        className={`transition-colors ${isHighlighted ? "bg-amber-50 dark:bg-amber-900/20 ring-2 ring-amber-400 ring-inset" : "hover:bg-slate-50/80 dark:hover:bg-white/5"}`}
+                        className={`align-top transition-colors ${isHighlighted ? "bg-[#EFF4FF] dark:bg-blue-900/20" : "hover:bg-[#F7F8FA] dark:hover:bg-white/5"}`}
                       >
-                        <td className="px-3 py-3 text-[14px] font-bold text-slate-400">{rowNum}</td>
                         <td className="px-3 py-3">
-                          <div className="flex flex-col gap-1">
-                            <span className="text-[14px] font-semibold text-blue-600 dark:text-blue-400">{item.GRN_No}</span>
-                            <span className="text-[13px] font-bold text-slate-500">{item.PO_Number || "—"}</span>
+                          <p className="text-[14px] font-semibold text-[#1A1D21] dark:text-white">{item.GRN_No}</p>
+                          <p className="text-[13px] text-[#5B6472]">{item.PO_Number || "—"}</p>
+                          <p className="text-[13px] text-[#5B6472]">{item.grnDate}</p>
+                        </td>
+                        <td className="px-3 py-3">
+                          <p className="text-[14px] font-semibold text-[#1A1D21] dark:text-white break-words">{item.Item_Name || "—"}</p>
+                          <p className="text-[13px] text-[#5B6472] break-words">{vendorKnown ? item.vendorName : "Vendor not linked"}</p>
+                          <p className="text-[13px] text-[#5B6472]">{[item.Category, item.Country].filter(Boolean).join(" · ")}</p>
+                        </td>
+                        <td className="px-3 py-3 text-right text-[14px] font-semibold text-[#1A1D21] dark:text-white tabular-nums">{formatQty(item.Qty)}</td>
+                        <td className="px-3 py-3">
+                          <p className="text-[14px] text-[#1A1D21] dark:text-white">
+                            {item.Payment_Terms_In_days !== undefined && String(item.Payment_Terms_In_days).trim() !== "" ? `${item.Payment_Terms_In_days} days` : "Terms not set"}
+                          </p>
+                          {item.calculatedPlannedDate && item.calculatedPlannedDate !== "—" ? (
+                            <p className={`text-[13px] ${late ? "text-[#DC2626] font-semibold" : "text-[#5B6472]"}`}>Pay by {item.calculatedPlannedDate}</p>
+                          ) : null}
+                        </td>
+                        <td className="px-3 py-3">
+                          <div className="flex flex-col items-start gap-1.5">
+                            <CheckChip label="Qty" actual={item.actual_1} status={item.status_1} />
+                            <CheckChip label="Quality" actual={item.actual_3} status={item.status_3} />
                           </div>
                         </td>
                         <td className="px-3 py-3">
-                          <div className="space-y-1 text-[13px] font-semibold text-slate-600 dark:text-slate-300">
-                            <p><span className="text-slate-400">GRN:</span> {item.grnDate}</p>
-                            <p><span className="text-slate-400">I2R:</span> {item.createdAt}</p>
-                            <p><span className="text-emerald-600 font-bold">Plan:</span> {item.calculatedPlannedDate}</p>
-                          </div>
-                        </td>
-                        <td className="px-3 py-3">
-                          <p className="text-[14px] font-bold text-slate-800 dark:text-white max-w-[120px] truncate" title={item.vendorName}>{item.vendorName}</p>
-                        </td>
-                        <td className="px-3 py-3">
-                          <div className="max-w-[140px]">
-                            <p className="text-[14px] font-semibold text-slate-700 dark:text-slate-200 truncate" title={item.Item_Name}>{item.Item_Name}</p>
-                            <p className="text-[13px] text-slate-400 truncate">{item.Category} · {item.Country || "—"}</p>
-                          </div>
-                        </td>
-                        <td className="px-3 py-3 text-right">
-                          <span className="text-[14px] font-semibold text-slate-800 dark:text-white tabular-nums">
-                            {item.Qty != null && String(item.Qty).trim() !== "" ? item.Qty : "—"}
-                          </span>
-                        </td>
-                        <td className="px-3 py-3 text-[14px] font-bold text-slate-700 dark:text-slate-200 whitespace-nowrap">
-                          {item.Payment_Terms_In_days ? `${item.Payment_Terms_In_days} Days` : "—"}
-                        </td>
-                        <td className="px-3 py-3 text-center"><GrnCheckBadge actual={item.actual_1} status={item.status_1} /></td>
-                        <td className="px-3 py-3 text-center"><GrnCheckBadge actual={item.actual_3} status={item.status_3} /></td>
-                        <td className="px-3 py-3 text-center"><PaymentStatusPill status={status || ""} /></td>
-                        <td className="px-3 py-3">
-                          <p className="text-[13px] font-semibold text-slate-600 dark:text-slate-300 line-clamp-2 max-w-[140px]" title={combinedRemarks}>{combinedRemarks}</p>
-                        </td>
-                        <td className="px-3 py-3">
-                          <div className="flex flex-col items-center gap-1.5 min-w-[100px]">
-                            {isPayed ? (
-                              <span className="text-[13px] font-semibold text-emerald-600">Completed</span>
-                            ) : isRejected ? (
-                              <span className="text-[13px] font-semibold text-rose-600">Blocked</span>
-                            ) : isApproved && isUser ? (
-                              <button
-                                onClick={() => openActionModal(item.GRN_No, "Payed")}
-                                disabled={actionLoading === item.GRN_No}
-                                className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-[13px] font-semibold shadow-sm disabled:opacity-50"
-                              >
-                                {actionLoading === item.GRN_No ? "..." : "Mark Paid"}
-                              </button>
-                            ) : isApproved ? (
-                              <span className="text-[13px] font-bold text-blue-600">Ready</span>
-                            ) : isAdmin ? (
-                              <div className="flex flex-col gap-1 w-full">
+                          <MobileStatusPill status={status || ""} />
+                          {remarks ? <p className="mt-1.5 text-[13px] text-[#5B6472] line-clamp-2 break-words" title={remarks}>{remarks}</p> : null}
+                          <div className="flex flex-wrap items-center gap-2 mt-2">
+                            {!isPayed && !isRejected && !isApproved && isAdmin ? (
+                              <>
                                 <button
                                   onClick={() => openActionModal(item.GRN_No, "Approved")}
                                   disabled={actionLoading === item.GRN_No}
-                                  className="px-2 py-1 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-[13px] font-semibold shadow-sm disabled:opacity-50"
+                                  className="h-9 px-3 rounded-lg bg-[#15803D] text-white text-[13px] font-semibold disabled:opacity-50"
                                 >
-                                  Approve
+                                  {actionLoading === item.GRN_No ? "Saving…" : "Approve"}
                                 </button>
                                 <button
                                   onClick={() => openActionModal(item.GRN_No, "Rejected")}
                                   disabled={actionLoading === item.GRN_No}
-                                  className="px-2 py-1 rounded-lg bg-gradient-to-r from-rose-500 to-red-600 text-white text-[13px] font-semibold shadow-sm disabled:opacity-50"
+                                  className="h-9 px-3 rounded-lg border border-[#FECACA] text-[#DC2626] bg-white text-[13px] font-semibold disabled:opacity-50"
                                 >
                                   Reject
                                 </button>
-                              </div>
-                            ) : (
-                              <span className="text-[13px] font-bold text-slate-400">Awaiting MD</span>
-                            )}
-                            {item.Attach_Bill && (
-                              <a href={item.Attach_Bill} target="_blank" rel="noopener noreferrer" className="text-[13px] font-bold text-blue-600 hover:underline">
-                                View Bill
+                              </>
+                            ) : null}
+                            {isApproved && isUser ? (
+                              <button
+                                onClick={() => openActionModal(item.GRN_No, "Payed")}
+                                disabled={actionLoading === item.GRN_No}
+                                className="h-9 px-3 rounded-lg bg-[#15803D] text-white text-[13px] font-semibold disabled:opacity-50"
+                              >
+                                {actionLoading === item.GRN_No ? "Saving…" : "Mark Paid"}
+                              </button>
+                            ) : null}
+                            {!isPayed && !isRejected && !isApproved && !isAdmin ? (
+                              <span className="text-[13px] text-[#5B6472]">Waiting for MD</span>
+                            ) : null}
+                            {item.Attach_Bill ? (
+                              <a href={item.Attach_Bill} target="_blank" rel="noopener noreferrer" className="text-[13px] font-semibold text-[#2563EB] hover:underline">
+                                View bill
                               </a>
-                            )}
+                            ) : null}
                           </div>
                         </td>
                       </tr>
@@ -765,19 +947,20 @@ export default function PaymentVendorApprovalPage() {
                   })}
                   {paginatedItems.length === 0 && (
                     <tr>
-                      <td colSpan={12} className="py-16 text-center text-[14px] font-semibold text-slate-400">
-                        No records match your filters
+                      <td colSpan={6} className="py-16 text-center text-[14px] text-[#5B6472]">
+                        Nothing here. Try another tab or clear the search.
                       </td>
                     </tr>
                   )}
                 </tbody>
               </table>
+              </div>
             </div>
           )}
 
           {/* Pagination */}
           <div className="px-4 py-3 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-slate-900/30 shrink-0">
-            <p className="text-[13px] font-semibold text-slate-400">
+            <p className="text-[13px] font-semibold text-[#5B6472]">
               Showing {paginatedItems.length > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0}–{Math.min(currentPage * itemsPerPage, filteredItems.length)} of {filteredItems.length}
             </p>
             <div className="flex items-center gap-2">
@@ -802,7 +985,7 @@ export default function PaymentVendorApprovalPage() {
         </div>
 
         {/* Footer info panels */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div className="hidden md:grid grid-cols-1 md:grid-cols-3 gap-3">
           <div className="rounded-2xl border border-blue-200/60 dark:border-blue-500/20 bg-gradient-to-br from-blue-50/80 via-white to-indigo-50/60 dark:from-blue-950/30 dark:via-slate-900 dark:to-indigo-950/20 p-4 shadow-md shadow-blue-500/5">
             <h3 className="text-[14px] font-semibold text-blue-600 dark:text-blue-400 mb-3">Approval Workflow</h3>
             <ul className="space-y-2 text-[14px] text-slate-600 dark:text-slate-300">
@@ -839,7 +1022,7 @@ export default function PaymentVendorApprovalPage() {
               </h2>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="p-1 text-gray-400 hover:text-gray-700 dark:hover:text-white transition-colors"
+                className="p-1 text-[#5B6472] hover:text-gray-700 dark:hover:text-white transition-colors"
               >
                 <XMarkIcon className="w-5 h-5" />
               </button>
@@ -851,11 +1034,10 @@ export default function PaymentVendorApprovalPage() {
               </p>
 
               <div className="flex flex-col gap-1.5">
-                <label className="text-[13px] font-semibold text-gray-400">
+                <label className="text-[13px] font-semibold text-[#5B6472]">
                   Remarks (Optional)
                 </label>
                 <textarea
-                  autoFocus
                   value={modalRemarks}
                   onChange={(e) => setModalRemarks(e.target.value)}
                   placeholder="Enter any remarks..."
@@ -867,13 +1049,13 @@ export default function PaymentVendorApprovalPage() {
             <div className="p-4 bg-gray-50/50 dark:bg-[#0B101E]/50 border-t border-gray-100 dark:border-white/5 flex items-center justify-end gap-3">
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="px-4 py-2 text-[14px] font-semibold text-gray-500 hover:text-gray-800 dark:text-slate-400 dark:hover:text-white transition-colors"
+                className="h-11 px-4 text-[14px] font-semibold text-gray-500 hover:text-gray-800 dark:text-slate-400 dark:hover:text-white transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={confirmAction}
-                className={`px-6 py-2 text-[14px] font-semibold   text-white rounded-lg shadow-md transition-all
+                className={`h-11 px-6 text-[15px] font-semibold text-white rounded-lg shadow-md transition-all
                   ${modalActionType === 'Approved' ? 'bg-emerald-600 hover:bg-emerald-700'
                     : modalActionType === 'Rejected' ? 'bg-red-600 hover:bg-red-700'
                       : 'bg-[#2563EB] hover:bg-[#1D4ED8] dark:bg-[#60A5FA] dark:hover:bg-[#E6C000] dark:text-black'}
@@ -927,7 +1109,7 @@ export default function PaymentVendorApprovalPage() {
 
               {/* Workflow Diagram */}
               <section>
-                <h3 className="text-[13px] font-semibold text-gray-400 mb-3 flex items-center gap-2">
+                <h3 className="text-[13px] font-semibold text-[#5B6472] mb-3 flex items-center gap-2">
                   <span className="w-6 h-0.5 bg-[#2563EB] rounded-full" />
                   Approval Workflow Diagram
                 </h3>
@@ -967,12 +1149,12 @@ export default function PaymentVendorApprovalPage() {
                       <div className="flex flex-col items-center gap-1 p-2 rounded-xl bg-red-50 dark:bg-red-950/30 border border-red-100 dark:border-red-900/40">
                         <XCircleIcon className="w-4 h-4 text-red-500" />
                         <span className="text-[13px] font-semibold text-red-600 dark:text-red-400">Rejected</span>
-                        <span className="text-[12px] text-center text-red-500/80">Payment blocked</span>
+                        <span className="text-[14px] text-center text-red-500/80">Payment blocked</span>
                       </div>
                       <div className="flex flex-col items-center gap-1 p-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/40">
                         <CheckCircleIcon className="w-4 h-4 text-emerald-500" />
                         <span className="text-[13px] font-semibold text-emerald-600 dark:text-emerald-400">Approved</span>
-                        <span className="text-[12px] text-center text-emerald-600/80 flex items-center gap-0.5">
+                        <span className="text-[14px] text-center text-emerald-600/80 flex items-center gap-0.5">
                           <BellIcon className="w-2.5 h-2.5" /> WhatsApp Himanshi
                         </span>
                       </div>
@@ -994,7 +1176,7 @@ export default function PaymentVendorApprovalPage() {
                       </div>
                     </div>
                     <div className="flex justify-center">
-                      <ArrowRightIcon className="w-4 h-4 rotate-90 text-gray-400" />
+                      <ArrowRightIcon className="w-4 h-4 rotate-90 text-[#5B6472]" />
                     </div>
                     {/* Step 4 */}
                     <div className="flex items-center gap-3 p-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg shadow-emerald-500/20">
@@ -1012,21 +1194,21 @@ export default function PaymentVendorApprovalPage() {
 
               {/* Status Filter Cards */}
               <section>
-                <h3 className="text-[13px] font-semibold text-gray-400 mb-3 flex items-center gap-2">
+                <h3 className="text-[13px] font-semibold text-[#5B6472] mb-3 flex items-center gap-2">
                   <span className="w-6 h-0.5 bg-[#2563EB] rounded-full" />
                   Status Filter Tabs
                 </h3>
                 <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
                   {[
                     { label: "All", desc: "Every record", color: "from-slate-500 to-slate-600" },
-                    { label: "Pending Approval", desc: "Awaiting MD", color: "from-orange-400 to-amber-500" },
+                    { label: "Pending Approval", desc: "Awaiting MD", color: "from-[#F7F8FA] to-amber-500" },
                     { label: "Pending Payment", desc: "MD approved", color: "from-blue-500 to-indigo-600" },
                     { label: "Payed", desc: "Completed", color: "from-emerald-500 to-green-600" },
                     { label: "Rejected", desc: "MD declined", color: "from-red-500 to-rose-600" },
                   ].map((tab) => (
                     <div key={tab.label} className={`rounded-xl p-3 bg-gradient-to-br ${tab.color} text-white shadow-md`}>
                       <p className="text-[13px] font-semibold tracking-wide leading-tight">{tab.label}</p>
-                      <p className="text-[12px] font-bold opacity-80 mt-1">{tab.desc}</p>
+                      <p className="text-[14px] font-bold opacity-80 mt-1">{tab.desc}</p>
                     </div>
                   ))}
                 </div>
@@ -1034,7 +1216,7 @@ export default function PaymentVendorApprovalPage() {
 
               {/* Data & Notifications */}
               <section>
-                <h3 className="text-[13px] font-semibold text-gray-400 mb-3 flex items-center gap-2">
+                <h3 className="text-[13px] font-semibold text-[#5B6472] mb-3 flex items-center gap-2">
                   <span className="w-6 h-0.5 bg-[#2563EB] rounded-full" />
                   Data & Notifications
                 </h3>
@@ -1090,21 +1272,21 @@ export default function PaymentVendorApprovalPage() {
               {/* Tools row */}
               <section className="grid md:grid-cols-3 gap-2">
                 <div className="flex items-start gap-2 p-3 rounded-xl bg-gray-50 dark:bg-navy-900/40 border border-gray-100 dark:border-white/5">
-                  <MagnifyingGlassIcon className="w-4 h-4 text-gray-400 shrink-0 mt-0.5" />
+                  <MagnifyingGlassIcon className="w-4 h-4 text-[#5B6472] shrink-0 mt-0.5" />
                   <div>
                     <p className="text-[13px] font-semibold text-gray-700 dark:text-slate-300">Search</p>
                     <p className="text-[13px] text-gray-500 dark:text-slate-500 mt-0.5">GRN, PO, item, category, country…</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-2 p-3 rounded-xl bg-gray-50 dark:bg-navy-900/40 border border-gray-100 dark:border-white/5">
-                  <CalendarIcon className="w-4 h-4 text-gray-400 shrink-0 mt-0.5" />
+                  <CalendarIcon className="w-4 h-4 text-[#5B6472] shrink-0 mt-0.5" />
                   <div>
                     <p className="text-[13px] font-semibold text-gray-700 dark:text-slate-300">Date Filters</p>
                     <p className="text-[13px] text-gray-500 dark:text-slate-500 mt-0.5">Day / Week / Month / Custom range on Planned Date</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-2 p-3 rounded-xl bg-gray-50 dark:bg-navy-900/40 border border-gray-100 dark:border-white/5">
-                  <ArrowDownTrayIcon className="w-4 h-4 text-gray-400 shrink-0 mt-0.5" />
+                  <ArrowDownTrayIcon className="w-4 h-4 text-[#5B6472] shrink-0 mt-0.5" />
                   <div>
                     <p className="text-[13px] font-semibold text-gray-700 dark:text-slate-300">Export CSV</p>
                     <p className="text-[13px] text-gray-500 dark:text-slate-500 mt-0.5">Download filtered list with remarks</p>

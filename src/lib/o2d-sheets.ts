@@ -26,7 +26,7 @@ class O2DService extends BaseSheetsService<O2D> {
 
   protected spreadsheetId = GOOGLE_SHEET_ID;
   protected sheetName: string;
-  protected range = "A:BI";
+  protected range = "A:BZ"; // BJ = Hold_Hours (2026-10-29)
   protected idColumnIndex = 0;
 
   constructor(sheetName: string = SHEET_NAME) {
@@ -67,6 +67,8 @@ class O2DService extends BaseSheetsService<O2D> {
       updated_at: get("updated_at"),
       hold: get("hold"),
       cancelled: get("cancelled"),
+      hold_hours: get("hold_hours"),
+      so_check: get("so_check"),
     };
 
     for (let i = 1; i <= 11; i++) {
@@ -129,6 +131,9 @@ class O2DService extends BaseSheetsService<O2D> {
     set("updated_at", o2d.updated_at);
     set("hold", o2d.hold || "");
     set("cancelled", o2d.cancelled || "");
+    // undefined = leave the cell as it is (Sheets skips nulls)
+    set("hold_hours", o2d.hold_hours);
+    set("so_check", o2d.so_check);
     for (let i = 1; i <= 11; i++) {
       set(`planned_${i}`, (o2d as any)[`planned_${i}`]);
       set(`actual_${i}`, (o2d as any)[`actual_${i}`]);
@@ -347,6 +352,13 @@ class O2DService extends BaseSheetsService<O2D> {
     // Use base class logic to stamp ZZ1 meta-timestamp
     void this.writeLastModified();
     return true;
+  }
+
+  /** Write one value into a column (e.g. "planned_5") on every row of an order. */
+  async updateOrderColumn(orderNo: string, column: string, value: string): Promise<boolean> {
+    if (column === "hold_hours") await this.ensureColumns(["Hold_Hours"]);
+    if (column === "so_check") await this.ensureColumns(["SO_Check"]);
+    return this.updateOrderToggleStatus(orderNo, column as any, value);
   }
 
   async removeFollowUp(orderNo: string, startStep: number, onlyThisStep: boolean): Promise<boolean> {

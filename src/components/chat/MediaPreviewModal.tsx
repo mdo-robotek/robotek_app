@@ -291,7 +291,7 @@ export default function MediaPreviewModal({
                   ) : (
                     <div className="w-full h-full bg-gray-100 flex flex-col items-center justify-center p-1">
                       <DocumentIcon className="w-6 h-6 text-gray-600" />
-                      <span className="text-[12px] text-gray-500 truncate w-full text-center mt-0.5">
+                      <span className="text-[14px] text-gray-500 truncate w-full text-center mt-0.5">
                         {item.label.split(".").pop()?.toUpperCase() || "DOC"}
                       </span>
                     </div>

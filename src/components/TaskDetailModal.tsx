@@ -51,13 +51,13 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ isOpen, onClose, titl
         >
           <div>
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white tracking-tight">{title}</h2>
-            <p className="text-[13px] font-bold text-gray-400">Detailed Task Breakdown</p>
+            <p className="text-[13px] font-bold text-[#5B6472]">Detailed Task Breakdown</p>
           </div>
           <button 
             onClick={onClose} 
             className="p-2 hover:bg-gray-100 dark:hover:bg-white/5 rounded-full transition-colors"
           >
-            <XMarkIcon className="w-8 h-8 text-gray-400" />
+            <XMarkIcon className="w-8 h-8 text-[#5B6472]" />
           </button>
         </div>
 
@@ -68,7 +68,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ isOpen, onClose, titl
         >
           <div className="grid grid-cols-1 gap-3">
             {tasks.length === 0 ? (
-              <div className="py-20 text-center text-gray-400 italic font-bold">No tasks found for this period</div>
+              <div className="py-20 text-center text-[#5B6472] italic font-bold">No tasks found for this period</div>
             ) : (
               tasks.map((task, idx) => (
                 <div 
@@ -115,15 +115,15 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ isOpen, onClose, titl
         >
           <div className="flex gap-6">
             <div className="text-center">
-              <p className="text-[13px] font-semibold text-gray-400">Total</p>
+              <p className="text-[13px] font-semibold text-[#5B6472]">Total</p>
               <p className="text-sm font-semibold text-gray-900 dark:text-white">{tasks.length}</p>
             </div>
             <div className="text-center">
-              <p className="text-[13px] font-semibold text-gray-400">Late</p>
+              <p className="text-[13px] font-semibold text-[#5B6472]">Late</p>
               <p className="text-sm font-semibold text-rose-500">{tasks.filter(t => t.isLate).length}</p>
             </div>
             <div className="text-center">
-              <p className="text-[13px] font-semibold text-gray-400">Success</p>
+              <p className="text-[13px] font-semibold text-[#5B6472]">Success</p>
               <p className="text-sm font-semibold text-emerald-500">
                 {tasks.length > 0 ? Math.round((tasks.filter(t => t.actualDate && !t.isLate).length / tasks.length) * 100) : 0}%
               </p>

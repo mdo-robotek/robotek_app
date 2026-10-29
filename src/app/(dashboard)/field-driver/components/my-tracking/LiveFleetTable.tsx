@@ -55,16 +55,16 @@ export default function LiveFleetTable() {
   return (
     <FieldCard title="Live Tracking (All Users)" compact>
       {loading ? (
-        <p className="text-sm text-gray-400 text-center py-6">Loading fleet data...</p>
+        <p className="text-sm text-[#5B6472] text-center py-6">Loading fleet data...</p>
       ) : rows.length === 0 ? (
-        <p className="text-sm text-gray-400 text-center py-6">No field movement recorded today</p>
+        <p className="text-sm text-[#5B6472] text-center py-6">No field movement recorded today</p>
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full text-left text-[14px]">
             <thead>
               <tr className="border-b border-gray-100 dark:border-white/10">
                 {['User ID', 'Name', 'Date', 'Location', 'Status'].map((h) => (
-                  <th key={h} className="py-2 px-2 font-semibold tracking-wider text-gray-400 text-[13px]">
+                  <th key={h} className="py-2 px-2 font-semibold tracking-wider text-[#5B6472] text-[13px]">
                     {h}
                   </th>
                 ))}

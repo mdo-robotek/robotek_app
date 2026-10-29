@@ -220,11 +220,13 @@ export default function UsersPage() {
         });
         fetchUsers();
       } else {
-        throw new Error("Failed to save user");
+        // Show the server's reason (e.g. "Only admins can add, change or remove users.")
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body?.error || "Something went wrong while saving. Please try again.");
       }
     } catch (error) {
       setIsStatusModalOpen(false); // Close loader on error too
-      alert("Something went wrong while saving. Please try again.");
+      alert(error instanceof Error ? error.message : "Something went wrong while saving. Please try again.");
     }
   };
 
@@ -401,11 +403,12 @@ export default function UsersPage() {
         setIsStatusModalOpen(false); // Close loader immediately
         fetchUsers();
       } else {
-        throw new Error("Delete failed");
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body?.error || "Delete failed");
       }
     } catch (error) {
       setIsStatusModalOpen(false); // Close loader on error too
-      alert("Failed to delete user. Please try again.");
+      alert(error instanceof Error && error.message !== "Delete failed" ? error.message : "Failed to delete user. Please try again.");
     } finally {
       setPendingDeleteId(null);
     }
@@ -432,14 +435,17 @@ export default function UsersPage() {
         body: JSON.stringify({ ...user, permissions: newPermissions }),
       });
 
-      if (!res.ok) throw new Error("Failed to update permissions");
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body?.error || "Failed to update permission. Please try again.");
+      }
     } catch (error) {
       console.error(error);
       // Revert on error
       setUsers(prev => prev.map(u => 
         u.id === userId ? { ...u, permissions: currentPermissions } : u
       ));
-      alert("Failed to update permission. Please try again.");
+      alert(error instanceof Error ? error.message : "Failed to update permission. Please try again.");
     }
   };
 
@@ -503,7 +509,7 @@ export default function UsersPage() {
         <div className="flex flex-col lg:flex-row items-center gap-4 px-1">
         <div className="w-full lg:w-1/3 text-center lg:text-left min-w-0">
           <h1 className="text-xl md:text-2xl font-semibold text-gray-900 dark:text-white tracking-tight">Users</h1>
-          <p className="text-gray-500 dark:text-slate-300 font-bold text-[12px] md:text-[10px] tracking-wider">System Access Control</p>
+          <p className="text-gray-500 dark:text-slate-300 font-bold text-[14px] md:text-[10px] tracking-wider">System Access Control</p>
         </div>
         
         <div className="w-full lg:w-1/3 flex justify-center flex-shrink-0 min-w-0">
@@ -515,7 +521,7 @@ export default function UsersPage() {
               className={`flex items-center gap-2 px-3 md:px-5 py-1.5 font-semibold   text-[13px] md:text-[10px] transition-all rounded-full whitespace-nowrap ${
                 activeTab === 'list' 
                 ? 'bg-[#2563EB] dark:bg-[#60A5FA] text-white dark:text-black shadow-md' 
-                : 'text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300'
+                : 'text-[#5B6472] dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300'
               }`}
               title="User List"
             >
@@ -530,7 +536,7 @@ export default function UsersPage() {
               className={`flex items-center gap-2 px-3 md:px-5 py-1.5 font-semibold   text-[13px] md:text-[10px] transition-all rounded-full whitespace-nowrap ${
                 activeTab === 'visibility' 
                 ? 'bg-[#2563EB] dark:bg-[#60A5FA] text-white dark:text-black shadow-md' 
-                : 'text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300'
+                : 'text-[#5B6472] dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300'
               }`}
               title="Page Visibility"
             >
@@ -590,7 +596,7 @@ export default function UsersPage() {
             className="px-3 md:px-4 py-3 flex flex-col lg:flex-row lg:items-center justify-between gap-4"
           >
             <div className="relative group flex-1 max-w-full lg:max-w-sm">
-              <MagnifyingGlassIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-[#2563EB] transition-colors" />
+              <MagnifyingGlassIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5B6472] group-focus-within:text-[#2563EB] transition-colors" />
               <input
                 type="text"
                 placeholder="Search database..."
@@ -602,19 +608,19 @@ export default function UsersPage() {
 
             <div className="flex flex-wrap items-center gap-3 md:gap-4">
               <div className="flex items-center gap-2">
-                <p className="text-[13px] md:text-[10px] font-semibold text-gray-400 whitespace-nowrap">
+                <p className="text-[13px] md:text-[10px] font-semibold text-[#5B6472] whitespace-nowrap">
                   Page <span className="text-[#2563EB] dark:text-[#60A5FA]">{currentPage}</span> of {totalPages || 1}
                 </p>
                 <div className="flex gap-0.5">
-                  <button onClick={() => setCurrentPage(1)} disabled={currentPage === 1} className="px-1.5 py-1 text-[13px] md:text-[10px] font-bold text-gray-400 hover:text-black dark:hover:text-white hover:bg-white dark:hover:bg-white/5 disabled:opacity-30 rounded-md transition-all whitespace-nowrap">First</button>
-                  <button onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))} disabled={currentPage === 1} className="p-1 text-gray-400 hover:text-black dark:hover:text-white hover:bg-white dark:hover:bg-white/5 disabled:opacity-30 rounded-md transition-all"><ChevronLeftIcon className="w-3.5 h-3.5" /></button>
-                  <button onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))} disabled={currentPage === totalPages || totalPages === 0} className="p-1 text-gray-400 hover:text-black dark:hover:text-white hover:bg-white dark:hover:bg-white/5 disabled:opacity-30 rounded-md transition-all"><ChevronRightIcon className="w-3.5 h-3.5" /></button>
-                  <button onClick={() => setCurrentPage(totalPages)} disabled={currentPage === totalPages || totalPages === 0} className="px-1.5 py-1 text-[13px] md:text-[10px] font-bold text-gray-400 hover:text-black dark:hover:text-white hover:bg-white dark:hover:bg-white/5 disabled:opacity-30 rounded-md transition-all whitespace-nowrap">Last</button>
+                  <button onClick={() => setCurrentPage(1)} disabled={currentPage === 1} className="px-1.5 py-1 text-[13px] md:text-[10px] font-bold text-[#5B6472] hover:text-black dark:hover:text-white hover:bg-white dark:hover:bg-white/5 disabled:opacity-30 rounded-md transition-all whitespace-nowrap">First</button>
+                  <button onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))} disabled={currentPage === 1} className="p-1 text-[#5B6472] hover:text-black dark:hover:text-white hover:bg-white dark:hover:bg-white/5 disabled:opacity-30 rounded-md transition-all"><ChevronLeftIcon className="w-3.5 h-3.5" /></button>
+                  <button onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))} disabled={currentPage === totalPages || totalPages === 0} className="p-1 text-[#5B6472] hover:text-black dark:hover:text-white hover:bg-white dark:hover:bg-white/5 disabled:opacity-30 rounded-md transition-all"><ChevronRightIcon className="w-3.5 h-3.5" /></button>
+                  <button onClick={() => setCurrentPage(totalPages)} disabled={currentPage === totalPages || totalPages === 0} className="px-1.5 py-1 text-[13px] md:text-[10px] font-bold text-[#5B6472] hover:text-black dark:hover:text-white hover:bg-white dark:hover:bg-white/5 disabled:opacity-30 rounded-md transition-all whitespace-nowrap">Last</button>
                 </div>
               </div>
               <div className="hidden xs:block h-4 w-[1px] bg-gray-200 dark:bg-white/10" />
               <div className="flex items-center gap-2">
-                <label className="text-[13px] md:text-[10px] font-semibold text-gray-400">Show</label>
+                <label className="text-[13px] md:text-[10px] font-semibold text-[#5B6472]">Show</label>
                 <select 
                   value={itemsPerPage}
                   onChange={(e) => { setItemsPerPage(Number(e.target.value)); setCurrentPage(1); }}
@@ -656,13 +662,13 @@ export default function UsersPage() {
                   <div className="flex items-center">Dept/Desig <SortIcon column="department" /></div>
                 </th>
                 <th onClick={() => handleSort('dob')} className="px-3 md:px-4 py-3 text-[13px] md:text-[10px] font-semibold cursor-pointer hover:bg-white/5 transition-colors hidden lg:table-cell">
-                  <div className="flex items-center">DOB <SortIcon column="dob" /></div>
+                  <div className="flex items-center">Dob <SortIcon column="dob" /></div>
                 </th>
                 <th onClick={() => handleSort('anniversary_date')} className="px-3 md:px-4 py-3 text-[13px] md:text-[10px] font-semibold cursor-pointer hover:bg-white/5 transition-colors hidden lg:table-cell">
                   <div className="flex items-center">Anniv. <SortIcon column="anniversary_date" /></div>
                 </th>
                 <th onClick={() => handleSort('doj')} className="px-3 md:px-4 py-3 text-[13px] md:text-[10px] font-semibold cursor-pointer hover:bg-white/5 transition-colors hidden lg:table-cell">
-                  <div className="flex items-center">DOJ <SortIcon column="doj" /></div>
+                  <div className="flex items-center">Doj <SortIcon column="doj" /></div>
                 </th>
                 <th onClick={() => handleSort('late_long')} className="px-3 md:px-4 py-3 text-[13px] md:text-[10px] font-semibold cursor-pointer hover:bg-white/5 transition-colors hidden xl:table-cell">
                   <div className="flex items-center">Site Locations <SortIcon column="late_long" /></div>
@@ -673,23 +679,23 @@ export default function UsersPage() {
                 <th className="px-3 md:px-4 py-3 text-[13px] md:text-[10px] font-semibold text-right">Actions</th>
               </tr>
             </thead>
-          <tbody className="divide-y divide-orange-50/30">
+          <tbody className="divide-y divide-[#E5E7EB]">
             {isLoading ? (
               <tr>
                 <td colSpan={9} className="px-4 py-10 text-center">
                   <div className="w-6 h-6 border-2 border-gray-100 border-t-[#2563EB] rounded-full animate-spin mx-auto mb-2" />
-                  <p className="text-gray-400 font-bold text-[12px]">Syncing...</p>
+                  <p className="text-[#5B6472] font-bold text-[14px]">Syncing...</p>
                 </td>
               </tr>
             ) : paginatedUsers.length === 0 ? (
               <tr>
                 <td colSpan={9} className="px-4 py-10 text-center">
-                  <p className="text-[14px] text-gray-400 font-bold">No entries found</p>
+                  <p className="text-[14px] text-[#5B6472] font-bold">No entries found</p>
                 </td>
               </tr>
             ) : (
               paginatedUsers.map((user) => (
-                <tr key={user.id} className="hover:bg-orange-50/10 border-b-2 border-gray-200 dark:border-white/10 last:border-0 transition-colors group">
+                <tr key={user.id} className="hover:bg-[#F7F8FA] border-b-2 border-gray-200 dark:border-white/10 last:border-0 transition-colors group">
                   <td className="px-3 md:px-4 py-3">
                     <span className="font-mono text-[13px] md:text-sm text-gray-900 dark:text-white font-semibold">{user.id}</span>
                   </td>
@@ -707,14 +713,14 @@ export default function UsersPage() {
                             }}
                           />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center font-semibold text-gray-400 dark:text-zinc-500 text-[13px]">
+                          <div className="w-full h-full flex items-center justify-center font-semibold text-[#5B6472] dark:text-zinc-500 text-[13px]">
                             {user.username?.substring(0, 2).toUpperCase()}
                           </div>
                         )}
                       </div>
                       <div className="min-w-0">
                         <p className="font-semibold text-[14px] md:text-xs text-gray-900 dark:text-white leading-tight truncate">{user.username}</p>
-                        <p className="text-[13px] md:text-[10px] text-gray-400 dark:text-slate-400 font-bold lowercase truncate max-w-[80px] md:max-w-[120px]">{user.email}</p>
+                        <p className="text-[13px] md:text-[10px] text-[#5B6472] dark:text-slate-400 font-bold lowercase truncate max-w-[80px] md:max-w-[120px]">{user.email}</p>
                       </div>
                     </div>
                   </td>
@@ -722,12 +728,12 @@ export default function UsersPage() {
                     <p className="text-[14px] md:text-xs font-bold text-gray-600 dark:text-slate-300">{user.phone || "—"}</p>
                   </td>
                   <td className="px-3 md:px-4 py-3 hidden lg:table-cell">
-                    <span className="px-1.5 md:px-2 py-0.5 bg-[#2563EB]/5 dark:bg-[#60A5FA]/10 text-white dark:text-[#60A5FA] text-[12px] md:text-[9px] font-semibold rounded border border-orange-100/50 dark:border-[#60A5FA]/20">
+                    <span className="px-1.5 md:px-2 py-0.5 bg-[#2563EB]/5 dark:bg-[#60A5FA]/10 text-[#2563EB] dark:text-[#60A5FA] text-[14px] md:text-[9px] font-semibold rounded border border-[#E5E7EB] dark:border-[#60A5FA]/20">
                       {user.office || "—"}
                     </span>
                   </td>
                   <td className="px-3 md:px-4 py-3 hidden lg:table-cell">
-                    <span className="inline-flex items-center px-1.5 md:px-2 py-0.5 bg-orange-50 dark:bg-[#60A5FA]/10 text-[#DC2626] dark:text-[#60A5FA] text-[12px] md:text-[10px] font-semibold rounded-md border border-orange-100 dark:border-[#60A5FA]/20">
+                    <span className="inline-flex items-center px-1.5 md:px-2 py-0.5 bg-[#F7F8FA] dark:bg-[#60A5FA]/10 text-[#DC2626] dark:text-[#60A5FA] text-[14px] md:text-[10px] font-semibold rounded-md border border-[#E5E7EB] dark:border-[#60A5FA]/20">
                       {user.role_name || "MEMBER"}
                     </span>
                   </td>
@@ -753,21 +759,21 @@ export default function UsersPage() {
                           if (user.late_long && (user.late_long.startsWith('[') || user.late_long.startsWith('{'))) {
                             const locs = JSON.parse(user.late_long);
                             return locs.map((l: any, i: number) => (
-                              <p key={i} className="text-[13px] font-bold text-gray-400 dark:text-slate-500 font-mono italic truncate max-w-[150px]">
+                              <p key={i} className="text-[13px] font-bold text-[#5B6472] dark:text-slate-500 font-mono italic truncate max-w-[150px]">
                                 <span className="text-[#2563EB] dark:text-[#60A5FA] not-italic mr-1">{l.name}:</span>
                                 {l.coords || "—"}
                               </p>
                             ));
                           }
-                          return <p className="text-[14px] md:text-xs font-bold text-gray-400 dark:text-slate-500 font-mono italic">{user.late_long || "—"}</p>;
+                          return <p className="text-[14px] md:text-xs font-bold text-[#5B6472] dark:text-slate-500 font-mono italic">{user.late_long || "—"}</p>;
                         } catch (e) {
-                          return <p className="text-[14px] md:text-xs font-bold text-gray-400 dark:text-slate-500 font-mono italic">{user.late_long || "—"}</p>;
+                          return <p className="text-[14px] md:text-xs font-bold text-[#5B6472] dark:text-slate-500 font-mono italic">{user.late_long || "—"}</p>;
                         }
                       })()}
                     </div>
                   </td>
                   <td className="px-3 md:px-4 py-3">
-                    <span className={`px-2 py-0.5 rounded-full text-[12px] font-semibold   border ${
+                    <span className={`px-2 py-0.5 rounded-full text-[14px] font-semibold   border ${
                       user.isActive 
                         ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' 
                         : 'bg-rose-500/10 text-rose-500 border-rose-500/20'
@@ -779,7 +785,7 @@ export default function UsersPage() {
                     <div className="flex items-center justify-end gap-1">
                       <button
                         onClick={() => handleEdit(user)}
-                        className="p-1.5 bg-[#2563EB]/10 text-white dark:bg-[#60A5FA]/10 dark:text-[#60A5FA] hover:bg-[#2563EB] hover:text-white dark:hover:bg-[#60A5FA] dark:hover:text-black rounded-lg transition-all"
+                        className="p-1.5 bg-[#2563EB]/10 text-[#2563EB] dark:bg-[#60A5FA]/10 dark:text-[#60A5FA] hover:bg-[#2563EB] hover:text-white dark:hover:bg-[#60A5FA] dark:hover:text-black rounded-lg transition-all"
                         title="Edit User"
                       >
                         <PencilSquareIcon className="w-3.5 h-3.5" />
@@ -815,7 +821,7 @@ export default function UsersPage() {
             className="px-3 md:px-4 py-3 flex flex-col lg:flex-row lg:items-center justify-between gap-4"
           >
             <div className="relative group flex-1 max-w-full lg:max-w-sm">
-              <MagnifyingGlassIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-[#2563EB] transition-colors" />
+              <MagnifyingGlassIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5B6472] group-focus-within:text-[#2563EB] transition-colors" />
               <input
                 type="text"
                 placeholder="Search user..."
@@ -839,7 +845,7 @@ export default function UsersPage() {
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-white/10">
                 {filteredUsers.map(user => (
-                  <tr key={user.id} className="hover:bg-orange-50/10 transition-colors group">
+                  <tr key={user.id} className="hover:bg-[#F7F8FA] transition-colors group">
                     <td className="px-3 md:px-6 py-3 md:py-4 border-r border-gray-200 dark:border-white/10 sticky left-0 bg-white dark:bg-[#131C2E] z-10">
                       <div className="flex items-center gap-2 md:gap-3">
                         <div className="w-7 h-7 md:w-8 md:h-8 rounded-lg bg-gray-50 dark:bg-zinc-800 overflow-hidden border border-gray-100 dark:border-zinc-700 flex-shrink-0">
@@ -851,14 +857,14 @@ export default function UsersPage() {
                               referrerPolicy="no-referrer"
                             />
                           ) : (
-                            <div className="w-full h-full flex items-center justify-center font-semibold text-gray-400 dark:text-zinc-500 text-[13px]">
+                            <div className="w-full h-full flex items-center justify-center font-semibold text-[#5B6472] dark:text-zinc-500 text-[13px]">
                               {user.username?.substring(0, 2).toUpperCase()}
                             </div>
                           )}
                         </div>
                         <div className="min-w-0">
                           <p className="font-semibold text-[14px] md:text-sm text-gray-900 dark:text-white leading-tight truncate">{user.username}</p>
-                          <p className="text-[13px] text-gray-400 font-bold tracking-wider truncate">{user.role_name || "MEMBER"}</p>
+                          <p className="text-[13px] text-[#5B6472] font-bold tracking-wider truncate">{user.role_name || "MEMBER"}</p>
                         </div>
                       </div>
                     </td>
@@ -869,7 +875,7 @@ export default function UsersPage() {
                           className={`w-7 h-7 rounded-full flex items-center justify-center transition-all transform active:scale-90 ${
                             user.permissions?.includes(page.id)
                               ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/30 rotate-0"
-                              : "bg-gray-100 dark:bg-white/5 text-gray-300 dark:text-gray-700 hover:bg-gray-200 dark:hover:bg-white/10"
+                              : "bg-gray-100 dark:bg-white/5 text-[#5B6472] dark:text-gray-700 hover:bg-gray-200 dark:hover:bg-white/10"
                           }`}
                         >
                           <CheckIcon className={`w-3.5 h-3.5 transition-all duration-300 ${
@@ -890,16 +896,16 @@ export default function UsersPage() {
       {isModalOpen && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-sm" onClick={() => setIsModalOpen(false)} />
-          <div className="relative bg-[#FFFFFF] dark:bg-navy-900 w-full max-w-xl rounded-2xl shadow-2xl border border-orange-100/50 dark:border-white/10 overflow-hidden animate-in fade-in zoom-in duration-300">
-            <div className="p-4 border-b border-orange-100/50 dark:border-zinc-800 flex items-center justify-between">
+          <div className="relative bg-[#FFFFFF] dark:bg-navy-900 w-full max-w-xl rounded-2xl shadow-2xl border border-[#E5E7EB] dark:border-white/10 overflow-hidden animate-in fade-in zoom-in duration-300">
+            <div className="p-4 border-b border-[#E5E7EB] dark:border-zinc-800 flex items-center justify-between">
               <div>
                 <h2 className="text-lg font-semibold text-gray-900 dark:text-white tracking-tight">
                   {editingUser ? "Edit User" : "Add New User"}
                 </h2>
                 <div className="flex items-center gap-2 mt-1">
-                  <p className="text-gray-400 dark:text-slate-400 font-bold text-[12px]">Profile Configuration</p>
+                  <p className="text-[#5B6472] dark:text-slate-400 font-bold text-[14px]">Profile Configuration</p>
                   {editingUser && (
-                    <span className="px-2 py-0.5 bg-orange-50 dark:bg-zinc-800 text-[12px] font-semibold text-gray-500 rounded border border-orange-100 dark:border-zinc-700">
+                    <span className="px-2 py-0.5 bg-[#F7F8FA] dark:bg-zinc-800 text-[14px] font-semibold text-gray-500 rounded border border-[#E5E7EB] dark:border-zinc-700">
                       User Profile
                     </span>
                   )}
@@ -911,7 +917,7 @@ export default function UsersPage() {
                   setSelectedImage(null);
                   setImagePreview(null);
                 }}
-                className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-zinc-200 transition-colors"
+                className="p-2 text-[#5B6472] hover:text-gray-600 dark:hover:text-zinc-200 transition-colors"
               >
                 <XMarkIcon className="w-8 h-8" />
               </button>
@@ -920,7 +926,7 @@ export default function UsersPage() {
             <form onSubmit={handleSubmit} className="p-4 space-y-4 max-h-[80vh] overflow-y-auto bg-white dark:bg-navy-800/50">
               {/* Profile Image Upload */}
               <div className="flex flex-col items-center justify-center p-4 bg-gray-50 dark:bg-navy-950/50 rounded-2xl border-2 border-dashed border-gray-100 dark:border-navy-800 group transition-all">
-                <div className="relative w-24 h-24 rounded-3xl overflow-hidden shadow-2xl border-4 border-white dark:border-navy-800 ring-4 ring-orange-50 dark:ring-navy-900 group-hover:scale-105 transition-all">
+                <div className="relative w-24 h-24 rounded-3xl overflow-hidden shadow-2xl border-4 border-white dark:border-navy-800 ring-4 ring-[#E5E7EB] dark:ring-navy-900 group-hover:scale-105 transition-all">
                   {imagePreview ? (
                     <img 
                       src={getNormalizedImageUrl(imagePreview)} 
@@ -929,7 +935,7 @@ export default function UsersPage() {
                       referrerPolicy="no-referrer"
                     />
                   ) : (
-                    <div className="w-full h-full bg-orange-100 dark:bg-navy-800 flex items-center justify-center text-orange-300 dark:text-navy-700 font-semibold text-3xl">
+                    <div className="w-full h-full bg-[#F7F8FA] dark:bg-navy-800 flex items-center justify-center text-[#D97706] dark:text-navy-700 font-semibold text-3xl">
                       {formData.username?.substring(0, 2).toUpperCase() || "UR"}
                     </div>
                   )}
@@ -949,7 +955,7 @@ export default function UsersPage() {
                     />
                   </label>
                 </div>
-                <p className="text-[13px] font-semibold text-gray-400 mt-3">Click Avatar to Update Photo</p>
+                <p className="text-[13px] font-semibold text-[#5B6472] mt-3">Click Avatar to Update Photo</p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
@@ -960,7 +966,7 @@ export default function UsersPage() {
                 </div>
 
                 <div>
-                  <label className="text-[13px] font-semibold text-gray-400 block mb-2">Employee Code</label>
+                  <label className="text-[13px] font-semibold text-[#5B6472] block mb-2">Employee Code</label>
                   <input
                     type="text"
                     value={formData.id}
@@ -968,18 +974,18 @@ export default function UsersPage() {
                     onChange={(e) => editingUser && setFormData({ ...formData, id: e.target.value })}
                     className={`w-full px-3 py-1.5 rounded-lg border focus:border-[#2563EB] outline-none font-bold text-[14px] transition-all shadow-sm ${
                       !editingUser
-                        ? 'bg-gray-100 dark:bg-zinc-800 text-gray-500 dark:text-zinc-400 cursor-not-allowed border-orange-100 dark:border-zinc-800'
+                        ? 'bg-gray-100 dark:bg-zinc-800 text-gray-500 dark:text-zinc-400 cursor-not-allowed border-[#E5E7EB] dark:border-zinc-800'
                         : 'bg-[#FFFFFF] dark:bg-zinc-900 focus:bg-white dark:focus:bg-zinc-900 text-gray-800 dark:text-zinc-100'
                     } ${
                       users.some(u => u.id === formData.id && u.id !== editingUser?.id)
                         ? 'border-red-500'
-                        : 'border-orange-100 dark:border-zinc-800'
+                        : 'border-[#E5E7EB] dark:border-zinc-800'
                     }`}
                     placeholder="Auto-generated"
                     required
                   />
                   {!editingUser && (
-                    <p className="mt-1 text-[13px] font-semibold text-gray-400">
+                    <p className="mt-1 text-[13px] font-semibold text-[#5B6472]">
                       🔒 Auto-generated unique code
                     </p>
                   )}
@@ -997,47 +1003,49 @@ export default function UsersPage() {
                 </div>
 
                 <div>
-                  <label className="text-[13px] font-semibold text-gray-400 block mb-2">Username</label>
+                  <label className="text-[13px] font-semibold text-[#5B6472] block mb-2">Username</label>
                   <input
                     type="text"
                     value={formData.username}
                     onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                    className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-3 py-1.5 rounded-lg border border-orange-100 dark:border-zinc-800 focus:border-[#2563EB] focus:bg-white dark:focus:bg-zinc-900 outline-none font-bold text-[14px] text-gray-800 dark:text-zinc-100 transition-all shadow-sm"
+                    className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-3 py-1.5 rounded-lg border border-[#E5E7EB] dark:border-zinc-800 focus:border-[#2563EB] focus:bg-white dark:focus:bg-zinc-900 outline-none font-bold text-[14px] text-gray-800 dark:text-zinc-100 transition-all shadow-sm"
                     placeholder="Enter Username"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="text-[13px] font-semibold text-gray-400 block mb-2">Email Address</label>
+                  <label className="text-[13px] font-semibold text-[#5B6472] block mb-2">Email Address</label>
                   <input
                     type="email"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-3 py-1.5 rounded-lg border border-orange-100 dark:border-zinc-800 focus:border-[#2563EB] focus:bg-white dark:focus:bg-zinc-900 outline-none font-bold text-[14px] text-gray-800 dark:text-zinc-100 transition-all shadow-sm"
+                    className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-3 py-1.5 rounded-lg border border-[#E5E7EB] dark:border-zinc-800 focus:border-[#2563EB] focus:bg-white dark:focus:bg-zinc-900 outline-none font-bold text-[14px] text-gray-800 dark:text-zinc-100 transition-all shadow-sm"
                     placeholder="example@domain.com"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="text-[13px] font-semibold text-gray-400 block mb-2">Password</label>
+                  <label className="text-[13px] font-semibold text-[#5B6472] block mb-2">
+                    {editingUser ? "New password" : "Password"}
+                  </label>
                   <input
                     type="text"
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-3 py-1.5 rounded-lg border border-orange-100 dark:border-zinc-800 focus:border-[#2563EB] focus:bg-white dark:focus:bg-zinc-900 outline-none font-bold text-[14px] text-gray-800 dark:text-zinc-100 transition-all shadow-sm"
-                    placeholder="••••••••"
+                    className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-3 py-1.5 rounded-lg border border-[#E5E7EB] dark:border-zinc-800 focus:border-[#2563EB] focus:bg-white dark:focus:bg-zinc-900 outline-none font-bold text-[14px] text-gray-800 dark:text-zinc-100 transition-all shadow-sm"
+                    placeholder={editingUser ? "Leave blank to keep the current password" : "Set a password"}
                   />
                 </div>
 
                 <div>
-                  <label className="text-[13px] font-semibold text-gray-400 block mb-2">Phone Number</label>
+                  <label className="text-[13px] font-semibold text-[#5B6472] block mb-2">Phone Number</label>
                   <input
                     type="text"
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-3 py-1.5 rounded-lg border border-orange-100 dark:border-zinc-800 focus:border-[#2563EB] focus:bg-white dark:focus:bg-zinc-900 outline-none font-bold text-[14px] text-gray-800 dark:text-zinc-100 transition-all shadow-sm"
+                    className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-3 py-1.5 rounded-lg border border-[#E5E7EB] dark:border-zinc-800 focus:border-[#2563EB] focus:bg-white dark:focus:bg-zinc-900 outline-none font-bold text-[14px] text-gray-800 dark:text-zinc-100 transition-all shadow-sm"
                     placeholder="+91-0000000000"
                   />
                 </div>
@@ -1065,7 +1073,7 @@ export default function UsersPage() {
 
                 <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-navy-950/50 rounded-xl border border-gray-100 dark:border-navy-800/50">
                   <div>
-                    <label className="text-[13px] font-semibold text-gray-400 block">Account Status</label>
+                    <label className="text-[13px] font-semibold text-[#5B6472] block">Account Status</label>
                     <p className="text-[13px] font-bold text-gray-500">Active / Inactive</p>
                   </div>
                   <button
@@ -1085,7 +1093,7 @@ export default function UsersPage() {
 
                 <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-navy-950/50 rounded-xl border border-gray-100 dark:border-navy-800/50">
                   <div>
-                    <label className="text-[13px] font-semibold text-gray-400 block">Track Attendance</label>
+                    <label className="text-[13px] font-semibold text-[#5B6472] block">Track Attendance</label>
                     <p className="text-[13px] font-bold text-gray-500">Off for staff tracked elsewhere (e.g. factory scanner)</p>
                   </div>
                   <button
@@ -1110,11 +1118,11 @@ export default function UsersPage() {
                 </div>
 
                 <div>
-                  <label className="text-[13px] font-semibold text-gray-400 block mb-2">Office Branch</label>
+                  <label className="text-[13px] font-semibold text-[#5B6472] block mb-2">Office Branch</label>
                   <select
                     value={formData.office}
                     onChange={(e) => setFormData({ ...formData, office: e.target.value })}
-                    className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-3 py-1.5 rounded-lg border border-orange-100 dark:border-zinc-800 focus:border-[#2563EB] focus:bg-white dark:focus:bg-zinc-900 outline-none font-bold text-[14px] text-gray-800 dark:text-zinc-100 transition-all shadow-sm"
+                    className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-3 py-1.5 rounded-lg border border-[#E5E7EB] dark:border-zinc-800 focus:border-[#2563EB] focus:bg-white dark:focus:bg-zinc-900 outline-none font-bold text-[14px] text-gray-800 dark:text-zinc-100 transition-all shadow-sm"
                   >
                     <option value="">Select Office</option>
                     <option value="GTK">GTK</option>
@@ -1125,11 +1133,11 @@ export default function UsersPage() {
                 </div>
 
                 <div>
-                  <label className="text-[13px] font-semibold text-gray-400 block mb-2">Role Name</label>
+                  <label className="text-[13px] font-semibold text-[#5B6472] block mb-2">Role Name</label>
                   <select
                     value={formData.role_name}
                     onChange={(e) => setFormData({ ...formData, role_name: e.target.value })}
-                    className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-3 py-1.5 rounded-lg border border-orange-100 dark:border-zinc-800 focus:border-[#2563EB] focus:bg-white dark:focus:bg-zinc-900 outline-none font-bold text-[14px] text-gray-800 dark:text-zinc-100 transition-all shadow-sm"
+                    className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-3 py-1.5 rounded-lg border border-[#E5E7EB] dark:border-zinc-800 focus:border-[#2563EB] focus:bg-white dark:focus:bg-zinc-900 outline-none font-bold text-[14px] text-gray-800 dark:text-zinc-100 transition-all shadow-sm"
                   >
                     <option value="">Select Role</option>
                     <option value="ADMIN">Admin</option>
@@ -1141,14 +1149,14 @@ export default function UsersPage() {
                 </div>
 
                 <div>
-                  <label className="text-[13px] font-semibold text-gray-400 block mb-2 flex items-center justify-between">
+                  <label className="text-[13px] font-semibold text-[#5B6472] block mb-2 flex items-center justify-between">
                     Department
                     <button type="button" onClick={() => setIsAddingOption({ type: 'department', isOpen: true })} className="p-1 hover:bg-[#2563EB]/10 rounded-full transition-colors"><PlusIcon className="w-3 h-3 text-[#2563EB] dark:text-[#60A5FA]" /></button>
                   </label>
                   <select
                     value={formData.department}
                     onChange={(e) => setFormData({ ...formData, department: e.target.value })}
-                    className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-3 py-1.5 rounded-lg border border-orange-100 dark:border-zinc-800 focus:border-[#2563EB] focus:bg-white dark:focus:bg-zinc-900 outline-none font-bold text-[14px] text-gray-800 dark:text-zinc-100 transition-all shadow-sm"
+                    className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-3 py-1.5 rounded-lg border border-[#E5E7EB] dark:border-zinc-800 focus:border-[#2563EB] focus:bg-white dark:focus:bg-zinc-900 outline-none font-bold text-[14px] text-gray-800 dark:text-zinc-100 transition-all shadow-sm"
                   >
                     <option value="">Select Department</option>
                     {dropdowns.departments.map((dept, i) => (
@@ -1158,14 +1166,14 @@ export default function UsersPage() {
                 </div>
 
                 <div>
-                  <label className="text-[13px] font-semibold text-gray-400 block mb-2 flex items-center justify-between">
+                  <label className="text-[13px] font-semibold text-[#5B6472] block mb-2 flex items-center justify-between">
                     Designation
                     <button type="button" onClick={() => setIsAddingOption({ type: 'designation', isOpen: true })} className="p-1 hover:bg-[#2563EB]/10 rounded-full transition-colors"><PlusIcon className="w-3 h-3 text-[#2563EB] dark:text-[#60A5FA]" /></button>
                   </label>
                   <select
                     value={formData.designation}
                     onChange={(e) => setFormData({ ...formData, designation: e.target.value })}
-                    className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-3 py-1.5 rounded-lg border border-orange-100 dark:border-zinc-800 focus:border-[#2563EB] focus:bg-white dark:focus:bg-zinc-900 outline-none font-bold text-[14px] text-gray-800 dark:text-zinc-100 transition-all shadow-sm"
+                    className="w-full bg-[#FFFFFF] dark:bg-zinc-900 px-3 py-1.5 rounded-lg border border-[#E5E7EB] dark:border-zinc-800 focus:border-[#2563EB] focus:bg-white dark:focus:bg-zinc-900 outline-none font-bold text-[14px] text-gray-800 dark:text-zinc-100 transition-all shadow-sm"
                   >
                     <option value="">Select Designation</option>
                     {dropdowns.designations.map((desig, i) => (
@@ -1182,7 +1190,7 @@ export default function UsersPage() {
                     <button
                       type="button"
                       onClick={addLocation}
-                      className="px-3 py-1 bg-[#2563EB] dark:bg-[#60A5FA] text-white dark:text-black rounded-lg font-semibold text-[12px] shadow-sm active:scale-95 transition-all"
+                      className="px-3 py-1 bg-[#2563EB] dark:bg-[#60A5FA] text-white dark:text-black rounded-lg font-semibold text-[14px] shadow-sm active:scale-95 transition-all"
                     >
                       + Add Site
                     </button>
@@ -1193,7 +1201,7 @@ export default function UsersPage() {
                       <div key={index} className="p-3 bg-gray-50 dark:bg-navy-950/50 rounded-xl border border-gray-100 dark:border-navy-800/50">
                         <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
                           <div className="md:col-span-4">
-                            <label className="text-[12px] font-semibold text-gray-400 block mb-1.5">Site Name</label>
+                            <label className="text-[14px] font-semibold text-[#5B6472] block mb-1.5">Site Name</label>
                             <input
                               type="text"
                               value={loc.name}
@@ -1204,7 +1212,7 @@ export default function UsersPage() {
                           </div>
                           <div className="md:col-span-8 flex gap-2">
                             <div className="flex-1">
-                              <label className="text-[12px] font-semibold text-gray-400 block mb-1.5">Coordinates</label>
+                              <label className="text-[14px] font-semibold text-[#5B6472] block mb-1.5">Coordinates</label>
                               <div className="relative">
                                 <input
                                   type="text"
@@ -1216,7 +1224,7 @@ export default function UsersPage() {
                                 <button
                                   type="button"
                                   onClick={() => handleViewOnMap(loc.coords)}
-                                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-[#2563EB] dark:hover:text-[#60A5FA] transition-colors"
+                                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-[#5B6472] hover:text-[#2563EB] dark:hover:text-[#60A5FA] transition-colors"
                                 >
                                   <GlobeAmericasIcon className="w-4 h-4" />
                                 </button>
@@ -1226,7 +1234,7 @@ export default function UsersPage() {
                               <button
                                 type="button"
                                 onClick={() => handleFetchLocation(index)}
-                                className="p-2 bg-[#2563EB]/10 text-white dark:bg-[#60A5FA]/10 dark:text-[#60A5FA] hover:bg-[#2563EB] hover:text-white dark:hover:bg-[#60A5FA] dark:hover:text-black rounded-lg transition-all"
+                                className="p-2 bg-[#2563EB]/10 text-[#2563EB] dark:bg-[#60A5FA]/10 dark:text-[#60A5FA] hover:bg-[#2563EB] hover:text-white dark:hover:bg-[#60A5FA] dark:hover:text-black rounded-lg transition-all"
                                 title="Auto Fetch"
                               >
                                 <MapPinIcon className="w-4 h-4" />
@@ -1248,7 +1256,7 @@ export default function UsersPage() {
                 </div>
               </div>
 
-              <div className="p-4 border-t border-orange-100/50 dark:border-zinc-800 flex gap-2">
+              <div className="p-4 border-t border-[#E5E7EB] dark:border-zinc-800 flex gap-2">
                 <button
                   type="button"
                   onClick={() => {
@@ -1256,7 +1264,7 @@ export default function UsersPage() {
                     setSelectedImage(null);
                     setImagePreview(null);
                   }}
-                  className="flex-1 px-4 py-2 rounded-xl font-semibold text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-all text-[13px]"
+                  className="flex-1 px-4 py-2 rounded-xl font-semibold text-[#5B6472] hover:text-gray-600 hover:bg-gray-50 transition-all text-[13px]"
                 >
                   Cancel
                 </button>
@@ -1290,7 +1298,7 @@ export default function UsersPage() {
             <div className="flex gap-2">
               <button 
                 onClick={() => setIsAddingOption({ ...isAddingOption, isOpen: false })}
-                className="flex-1 py-2 font-semibold text-[13px] text-gray-400 hover:text-gray-600"
+                className="flex-1 py-2 font-semibold text-[13px] text-[#5B6472] hover:text-gray-600"
               >
                 Cancel
               </button>

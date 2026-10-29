@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import useSWR from "swr";
 import { 
   ClipboardDocumentListIcon, 
@@ -16,6 +17,7 @@ import {
 import IMSMaster from "./IMSMaster";
 import IMSFloor from "./IMSFloor";
 import IMSFinal from "./IMSFinal";
+import ModuleStrip from "@/components/ModuleStrip";
 
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
@@ -208,119 +210,112 @@ export default function IMSHub() {
     gradient: string,
     shadow: string
   ) => {
+    // Calm card (Oct 26): the four neon gradient tiles broke the ERP's
+    // one-accent rule. Same data, same clicks — white card, blue accent.
+    void gradient; void shadow;
     return (
-      <div 
+      <div
+        role="button"
+        tabIndex={0}
         onClick={() => setActiveLocation(id)}
-        className={`relative rounded-3xl p-6 shadow-xl ${shadow} transition-all duration-300 group flex flex-col justify-between border border-white/10 ${gradient} hover:shadow-2xl hover:-translate-y-2 cursor-pointer`}
+        onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") setActiveLocation(id); }}
+        className="relative rounded-2xl bg-white dark:bg-navy-900 border border-[#E5E7EB] dark:border-navy-800 p-5 cursor-pointer hover:border-[#2563EB] transition-colors flex flex-col gap-4"
       >
-        <div className="absolute inset-0 overflow-hidden rounded-3xl pointer-events-none">
-          <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-          <div className="absolute -right-10 -top-10 w-40 h-40 bg-white/10 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-500"></div>
-        </div>
-
         <button
           type="button"
           title="How IN / OUT are calculated"
+          aria-label="How In and Out are calculated"
           onClick={(e) => {
             e.stopPropagation();
             setInfoLocation(id);
           }}
-          className="absolute top-4 right-4 z-20 p-1.5 rounded-full bg-white/15 hover:bg-white/30 border border-white/25 text-white transition-colors"
+          className="absolute top-3 right-3 z-20 w-10 h-10 flex items-center justify-center rounded-full text-[#5B6472] hover:text-[#2563EB] hover:bg-[#EFF4FF] dark:hover:bg-navy-800 transition-colors"
         >
           <InformationCircleIcon className="w-5 h-5" />
         </button>
-        
-        <div className="relative mb-10 z-10 pr-8">
-          <div className="flex items-start gap-3">
-            <div className="p-3 bg-white/20 backdrop-blur-md rounded-2xl transition-all duration-300 shadow-sm group-hover:shadow-md shrink-0">
-              <div className="text-white w-7 h-7 transition-colors duration-300">
-                {icon}
-              </div>
-            </div>
-            <div className="flex-1 min-w-0">
-              <h2 className="text-base lg:text-lg xl:text-xl font-semibold text-white tracking-tight leading-snug transition-colors">
-                {title}
-              </h2>
-              <p className="text-[13px] font-bold text-white/70 mt-1 leading-snug">
-                {subtitle}
-              </p>
-            </div>
+
+        <div className="flex items-start gap-3 pr-10">
+          <div className="w-11 h-11 shrink-0 rounded-xl bg-[#EFF4FF] dark:bg-[#60A5FA]/10 text-[#2563EB] dark:text-[#60A5FA] flex items-center justify-center">
+            <div className="w-6 h-6">{icon}</div>
+          </div>
+          <div className="flex-1 min-w-0">
+            <h2 className="text-[17px] font-semibold text-[#1A1D21] dark:text-white leading-snug">{title}</h2>
+            <p className="text-[14px] text-[#5B6472] dark:text-gray-400 leading-snug">{subtitle}</p>
           </div>
         </div>
 
         {isLoading || !data ? (
-          <div className="relative space-y-4 animate-pulse z-10">
-            <div className="h-16 bg-white/20 rounded-2xl w-full"></div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="h-16 bg-white/20 rounded-2xl w-full"></div>
-              <div className="h-16 bg-white/20 rounded-2xl w-full"></div>
+          <div className="space-y-3 animate-pulse">
+            <div className="h-16 bg-[#F1F3F6] dark:bg-navy-800 rounded-xl" />
+            <div className="grid grid-cols-2 gap-3">
+              <div className="h-16 bg-[#F1F3F6] dark:bg-navy-800 rounded-xl" />
+              <div className="h-16 bg-[#F1F3F6] dark:bg-navy-800 rounded-xl" />
             </div>
           </div>
         ) : (
-          <div className="relative space-y-4 z-10 min-w-0">
-            <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/20 transition-colors shadow-sm min-w-0">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-[13px] font-semibold text-white/80 flex items-center gap-1.5">
-                  <ScaleIcon className="w-4 h-4 text-white/80"/> Live Stock
-                </span>
-              </div>
+          <div className="space-y-3 min-w-0">
+            <div className="min-w-0">
+              <p className="text-[13px] font-semibold text-[#5B6472] dark:text-gray-400 flex items-center gap-1.5">
+                <ScaleIcon className="w-4 h-4" /> Live stock
+              </p>
               <div
-                className={`${getLiveStockFontClass(data.liveStock)} font-semibold tracking-tight leading-none break-words [overflow-wrap:anywhere] ${data.liveStock < 0 ? "text-rose-300" : "text-white"} transition-colors`}
+                className={`${getLiveStockFontClass(data.liveStock)} mt-1 font-semibold leading-none tabular-nums break-words [overflow-wrap:anywhere] ${data.liveStock < 0 ? "text-[#DC2626]" : "text-[#1A1D21] dark:text-white"}`}
                 title={formatMetric(data.liveStock)}
               >
                 {formatMetric(data.liveStock)}
               </div>
             </div>
-
             <div className="grid grid-cols-2 gap-3 min-w-0">
-              <div className="bg-white/10 backdrop-blur-md rounded-2xl p-3 sm:p-4 border border-white/20 transition-colors min-w-0">
-                <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-[14px] sm:text-sm font-semibold text-white/80 flex items-center gap-1.5">
-                    <ArrowTrendingUpIcon className="w-4 h-4 shrink-0"/> In
-                  </span>
-                </div>
-                <div
-                  className={`${getInOutFontClass(data.totalIn)} font-semibold text-white leading-none whitespace-nowrap tabular-nums`}
-                  title={formatMetric(data.totalIn)}
-                >
+              <div className="bg-[#F7F8FA] dark:bg-navy-800 rounded-xl p-3 min-w-0">
+                <p className="text-[13px] font-semibold text-[#5B6472] dark:text-gray-400 flex items-center gap-1.5">
+                  <ArrowTrendingUpIcon className="w-4 h-4 shrink-0" /> In
+                </p>
+                <div className={`${getInOutFontClass(data.totalIn)} mt-1 font-semibold text-[#1A1D21] dark:text-white leading-none whitespace-nowrap tabular-nums`} title={formatMetric(data.totalIn)}>
                   {formatMetric(data.totalIn)}
                 </div>
               </div>
-              <div className="bg-white/10 backdrop-blur-md rounded-2xl p-3 sm:p-4 border border-white/20 transition-colors min-w-0">
-                <div className="flex items-center justify-between mb-1.5">
-                  <span className={`font-semibold text-white/80   flex items-center gap-1.5 leading-tight ${id === "1st" || id === "sfg" ? "text-[13px] sm:text-xs" : "text-[14px] sm:text-sm"}`}>
-                    <ArrowTrendingDownIcon className="w-4 h-4 shrink-0"/>
-                    {id === "sfg" ? "Transfer to 1st Floor" : id === "1st" ? "Transfer to G Floor" : "Out"}
-                  </span>
-                </div>
-                <div
-                  className={`${getInOutFontClass(data.totalOut)} font-semibold text-white leading-none whitespace-nowrap tabular-nums`}
-                  title={formatMetric(data.totalOut)}
-                >
+              <div className="bg-[#F7F8FA] dark:bg-navy-800 rounded-xl p-3 min-w-0">
+                <p className="text-[13px] font-semibold text-[#5B6472] dark:text-gray-400 flex items-center gap-1.5 leading-tight">
+                  <ArrowTrendingDownIcon className="w-4 h-4 shrink-0" />
+                  {id === "sfg" ? "To 1st Floor" : id === "1st" ? "To G Floor" : "Out"}
+                </p>
+                <div className={`${getInOutFontClass(data.totalOut)} mt-1 font-semibold text-[#1A1D21] dark:text-white leading-none whitespace-nowrap tabular-nums`} title={formatMetric(data.totalOut)}>
                   {formatMetric(data.totalOut)}
                 </div>
               </div>
             </div>
           </div>
         )}
+        <p className="text-[14px] font-semibold text-[#2563EB] dark:text-[#60A5FA]">Open {title} →</p>
       </div>
     );
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-[#0a0f1c] p-6">
+    <div className="min-h-full p-2 md:p-4">
       <div className="w-full mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl font-semibold text-gray-900 dark:text-white tracking-tight mb-2 flex items-center gap-3">
-            <ClipboardDocumentListIcon className="w-8 h-8 text-[#2563EB] dark:text-[#60A5FA]" />
-            IMS Dashboard Hub
+        <div className="mb-5">
+          <h1 className="text-[24px] font-semibold text-[#1A1D21] dark:text-white mb-1 flex items-center gap-2">
+            <ClipboardDocumentListIcon className="w-7 h-7 text-[#2563EB] dark:text-[#60A5FA]" />
+            IMS
           </h1>
-          <p className="text-[14px] font-bold text-gray-500 max-w-xl">
-            Select an inventory management system location to view detailed stock metrics, manage inward/outward flow, and generate reports.
+          <p className="text-[15px] text-[#5B6472] dark:text-gray-400 max-w-xl">
+            Pick a location to see and update its stock.
           </p>
         </div>
+        {/* Key figures — same numbers as the Stock tile on the CEO home */}
+        <div className="mb-3 -mx-2"><ModuleStrip module="ims" /></div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+        {/* Stock Tally — bought (GRN) vs sold (Busy), to check the warehouse count */}
+        <Link href="/ims/tally" className="mb-6 flex items-center gap-3 rounded-xl bg-white dark:bg-navy-900 border border-[#E5E7EB] dark:border-navy-800 px-4 min-h-[56px] hover:border-[#2563EB] transition-colors">
+          <span className="flex-1">
+            <span className="block text-[15px] font-semibold text-[#1A1D21] dark:text-white">Stock Tally</span>
+            <span className="block text-[13px] text-[#5B6472] dark:text-gray-400">Bought (GRN) minus sold (Busy), item by item — check it against the warehouse count</span>
+          </span>
+          <span className="text-[14px] font-semibold text-[#2563EB]">Open</span>
+        </Link>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
           {renderTile(
             "sfg",
             "SFG IMS",
@@ -354,8 +349,8 @@ export default function IMSHub() {
             "Total Storage Overview",
             <ClipboardDocumentListIcon />,
             finalData,
-            "bg-gradient-to-br from-orange-500 to-amber-700",
-            "shadow-orange-900/20"
+            "bg-[#2563EB]",
+            ""
           )}
         </div>
 
@@ -386,7 +381,7 @@ export default function IMSHub() {
 
               <div className="p-5 space-y-4 overflow-y-auto custom-scrollbar">
                 <div className="rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 px-4 py-3">
-                  <p className="text-[13px] font-semibold text-gray-400 mb-1">Formula</p>
+                  <p className="text-[13px] font-semibold text-[#5B6472] mb-1">Formula</p>
                   <p className="text-sm font-semibold text-[#2563EB] dark:text-[#60A5FA]">{IMS_CALC_INFO[infoLocation].formula}</p>
                 </div>
 
@@ -399,9 +394,9 @@ export default function IMSHub() {
                     <ul className="space-y-3">
                       {IMS_CALC_INFO[infoLocation].inSources.map((source) => (
                         <li key={source.label} className="border-t border-emerald-100/80 dark:border-emerald-500/10 pt-3 first:border-t-0 first:pt-0">
-                          <p className="text-[13px] font-semibold text-gray-400 mb-1">Data Source</p>
+                          <p className="text-[13px] font-semibold text-[#5B6472] mb-1">Data Source</p>
                           <p className="text-[14px] font-bold text-gray-800 dark:text-gray-200 mb-1.5">{source.label}</p>
-                          <p className="text-[13px] font-semibold text-gray-400 mb-1">How Calculated</p>
+                          <p className="text-[13px] font-semibold text-[#5B6472] mb-1">How Calculated</p>
                           <p className="text-[14px] font-medium text-gray-600 dark:text-gray-300 leading-relaxed">{source.detail}</p>
                         </li>
                       ))}
@@ -416,9 +411,9 @@ export default function IMSHub() {
                     <ul className="space-y-3">
                       {IMS_CALC_INFO[infoLocation].outSources.map((source) => (
                         <li key={source.label} className="border-t border-rose-100/80 dark:border-rose-500/10 pt-3 first:border-t-0 first:pt-0">
-                          <p className="text-[13px] font-semibold text-gray-400 mb-1">Data Source</p>
+                          <p className="text-[13px] font-semibold text-[#5B6472] mb-1">Data Source</p>
                           <p className="text-[14px] font-bold text-gray-800 dark:text-gray-200 mb-1.5">{source.label}</p>
-                          <p className="text-[13px] font-semibold text-gray-400 mb-1">How Calculated</p>
+                          <p className="text-[13px] font-semibold text-[#5B6472] mb-1">How Calculated</p>
                           <p className="text-[14px] font-medium text-gray-600 dark:text-gray-300 leading-relaxed">{source.detail}</p>
                         </li>
                       ))}

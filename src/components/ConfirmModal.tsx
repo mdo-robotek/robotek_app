@@ -37,7 +37,7 @@ export default function ConfirmModal({
       >
         <div className="p-6">
           <div className="flex flex-col items-center gap-4 text-center">
-            <div className={`p-4 rounded-full ${type === 'danger' ? 'bg-red-50 dark:bg-red-500/10 text-red-500' : 'bg-orange-50 dark:bg-[#60A5FA]/10 text-[#2563EB]'}`}>
+            <div className={`p-4 rounded-full ${type === 'danger' ? 'bg-red-50 dark:bg-red-500/10 text-red-500' : 'bg-[#F7F8FA] dark:bg-[#60A5FA]/10 text-[#2563EB]'}`}>
               <ExclamationTriangleIcon className="w-10 h-10" />
             </div>
             
@@ -54,7 +54,7 @@ export default function ConfirmModal({
           <div className="mt-8 flex gap-3">
             <button
               onClick={onClose}
-              className="flex-1 px-4 py-2.5 rounded-xl font-semibold text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-all text-[13px] border border-gray-100"
+              className="flex-1 px-4 py-2.5 rounded-xl font-semibold text-[#5B6472] hover:text-gray-600 hover:bg-gray-50 transition-all text-[13px] border border-gray-100"
             >
               {cancelLabel}
             </button>

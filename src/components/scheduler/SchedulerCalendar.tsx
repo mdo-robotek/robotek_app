@@ -53,7 +53,7 @@ export default function SchedulerCalendar({
   const categoryColors: Record<CalendarEventType, string> = {
     delegation: "bg-blue-500",
     checklist: "bg-purple-500",
-    ticket: "bg-orange-500",
+    ticket: "bg-[#D97706]",
     o2d: "bg-emerald-500",
     meeting: "bg-rose-500",
     scot: "bg-indigo-500"
@@ -171,7 +171,7 @@ export default function SchedulerCalendar({
                 </div>
               ))}
               {dayEvents.length > 4 && (
-                <div className="text-[13px] font-semibold text-slate-400 pl-1">
+                <div className="text-[13px] font-semibold text-[#5B6472] pl-1">
                   +{dayEvents.length - 4} more
                 </div>
               )}
@@ -233,7 +233,7 @@ export default function SchedulerCalendar({
              {/* Time labels */}
              <div className="border-r border-slate-100 dark:border-slate-800">
               {hours.map(h => (
-                <div key={h} className="h-[50px] text-[13px] font-semibold text-slate-400 text-center pt-2 leading-none">
+                <div key={h} className="h-[50px] text-[13px] font-semibold text-[#5B6472] text-center pt-2 leading-none">
                   {format(setHours(new Date(), h), "h aa")}
                 </div>
               ))}
@@ -266,7 +266,7 @@ export default function SchedulerCalendar({
                       className={`absolute rounded-xl p-2 border-l-4 shadow-sm z-20 cursor-pointer overflow-hidden ${categoryColors[e.type]} bg-opacity-90 dark:bg-opacity-80 border-black/10`}
                     >
                       <div className="text-[13px] font-semibold text-white leading-tight mb-1 truncate">{e.title}</div>
-                      <div className="flex items-center gap-1 text-[12px] font-bold text-white opacity-90">
+                      <div className="flex items-center gap-1 text-[14px] font-bold text-white opacity-90">
                         <ClockIcon className="w-3 h-3" />
                         {format(e.start, "h:mm aa")}
                       </div>
@@ -314,7 +314,7 @@ export default function SchedulerCalendar({
           <div className="relative">
             {hours.map(h => (
               <div key={h} className="h-16 border-t border-slate-100 dark:border-slate-800 flex items-start pt-2 gap-4">
-                <span className="text-[13px] font-semibold text-slate-400 w-12 text-right tracking-tighter">{format(setHours(new Date(), h), "h aa")}</span>
+                <span className="text-[13px] font-semibold text-[#5B6472] w-12 text-right tracking-tighter">{format(setHours(new Date(), h), "h aa")}</span>
                 <div className="flex-1 border-t border-slate-50 dark:border-slate-800/50 mt-1.5"></div>
               </div>
             ))}
@@ -400,7 +400,7 @@ export default function SchedulerCalendar({
 
         <div className="flex-1 overflow-y-auto p-6 invisible-scrollbar">
           {currentEvents.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20 text-slate-400 dark:text-slate-500">
+            <div className="flex flex-col items-center justify-center py-20 text-[#5B6472] dark:text-slate-500">
                <span className="text-4xl mb-4 opacity-50">📋</span>
                <p className="text-sm font-bold">No tasks scheduled in this timeframe.</p>
             </div>
@@ -414,7 +414,7 @@ export default function SchedulerCalendar({
                   e.type === 'meeting' ? 'bg-rose-500/10 border-rose-500/20' :
                   e.type === 'delegation' ? 'bg-blue-500/10 border-blue-500/20' :
                   e.type === 'checklist' ? 'bg-purple-500/10 border-purple-500/20' :
-                  e.type === 'ticket' ? 'bg-orange-500/10 border-orange-500/20' :
+                  e.type === 'ticket' ? 'bg-[#D97706]/10 border-[#E5E7EB]' :
                   e.type === 'scot' ? 'bg-indigo-500/10 border-indigo-500/20' :
                   'bg-emerald-500/10 border-emerald-500/20';
 
@@ -422,7 +422,7 @@ export default function SchedulerCalendar({
                   e.type === 'meeting' ? 'text-rose-500' :
                   e.type === 'delegation' ? 'text-blue-500' :
                   e.type === 'checklist' ? 'text-purple-500' :
-                  e.type === 'ticket' ? 'text-orange-500' :
+                  e.type === 'ticket' ? 'text-[#D97706]' :
                   e.type === 'scot' ? 'text-indigo-500' :
                   'text-emerald-500';
 
@@ -445,7 +445,7 @@ export default function SchedulerCalendar({
                           <span className={`text-[13px] font-semibold   ${iconTextClass}`}>
                              {e.type}
                           </span>
-                          <span className="text-[13px] font-bold text-slate-300 dark:text-slate-600">•</span>
+                          <span className="text-[13px] font-bold text-[#5B6472] dark:text-slate-600">•</span>
                           <div className="flex items-center gap-1 text-[13px] font-bold text-slate-500 dark:text-slate-400">
                              <ClockIcon className="w-3 h-3" />
                              {format(e.start, "EEEE, MMM dd • hh:mm a")}
@@ -472,7 +472,7 @@ export default function SchedulerCalendar({
                       
                       {e.status && (
                         <span className={`text-[13px] font-semibold px-4 py-2 rounded-full whitespace-nowrap shadow-sm border border-transparent
-                          ${e.status.toLowerCase().includes('pending') ? 'bg-orange-500/10 text-orange-600 dark:text-orange-400' : 'bg-blue-500/10 text-blue-600 dark:text-blue-400'}
+                          ${e.status.toLowerCase().includes('pending') ? 'bg-[#D97706]/10 text-[#D97706] dark:text-[#D97706]' : 'bg-blue-500/10 text-blue-600 dark:text-blue-400'}
                         `}>
                           Status: {e.status}
                         </span>

@@ -58,7 +58,7 @@ const CircularProgress = ({ percentage, isNegative, total, completed, isOnTime, 
   const fillPercentage = hasNoTasks ? 0 : (isNegative ? (100 - percentage) : percentage);
   const offset = circumference - (fillPercentage / 100) * circumference;
   
-  const color = hasNoTasks ? 'text-gray-300' : (isNegative ? (
+  const color = hasNoTasks ? 'text-[#5B6472]' : (isNegative ? (
     fillPercentage < 20 ? 'text-emerald-500' : fillPercentage < 50 ? 'text-amber-500' : 'text-rose-500'
   ) : (
     percentage >= 80 ? 'text-emerald-500' : percentage >= 50 ? 'text-amber-500' : 'text-rose-500'
@@ -99,7 +99,7 @@ const CircularProgress = ({ percentage, isNegative, total, completed, isOnTime, 
 const ScoreRow = ({ label, completed, total, percentage, isNegative, isOnTime }: any) => {
   const hasNoTasks = isOnTime ? (completed === 0) : (total === 0);
   const displayPercentage = hasNoTasks ? "—" : (isNegative ? percentage - 100 : percentage);
-  const color = hasNoTasks ? 'text-gray-300' : (isNegative ? (
+  const color = hasNoTasks ? 'text-[#5B6472]' : (isNegative ? (
     (100 - percentage) < 20 ? 'text-emerald-500' : (100 - percentage) < 50 ? 'text-amber-500' : 'text-rose-500'
   ) : (
     percentage >= 80 ? 'text-emerald-500' : percentage >= 50 ? 'text-amber-500' : 'text-rose-500'
@@ -113,11 +113,11 @@ const ScoreRow = ({ label, completed, total, percentage, isNegative, isOnTime }:
           <span className="text-[14px] font-bold text-gray-900 dark:text-white">{completed}</span>
           {!isOnTime && (
             <>
-              <span className="text-gray-400 text-[13px]">/</span>
-              <span className="text-sm font-medium text-gray-400">{total}</span>
+              <span className="text-[#5B6472] text-[13px]">/</span>
+              <span className="text-sm font-medium text-[#5B6472]">{total}</span>
             </>
           )}
-          <span className="text-gray-400 text-[13px] mx-1"> = </span>
+          <span className="text-[#5B6472] text-[13px] mx-1"> = </span>
           <span className={`text-[14px] font-semibold ${color}`}>
             {displayPercentage}{!hasNoTasks && "%"}
           </span>
@@ -302,7 +302,7 @@ const renderTaskTile = (task: any) => {
         
         <div className="flex items-center justify-between px-1">
           <div className="flex flex-col">
-            <span className="text-[13px] font-semibold text-gray-400 tracking-tighter">Target</span>
+            <span className="text-[13px] font-semibold text-[#5B6472] tracking-tighter">Target</span>
             <span className="text-[13px] font-semibold text-gray-600 dark:text-gray-400 whitespace-nowrap">
               {formatDate(task.plannedDate)}
             </span>
@@ -401,7 +401,7 @@ const renderCategoryStatusSections = (tasks: any[], title: string, Icon: any, co
           </div>
           <div className="grid grid-cols-1 gap-3">
             {pendingTasks.length === 0 ? (
-              <p className="text-[13px] text-gray-400 font-bold text-center py-6 italic">No Pending</p>
+              <p className="text-[13px] text-[#5B6472] font-bold text-center py-6 italic">No Pending</p>
             ) : pendingTasks.map((t, idx) => (
               <div key={idx}>{renderTaskTile(t)}</div>
             ))}
@@ -422,7 +422,7 @@ const renderCategoryStatusSections = (tasks: any[], title: string, Icon: any, co
           </div>
           <div className="grid grid-cols-1 gap-3">
              {completedTasks.length === 0 ? (
-                <p className="text-[13px] text-gray-400 font-bold text-center py-6 italic">No Completions</p>
+                <p className="text-[13px] text-[#5B6472] font-bold text-center py-6 italic">No Completions</p>
              ) : completedTasks.map((t, idx) => (
                 <div key={idx}>{renderTaskTile(t)}</div>
              ))}
@@ -441,7 +441,7 @@ const renderCategoryStatusSections = (tasks: any[], title: string, Icon: any, co
           </div>
           <div className="grid grid-cols-1 gap-3">
              {delayedTasks.length === 0 ? (
-                <p className="text-[13px] text-gray-400 font-bold text-center py-6 italic">No Delayed Tasks</p>
+                <p className="text-[13px] text-[#5B6472] font-bold text-center py-6 italic">No Delayed Tasks</p>
              ) : delayedTasks.map((t, idx) => (
                 <div key={idx}>{renderTaskTile(t)}</div>
              ))}
@@ -471,7 +471,7 @@ const PDFReportHeader = ({ user, dateRange }: any) => {
            />
         </div>
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight leading-none">ROBOTEK</h1>
+          <h1 className="text-2xl font-semibold tracking-tight leading-none">Robotek</h1>
           <p className="text-[13px] font-bold mt-1 text-blue-100">Weekly MIS Performance Report</p>
         </div>
       </div>
@@ -500,17 +500,17 @@ const PDFTaskGrid = ({ tasks, title, colorClass }: any) => {
     <div className="flex-1 min-w-0 bg-white rounded-xl border border-gray-100 flex flex-col h-full overflow-hidden">
       <div className={`px-3 py-1.5 border-b border-gray-100 ${colColor.replace('text-', 'bg-').replace('600', '50').replace('400', '50')} flex items-center justify-between shrink-0`}>
         <h4 className={`text-[13px] font-semibold   ${colColor}`}>{colTitle}</h4>
-        <span className="text-[12px] font-semibold text-gray-400 opacity-70">{taskList.length}</span>
+        <span className="text-[12px] font-semibold text-[#5B6472] opacity-70">{taskList.length}</span>
       </div>
       <div className="p-1 space-y-[2px] overflow-hidden flex-1">
         {taskList.length === 0 ? (
-          <p className="text-[12px] italic text-gray-300 py-4 text-center border-2 border-dashed border-gray-50 rounded-lg m-1">No tasks</p>
+          <p className="text-[12px] italic text-[#5B6472] py-4 text-center border-2 border-dashed border-gray-50 rounded-lg m-1">No tasks</p>
         ) : taskList.map((t, idx) => (
           <div key={idx} className="px-1.5 py-1 border-b border-gray-50 last:border-0 hover:bg-gray-50/50">
             <p className="text-[12px] font-semibold text-gray-900 leading-tight truncate mb-0.5">{t.title}</p>
             <div className="flex items-center justify-between gap-1 overflow-hidden">
                <div className="flex items-center gap-1 shrink-0">
-                  <span className="text-[6px] font-bold text-gray-400 tracking-tighter">TG:</span>
+                  <span className="text-[6px] font-bold text-[#5B6472] tracking-tighter">TG:</span>
                   <span className="text-[12px] font-semibold text-gray-500 whitespace-nowrap">{formatDate(t.plannedDate)}</span>
                </div>
                {t.actualDate ? (
@@ -536,7 +536,7 @@ const PDFTaskGrid = ({ tasks, title, colorClass }: any) => {
       <div className={`px-4 py-2 border-b-2 border-gray-100 bg-gray-50/50 flex items-center gap-3 mb-3 rounded-xl shrink-0`}>
          <div className={`w-1.5 h-4 rounded-full ${colorClass.replace('text-', 'bg-')}`} />
          <h3 className={`font-semibold text-[14px] ${colorClass}  `}>{title}</h3>
-         <span className="ml-auto text-[12px] font-semibold text-gray-400">{tasks.length} Total</span>
+         <span className="ml-auto text-[12px] font-semibold text-[#5B6472]">{tasks.length} Total</span>
       </div>
       
       <div className="flex items-start gap-3 flex-1 h-[0] overflow-hidden">
@@ -570,11 +570,11 @@ const PDFHiddenReport = ({ user, dateRange, userTrendData, isNegativeMode, calcu
            </div>
            <div className="w-40 shrink-0">
               <h2 className="text-lg font-semibold text-[#2563EB] truncate">{user.user.username}</h2>
-              <p className="text-[12px] font-semibold text-gray-400">{user.user.roleName}</p>
+              <p className="text-[12px] font-semibold text-[#5B6472]">{user.user.roleName}</p>
            </div>
            <div className="flex gap-4 px-4 border-l border-r border-gray-100 shrink-0">
               <div className="text-center">
-                 <p className="text-[12px] font-semibold text-gray-400 mb-0.5">Total</p>
+                 <p className="text-[12px] font-semibold text-[#5B6472] mb-0.5">Total</p>
                  <p className="text-xl font-semibold text-[#2563EB] tracking-tight">{user.total}</p>
               </div>
               <div className="text-center">
@@ -597,13 +597,14 @@ const PDFHiddenReport = ({ user, dateRange, userTrendData, isNegativeMode, calcu
         {/* Breakdown & Trend Chart Wrapper - High Density */}
         <div className="flex flex-col gap-4 flex-1 overflow-hidden">
            <div className="w-full bg-white rounded-xl border border-gray-100 shadow-sm p-4 shrink-0">
-              <h3 className="text-[13px] font-semibold text-gray-400 mb-2 border-b pb-2">Category Performance Breakdown</h3>
+              <h3 className="text-[13px] font-semibold text-[#5B6472] mb-2 border-b pb-2">Category Performance Breakdown</h3>
               <div className="flex items-center justify-around w-full mt-3">
                 {[
-                  { label: 'Delegations', stats: user.delegationStats, color: 'text-orange-500', icon: DocumentTextIcon },
+                  { label: 'Delegations', stats: user.delegationStats, color: 'text-[#D97706]', icon: DocumentTextIcon },
                   { label: 'Checklists', stats: user.checklistStats, color: 'text-emerald-500', icon: ClipboardDocumentListIcon },
                   { label: 'O2D FMS Jobs', stats: user.o2dStats, color: 'text-blue-500', icon: ShoppingBagIcon },
                   { label: 'Scot Tracking', stats: user.scotStats, color: 'text-purple-500', icon: PhoneIcon },
+                  ...(user.fmsStats?.total ? [{ label: 'Other FMS', stats: user.fmsStats, color: 'text-teal-500', icon: ShoppingBagIcon }] : []),
                   ...(user.leaveStats ? [{ label: 'Leave', stats: user.leaveStats, color: 'text-violet-500', icon: CalendarDaysIcon, isLeave: true }] : []),
                 ].map((cat: any, i) => (
                   <div key={i} className="flex flex-col items-center gap-1">
@@ -640,7 +641,7 @@ const PDFHiddenReport = ({ user, dateRange, userTrendData, isNegativeMode, calcu
       {/* Page 2: Delegations - Using 3 Column Grid */}
       <div ref={pageRefs.page2} ref-id="pdf-page-2" style={{ backgroundColor: '#ffffff' }} className="w-[794px] h-[1123px] p-4 flex flex-col overflow-hidden">
         <PDFReportHeader user={user} dateRange={dateRange} />
-        <PDFTaskGrid tasks={user.delegationStats?.items || []} title="Delegations Snapshot" colorClass="text-orange-600" />
+        <PDFTaskGrid tasks={user.delegationStats?.items || []} title="Delegations Snapshot" colorClass="text-[#D97706]" />
       </div>
 
       {/* Page 3: Checklists - Using 3 Column Grid */}
@@ -672,6 +673,7 @@ const UserDrilldownContent = ({ user, dateRange, chartGranularity, onGranularity
       ...(user.checklistStats?.items || []),
       ...(user.o2dStats?.items || []),
       ...(user.scotStats?.items || []),
+      ...(user.fmsStats?.items || []),
     ];
   }, [user]);
 
@@ -857,7 +859,7 @@ const UserDrilldownContent = ({ user, dateRange, chartGranularity, onGranularity
                   <thead>
                     <tr 
                       style={{ borderColor: 'var(--panel-border)' }}
-                      className="border-b-2 text-[13px] font-semibold text-gray-400"
+                      className="border-b-2 text-[13px] font-semibold text-[#5B6472]"
                     >
                       <th className="pb-3 text-left">Category</th>
                       <th className="pb-3 text-center">{user.leaveStats ? "Score / Total" : "Score %"}</th>
@@ -869,7 +871,7 @@ const UserDrilldownContent = ({ user, dateRange, chartGranularity, onGranularity
                     className="divide-y text-[14px] md:text-sm font-bold text-gray-700 dark:text-gray-300"
                   >
                     <tr>
-                      <td className="py-2.5 flex items-center gap-2 font-semibold text-[13px] sm:text-xs text-gray-900 dark:text-white"><DocumentTextIcon className="w-5 h-5 text-orange-500 shrink-0"/> Delegations</td>
+                      <td className="py-2.5 flex items-center gap-2 font-semibold text-[13px] sm:text-xs text-gray-900 dark:text-white"><DocumentTextIcon className="w-5 h-5 text-[#D97706] shrink-0"/> Delegations</td>
                       <td className={`py-2.5 text-center font-semibold ${user.delegationStats?.score >= 80 ? 'text-emerald-500' : 'text-amber-500'}`}>
                         {user.delegationStats?.total === 0 ? "—" : (isNegativeMode ? user.delegationStats?.score - 100 : user.delegationStats?.score || 0) + "%"}
                       </td>
@@ -904,6 +906,17 @@ const UserDrilldownContent = ({ user, dateRange, chartGranularity, onGranularity
                         {user.scotStats?.completed === 0 ? "—" : (isNegativeMode ? user.scotStats?.onTimeRate - 100 : user.scotStats?.onTimeRate || 0) + "%"}
                       </td>
                     </tr>
+                    {user.fmsStats && user.fmsStats.total > 0 && (
+                      <tr>
+                        <td className="py-2.5 flex items-center gap-2 font-semibold text-[13px] sm:text-xs text-gray-900 dark:text-white"><ShoppingBagIcon className="w-5 h-5 text-teal-500 shrink-0"/> Other FMS</td>
+                        <td className={`py-2.5 text-center font-semibold ${user.fmsStats.score >= 80 ? 'text-emerald-500' : 'text-amber-500'}`}>
+                          {(isNegativeMode ? user.fmsStats.score - 100 : user.fmsStats.score || 0) + "%"}
+                        </td>
+                        <td className={`py-2.5 text-center font-semibold ${user.fmsStats.onTimeRate >= 80 ? 'text-emerald-500' : 'text-amber-500'}`}>
+                          {user.fmsStats.completed === 0 ? "—" : (isNegativeMode ? user.fmsStats.onTimeRate - 100 : user.fmsStats.onTimeRate || 0) + "%"}
+                        </td>
+                      </tr>
+                    )}
                     {user.leaveStats && (
                       <tr>
                         <td className="py-2.5 flex items-center gap-2 font-semibold text-[13px] sm:text-xs text-gray-900 dark:text-white">
@@ -911,13 +924,13 @@ const UserDrilldownContent = ({ user, dateRange, chartGranularity, onGranularity
                         </td>
                         <td className="py-2.5 text-center font-semibold text-slate-700 dark:text-slate-200">
                           <span className="text-emerald-600">{user.leaveStats.completed}</span>
-                          <span className="text-gray-400 mx-0.5">/</span>
+                          <span className="text-[#5B6472] mx-0.5">/</span>
                           <span>{user.leaveStats.total}</span>
-                          <div className="text-[12px] font-bold text-gray-400 mt-0.5">Done / Total</div>
+                          <div className="text-[12px] font-bold text-[#5B6472] mt-0.5">Done / Total</div>
                         </td>
                         <td className={`py-2.5 text-center font-semibold ${user.leaveStats.pending > 0 ? "text-amber-600" : "text-emerald-500"}`}>
                           {user.leaveStats.pending}
-                          <div className="text-[12px] font-bold text-gray-400 mt-0.5">Pending</div>
+                          <div className="text-[12px] font-bold text-[#5B6472] mt-0.5">Pending</div>
                         </td>
                       </tr>
                     )}
@@ -942,7 +955,7 @@ const UserDrilldownContent = ({ user, dateRange, chartGranularity, onGranularity
 
         {/* 4 Separate Category Score Tables */}
         {([
-          { catKey: 'delegation' as const, label: 'Delegations', Icon: DocumentTextIcon, accentColor: 'text-orange-500', headerBg: 'bg-orange-50/60 dark:bg-orange-950/20', headerBorder: 'border-orange-100 dark:border-orange-900/30', rowEven: 'bg-orange-50/20 dark:bg-orange-950/10', dot: 'bg-orange-400' },
+          { catKey: 'delegation' as const, label: 'Delegations', Icon: DocumentTextIcon, accentColor: 'text-[#D97706]', headerBg: 'bg-[#F7F8FA] dark:bg-[#FEF3C7]', headerBorder: 'border-[#E5E7EB] dark:border-[#E5E7EB]', rowEven: 'bg-[#F7F8FA] dark:bg-[#FEF3C7]', dot: 'bg-[#FEF3C7]' },
           { catKey: 'checklist' as const, label: 'Checklists', Icon: ClipboardDocumentListIcon, accentColor: 'text-emerald-500', headerBg: 'bg-emerald-50/60 dark:bg-emerald-950/20', headerBorder: 'border-emerald-100 dark:border-emerald-900/30', rowEven: 'bg-emerald-50/20 dark:bg-emerald-950/10', dot: 'bg-emerald-400' },
           { catKey: 'o2d' as const, label: 'O2D FMS Jobs', Icon: ShoppingBagIcon, accentColor: 'text-blue-500', headerBg: 'bg-blue-50/60 dark:bg-blue-950/20', headerBorder: 'border-blue-100 dark:border-blue-900/30', rowEven: 'bg-blue-50/20 dark:bg-blue-950/10', dot: 'bg-blue-400' },
           { catKey: 'scot' as const, label: 'Scot Tracking', Icon: PhoneIcon, accentColor: 'text-purple-500', headerBg: 'bg-purple-50/60 dark:bg-purple-950/20', headerBorder: 'border-purple-100 dark:border-purple-900/30', rowEven: 'bg-purple-50/20 dark:bg-purple-950/10', dot: 'bg-purple-400' },
@@ -965,7 +978,7 @@ const UserDrilldownContent = ({ user, dateRange, chartGranularity, onGranularity
                 <h3 className={`font-semibold text-[14px]   ${cat.accentColor}`}>
                   {cat.label}
                 </h3>
-                <span className="ml-auto text-[13px] font-bold text-gray-400">
+                <span className="ml-auto text-[13px] font-bold text-[#5B6472]">
                   Last {categoryTrendData.length} {periodLabel}
                 </span>
               </div>
@@ -976,7 +989,7 @@ const UserDrilldownContent = ({ user, dateRange, chartGranularity, onGranularity
                     <tr className="bg-gray-50/50 dark:bg-navy-950/40">
                       <th 
                         style={{ backgroundColor: 'var(--panel-card)', borderColor: 'var(--panel-border)' }}
-                        className="sticky left-0 z-10 px-4 py-2.5 text-[13px] font-semibold text-gray-400 min-w-[110px] border-b"
+                        className="sticky left-0 z-10 px-4 py-2.5 text-[13px] font-semibold text-[#5B6472] min-w-[110px] border-b"
                       >
                         Metric
                       </th>
@@ -984,7 +997,7 @@ const UserDrilldownContent = ({ user, dateRange, chartGranularity, onGranularity
                         <th 
                           key={i} 
                           style={{ borderColor: 'var(--panel-border)' }}
-                          className="px-2 py-2.5 text-center text-[13px] font-semibold text-gray-400 whitespace-nowrap min-w-[64px] border-b"
+                          className="px-2 py-2.5 text-center text-[13px] font-semibold text-[#5B6472] whitespace-nowrap min-w-[64px] border-b"
                         >
                           {d.label}
                         </th>
@@ -1013,7 +1026,7 @@ const UserDrilldownContent = ({ user, dateRange, chartGranularity, onGranularity
                         const display = hasNoTasks ? "—" : (isNegativeMode ? val - 100 : val);
                         const displayStr = hasNoTasks ? display : display + "%";
                         
-                        const colorClass = hasNoTasks ? 'text-gray-300' : (val >= 80 ? 'text-emerald-500' : val >= 50 ? 'text-amber-500' : 'text-rose-500');
+                        const colorClass = hasNoTasks ? 'text-[#5B6472]' : (val >= 80 ? 'text-emerald-500' : val >= 50 ? 'text-amber-500' : 'text-rose-500');
                         const bgClass = hasNoTasks ? 'bg-gray-50 dark:bg-navy-900/50' : (val >= 80 ? 'bg-emerald-50 dark:bg-emerald-950/20' : val >= 50 ? 'bg-amber-50 dark:bg-amber-950/20' : 'bg-rose-50 dark:bg-rose-950/20');
                         const barColor = hasNoTasks ? 'bg-gray-200' : (val >= 80 ? 'bg-emerald-400' : val >= 50 ? 'bg-amber-400' : 'bg-rose-400');
                         return (
@@ -1047,7 +1060,7 @@ const UserDrilldownContent = ({ user, dateRange, chartGranularity, onGranularity
                         const display = hasNoTasks ? "—" : (isNegativeMode ? val - 100 : val);
                         const displayStr = hasNoTasks ? display : display + "%";
 
-                        const colorClass = hasNoTasks ? 'text-gray-300' : (val >= 80 ? 'text-emerald-500' : val >= 50 ? 'text-amber-500' : 'text-rose-500');
+                        const colorClass = hasNoTasks ? 'text-[#5B6472]' : (val >= 80 ? 'text-emerald-500' : val >= 50 ? 'text-amber-500' : 'text-rose-500');
                         const bgClass = hasNoTasks ? 'bg-gray-50 dark:bg-navy-900/50' : (val >= 80 ? 'bg-emerald-50 dark:bg-emerald-950/20' : val >= 50 ? 'bg-amber-50 dark:bg-amber-950/20' : 'bg-rose-50 dark:bg-rose-950/20');
                         const barColor = hasNoTasks ? 'bg-gray-200' : (val >= 80 ? 'bg-emerald-400' : val >= 50 ? 'bg-amber-400' : 'bg-rose-400');
                         return (
@@ -1076,7 +1089,7 @@ const UserDrilldownContent = ({ user, dateRange, chartGranularity, onGranularity
               user.delegationStats?.items || [], 
               "Delegations History", 
               DocumentTextIcon, 
-              "text-orange-600"
+              "text-[#D97706]"
             )}
           </div>
           
@@ -1107,6 +1120,15 @@ const UserDrilldownContent = ({ user, dateRange, chartGranularity, onGranularity
             )}
           </div>
 
+          <div data-pdf-section="history-fms">
+            {renderCategoryStatusSections(
+              user.fmsStats?.items || [],
+              "Other FMS Steps History",
+              ShoppingBagIcon,
+              "text-teal-600"
+            )}
+          </div>
+
           {user.leaveStats && (
             <div data-pdf-section="history-leave">
               {renderCategoryStatusSections(
@@ -1125,8 +1147,8 @@ const UserDrilldownContent = ({ user, dateRange, chartGranularity, onGranularity
 
 const CategoryDrilldownContent = ({ catData, label, dateRange, chartGranularity, calculateDelayHours, isNegativeMode }: any) => {
   const Icon = label === 'Delegations' ? DocumentTextIcon : label === 'Checklists' ? ClipboardDocumentListIcon : ShoppingBagIcon;
-  const accentColor = label === 'Delegations' ? 'text-orange-500' : label === 'Checklists' ? 'text-emerald-500' : 'text-blue-500';
-  const bgColor = label === 'Delegations' ? 'from-orange-600 to-orange-400' : label === 'Checklists' ? 'from-emerald-600 to-emerald-400' : 'from-blue-600 to-blue-400';
+  const accentColor = label === 'Delegations' ? 'text-[#D97706]' : label === 'Checklists' ? 'text-emerald-500' : 'text-blue-500';
+  const bgColor = label === 'Delegations' ? 'from-[#F7F8FA] to-[#F7F8FA]' : label === 'Checklists' ? 'from-emerald-600 to-emerald-400' : 'from-blue-600 to-blue-400';
 
   const pendingCount = catData.total - catData.completed;
   const delayedCount = useMemo(() => (catData.items || []).filter((i: any) => i.isLate).length, [catData.items]);
@@ -1190,7 +1212,7 @@ const CategoryDrilldownContent = ({ catData, label, dateRange, chartGranularity,
           <h3 className={`font-semibold text-[14px]   ${tableAccent}`}>
             {title}
           </h3>
-          <span className="ml-auto text-[13px] font-bold text-gray-400">
+          <span className="ml-auto text-[13px] font-bold text-[#5B6472]">
             Last {trendData.length} {periodLabel}
           </span>
         </div>
@@ -1201,12 +1223,12 @@ const CategoryDrilldownContent = ({ catData, label, dateRange, chartGranularity,
               <tr className="bg-gray-50/50 dark:bg-navy-950/40">
                 <th 
                   style={{ backgroundColor: 'var(--panel-card)', borderColor: 'var(--panel-border)' }}
-                  className="sticky left-0 z-10 px-4 py-2.5 text-[13px] font-semibold text-gray-400 min-w-[110px] border-b"
+                  className="sticky left-0 z-10 px-4 py-2.5 text-[13px] font-semibold text-[#5B6472] min-w-[110px] border-b"
                 >
                   Metric
                 </th>
                 {trendData.map((d, i) => (
-                  <th key={i} style={{ borderColor: 'var(--panel-border)' }} className="px-2 py-2.5 text-center text-[13px] font-semibold text-gray-400 whitespace-nowrap min-w-[64px] border-b">
+                  <th key={i} style={{ borderColor: 'var(--panel-border)' }} className="px-2 py-2.5 text-center text-[13px] font-semibold text-[#5B6472] whitespace-nowrap min-w-[64px] border-b">
                     {d.label}
                   </th>
                 ))}
@@ -1223,7 +1245,7 @@ const CategoryDrilldownContent = ({ catData, label, dateRange, chartGranularity,
                 {trendData.map((d, i) => {
                   const hasNoTasks = d.total === 0;
                   const display = hasNoTasks ? "—" : (isNegativeMode ? d.score - 100 : d.score);
-                  const colorClass = hasNoTasks ? 'text-gray-300' : (d.score >= 80 ? 'text-emerald-500' : d.score >= 50 ? 'text-amber-500' : 'text-rose-500');
+                  const colorClass = hasNoTasks ? 'text-[#5B6472]' : (d.score >= 80 ? 'text-emerald-500' : d.score >= 50 ? 'text-amber-500' : 'text-rose-500');
                   return (
                     <td key={i} className="px-2 py-3 text-center">
                       <span className={`text-[14px] font-semibold ${colorClass}`}>{display}{!hasNoTasks && "%"}</span>
@@ -1241,7 +1263,7 @@ const CategoryDrilldownContent = ({ catData, label, dateRange, chartGranularity,
                 {trendData.map((d, i) => {
                   const hasNoTasks = d.completed === 0;
                   const display = hasNoTasks ? "—" : (isNegativeMode ? d.onTime - 100 : d.onTime);
-                  const colorClass = hasNoTasks ? 'text-gray-300' : (d.onTime >= 80 ? 'text-emerald-500' : d.onTime >= 50 ? 'text-amber-500' : 'text-rose-500');
+                  const colorClass = hasNoTasks ? 'text-[#5B6472]' : (d.onTime >= 80 ? 'text-emerald-500' : d.onTime >= 50 ? 'text-amber-500' : 'text-rose-500');
                   return (
                     <td key={i} className="px-2 py-3 text-center">
                       <span className={`text-[14px] font-semibold ${colorClass}`}>{display}{!hasNoTasks && "%"}</span>
@@ -1291,7 +1313,7 @@ const CategoryDrilldownContent = ({ catData, label, dateRange, chartGranularity,
           <div className="flex-1 flex flex-wrap items-center justify-center xl:justify-around gap-4 xl:gap-6 w-full py-2">
              <div className="flex flex-col items-center min-w-[70px]">
                 <ClipboardDocumentListIcon className={`w-6 h-6 mb-2 ${accentColor}`} />
-                <p className="text-[13px] font-semibold text-gray-400 mb-1.5">Total</p>
+                <p className="text-[13px] font-semibold text-[#5B6472] mb-1.5">Total</p>
                 <p className="text-4xl font-semibold text-gray-900 dark:text-white leading-none">{catData.total}</p>
              </div>
              <div className="flex flex-col items-center min-w-[70px]">
@@ -1748,7 +1770,7 @@ function ScorePageContent() {
         <thead>
           <tr 
             style={{ backgroundColor: 'var(--background)', borderColor: 'var(--panel-border)' }}
-            className="border-b text-gray-400 font-semibold"
+            className="border-b text-[#5B6472] font-semibold"
           >
             <th className="px-3 py-2">Task</th>
             <th className="px-2 py-2 text-center">Status</th>
@@ -1761,7 +1783,7 @@ function ScorePageContent() {
         >
           {tasks.length === 0 ? (
             <tr>
-              <td colSpan={3} className="py-6 text-center italic text-gray-400">No tasks found</td>
+              <td colSpan={3} className="py-6 text-center italic text-[#5B6472]">No tasks found</td>
             </tr>
           ) : tasks.map((task, idx) => (
             <tr key={idx} className="hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
@@ -1777,7 +1799,7 @@ function ScorePageContent() {
                   {task.isLate ? 'Late' : task.actualDate ? 'Done' : 'Pend'}
                 </span>
               </td>
-              <td className="px-3 py-2 text-right text-gray-400 font-semibold">
+              <td className="px-3 py-2 text-right text-[#5B6472] font-semibold">
                 {task.plannedDate ? new Date(task.plannedDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }) : '—'}
               </td>
             </tr>
@@ -1817,13 +1839,13 @@ function ScorePageContent() {
           <div className="flex items-center justify-between mb-8 border-b-4 border-[#2563EB] pb-4">
              <div>
                 <h1 className="text-3xl font-semibold text-[#2563EB] tracking-tight">Robotek Industries</h1>
-                <p className="text-[13px] font-semibold text-gray-400 mt-1">Weekly MIS Performance Analytics</p>
+                <p className="text-[13px] font-semibold text-[#5B6472] mt-1">Weekly MIS Performance Analytics</p>
              </div>
              <div className="text-right">
                 <div className="px-3 py-1 bg-[#2563EB] text-white text-[13px] font-semibold rounded-md mb-2 inline-block">
                    Official Scorecard
                 </div>
-                <p className="text-[13px] font-semibold text-gray-300">Reporting Period</p>
+                <p className="text-[13px] font-semibold text-[#5B6472]">Reporting Period</p>
                 <p className="text-sm font-semibold text-[#2563EB]">{dateRange.from} to {dateRange.to}</p>
              </div>
           </div>
@@ -1849,9 +1871,9 @@ function ScorePageContent() {
 
           {/* Branded Print Footer */}
           <div className="mt-16 pt-6 border-t border-gray-100 flex justify-between items-center">
-             <p className="text-[12px] font-semibold text-gray-300">© {new Date().getFullYear()} Robotek ERP - Confidential Analytics Report</p>
+             <p className="text-[12px] font-semibold text-[#5B6472]">© {new Date().getFullYear()} Sarthi · Confidential analytics report</p>
              <div className="flex items-center gap-4">
-                <p className="text-[12px] font-semibold text-gray-300">System Verify: OK</p>
+                <p className="text-[12px] font-semibold text-[#5B6472]">System Verify: OK</p>
                 <div className="w-12 h-1 bg-gray-100 rounded-full overflow-hidden">
                    <div className="w-full h-full bg-emerald-400" />
                 </div>
@@ -1867,7 +1889,8 @@ function ScorePageContent() {
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 px-4">
         <div>
           <h1 className="text-xl font-semibold text-gray-900 dark:text-white tracking-tight">Performance Score</h1>
-          <p className="text-[13px] font-bold text-gray-400 mt-0.5">Operational Analytics & Rankings</p>
+          <a href="/score/why" className="inline-flex items-center gap-1 mt-1 px-3 py-1.5 rounded-lg bg-red-50 text-red-700 border border-red-200 text-[13px] font-semibold hover:bg-red-100 print:hidden">Why did the score drop? →</a>
+          <p className="text-[13px] font-bold text-[#5B6472] mt-0.5">Operational Analytics & Rankings</p>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
@@ -1877,7 +1900,7 @@ function ScorePageContent() {
               style={{ backgroundColor: 'var(--panel-card)', borderColor: 'var(--panel-border)' }}
               className="relative group min-w-[180px] border-2 rounded-xl overflow-hidden shadow-sm"
             >
-              <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
+              <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#5B6472]" />
               <input 
                 type="text" 
                 placeholder={viewSetting === 'user' ? "Search user..." : "Search category..."}
@@ -1899,7 +1922,7 @@ function ScorePageContent() {
                   {filterType === 'week' ? 'Week' : filterType === 'month' ? 'Month' : filterType === 'custom' ? 'Custom' : 'Till Date'}
                 </span>
               </div>
-              <ChevronDownIcon className={`w-4 h-4 text-gray-400 transition-transform duration-300 ${isFilterDropdownOpen ? 'rotate-180' : ''}`} />
+              <ChevronDownIcon className={`w-4 h-4 text-[#5B6472] transition-transform duration-300 ${isFilterDropdownOpen ? 'rotate-180' : ''}`} />
             </button>
 
             {isFilterDropdownOpen && (
@@ -1922,7 +1945,7 @@ function ScorePageContent() {
                         setIsFilterDropdownOpen(false);
                       }}
                       className={`w-full px-4 py-2.5 text-left text-[13px] font-semibold   flex items-center gap-2 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors ${
-                        isActive ? 'text-[#2563EB] dark:text-[#60A5FA] bg-gray-50/50 dark:bg-white/5' : 'text-gray-400'
+                        isActive ? 'text-[#2563EB] dark:text-[#60A5FA] bg-gray-50/50 dark:bg-white/5' : 'text-[#5B6472]'
                       }`}
                     >
                       {btn.icon}
@@ -1967,13 +1990,13 @@ function ScorePageContent() {
              >
                 <button 
                  onClick={() => setViewSetting('user')}
-                 className={`px-4 py-1.5 rounded-lg text-[13px] font-semibold   transition-all ${viewSetting === 'user' ? 'bg-[#2563EB] dark:bg-[#60A5FA] text-white dark:text-black shadow-md' : 'text-gray-400 hover:text-gray-600'}`}
+                 className={`px-4 py-1.5 rounded-lg text-[13px] font-semibold   transition-all ${viewSetting === 'user' ? 'bg-[#2563EB] dark:bg-[#60A5FA] text-white dark:text-black shadow-md' : 'text-[#5B6472] hover:text-gray-600'}`}
                 >
                   By User
                 </button>
                 <button 
                  onClick={() => setViewSetting('category')}
-                 className={`px-4 py-1.5 rounded-lg text-[13px] font-semibold   transition-all ${viewSetting === 'category' ? 'bg-[#2563EB] dark:bg-[#60A5FA] text-white dark:text-black shadow-md' : 'text-gray-400 hover:text-gray-600'}`}
+                 className={`px-4 py-1.5 rounded-lg text-[13px] font-semibold   transition-all ${viewSetting === 'category' ? 'bg-[#2563EB] dark:bg-[#60A5FA] text-white dark:text-black shadow-md' : 'text-[#5B6472] hover:text-gray-600'}`}
                 >
                   By Category
                 </button>
@@ -1988,13 +2011,13 @@ function ScorePageContent() {
              >
                 <button 
                  onClick={() => setViewMode('grid')}
-                 className={`p-2 rounded-full transition-all ${viewMode === 'grid' ? 'bg-[#2563EB] dark:bg-[#60A5FA] text-white dark:text-black shadow-md scale-105' : 'text-gray-400 hover:text-gray-600'}`}
+                 className={`p-2 rounded-full transition-all ${viewMode === 'grid' ? 'bg-[#2563EB] dark:bg-[#60A5FA] text-white dark:text-black shadow-md scale-105' : 'text-[#5B6472] hover:text-gray-600'}`}
                 >
                   <Squares2X2Icon className="w-4 h-4" />
                 </button>
                 <button 
                  onClick={() => setViewMode('table')}
-                 className={`p-2 rounded-full transition-all ${viewMode === 'table' ? 'bg-[#2563EB] dark:bg-[#60A5FA] text-white dark:text-black shadow-md scale-105' : 'text-gray-400 hover:text-gray-600'}`}
+                 className={`p-2 rounded-full transition-all ${viewMode === 'table' ? 'bg-[#2563EB] dark:bg-[#60A5FA] text-white dark:text-black shadow-md scale-105' : 'text-[#5B6472] hover:text-gray-600'}`}
                 >
                   <ListBulletIcon className="w-4 h-4" />
                 </button>
@@ -2058,13 +2081,13 @@ function ScorePageContent() {
       {isLoading ? (
         <div className="flex flex-col items-center justify-center p-40">
            <ArrowPathIcon className="w-12 h-12 animate-spin text-[#2563EB] dark:text-[#60A5FA]" />
-           <p className="mt-4 text-[13px] font-semibold text-gray-400">Loading Real-Time Scores</p>
+           <p className="mt-4 text-[13px] font-semibold text-[#5B6472]">Loading Real-Time Scores</p>
         </div>
       ) : error ? (
         <div className="p-20 text-center border-4 border-dashed border-rose-100 dark:border-rose-900/20 rounded-[3rem]">
            <ExclamationCircleIcon className="w-12 h-12 text-rose-500 mx-auto mb-4" />
            <h3 className="text-xl font-semibold text-rose-600">Dashboard Sync Error</h3>
-           <p className="text-[14px] font-bold text-gray-400 mt-2">Please check your connection and try again</p>
+           <p className="text-[14px] font-bold text-[#5B6472] mt-2">Please check your connection and try again</p>
         </div>
       ) : (
         <>
@@ -2112,8 +2135,8 @@ function ScorePageContent() {
                             C
                          </div>
                          <div>
-                            <h3 className="text-[14px] font-semibold text-gray-900 dark:text-white leading-tight">COMPANY OVERALL</h3>
-                            <div className="px-1.5 py-0.5 bg-[#2563EB]/10 dark:bg-yellow-500/10 rounded-md text-[12px] font-semibold text-white dark:text-[#60A5FA] tracking-tighter mt-0.5 inline-block">SYSTEM SNAPSHOT</div>
+                            <h3 className="text-[14px] font-semibold text-gray-900 dark:text-white leading-tight">Company Overall</h3>
+                            <div className="px-1.5 py-0.5 bg-[#2563EB]/10 dark:bg-yellow-500/10 rounded-md text-[12px] font-semibold text-[#2563EB] dark:text-[#60A5FA] tracking-tighter mt-0.5 inline-block">System Snapshot</div>
                          </div>
                       </div>
                    </div>
@@ -2146,7 +2169,7 @@ function ScorePageContent() {
                                   {companyStats.totalDelayHours}
                                </span>
                             </div>
-                            <div className="text-[7.5px] font-semibold text-gray-400 mt-0.5 whitespace-nowrap">
+                            <div className="text-[7.5px] font-semibold text-[#5B6472] mt-0.5 whitespace-nowrap">
                                Avg Delay Hrs
                             </div>
                          </div>
@@ -2190,7 +2213,7 @@ function ScorePageContent() {
                                   <h3 className="text-[14px] font-semibold text-gray-900 dark:text-white truncate max-w-[100px] leading-tight group-hover:text-[#2563EB] dark:group-hover:text-[#60A5FA] transition-colors">{item.user.username}</h3>
                                   <div 
                                     style={{ backgroundColor: 'white', borderColor: 'var(--panel-border)' }}
-                                    className="px-1.5 py-0.5 dark:bg-navy-800 rounded-md text-[12px] font-semibold text-gray-400 dark:text-gray-400 tracking-tighter mt-0.5 inline-block border"
+                                    className="px-1.5 py-0.5 dark:bg-navy-800 rounded-md text-[12px] font-semibold text-[#5B6472] dark:text-gray-400 tracking-tighter mt-0.5 inline-block border"
                                   >
                                      {item.user.roleName}
                                   </div>
@@ -2201,7 +2224,7 @@ function ScorePageContent() {
                               style={{ borderColor: 'var(--panel-border)' }}
                               className="w-8 h-8 flex items-center justify-center rounded-full bg-white dark:bg-navy-800 border-2 shadow-sm group-hover:scale-110 group-hover:border-[#2563EB]/20 dark:group-hover:border-[#60A5FA]/20 transition-all"
                             >
-                               <ChevronRightIcon className="w-4 h-4 text-gray-400 group-hover:text-[#2563EB] dark:group-hover:text-[#60A5FA]" />
+                               <ChevronRightIcon className="w-4 h-4 text-[#5B6472] group-hover:text-[#2563EB] dark:group-hover:text-[#60A5FA]" />
                             </div>
                          </div>
                       </div>
@@ -2225,7 +2248,7 @@ function ScorePageContent() {
               ) : (
                 /* Category Tiles (Aggregated & Filtered by Search) */
                 companyStats && [
-                  { label: 'Delegations', id: 'delegationStats', icon: <DocumentTextIcon className="w-6 h-6" />, color: 'text-orange-500', bg: 'from-orange-100/50 via-orange-50/50 to-transparent dark:from-orange-900/40' },
+                  { label: 'Delegations', id: 'delegationStats', icon: <DocumentTextIcon className="w-6 h-6" />, color: 'text-[#D97706]', bg: 'from-[#F7F8FA] via-[#F7F8FA] to-transparent dark:from-[#F7F8FA]' },
                   { label: 'Checklists', id: 'checklistStats', icon: <ClipboardDocumentListIcon className="w-6 h-6" />, color: 'text-emerald-500', bg: 'from-emerald-100/50 via-emerald-50/50 to-transparent dark:from-emerald-900/40' },
                   { label: 'O2D FMS Jobs', id: 'o2dStats', icon: <ShoppingBagIcon className="w-6 h-6" />, color: 'text-blue-500', bg: 'from-blue-100/50 via-blue-50/50 to-transparent dark:from-blue-900/40' }
                 ].filter(cat => cat.label.toLowerCase().includes(searchTerm.toLowerCase())).map(cat => {
@@ -2246,9 +2269,9 @@ function ScorePageContent() {
                          </div>
                          <div className="flex-1">
                             <h3 className="text-sm font-semibold text-gray-900 dark:text-white leading-tight">{cat.label}</h3>
-                            <p className="text-[13px] font-bold text-gray-400 mt-0.5">Combined Department Score</p>
+                            <p className="text-[13px] font-bold text-[#5B6472] mt-0.5">Combined Department Score</p>
                          </div>
-                         <ChevronRightIcon className="w-5 h-5 text-gray-300" />
+                         <ChevronRightIcon className="w-5 h-5 text-[#5B6472]" />
                       </div>
                       <div className="p-4 space-y-2">
                          <ScoreRow label="Overall Efficiency" completed={data.completed} total={data.total} percentage={data.score} isNegative={isNegativeMode} />
@@ -2270,7 +2293,7 @@ function ScorePageContent() {
                    <thead>
                      <tr 
                       style={{ backgroundColor: 'var(--background)', borderColor: 'var(--panel-border)' }}
-                      className="text-[13px] font-semibold text-gray-400 border-b"
+                      className="text-[13px] font-semibold text-[#5B6472] border-b"
                      >
                         <th className="px-6 py-4">User Profile</th>
                         <th className="px-4 py-4 text-center">Score %</th>
@@ -2300,7 +2323,7 @@ function ScorePageContent() {
                                  </div>
                                  <div className="min-w-0">
                                     <p className="font-semibold text-gray-900 dark:text-white text-[13px] truncate max-w-[120px]">{item.user.username}</p>
-                                    <p className="text-[12px] font-bold text-gray-400 tracking-tighter">{item.user.roleName}</p>
+                                    <p className="text-[12px] font-bold text-[#5B6472] tracking-tighter">{item.user.roleName}</p>
                                  </div>
                               </div>
                            </td>
@@ -2341,12 +2364,12 @@ function ScorePageContent() {
                               <div className="inline-flex items-center gap-3">
                                  <div className="text-right">
                                     <p className="text-sm font-semibold text-gray-900 dark:text-white">{isNegativeMode ? item.finalScore - 100 : item.finalScore}%</p>
-                                    <p className="text-[12px] font-semibold text-gray-400">Efficiency</p>
+                                    <p className="text-[12px] font-semibold text-[#5B6472]">Efficiency</p>
                                  </div>
                                  <div className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold text-[14px] ${
                                    idx === 0 ? 'bg-amber-100 text-amber-600 border-2 border-amber-300' : 
                                    idx === 1 ? 'bg-slate-100 text-slate-500 border-2 border-slate-300' : 
-                                   'bg-gray-50 text-gray-400'
+                                   'bg-gray-50 text-[#5B6472]'
                                  }`}>
                                     #{idx + 1}
                                  </div>

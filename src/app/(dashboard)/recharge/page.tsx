@@ -511,7 +511,7 @@ export default function RechargePage() {
 
         <div className="flex flex-wrap items-center gap-2.5 mr-1">
           <div className="relative">
-            <MagnifyingGlassIcon className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <MagnifyingGlassIcon className="w-4 h-4 text-[#5B6472] absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input 
               type="text" 
               placeholder="Search..." 
@@ -663,7 +663,7 @@ export default function RechargePage() {
                 // Determine icon color based on expiry
                 let iconColor = "text-emerald-500 bg-emerald-50 dark:bg-emerald-500/10";
                 if (isDiscontinued) {
-                  iconColor = "text-gray-400 bg-gray-100 dark:bg-gray-800";
+                  iconColor = "text-[#5B6472] bg-gray-100 dark:bg-gray-800";
                 } else if (expiryDate) {
                   const diffTime = expiryDate.getTime() - today.getTime();
                   const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
@@ -711,7 +711,7 @@ export default function RechargePage() {
                           <PhoneIcon className="w-4 h-4" />
                           <p className="text-sm font-semibold tracking-wide">{r.phone_wifi_num}</p>
                         </div>
-                        <div className="text-[14px] font-semibold text-gray-400 tracking-wide mt-1">
+                        <div className="text-[14px] font-semibold text-[#5B6472] tracking-wide mt-1">
                           Filled By: <span className="text-gray-600 dark:text-gray-300">{r.filled_by}</span>
                         </div>
                       </div>
@@ -720,11 +720,11 @@ export default function RechargePage() {
                     {/* Dates */}
                     <div className="flex gap-8 min-w-[250px] border-l border-gray-100 dark:border-white/5 pl-6 shrink-0">
                       <div>
-                        <p className="text-[13px] font-bold text-gray-400 mb-1.5">Recharge Date</p>
+                        <p className="text-[13px] font-bold text-[#5B6472] mb-1.5">Recharge Date</p>
                         <p className="text-base font-semibold text-gray-800 dark:text-gray-200">{formatDate(r.date_of_recharge)}</p>
                       </div>
                       <div>
-                        <p className="text-[13px] font-bold text-gray-400 mb-1.5">Expiry Date <span className="lowercase font-bold opacity-70">({r.validity}d)</span></p>
+                        <p className="text-[13px] font-bold text-[#5B6472] mb-1.5">Expiry Date <span className="lowercase font-bold opacity-70">({r.validity}d)</span></p>
                         <p className={`text-base font-bold ${isDiscontinued ? 'text-gray-500' : 'text-[#FF3B30] dark:text-[#FF453A]'}`}>
                           {expiryDate ? formatDate(expiryDate.toISOString()) : "-"}
                         </p>
@@ -733,7 +733,7 @@ export default function RechargePage() {
 
                     {/* Amount */}
                     <div className="min-w-[150px] text-right border-l border-gray-100 dark:border-white/5 pl-6 pr-4 shrink-0">
-                       <p className="text-[13px] font-bold text-gray-400 mb-1.5">Amount</p>
+                       <p className="text-[13px] font-bold text-[#5B6472] mb-1.5">Amount</p>
                        <p className="text-3xl font-semibold text-[#2563EB] dark:text-[#0A84FF] tracking-tight">₹{r.amount}</p>
                     </div>
 
@@ -777,17 +777,17 @@ export default function RechargePage() {
                              
                              <div className="flex items-center gap-6 flex-1">
                                <div>
-                                 <p className="text-[13px] font-semibold text-gray-400 mb-0.5">Recharge Date</p>
+                                 <p className="text-[13px] font-semibold text-[#5B6472] mb-0.5">Recharge Date</p>
                                  <p className="text-sm font-bold text-gray-800 dark:text-gray-300">{formatDate(hist.date_of_recharge)}</p>
                                </div>
                                <div>
-                                 <p className="text-[13px] font-semibold text-gray-400 mb-0.5">Expiry <span className="lowercase font-bold opacity-70">({hist.validity}d)</span></p>
+                                 <p className="text-[13px] font-semibold text-[#5B6472] mb-0.5">Expiry <span className="lowercase font-bold opacity-70">({hist.validity}d)</span></p>
                                  <p className="text-sm font-semibold text-gray-500">{histExpiry ? formatDate(histExpiry.toISOString()) : "-"}</p>
                                </div>
                              </div>
 
                              <div className="text-right min-w-[100px]">
-                               <p className="text-[13px] font-semibold text-gray-400 mb-0.5">Amount</p>
+                               <p className="text-[13px] font-semibold text-[#5B6472] mb-0.5">Amount</p>
                                <p className="text-lg font-semibold text-gray-600 dark:text-gray-400 tracking-tight">₹{hist.amount}</p>
                              </div>
 
@@ -797,10 +797,10 @@ export default function RechargePage() {
                                     <EyeIcon className="w-3.5 h-3.5" />
                                   </a>
                                 )}
-                                <button onClick={() => openEditModal(hist)} className="p-1.5 text-gray-400 hover:text-[#2563EB] hover:bg-blue-50 dark:hover:text-[#60A5FA] dark:hover:bg-yellow-500/10 rounded-md transition-colors">
+                                <button onClick={() => openEditModal(hist)} className="p-1.5 text-[#5B6472] hover:text-[#2563EB] hover:bg-blue-50 dark:hover:text-[#60A5FA] dark:hover:bg-yellow-500/10 rounded-md transition-colors">
                                   <PencilSquareIcon className="w-3.5 h-3.5" />
                                 </button>
-                                <button onClick={() => requestDelete(hist.id)} className="p-1.5 text-gray-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-md transition-colors">
+                                <button onClick={() => requestDelete(hist.id)} className="p-1.5 text-[#5B6472] hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-md transition-colors">
                                   <TrashIcon className="w-3.5 h-3.5" />
                                 </button>
                              </div>
@@ -813,7 +813,7 @@ export default function RechargePage() {
                 );
               })}
               {filteredGroups.length === 0 && (
-                <div className="col-span-full p-8 text-center text-[14px] font-bold text-gray-400 bg-white dark:bg-[#111827] rounded-2xl border border-gray-200 dark:border-white/5">
+                <div className="col-span-full p-8 text-center text-[14px] font-bold text-[#5B6472] bg-white dark:bg-[#111827] rounded-2xl border border-gray-200 dark:border-white/5">
                   No records found for this filter
                 </div>
               )}
@@ -892,7 +892,7 @@ export default function RechargePage() {
               <div className="grid grid-cols-2 gap-4">
                 {/* Doer / WiFi Name */}
                 <div className="col-span-2 md:col-span-1">
-                  <label className="block text-[13px] font-semibold text-gray-400 dark:text-gray-500 mb-1.5">Doer / WiFi Name</label>
+                  <label className="block text-[13px] font-semibold text-[#5B6472] dark:text-gray-500 mb-1.5">Doer / WiFi Name</label>
                   <input
                     required
                     disabled={isQuickRecharge}
@@ -913,7 +913,7 @@ export default function RechargePage() {
 
                 {/* Phone / WiFi Number */}
                 <div className="col-span-2 md:col-span-1">
-                  <label className="block text-[13px] font-semibold text-gray-400 dark:text-gray-500 mb-1.5">Phone / WiFi Number</label>
+                  <label className="block text-[13px] font-semibold text-[#5B6472] dark:text-gray-500 mb-1.5">Phone / WiFi Number</label>
                   <input
                     required
                     disabled={isQuickRecharge}
@@ -927,7 +927,7 @@ export default function RechargePage() {
 
                 {/* Date of Recharge */}
                 <div className="col-span-2 md:col-span-1">
-                  <label className="block text-[13px] font-semibold text-gray-400 dark:text-gray-500 mb-1.5">Date of Recharge</label>
+                  <label className="block text-[13px] font-semibold text-[#5B6472] dark:text-gray-500 mb-1.5">Date of Recharge</label>
                   <input
                     required
                     type="date"
@@ -939,7 +939,7 @@ export default function RechargePage() {
 
                 {/* Validity */}
                 <div className="col-span-2 md:col-span-1">
-                  <label className="block text-[13px] font-semibold text-gray-400 dark:text-gray-500 mb-1.5">Validity (Days)</label>
+                  <label className="block text-[13px] font-semibold text-[#5B6472] dark:text-gray-500 mb-1.5">Validity (Days)</label>
                   <input
                     required
                     type="number"
@@ -953,7 +953,7 @@ export default function RechargePage() {
 
                 {/* Amount */}
                 <div className="col-span-2 md:col-span-1">
-                  <label className="block text-[13px] font-semibold text-gray-400 dark:text-gray-500 mb-1.5">Amount</label>
+                  <label className="block text-[13px] font-semibold text-[#5B6472] dark:text-gray-500 mb-1.5">Amount</label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                       <span className="text-[#2563EB] font-semibold text-sm">₹</span>
@@ -972,11 +972,11 @@ export default function RechargePage() {
 
                 {/* Attach Bill */}
                 <div className="col-span-2 md:col-span-1">
-                  <label className="block text-[13px] font-semibold text-gray-400 dark:text-gray-500 mb-1.5">Attach Bill</label>
+                  <label className="block text-[13px] font-semibold text-[#5B6472] dark:text-gray-500 mb-1.5">Attach Bill</label>
                   <div className="flex items-center gap-2">
                     <label className="flex-1 flex items-center justify-center gap-2 border-2 border-dashed border-gray-200 dark:border-white/10 rounded-2xl p-2.5 cursor-pointer hover:border-[#2563EB] hover:bg-[#2563EB]/5 transition-all group">
-                      <DocumentArrowUpIcon className="w-4 h-4 text-gray-400 group-hover:text-[#2563EB] transition-colors" />
-                      <span className="text-[13px] font-bold text-gray-400 group-hover:text-[#2563EB] truncate max-w-[100px] transition-colors">
+                      <DocumentArrowUpIcon className="w-4 h-4 text-[#5B6472] group-hover:text-[#2563EB] transition-colors" />
+                      <span className="text-[13px] font-bold text-[#5B6472] group-hover:text-[#2563EB] truncate max-w-[100px] transition-colors">
                         {pendingFile ? pendingFile.name : 'Choose File'}
                       </span>
                       <input type="file" className="hidden" onChange={handleFileUpload} />

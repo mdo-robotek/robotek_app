@@ -21,7 +21,13 @@ async function getDriveClient() {
   return google.drive({ version: "v3", auth: oauth2Client });
 }
 
-export async function uploadFileToDrive(file: File, folderId?: string): Promise<string | null> {
+/**
+ * Uploads a file and returns its Drive id. By default the file is opened to
+ * "anyone with the link" (existing behaviour for CVs, voice notes etc.).
+ * Pass { private: true } for ID documents (Aadhaar, PAN, bank) — those are
+ * served only through Sarthi to logged-in HR/admins (Sahil, 2026-10-27).
+ */
+export async function uploadFileToDrive(file: File, folderId?: string, opts?: { private?: boolean }): Promise<string | null> {
   try {
     const drive = await getDriveClient();
     
@@ -51,8 +57,8 @@ export async function uploadFileToDrive(file: File, folderId?: string): Promise<
     const fileId = response.data.id;
     if (!fileId) return null;
 
-    // Set permission to anyone with the link can view
-    await drive.permissions.create({
+    // Set permission to anyone with the link can view (not for private documents)
+    if (!opts?.private) await drive.permissions.create({
       fileId: fileId,
       requestBody: {
         role: "reader",
@@ -149,3 +155,67 @@ export async function getFileStream(fileId: string) {
 }
 
 export { getDriveImageUrl };
+
+/**
+ * Name / type / size of an uploaded file, and whether it is shared by link
+ * (every upload except private employee documents). Used by the file viewer.
+ */
+export async function getFileMeta(fileId: string): Promise<{ name: string; mimeType: string; size: number; isPublic: boolean } | null> {
+  try {
+    const drive = await getDriveClient();
+    const res = await drive.files.get({ fileId, fields: "name, mimeType, size, permissions(type, role)" });
+    const perms = (res.data.permissions || []) as { type?: string }[];
+    return {
+      name: res.data.name || "file",
+      mimeType: res.data.mimeType || "",
+      size: Number(res.data.size || 0),
+      isPublic: perms.some((p) => p.type === "anyone"),
+    };
+  } catch (error) {
+    console.error("getFileMeta failed", fileId, error);
+    return null;
+  }
+}
+
+/**
+ * Text of an uploaded PDF (used to read Busy SO PDFs, 2026-10-29).
+ * Google turns a temporary copy into a Google Doc, we read its text, and the
+ * temporary copy is removed. Falls back to "pdftotext" if the server has it.
+ */
+export async function getPdfText(fileId: string): Promise<string> {
+  const drive = await getDriveClient();
+  let text = "";
+  let copyId = "";
+  try {
+    const meta = await drive.files.get({ fileId, fields: "parents", supportsAllDrives: true });
+    const copy = await drive.files.copy({
+      fileId,
+      supportsAllDrives: true,
+      fields: "id",
+      requestBody: { name: `sarthi-temp-text-${fileId}`, mimeType: "application/vnd.google-apps.document", parents: meta.data.parents || undefined },
+    });
+    copyId = copy.data.id || "";
+    if (copyId) {
+      const res = await drive.files.export({ fileId: copyId, mimeType: "text/plain" }, { responseType: "text" });
+      text = String(res.data || "");
+    }
+  } catch (e) {
+    console.error("getPdfText via Google failed", e);
+  } finally {
+    // the temporary Google Doc copy only — never the uploaded file
+    if (copyId && copyId !== fileId) await drive.files.delete({ fileId: copyId, supportsAllDrives: true }).catch(() => {});
+  }
+  if (text.trim()) return text;
+  try {
+    const { execFile } = await import("child_process");
+    const res = await drive.files.get({ fileId, alt: "media", supportsAllDrives: true }, { responseType: "arraybuffer" });
+    const buf = Buffer.from(res.data as ArrayBuffer);
+    text = await new Promise<string>((resolve) => {
+      const p = execFile("pdftotext", ["-layout", "-", "-"], { maxBuffer: 10 * 1024 * 1024, timeout: 20000 }, (err, out) => resolve(err ? "" : String(out)));
+      p.stdin?.end(buf);
+    });
+  } catch {
+    /* no pdftotext on this server */
+  }
+  return text;
+}

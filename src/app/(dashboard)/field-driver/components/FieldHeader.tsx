@@ -21,7 +21,7 @@ export default function FieldHeader({
           <button
             type="button"
             onClick={onOpenGuide}
-            className="shrink-0 text-gray-400 hover:text-[#1D4ED8] dark:hover:text-white transition-colors"
+            className="shrink-0 text-[#5B6472] hover:text-[#1D4ED8] dark:hover:text-white transition-colors"
             title="How Field Tracking works"
             aria-label="Open guide"
           >

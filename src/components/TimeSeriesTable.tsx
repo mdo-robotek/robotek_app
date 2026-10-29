@@ -134,7 +134,7 @@ export default function TimeSeriesTable({ transactions, bucket, isLoading, searc
 
   const getHealthColors = (live: number) => {
     if (live < 0) return "text-rose-500 font-semibold";
-    if (live === 0) return "text-gray-400 font-bold";
+    if (live === 0) return "text-[#5B6472] font-bold";
     return "text-emerald-600 dark:text-emerald-400 font-semibold";
   };
 
@@ -229,7 +229,7 @@ export default function TimeSeriesTable({ transactions, bucket, isLoading, searc
           ))}
           {paginatedData.length === 0 && (
             <tr>
-              <td colSpan={buckets.length + 2} className="py-8 text-center text-gray-400 text-[14px] font-semibold">
+              <td colSpan={buckets.length + 2} className="py-8 text-center text-[#5B6472] text-[14px] font-semibold">
                 No items found
               </td>
             </tr>

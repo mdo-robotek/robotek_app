@@ -98,7 +98,7 @@ function StatusBadge({ status }: { status: string }) {
   }
   const map: Record<string, string> = {
     SENT: "text-white bg-gradient-to-r from-emerald-500 to-teal-600 shadow-md shadow-emerald-500/40",
-    FAILED: "text-white bg-gradient-to-r from-rose-500 to-orange-500 shadow-md shadow-rose-500/40",
+    FAILED: "text-white bg-[#DC2626] shadow-md shadow-rose-500/40",
     SKIPPED: "text-white bg-gradient-to-r from-pink-500 to-fuchsia-600 shadow-md shadow-pink-500/40",
     NOT_SENT: "text-white bg-gradient-to-r from-slate-500 to-slate-700 shadow-md shadow-slate-500/30",
     QUEUED: "text-white bg-gradient-to-r from-indigo-500 to-violet-600 shadow-md shadow-indigo-500/40",
@@ -710,7 +710,7 @@ export default function CustomerTargetPage() {
               type="button"
               title="How to use this page"
               onClick={() => setGuideOpen(true)}
-              className="p-1 rounded-full text-white dark:text-[#60A5FA] hover:bg-[#2563EB]/10 dark:hover:bg-[#60A5FA]/10"
+              className="p-1 rounded-full text-[#2563EB] dark:text-[#60A5FA] hover:bg-[#2563EB]/10 dark:hover:bg-[#60A5FA]/10"
             >
               <InformationCircleIcon className="w-5 h-5" />
             </button>
@@ -759,7 +759,7 @@ export default function CustomerTargetPage() {
             <>
               <button
                 onClick={() => importRef.current?.click()}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 text-white text-[14px] font-bold shadow-md shadow-orange-500/25 hover:brightness-105"
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#2563EB] text-white text-[14px] font-bold shadow-md hover:brightness-105"
               >
                 <ArrowUpTrayIcon className="w-4 h-4" /> Import Achievement
               </button>
@@ -808,7 +808,7 @@ export default function CustomerTargetPage() {
             </div>
             <p className="text-2xl font-semibold leading-none">{summary.withAchievement}</p>
           </div>
-          <div className="rounded-2xl bg-gradient-to-br from-rose-500 to-orange-500 text-white p-3.5 shadow-md shadow-rose-500/25 ring-1 ring-white/20">
+          <div className="rounded-2xl bg-[#DC2626] text-white p-3.5 shadow-md shadow-rose-500/25 ring-1 ring-white/20">
             <div className="flex items-center justify-between mb-2">
               <p className="text-[13px] font-semibold text-rose-100">Pending Target</p>
               <div className="w-8 h-8 rounded-xl bg-white/15 flex items-center justify-center">
@@ -874,13 +874,13 @@ export default function CustomerTargetPage() {
             </button>
             <button
               onClick={() => selectEligible("failed")}
-              className="text-[13px] font-semibold px-3 py-2 rounded-xl bg-gradient-to-r from-rose-500 to-orange-500 text-white shadow-sm shadow-rose-500/20 hover:brightness-105"
+              className="text-[13px] font-semibold px-3 py-2 rounded-xl bg-[#DC2626] text-white shadow-sm shadow-rose-500/20 hover:brightness-105"
             >
               Select Failed
             </button>
             <button
               onClick={() => selectEligible("not_sent")}
-              className="text-[13px] font-semibold px-3 py-2 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 text-white shadow-sm shadow-amber-500/20 hover:brightness-105"
+              className="text-[13px] font-semibold px-3 py-2 rounded-xl bg-[#2563EB] text-white shadow-sm shadow-amber-500/20 hover:brightness-105"
             >
               Select Not Sent
             </button>
@@ -898,11 +898,11 @@ export default function CustomerTargetPage() {
 
         <div className="flex-1 min-h-[280px] overflow-auto">
           {isLoading ? (
-            <div className="h-64 flex items-center justify-center text-[14px] font-semibold text-gray-400">Loading...</div>
+            <div className="h-64 flex items-center justify-center text-[14px] font-semibold text-[#5B6472]">Loading...</div>
           ) : activeTab === "log" ? (
             <table className="w-full border-collapse text-left">
               <thead className="sticky top-0 bg-white dark:bg-slate-900 z-10">
-                <tr className="text-[13px] font-semibold text-gray-400">
+                <tr className="text-[13px] font-semibold text-[#5B6472]">
                   <th className="p-3">Time</th>
                   <th className="p-3">Party</th>
                   <th className="p-3">Mobile</th>
@@ -916,7 +916,7 @@ export default function CustomerTargetPage() {
               </thead>
               <tbody className="divide-y divide-gray-100 dark:divide-white/5">
                 {logs.length === 0 && (
-                  <tr><td colSpan={9} className="p-10 text-center text-[14px] font-bold text-gray-400">No send log for {month} {year}</td></tr>
+                  <tr><td colSpan={9} className="p-10 text-center text-[14px] font-bold text-[#5B6472]">No send log for {month} {year}</td></tr>
                 )}
                 {logs.map((l) => (
                   <tr key={l.id} className="hover:bg-slate-50/80 dark:hover:bg-white/5">
@@ -936,7 +936,7 @@ export default function CustomerTargetPage() {
           ) : (
             <table className="w-full border-collapse text-left">
               <thead className="sticky top-0 bg-white dark:bg-slate-900 z-10">
-                <tr className="text-[13px] font-semibold text-gray-400">
+                <tr className="text-[13px] font-semibold text-[#5B6472]">
                   <th className="p-3 w-10"></th>
                   <th className="p-3">Party Name</th>
                   <th className="p-3">Customer Name</th>
@@ -1044,7 +1044,7 @@ export default function CustomerTargetPage() {
                 })}
                 {paginated.length === 0 && (
                   <tr>
-                    <td colSpan={showAchievementColumns ? 10 : 7} className="p-10 text-center text-[14px] font-bold text-gray-400">
+                    <td colSpan={showAchievementColumns ? 10 : 7} className="p-10 text-center text-[14px] font-bold text-[#5B6472]">
                       No parties found
                     </td>
                   </tr>
@@ -1145,7 +1145,7 @@ export default function CustomerTargetPage() {
                 <p className="text-emerald-100 font-bold text-[13px] tracking-wider">Will be Sent</p>
                 <p className="text-xl font-semibold leading-tight mt-0.5">{bulkStats.willSend}</p>
               </div>
-              <div className="rounded-2xl bg-gradient-to-br from-rose-500 to-orange-500 text-white px-3 py-2.5 shadow-md shadow-rose-500/25">
+              <div className="rounded-2xl bg-[#DC2626] text-white px-3 py-2.5 shadow-md shadow-rose-500/25">
                 <p className="text-rose-100 font-bold text-[13px] tracking-wider">Failed</p>
                 <p className="text-xl font-semibold leading-tight mt-0.5">{bulkStats.failedLatest}</p>
               </div>
@@ -1303,24 +1303,24 @@ export default function CustomerTargetPage() {
             <div className="p-5 space-y-4 overflow-y-auto">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <div>
-                  <label className="text-[13px] font-semibold text-gray-400">Party Name</label>
+                  <label className="text-[13px] font-semibold text-[#5B6472]">Party Name</label>
                   <input value={formName} onChange={(e) => setFormName(e.target.value)} className="mt-1 w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-white/10 bg-transparent text-sm font-bold" />
                 </div>
                 <div>
-                  <label className="text-[13px] font-semibold text-gray-400">Customer Name</label>
+                  <label className="text-[13px] font-semibold text-[#5B6472]">Customer Name</label>
                   <input value={formCustomerName} onChange={(e) => setFormCustomerName(e.target.value)} className="mt-1 w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-white/10 bg-transparent text-sm font-bold" />
                 </div>
                 <div>
-                  <label className="text-[13px] font-semibold text-gray-400">Mobile Num</label>
+                  <label className="text-[13px] font-semibold text-[#5B6472]">Mobile Num</label>
                   <input value={formMobile} onChange={(e) => setFormMobile(e.target.value)} className="mt-1 w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-white/10 bg-transparent text-sm font-bold" />
                 </div>
               </div>
               <div>
-                <p className="text-[13px] font-semibold text-gray-400 mb-2">Monthly Targets</p>
+                <p className="text-[13px] font-semibold text-[#5B6472] mb-2">Monthly Targets</p>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                   {MONTH_NAMES.map((m) => (
                     <div key={m}>
-                      <label className="text-[13px] font-bold text-gray-400">{m}</label>
+                      <label className="text-[13px] font-bold text-[#5B6472]">{m}</label>
                       <input
                         type="number"
                         value={formMonths[m] === "" ? "" : formMonths[m]}
@@ -1353,7 +1353,7 @@ export default function CustomerTargetPage() {
           <div className="bg-white dark:bg-slate-900 rounded-3xl w-full max-w-2xl shadow-2xl border border-white/10 overflow-hidden max-h-[90vh] flex flex-col">
             <div className="px-5 py-4 border-b border-gray-100 dark:border-white/10 shrink-0">
               <h3 className="text-sm font-semibold">Import {month} Achievement</h3>
-              <p className="text-[13px] font-bold text-gray-400 mt-1">
+              <p className="text-[13px] font-bold text-[#5B6472] mt-1">
                 {importPreview.fileName} · {importPreview.rows.length} rows
               </p>
               <div className="flex flex-wrap gap-2 mt-3">
@@ -1373,7 +1373,7 @@ export default function CustomerTargetPage() {
             <div className="p-5 flex-1 min-h-0 overflow-auto">
               <table className="w-full text-left text-[14px]">
                 <thead className="sticky top-0 bg-white dark:bg-slate-900">
-                  <tr className="text-[13px] font-semibold text-gray-400">
+                  <tr className="text-[13px] font-semibold text-[#5B6472]">
                     <th className="py-1 pr-2">#</th>
                     <th className="py-1">Customer Name</th>
                     <th className="py-1">No / Mobile</th>
@@ -1394,7 +1394,7 @@ export default function CustomerTargetPage() {
                             : "border-rose-100 bg-rose-50 dark:bg-rose-900/20 dark:border-rose-500/20"
                         }`}
                       >
-                        <td className="py-1.5 pr-2 text-gray-400 font-bold">{i + 1}</td>
+                        <td className="py-1.5 pr-2 text-[#5B6472] font-bold">{i + 1}</td>
                         <td className={`py-1.5 font-bold ${matched ? "text-gray-900 dark:text-white" : "text-rose-700 dark:text-rose-300"}`}>
                           {r.customerName || "—"}
                         </td>
@@ -1416,7 +1416,7 @@ export default function CustomerTargetPage() {
               </table>
             </div>
             <div className="p-4 border-t border-gray-100 dark:border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-2 shrink-0">
-              <p className="text-[13px] font-bold text-gray-400">
+              <p className="text-[13px] font-bold text-[#5B6472]">
                 Only matched rows will import. Files can be No + Amount, or Customer Name + Mobile No + Amount.
               </p>
               <div className="flex justify-end gap-2">
@@ -1446,7 +1446,7 @@ export default function CustomerTargetPage() {
             </div>
             <div className="p-5 space-y-3">
               <div className="rounded-2xl bg-white dark:bg-white/5 border border-gray-100 dark:border-white/10 p-4 text-center">
-                <p className="text-[13px] font-semibold text-gray-400">Recipients</p>
+                <p className="text-[13px] font-semibold text-[#5B6472]">Recipients</p>
                 <p className="text-3xl font-semibold text-[#2563eb]">{recipientsForScope.length}</p>
               </div>
               <div className="max-h-40 overflow-auto text-[14px] font-bold text-gray-600 dark:text-gray-300 space-y-1">
@@ -1463,7 +1463,7 @@ export default function CustomerTargetPage() {
                   <input value={forceConfirm} onChange={(e) => setForceConfirm(e.target.value)} className="w-full px-3 py-2 rounded-xl border border-red-300 bg-red-50 dark:bg-red-900/20 text-sm font-semibold" placeholder="FORCE" />
                 </div>
               )}
-              <p className="text-[13px] text-gray-400 font-bold flex items-center gap-1">
+              <p className="text-[13px] text-[#5B6472] font-bold flex items-center gap-1">
                 <CheckCircleIcon className="w-4 h-4 text-emerald-500" />
                 Already SENT parties are never re-messaged unless Force Resend.
               </p>
@@ -1540,7 +1540,7 @@ export default function CustomerTargetPage() {
         >
           <div className="relative w-72 rounded-2xl bg-gradient-to-br from-slate-900 via-[#1e293b] to-amber-950 text-white shadow-[0_12px_40px_rgba(245,158,11,0.35)] ring-1 ring-amber-400/50 px-4 py-3">
             <div className="flex items-start gap-2.5">
-              <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 shadow-md shadow-amber-500/40">
+              <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-[#2563EB] shadow-md shadow-amber-500/40">
                 <ExclamationTriangleIcon className="w-4 h-4 text-white" />
               </span>
               <div>

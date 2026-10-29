@@ -232,7 +232,7 @@ export default function TeamQueriesView() {
       {/* Action Bar */}
       <div className="bg-white dark:bg-navy-800 p-3 rounded-2xl border border-gray-100 dark:border-navy-700 shadow-sm flex items-center justify-between overflow-x-auto no-scrollbar gap-4">
         <div className="flex items-center gap-2">
-          <span className="text-[13px] font-semibold text-gray-400 px-2">Filter:</span>
+          <span className="text-[13px] font-semibold text-[#5B6472] px-2">Filter:</span>
           {filters.map(f => (
             <button
               key={f}
@@ -244,7 +244,7 @@ export default function TeamQueriesView() {
               }`}
             >
               {f}
-              <span className={`px-1.5 py-0.5 rounded-full text-[12px] ${
+              <span className={`px-1.5 py-0.5 rounded-full text-[14px] ${
                 activeFilter === f ? 'bg-white/20 text-white' : 'bg-gray-200 text-gray-600 dark:bg-gray-800 dark:text-gray-400'
               }`}>
                 {getFilterCount(f)}
@@ -285,37 +285,37 @@ export default function TeamQueriesView() {
                   </tr>
                 ) : filteredItems.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="py-20 text-center text-gray-400 font-bold text-[14px] italic bg-gray-50/30">
+                    <td colSpan={7} className="py-20 text-center text-[#5B6472] font-bold text-[14px] italic bg-gray-50/30">
                       No queries logged yet
                     </td>
                   </tr>
                 ) : (
                   filteredItems.map((item, index) => (
                     <tr key={item.id} className="hover:bg-gray-50/50 dark:hover:bg-navy-800/50 transition-colors group">
-                      <td className="px-4 py-4 text-[13px] font-semibold text-gray-400 text-center">{index + 1}</td>
+                      <td className="px-4 py-4 text-[13px] font-semibold text-[#5B6472] text-center">{index + 1}</td>
                       <td className="px-4 py-4 text-[13px] font-semibold text-[#1D4ED8] dark:text-blue-400">
                         {item.teamMember}
                       </td>
                       <td className="px-4 py-4 text-[14px] font-bold text-gray-800 dark:text-gray-200 min-w-[200px]">
                         {item.query}
                         {item.eaNotes && (
-                          <div className="mt-1 text-[13px] text-gray-400 font-medium italic truncate max-w-sm">
+                          <div className="mt-1 text-[13px] text-[#5B6472] font-medium italic truncate max-w-sm">
                             Notes: {item.eaNotes}
                           </div>
                         )}
                       </td>
                       <td className="px-4 py-4 text-center">
-                        <span className={`inline-block px-2.5 py-1 rounded-full text-[12px] font-semibold   border ${getCategoryStyle(item.category)}`}>
+                        <span className={`inline-block px-2.5 py-1 rounded-full text-[14px] font-semibold   border ${getCategoryStyle(item.category)}`}>
                           {item.category}
                         </span>
                       </td>
                       <td className="px-4 py-4 text-center">
-                        <span className={`inline-block px-2.5 py-1 rounded-full text-[12px] font-semibold   border ${getEAResolveStyle(item.eaResolve)}`}>
+                        <span className={`inline-block px-2.5 py-1 rounded-full text-[14px] font-semibold   border ${getEAResolveStyle(item.eaResolve)}`}>
                           {item.eaResolve}
                         </span>
                       </td>
                       <td className="px-4 py-4 text-center">
-                        <span className={`inline-block px-2.5 py-1 rounded-full text-[12px] font-semibold   border ${getStatusStyle(item.status)}`}>
+                        <span className={`inline-block px-2.5 py-1 rounded-full text-[14px] font-semibold   border ${getStatusStyle(item.status)}`}>
                           {item.status}
                         </span>
                       </td>
@@ -349,13 +349,13 @@ export default function TeamQueriesView() {
                     {editingItem ? "Update Query" : "Log Team Query"}
                   </h2>
                   <div className="flex items-center gap-2 mt-1">
-                    <p className="text-gray-400 dark:text-slate-400 font-bold text-[12px]">Triage & Escalate Workspace</p>
-                    <span className="px-2 py-0.5 bg-orange-50 dark:bg-navy-800 text-[12px] font-semibold text-[#2563EB] dark:text-[#60A5FA] rounded border border-orange-100 dark:border-navy-700">
+                    <p className="text-[#5B6472] dark:text-slate-400 font-bold text-[14px]">Triage & Escalate Workspace</p>
+                    <span className="px-2 py-0.5 bg-[#F7F8FA] dark:bg-navy-800 text-[14px] font-semibold text-[#2563EB] dark:text-[#60A5FA] rounded border border-[#E5E7EB] dark:border-navy-700">
                       Query Intake
                     </span>
                   </div>
                 </div>
-                <button onClick={closeModal} className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-white transition-colors">
+                <button onClick={closeModal} className="p-2 text-[#5B6472] hover:text-gray-600 dark:hover:text-white transition-colors">
                   <XMarkIcon className="w-8 h-8" />
                 </button>
               </div>
@@ -373,7 +373,7 @@ export default function TeamQueriesView() {
                   <div className="h-0.5 w-10 bg-[#2563EB] dark:bg-[#60A5FA] rounded-full mb-4"></div>
                 </div>
                 <div>
-                  <label className="flex items-center gap-2 text-[13px] font-semibold text-gray-400 mb-1.5 px-1 font-semibold">
+                  <label className="flex items-center gap-2 text-[13px] font-semibold text-[#5B6472] mb-1.5 px-1 font-semibold">
                     <UserIcon className="w-3 h-3" /> Team Member *
                   </label>
                   <SearchableSelect 
@@ -381,21 +381,21 @@ export default function TeamQueriesView() {
                     value={formMember} 
                     onChange={setFormMember} 
                     placeholder="Who raised this?" 
-                    className="bg-[#FFFFFF] dark:bg-navy-900 border border-orange-100 dark:border-navy-700/50 shadow-sm"
+                    className="bg-[#FFFFFF] dark:bg-navy-900 border border-[#E5E7EB] dark:border-navy-700/50 shadow-sm"
                   />
                 </div>
 
                 <div>
-                  <label className="flex items-center gap-2 text-[13px] font-semibold text-gray-400 mb-1.5 px-1 font-semibold">
+                  <label className="flex items-center gap-2 text-[13px] font-semibold text-[#5B6472] mb-1.5 px-1 font-semibold">
                     <ChatBubbleBottomCenterTextIcon className="w-3 h-3" /> Query *
                   </label>
                   <textarea required rows={3} value={formQuery} onChange={e => setFormQuery(e.target.value)}
                     placeholder="Tell us what's happening..."
-                    className="w-full bg-[#FFFFFF] dark:bg-navy-900 px-4 py-3 rounded-xl border border-orange-100 dark:border-navy-700/50 focus:border-[#2563EB] dark:focus:border-[#60A5FA] focus:bg-white outline-none text-[13px] font-bold text-gray-800 dark:text-white transition-all shadow-sm resize-none appearance-none" />
+                    className="w-full bg-[#FFFFFF] dark:bg-navy-900 px-4 py-3 rounded-xl border border-[#E5E7EB] dark:border-navy-700/50 focus:border-[#2563EB] dark:focus:border-[#60A5FA] focus:bg-white outline-none text-[13px] font-bold text-gray-800 dark:text-white transition-all shadow-sm resize-none appearance-none" />
                 </div>
 
                 <div>
-                  <label className="flex items-center gap-2 text-[13px] font-semibold text-gray-400 mb-2 px-1 font-semibold">
+                  <label className="flex items-center gap-2 text-[13px] font-semibold text-[#5B6472] mb-2 px-1 font-semibold">
                     <TagIcon className="w-3 h-3" /> Category *
                   </label>
                   <div className="flex flex-wrap gap-2">
@@ -406,7 +406,7 @@ export default function TeamQueriesView() {
                         <button
                           key={cat} type="button" onClick={() => setFormCategory(cat)}
                           className={`flex-1 min-w-[100px] px-3 py-2 rounded-xl text-[13px] font-semibold   border transition-all ${
-                            isActive ? baseStyle + ' ring-2 ring-offset-1 ring-gray-100 scale-105 shadow-md' : 'bg-white text-gray-400 border-gray-100 dark:bg-navy-900'
+                            isActive ? baseStyle + ' ring-2 ring-offset-1 ring-gray-100 scale-105 shadow-md' : 'bg-white text-[#5B6472] border-gray-100 dark:bg-navy-900'
                           }`}
                         >
                           {cat}
@@ -417,7 +417,7 @@ export default function TeamQueriesView() {
                 </div>
 
                 <div>
-                  <label className="flex items-center gap-2 text-[13px] font-semibold text-gray-400 mb-2 px-1 font-semibold">
+                  <label className="flex items-center gap-2 text-[13px] font-semibold text-[#5B6472] mb-2 px-1 font-semibold">
                     <LightBulbIcon className="w-3 h-3" /> Can EA Resolve? *
                   </label>
                   <div className="flex gap-2">
@@ -428,7 +428,7 @@ export default function TeamQueriesView() {
                         <button
                           key={opt} type="button" onClick={() => setFormEAResolve(opt)}
                           className={`flex-1 px-3 py-2 rounded-xl text-[13px] font-semibold   border transition-all ${
-                            isActive ? baseStyle + ' ring-2 ring-offset-1 ring-gray-100 scale-105 shadow-md' : 'bg-white text-gray-400 border-gray-100 dark:bg-navy-900'
+                            isActive ? baseStyle + ' ring-2 ring-offset-1 ring-gray-100 scale-105 shadow-md' : 'bg-white text-[#5B6472] border-gray-100 dark:bg-navy-900'
                           }`}
                         >
                           {opt}
@@ -439,7 +439,7 @@ export default function TeamQueriesView() {
                 </div>
 
                 <div>
-                  <label className="flex items-center gap-2 text-[13px] font-semibold text-gray-400 mb-2 px-1 font-semibold">
+                  <label className="flex items-center gap-2 text-[13px] font-semibold text-[#5B6472] mb-2 px-1 font-semibold">
                     <CheckCircleIcon className="w-3 h-3" /> Status *
                   </label>
                   <div className="flex flex-wrap gap-2">
@@ -450,7 +450,7 @@ export default function TeamQueriesView() {
                         <button
                           key={s} type="button" onClick={() => setFormStatus(s)}
                           className={`flex-1 px-3 py-2.5 rounded-xl text-[13px] font-semibold   border transition-all ${
-                            isActive ? baseStyle + ' ring-2 ring-offset-1 ring-gray-100 scale-105' : 'bg-gray-50 text-gray-400 border-gray-100 dark:bg-navy-900'
+                            isActive ? baseStyle + ' ring-2 ring-offset-1 ring-gray-100 scale-105' : 'bg-gray-50 text-[#5B6472] border-gray-100 dark:bg-navy-900'
                           }`}
                         >
                           {s}
@@ -461,14 +461,14 @@ export default function TeamQueriesView() {
                 </div>
 
                 <div>
-                   <label className="text-[13px] font-semibold text-gray-400 mb-1.5 px-1 block font-semibold">EA Notes</label>
+                   <label className="text-[13px] font-semibold text-[#5B6472] mb-1.5 px-1 block font-semibold">EA Notes</label>
                    <textarea rows={2} value={formNotes} onChange={e => setFormNotes(e.target.value)}
                     placeholder="Initial notes..."
-                    className="w-full bg-[#FFFFFF] dark:bg-navy-900 px-4 py-3 rounded-xl border border-orange-100 dark:border-navy-700/50 focus:border-[#2563EB] dark:focus:border-[#60A5FA] focus:bg-white outline-none text-[13px] font-bold text-gray-800 dark:text-white transition-all shadow-sm resize-none appearance-none" />
+                    className="w-full bg-[#FFFFFF] dark:bg-navy-900 px-4 py-3 rounded-xl border border-[#E5E7EB] dark:border-navy-700/50 focus:border-[#2563EB] dark:focus:border-[#60A5FA] focus:bg-white outline-none text-[13px] font-bold text-gray-800 dark:text-white transition-all shadow-sm resize-none appearance-none" />
                 </div>
 
                 <div className="pt-4 flex justify-end gap-5">
-                  <button type="button" onClick={closeModal} className="px-8 py-3 rounded-xl text-[13px] font-semibold text-gray-400 hover:text-gray-900 transition-colors">
+                  <button type="button" onClick={closeModal} className="px-8 py-3 rounded-xl text-[13px] font-semibold text-[#5B6472] hover:text-gray-900 transition-colors">
                     Dismiss
                   </button>
                   <button type="submit" 

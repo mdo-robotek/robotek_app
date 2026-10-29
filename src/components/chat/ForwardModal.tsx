@@ -60,7 +60,7 @@ export default function ForwardModal({ message, onClose, onForward }: ForwardMod
           </div>
           <button 
             onClick={onClose}
-            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
+            className="p-2 text-[#5B6472] hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
           >
             <XMarkIcon className="w-5 h-5" />
           </button>
@@ -69,7 +69,7 @@ export default function ForwardModal({ message, onClose, onForward }: ForwardMod
         {/* Search */}
         <div className="p-4 border-b border-gray-100">
           <div className="relative">
-            <MagnifyingGlassIcon className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <MagnifyingGlassIcon className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-[#5B6472]" />
             <input 
               type="text" 
               placeholder="Search contacts..." 

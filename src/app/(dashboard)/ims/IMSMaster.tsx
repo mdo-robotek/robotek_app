@@ -87,7 +87,7 @@ const getTxSourceBadgeClass = (source?: string) => {
   if (source === "GRN") {
     return "bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300";
   }
-  return "bg-orange-100 text-orange-700 dark:bg-orange-500/20 dark:text-orange-300";
+  return "bg-[#F7F8FA] text-[#D97706] dark:bg-[#D97706]/20 dark:text-[#D97706]";
 };
 
 const FloatingInput = ({
@@ -106,7 +106,7 @@ const FloatingInput = ({
       className="block px-3 pb-2.5 pt-4 w-full text-sm font-bold text-gray-900 bg-transparent rounded-lg border-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-[#60A5FA] focus:outline-none focus:ring-0 focus:border-[#2563EB] peer disabled:opacity-50 disabled:bg-gray-100 dark:disabled:bg-white/5"
       placeholder=" "
     />
-    <label htmlFor={name} className="absolute text-[13px] font-semibold text-gray-400 dark:text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white dark:bg-[#111827] px-2 peer-focus:px-2 peer-focus:text-[#2563EB] peer-focus:dark:text-[#2563EB] peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1">{label}</label>
+    <label htmlFor={name} className="absolute text-[13px] font-semibold text-[#5B6472] dark:text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white dark:bg-[#111827] px-2 peer-focus:px-2 peer-focus:text-[#2563EB] peer-focus:dark:text-[#2563EB] peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1">{label}</label>
   </div>
 );
 
@@ -210,7 +210,7 @@ const sourceBadgeClass = (source?: string) => {
     case "GRN":
       return "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300";
     case "O2D":
-      return "bg-orange-100 text-orange-700 dark:bg-orange-500/20 dark:text-orange-300";
+      return "bg-[#F7F8FA] text-[#D97706] dark:bg-[#D97706]/20 dark:text-[#D97706]";
     case "GRN, O2D":
       return "bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-300";
     default:
@@ -1569,7 +1569,7 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
               onClick={() => setViewMode('outform')}
               className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-[13px] font-semibold  tracking-wider transition-all h-full ${
                 viewMode === 'outform'
-                  ? 'bg-white dark:bg-[#111827] text-orange-700 dark:text-orange-400 shadow-sm'
+                  ? 'bg-white dark:bg-[#111827] text-[#D97706] dark:text-[#D97706] shadow-sm'
                   : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
               }`}
             >
@@ -1613,7 +1613,7 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
       {viewMode !== "outform" && (
       <div className="flex flex-wrap items-center gap-2 shrink-0 w-full">
         <div className="relative shrink-0 w-[220px]">
-          <MagnifyingGlassIcon className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" />
+          <MagnifyingGlassIcon className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-[#5B6472]" />
           <input
             type="text"
             placeholder="SEARCH ID / ITEM..."
@@ -1873,7 +1873,7 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
                             </button>
                           </div>
                         ) : (
-                          <span className="text-[13px] font-semibold text-gray-300 dark:text-gray-600">—</span>
+                          <span className="text-[13px] font-semibold text-[#5B6472] dark:text-gray-600">—</span>
                         )}
                       </td>
                       <td className="py-2 px-4 text-[14px] font-bold text-gray-500">
@@ -1881,7 +1881,7 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
                       </td>
                       <td className="py-2 px-3 text-[14px] font-bold text-gray-500">{log.category}</td>
                       <td className="py-2 px-3">
-                        <span className={`inline-flex px-1.5 py-0.5 rounded text-[12px] font-semibold  tracking-wider ${getTxSourceBadgeClass(log.source)}`}>
+                        <span className={`inline-flex px-1.5 py-0.5 rounded text-[14px] font-semibold  tracking-wider ${getTxSourceBadgeClass(log.source)}`}>
                           {formatTxSourceLabel(log.source)}
                         </span>
                       </td>
@@ -1906,7 +1906,7 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
                             Approved
                           </span>
                         ) : (
-                          <span className="text-[13px] font-semibold tracking-wider text-gray-400">Pending</span>
+                          <span className="text-[13px] font-semibold tracking-wider text-[#5B6472]">Pending</span>
                         )}
                       </td>
                     </tr>
@@ -1914,7 +1914,7 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
                   })}
                   {datewiseActiveFiltered.length === 0 && (
                     <tr>
-                      <td colSpan={11} className="py-8 text-center text-gray-400 text-[14px] font-semibold">No items found</td>
+                      <td colSpan={11} className="py-8 text-center text-[#5B6472] text-[14px] font-semibold">No items found</td>
                     </tr>
                   )}
                 </tbody>
@@ -2002,7 +2002,7 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
                           >
                             <td className="py-1 px-2 text-center sticky left-0 z-20 transition-colors border-r shadow-[1px_0_0_0_#bfdbfe] dark:shadow-[1px_0_0_0_rgba(59,130,246,0.2)] bg-white group-even:bg-blue-50/30 dark:bg-[#111827] dark:group-even:bg-[#182031] group-hover:bg-blue-50/50 dark:group-hover:bg-[#1a2335] border-blue-100 dark:border-blue-500/10">
                               <div className="flex items-center justify-center gap-2">
-                                <button onClick={() => { setLogsItem(item); setLogsModalOpen(true); }} className="text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:scale-110 transition-all" title="View Transaction Logs">
+                                <button onClick={() => { setLogsItem(item); setLogsModalOpen(true); }} className="text-[#5B6472] hover:text-indigo-600 dark:hover:text-indigo-400 hover:scale-110 transition-all" title="View Transaction Logs">
                                   <EyeIcon className="w-4 h-4" />
                                 </button>
                                 <button
@@ -2071,7 +2071,7 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
                               <div className="flex flex-col gap-1 w-full max-w-[180px]">
                                 <div className="flex justify-between items-baseline leading-none">
                                   <span className={`text-[14px] font-semibold ${health.text}`}>{item.live_stock}</span>
-                                  <span className="text-[13px] font-bold text-gray-400">{health.label}</span>
+                                  <span className="text-[13px] font-bold text-[#5B6472]">{health.label}</span>
                                 </div>
                                 <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 overflow-hidden flex">
                                   <div className={`h-full ${health.color} transition-all duration-500`} style={{ width: `${health.pct}%` }}></div>
@@ -2083,7 +2083,7 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
                       })}
                       {filteredItems.length === 0 && (
                         <tr>
-                          <td colSpan={18} className="py-8 text-center text-gray-400 text-[14px] font-semibold">No items found</td>
+                          <td colSpan={18} className="py-8 text-center text-[#5B6472] text-[14px] font-semibold">No items found</td>
                         </tr>
                       )}
                     </tbody>
@@ -2103,7 +2103,7 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
                     <div>
                       <div className="flex items-center gap-3 mb-1">
                         <h2 className="text-xl font-semibold text-gray-900 dark:text-white leading-none">{logsItem.item_name}</h2>
-                        <span className="px-2 py-0.5 bg-[#2563EB]/10 text-white dark:bg-[#60A5FA]/20 dark:text-[#60A5FA] border border-[#2563EB]/20 dark:border-[#60A5FA]/30 rounded text-[13px] font-semibold">ID: {logsItem.id}</span>
+                        <span className="px-2 py-0.5 bg-[#2563EB]/10 text-[#2563EB] dark:bg-[#60A5FA]/20 dark:text-[#60A5FA] border border-[#2563EB]/20 dark:border-[#60A5FA]/30 rounded text-[13px] font-semibold">ID: {logsItem.id}</span>
                       </div>
                       <p className="text-[13px] font-bold text-gray-500">{logsItem.category}</p>
                     </div>
@@ -2159,7 +2159,7 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
                       </tbody>
                     </table>
                   ) : (
-                    <div className="p-8 text-center text-gray-400 flex flex-col items-center justify-center h-full">
+                    <div className="p-8 text-center text-[#5B6472] flex flex-col items-center justify-center h-full">
                       <ArchiveBoxIcon className="w-12 h-12 mb-3 opacity-20" />
                       <p className="font-sans text-[14px] font-semibold mt-2">No transaction logs found</p>
                     </div>
@@ -2271,7 +2271,7 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
 
               <div className="p-6 space-y-4 bg-white dark:bg-[#111827]">
                 <div className="p-3 rounded-xl bg-gray-50 dark:bg-white/[0.02] border border-gray-100 dark:border-white/5 space-y-2">
-                  <p className="text-[13px] font-semibold text-gray-400">Item Name</p>
+                  <p className="text-[13px] font-semibold text-[#5B6472]">Item Name</p>
                   <SearchableSelect
                     label=""
                     options={renameItemOptions}
@@ -2386,7 +2386,7 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
                 <div className="px-4 py-3 border-b border-slate-800 flex items-center justify-between bg-slate-900/90">
                   <div className="flex items-center gap-2">
                     <DocumentTextIcon className="w-4 h-4 text-emerald-400" />
-                    <span className="text-[13px] font-semibold text-slate-300">File Preview</span>
+                    <span className="text-[13px] font-semibold text-[#5B6472]">File Preview</span>
                   </div>
                   <span className="text-[13px] font-bold text-slate-500">XLSX</span>
                 </div>
@@ -2404,7 +2404,7 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
 
                   <div className="absolute inset-x-4 top-4 rounded-lg border border-emerald-500/20 bg-emerald-500/5 px-3 py-2">
                     <p className="text-[13px] font-semibold text-emerald-300">Out Form Import</p>
-                    <p className="text-[13px] font-medium text-slate-400 mt-1 truncate">{importFileName}</p>
+                    <p className="text-[13px] font-medium text-[#5B6472] mt-1 truncate">{importFileName}</p>
                   </div>
 
                   <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-emerald-400/10 to-transparent pointer-events-none" />
@@ -2466,7 +2466,7 @@ export default function IMSMaster({ onBack }: { onBack: () => void }) {
                     <span className="w-2.5 h-2.5 rounded-full bg-amber-400/80" />
                     <span className="w-2.5 h-2.5 rounded-full bg-emerald-400/80" />
                   </div>
-                  <span className="text-[13px] font-semibold text-slate-400">Import Console</span>
+                  <span className="text-[13px] font-semibold text-[#5B6472]">Import Console</span>
                 </div>
                 <div
                   ref={importLogRef}

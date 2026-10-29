@@ -267,7 +267,7 @@ export default function AnalyticsDashboard({ feeders, scotRows = [], defaultEmpl
         <div className="space-y-6">
           {/* Global Search */}
           <div className="relative shrink-0">
-            <MagnifyingGlassIcon className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <MagnifyingGlassIcon className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#5B6472]" />
             <input
               type="text"
               placeholder="SEARCH DASHBOARD..."
@@ -390,7 +390,7 @@ export default function AnalyticsDashboard({ feeders, scotRows = [], defaultEmpl
           <KPICard title="Total Calls" value={kpi.totalCalls.toLocaleString()} icon={<PhoneIcon />} color="text-blue-500" bg="bg-blue-500/10" glowColor="blue" />
           <KPICard title="Talk Time (Hrs)" value={kpi.totalDurationHours.toLocaleString()} icon={<ClockIcon />} color="text-emerald-500" bg="bg-emerald-500/10" glowColor="emerald" />
           <KPICard title="Avg Duration" value={kpi.avgDurationStr} icon={<ArrowTrendingUpIcon />} color="text-purple-500" bg="bg-purple-500/10" glowColor="purple" />
-          <KPICard title="Active Staff" value={kpi.activeEmployees} icon={<UserGroupIcon />} color="text-orange-500" bg="bg-orange-500/10" glowColor="orange" />
+          <KPICard title="Active Staff" value={kpi.activeEmployees} icon={<UserGroupIcon />} color="text-[#D97706]" bg="bg-[#D97706]/10" glowColor="orange" />
           <KPICard title="Customers" value={kpi.uniqueCustomers.toLocaleString()} icon={<MapPinIcon />} color="text-pink-500" bg="bg-pink-500/10" glowColor="pink" />
         </div>
 
@@ -469,7 +469,7 @@ export default function AnalyticsDashboard({ feeders, scotRows = [], defaultEmpl
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none pb-8">
                 <div className="text-center">
                   <p className="text-2xl font-semibold text-slate-900 dark:text-white leading-none">{kpi.totalCalls}</p>
-                  <p className="text-[12px] font-bold text-slate-500 mt-1">Total</p>
+                  <p className="text-[14px] font-bold text-slate-500 mt-1">Total</p>
                 </div>
               </div>
             </div>
@@ -534,7 +534,7 @@ export default function AnalyticsDashboard({ feeders, scotRows = [], defaultEmpl
                 </thead>
                 <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                   {computedOrderRows.length === 0 ? (
-                    <tr><td colSpan={7} className="px-6 py-10 text-center text-[14px] font-bold text-slate-400">No target data available</td></tr>
+                    <tr><td colSpan={7} className="px-6 py-10 text-center text-[14px] font-bold text-[#5B6472]">No target data available</td></tr>
                   ) : (
                     <>
                       <tr className="bg-slate-100/50 dark:bg-slate-800/80 border-b-2 border-slate-200 dark:border-slate-700">
@@ -586,7 +586,7 @@ export default function AnalyticsDashboard({ feeders, scotRows = [], defaultEmpl
                             {hasTarget ? (
                               <span className="text-[14px] font-semibold text-blue-900 dark:text-blue-400">{row.monthlyTarget}</span>
                             ) : (
-                              <span className="text-[13px] font-bold text-slate-400">N/A</span>
+                              <span className="text-[13px] font-bold text-[#5B6472]">N/A</span>
                             )}
                           </td>
                           <td className="px-4 py-4 text-center border-r border-slate-100 dark:border-slate-800">
@@ -599,14 +599,14 @@ export default function AnalyticsDashboard({ feeders, scotRows = [], defaultEmpl
                                 {(remainingMonth as number) <= 0 ? `+${Math.abs(remainingMonth as number)}` : `-${remainingMonth}`}
                               </span>
                             ) : (
-                              <span className="text-[13px] font-bold text-slate-400">N/A</span>
+                              <span className="text-[13px] font-bold text-[#5B6472]">N/A</span>
                             )}
                           </td>
                           <td className="px-4 py-4 text-center border-r border-slate-100 dark:border-slate-800">
                             {hasTarget ? (
                               <span className="text-[14px] font-semibold text-blue-900 dark:text-blue-400">{row.weeklyTarget}</span>
                             ) : (
-                              <span className="text-[13px] font-bold text-slate-400">N/A</span>
+                              <span className="text-[13px] font-bold text-[#5B6472]">N/A</span>
                             )}
                           </td>
                           <td className="px-4 py-4 text-center border-r border-slate-100 dark:border-slate-800">
@@ -619,7 +619,7 @@ export default function AnalyticsDashboard({ feeders, scotRows = [], defaultEmpl
                                 {(remainingWeek as number) <= 0 ? `+${Math.abs(remainingWeek as number)}` : `-${remainingWeek}`}
                               </span>
                             ) : (
-                              <span className="text-[13px] font-bold text-slate-400">N/A</span>
+                              <span className="text-[13px] font-bold text-[#5B6472]">N/A</span>
                             )}
                           </td>
                         </tr>
@@ -635,16 +635,16 @@ export default function AnalyticsDashboard({ feeders, scotRows = [], defaultEmpl
 
         {/* 4. Time Intelligence Analysis (Hourly Heatmap) */}
         <div className="relative p-6 rounded-[2rem] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden z-0">
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] bg-orange-500/5 dark:bg-orange-500/10 rounded-full blur-[100px] z-[-1]"></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] bg-[#D97706]/5 dark:bg-[#D97706]/10 rounded-full blur-[100px] z-[-1]"></div>
           <h3 className="text-sm font-semibold text-slate-900 dark:text-white flex items-center gap-2 mb-6 relative z-10">
-            <ClockIcon className="w-5 h-5 text-orange-500" />
+            <ClockIcon className="w-5 h-5 text-[#D97706]" />
             Time Intelligence Analysis (Hourly Heatmap)
           </h3>
           <div className="overflow-x-auto pb-4 relative z-10">
             <div className="min-w-[600px]">
               {/* Header Days */}
               <div className="grid grid-cols-8 gap-1 mb-2">
-                <div className="text-[13px] font-bold text-slate-400 text-right pr-4">Hour</div>
+                <div className="text-[13px] font-bold text-[#5B6472] text-right pr-4">Hour</div>
                 {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
                   <div key={day} className="text-[13px] font-bold text-slate-500 text-center">{day}</div>
                 ))}
@@ -662,7 +662,7 @@ export default function AnalyticsDashboard({ feeders, scotRows = [], defaultEmpl
 
                   return (
                     <div key={hourIndex} className="grid grid-cols-8 gap-1 items-center">
-                      <div className="text-[13px] font-bold text-slate-400 text-right pr-4">{formatHr}</div>
+                      <div className="text-[13px] font-bold text-[#5B6472] text-right pr-4">{formatHr}</div>
                       {dayArray.map((val, dIdx) => {
                         const intensity = val / maxVal;
                         let bgClass = "bg-slate-100 dark:bg-slate-800";
@@ -708,7 +708,7 @@ export default function AnalyticsDashboard({ feeders, scotRows = [], defaultEmpl
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                 {leaderboard.map((emp, idx) => (
                   <tr key={idx} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
-                    <td className="px-4 py-3 text-[14px] font-semibold text-slate-400">#{idx + 1}</td>
+                    <td className="px-4 py-3 text-[14px] font-semibold text-[#5B6472]">#{idx + 1}</td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
                         <div className="w-6 h-6 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-[13px] font-semibold">{emp.name.charAt(0)}</div>
@@ -759,7 +759,7 @@ export default function AnalyticsDashboard({ feeders, scotRows = [], defaultEmpl
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                 {charts.topCustomers.map((tgt, idx) => (
                   <tr key={idx} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
-                    <td className="px-4 py-3 text-[14px] font-semibold text-slate-400">#{idx + 1}</td>
+                    <td className="px-4 py-3 text-[14px] font-semibold text-[#5B6472]">#{idx + 1}</td>
                     <td className="px-4 py-3 text-[14px] font-semibold text-slate-900 dark:text-white">{tgt.name}</td>
                     <td className="px-4 py-3 text-right text-[14px] font-bold text-slate-700 dark:text-slate-300">{tgt.calls}</td>
                     <td className="px-4 py-3 text-right text-[14px] font-bold text-slate-700 dark:text-slate-300">{tgt.durationStr}</td>

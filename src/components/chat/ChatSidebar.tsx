@@ -138,9 +138,9 @@ export default function ChatSidebar({ currentUsername, activeChatId, onSelectCha
       {/* Chat list */}
       <div className="flex-1 overflow-y-auto custom-scrollbar">
         {(!contacts || !groups) ? (
-          <div className="text-center py-8 text-gray-400 text-sm animate-pulse">Loading chats...</div>
+          <div className="text-center py-8 text-[#5B6472] text-sm animate-pulse">Loading chats...</div>
         ) : allChats.length === 0 ? (
-          <div className="text-center py-8 text-gray-400 text-sm">No conversations found.</div>
+          <div className="text-center py-8 text-[#5B6472] text-sm">No conversations found.</div>
         ) : (
           allChats.map((chat) => {
             const isActive = activeChatId === (chat.isGroup ? chat.id : chat.username);
@@ -260,7 +260,7 @@ function ReadTicks({ read }: { read?: boolean }) {
     );
   }
   return (
-    <svg viewBox="0 0 16 15" className="w-4 h-3 text-gray-400 shrink-0" fill="currentColor">
+    <svg viewBox="0 0 16 15" className="w-4 h-3 text-[#5B6472] shrink-0" fill="currentColor">
       <path d="M15.01 3.316l-.478-.372a.365.365 0 0 0-.51.063L8.666 9.88a.32.32 0 0 1-.484.033l-.358-.325a.319.319 0 0 0-.484.032l-.378.483a.418.418 0 0 0 .036.541l1.32 1.266c.143.14.361.125.484-.033l6.272-8.048a.366.366 0 0 0-.064-.512zm-4.1 0l-.478-.372a.365.365 0 0 0-.51.063L4.566 9.88a.32.32 0 0 1-.484.033L1.891 7.769a.366.366 0 0 0-.515.006l-.423.433a.364.364 0 0 0 .006.514l3.258 3.185c.143.14.361.125.484-.033l6.272-8.048a.365.365 0 0 0-.063-.51z" />
     </svg>
   );

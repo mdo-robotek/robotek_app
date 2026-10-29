@@ -314,3 +314,20 @@ export function periodRange(period: BoardPeriod, now: number): { from: number; t
     default: return { from: wk, to: now, label: "This week", prev: { from: wk - 7 * 86400000, to: wk - 1 } };
   }
 }
+
+// ───────────────────────── How the score is shown ─────────────────────────
+// Sahil, 2026-10-29: our MIS writes these as minus — "work not done −20%",
+// "work not done on time −10%". 0 is best, up to −5 is great, up to −10 is
+// okay for the company, worse than −10 needs work.
+export function neg(pct: number): string {
+  const v = Math.round(pct * 10) / 10;
+  return v === 0 ? "0%" : `−${v}%`;
+}
+export type ScoreBand = "great" | "okay" | "bad";
+export function scoreBand(pct: number): ScoreBand {
+  return pct <= 5 ? "great" : pct <= 10 ? "okay" : "bad";
+}
+export const BAND_TEXT: Record<ScoreBand, string> = { great: "text-[#15803D]", okay: "text-[#B45309]", bad: "text-[#DC2626]" };
+export const BAND_BG: Record<ScoreBand, string> = { great: "bg-[#15803D]", okay: "bg-[#D97706]", bad: "bg-[#DC2626]" };
+export const BAND_RING: Record<ScoreBand, string> = { great: "ring-[#15803D]", okay: "ring-[#D97706]", bad: "ring-[#DC2626]" };
+export const SCORE_LEGEND = "0% best · up to −5% great · up to −10% okay · below −10% needs work";

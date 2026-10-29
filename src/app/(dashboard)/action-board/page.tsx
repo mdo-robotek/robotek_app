@@ -7,7 +7,7 @@ import {
   PhoneIcon, ChatBubbleLeftEllipsisIcon, ChevronDownIcon, ChevronUpIcon, MagnifyingGlassIcon, ArrowPathIcon,
 } from "@heroicons/react/24/outline";
 import type { CompanyScore, PersonLate, TicketFollowUp } from "@/lib/action-board";
-import { nudgeText, phoneDigits, ticketNudgeText } from "@/lib/action-board";
+import { nudgeText, phoneDigits, ticketNudgeText, neg, scoreBand, BAND_TEXT, SCORE_LEGEND } from "@/lib/action-board";
 
 const fetcher = (url: string) =>
   fetch(url).then((r) => {
@@ -25,7 +25,7 @@ type Board = {
   failedSources: string[];
 };
 
-const tone = (pct: number) => (pct <= 0 ? "text-[#15803D]" : pct <= 10 ? "text-[#B45309]" : "text-[#DC2626]");
+const tone = (pct: number) => BAND_TEXT[scoreBand(pct)];
 const lateText = (h: number) => (h >= 24 ? `${Math.floor(h / 24)}d ${h % 24 ? `${h % 24}h ` : ""}late` : `${Math.max(1, h)}h late`);
 const initials = (n: string) => n.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join("").toUpperCase();
 
@@ -84,7 +84,7 @@ export default function ActionBoardPage() {
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="text-[22px] font-semibold text-[#1A1D21] dark:text-white">Action Board</h1>
-          <p className="text-[14px] text-[#5B6472] dark:text-gray-400">Who is late right now, and on what. Call or WhatsApp them — goal is 0% not done and 0% late.</p>
+          <p className="text-[14px] text-[#5B6472] dark:text-gray-400">Who is late right now, and on what. Call or WhatsApp them — goal is 0% on both scores. {SCORE_LEGEND}.</p>
         </div>
         <button type="button" onClick={() => mutate()} className="h-11 px-3 inline-flex items-center gap-1.5 rounded-xl border border-[#E5E7EB] dark:border-navy-700 bg-white dark:bg-navy-900 text-[14px] font-semibold text-[#1A1D21] dark:text-white">
           <ArrowPathIcon className={`w-4 h-4 ${isValidating ? "animate-spin" : ""}`} /> Refresh
@@ -100,13 +100,13 @@ export default function ActionBoardPage() {
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
             <div className={`${card} p-4`}>
               <p className="text-[14px] font-semibold text-[#5B6472]">Work not done · this week</p>
-              <p className={`mt-1 text-[34px] leading-none font-semibold tabular-nums ${tone(w.notDonePct)}`}>{w.notDonePct}%</p>
-              <p className="mt-1.5 text-[13px] text-[#5B6472]">{w.notDone} of {w.due} · target 0%</p>
+              <p className={`mt-1 text-[34px] leading-none font-semibold tabular-nums ${tone(w.notDonePct)}`}>{neg(w.notDonePct)}</p>
+              <p className="mt-1.5 text-[13px] text-[#5B6472]">{w.notDone} of {w.due} planned · target 0%</p>
             </div>
             <div className={`${card} p-4`}>
-              <p className="text-[14px] font-semibold text-[#5B6472]">Not done on time · this week</p>
-              <p className={`mt-1 text-[34px] leading-none font-semibold tabular-nums ${tone(w.notOnTimePct)}`}>{w.notOnTimePct}%</p>
-              <p className="mt-1.5 text-[13px] text-[#5B6472]">Last week {data.score.lastWeek.notOnTimePct}% · this month {data.score.month.notOnTimePct}%</p>
+              <p className="text-[14px] font-semibold text-[#5B6472]">Work not done on time · this week</p>
+              <p className={`mt-1 text-[34px] leading-none font-semibold tabular-nums ${tone(w.notOnTimePct)}`}>{neg(w.notOnTimePct)}</p>
+              <p className="mt-1.5 text-[13px] text-[#5B6472]">Last week {neg(data.score.lastWeek.notOnTimePct)} · this month {neg(data.score.month.notOnTimePct)}</p>
             </div>
             <div className={`${card} p-4`}>
               <p className="text-[14px] font-semibold text-[#5B6472]">Late right now</p>

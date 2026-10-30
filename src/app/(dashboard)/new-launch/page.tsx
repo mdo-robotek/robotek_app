@@ -25,7 +25,7 @@ import {
   CalendarIcon,
   LinkIcon,
 } from "@heroicons/react/24/outline";
-import { NewLaunchField, NewLaunchStep, NEW_LAUNCH_BRIEF_FIELDS, NEW_LAUNCH_LAUNCH_STEP, NEW_LAUNCH_TOTAL_STEPS } from "@/lib/new-launch-steps";
+import { NewLaunchField, NewLaunchStep, NEW_LAUNCH_BRIEF_FIELDS, NEW_LAUNCH_LAUNCH_STEP, NEW_LAUNCH_TEAM_ROLES, NEW_LAUNCH_TOTAL_STEPS, doerFor } from "@/lib/new-launch-steps";
 import { NewLaunch, NewLaunchHistoryEntry } from "@/types/new-launch";
 
 const fetcher = (url: string) =>
@@ -35,7 +35,8 @@ const fetcher = (url: string) =>
     return json;
   });
 
-type ApiData = { items: NewLaunch[]; steps: NewLaunchStep[]; isAdmin: boolean };
+type Person = { username: string; role: string; designation: string; department: string };
+type ApiData = { items: NewLaunch[]; steps: NewLaunchStep[]; users: Person[]; isAdmin: boolean };
 
 type Filter =
   | { kind: "all" }
@@ -86,11 +87,11 @@ function parseJson<T>(raw: string | undefined, fallback: T): T {
 function currentStepOf(item: NewLaunch) {
   return Number(item.current_step) || 0;
 }
-function isMine(step: NewLaunchStep | undefined, username: string, role: string, isAdmin: boolean) {
+function isMine(item: NewLaunch, step: NewLaunchStep | undefined, username: string, role: string, isAdmin: boolean) {
   if (!step) return false;
-  const doer = step.doer.toLowerCase().trim();
-  const me = username.toLowerCase().trim();
   if (step.approval) return isAdmin;
+  const doer = doerFor(step, parseJson<Record<string, string>>(item.fields, {})).toLowerCase().trim();
+  const me = username.toLowerCase().trim();
   if (doer === "ea") return role.toUpperCase() === "EA" || me === "ea";
   if (!me) return false;
   const first = doer.split(/\s+/)[0];
@@ -116,6 +117,7 @@ export default function NewLaunchFmsPage() {
 
   const items = useMemo(() => data?.items || [], [data]);
   const steps = useMemo(() => data?.steps || [], [data]);
+  const users = useMemo(() => data?.users || [], [data]);
   const isAdmin = !!data?.isAdmin;
   const now = Date.now();
 
@@ -165,7 +167,7 @@ export default function NewLaunchFmsPage() {
     return {
       byStep,
       all: active.length,
-      mine: active.filter((i) => isMine(stepOf(i), username, role, isAdmin)).length,
+      mine: active.filter((i) => isMine(i, stepOf(i), username, role, isAdmin)).length,
       overdue: active.filter(overdueOf).length,
       approval: active.filter((i) => !!stepOf(i)?.approval).length,
       launched: items.filter((i) => i.status !== "Cancelled" && !!i[`actual_${NEW_LAUNCH_LAUNCH_STEP}`]).length,
@@ -180,7 +182,7 @@ export default function NewLaunchFmsPage() {
     switch (filter.kind) {
       case "completed": list = items.filter((i) => i.status === "Completed"); break;
       case "cancelled": list = items.filter((i) => i.status === "Cancelled"); break;
-      case "mine": list = active.filter((i) => isMine(stepOf(i), username, role, isAdmin)); break;
+      case "mine": list = active.filter((i) => isMine(i, stepOf(i), username, role, isAdmin)); break;
       case "overdue": list = active.filter(overdueOf); break;
       case "approval": list = active.filter((i) => !!stepOf(i)?.approval); break;
       case "step": list = active.filter((i) => currentStepOf(i) === filter.n); break;
@@ -369,7 +371,7 @@ export default function NewLaunchFmsPage() {
                 steps={steps}
                 now={now}
                 isAdmin={isAdmin}
-                mine={isMine(stepOf(item), username, role, isAdmin)}
+                mine={isMine(item, stepOf(item), username, role, isAdmin)}
                 expanded={!!expanded[item.id]}
                 onToggle={() => setExpanded((e) => ({ ...e, [item.id]: !e[item.id] }))}
                 onAction={(mode) => setActionFor({ item, mode })}
@@ -387,6 +389,8 @@ export default function NewLaunchFmsPage() {
       {(createOpen || editItem) && (
         <LaunchFormModal
           item={editItem}
+          steps={steps}
+          users={users}
           onClose={() => { setCreateOpen(false); setEditItem(null); }}
           onSubmit={async (v) => {
             const ok = editItem
@@ -416,6 +420,7 @@ export default function NewLaunchFmsPage() {
       {configOpen && (
         <ConfigModal
           steps={steps}
+          users={users}
           onClose={() => setConfigOpen(false)}
           onSave={async (configs) => {
             const ok = await post({ action: "save-config", configs }, "Step setup saved");
@@ -499,7 +504,7 @@ function LaunchCard({
               <p className="text-[12px] text-slate-500">Step {n} of {NEW_LAUNCH_TOTAL_STEPS} · {step.phase}</p>
               <p className="text-[14px] font-semibold text-slate-800 dark:text-white leading-snug">{step.name}</p>
               <p className="text-[13px] text-slate-500 mt-0.5">
-                Doer: <span className={`font-semibold ${mine ? "text-[#2563EB]" : "text-slate-700 dark:text-slate-200"}`}>{step.doer}{mine ? " (you)" : ""}</span>
+                Doer: <span className={`font-semibold ${mine ? "text-[#2563EB]" : "text-slate-700 dark:text-slate-200"}`}>{doerFor(step, fields)}{mine ? " (you)" : ""}</span>
               </p>
               <p className="text-[13px] mt-0.5">
                 <span className="text-slate-500">Planned {fmtDateTime(item[`planned_${n}`])}</span>
@@ -586,7 +591,7 @@ function LaunchCard({
                           </div>
                         ))}
                       </td>
-                      <td className="py-1.5 px-2 text-slate-500">{s.doer}</td>
+                      <td className="py-1.5 px-2 text-slate-500">{doerFor(s, fields)}</td>
                       <td className="py-1.5 px-2 text-slate-500 whitespace-nowrap">{fmtDateTime(planned)}</td>
                       <td className={`py-1.5 px-2 whitespace-nowrap ${actual ? (late ? "text-red-600" : "text-emerald-600") : "text-slate-400"}`}>
                         {actual ? fmtDateTime(actual) : isCurrent ? "Pending" : "—"}
@@ -712,13 +717,34 @@ function BriefView({ item, compact }: { item: NewLaunch; compact?: boolean }) {
 
 type LaunchFormValues = { product_name: string; form_date: string; remark: string; form: Record<string, string> };
 
-function LaunchFormModal({ item, onClose, onSubmit }: { item: NewLaunch | null; onClose: () => void; onSubmit: (v: LaunchFormValues) => Promise<void> }) {
+function UserSelect({ users, value, onChange, className }: { users: Person[]; value: string; onChange: (v: string) => void; className?: string }) {
+  const known = users.some((u) => u.username.toLowerCase() === value.toLowerCase());
+  return (
+    <select value={value} onChange={(e) => onChange(e.target.value)} className={`${inputCls} ${className || ""}`}>
+      <option value="">Select person…</option>
+      {value && !known && <option value={value}>{value} (not an ERP user)</option>}
+      {users.map((u) => (
+        <option key={u.username} value={u.username}>
+          {u.username}{u.designation || u.department ? ` — ${u.designation || u.department}` : ""}
+        </option>
+      ))}
+    </select>
+  );
+}
+
+function LaunchFormModal({ item, steps, users, onClose, onSubmit }: { item: NewLaunch | null; steps: NewLaunchStep[]; users: Person[]; onClose: () => void; onSubmit: (v: LaunchFormValues) => Promise<void> }) {
   const [product, setProduct] = useState(item?.product_name || "");
   const [date, setDate] = useState(item?.form_date || todayIST());
   const [remark, setRemark] = useState(item?.remark || "");
   const [form, setForm] = useState<Record<string, string>>(() => {
     const b = item ? briefOf(item) : {};
-    return { ...b, priority: b.priority || "Normal" };
+    const saved = item ? parseJson<Record<string, string>>(item.fields, {}) : {};
+    const team: Record<string, string> = {};
+    // Pre-fill each role with the launch's own pick, else the Step setup person.
+    NEW_LAUNCH_TEAM_ROLES.forEach((r) => {
+      team[`team_${r.key}`] = saved[`0_team_${r.key}`] || steps[r.steps[0] - 1]?.doer || "";
+    });
+    return { ...b, ...team, priority: b.priority || "Normal" };
   });
   const [busy, setBusy] = useState(false);
   const missing = [
@@ -757,8 +783,20 @@ function LaunchFormModal({ item, onClose, onSubmit }: { item: NewLaunch | null; 
             <textarea value={remark} onChange={(e) => setRemark(e.target.value)} rows={2} className={inputCls} placeholder="Anything else the team should know" />
           </div>
         </div>
+        <div className="pt-2 border-t border-slate-100 dark:border-navy-700">
+          <p className="text-[14px] font-semibold text-slate-700 dark:text-slate-200">Team for this launch</p>
+          <p className="text-[13px] text-slate-500 mb-2">Pick who does each part. The step shows in that person&apos;s “My tasks”. Approvals stay with Admin.</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {NEW_LAUNCH_TEAM_ROLES.map((r) => (
+              <div key={r.key}>
+                <Label>{r.label} <span className="font-normal text-slate-400">· step{r.steps.length > 1 ? "s" : ""} {r.steps.join(", ")}</span></Label>
+                <UserSelect users={users} value={form[`team_${r.key}`] || ""} onChange={(v) => setForm((f) => ({ ...f, [`team_${r.key}`]: v }))} />
+              </div>
+            ))}
+          </div>
+        </div>
         {missing.length > 0 && <p className="text-[13px] text-amber-700 dark:text-amber-400">Still needed: {missing.join(", ")}</p>}
-        {!item && missing.length === 0 && <p className="text-[13px] text-slate-500">Filled by you. Step 1 (Final Vendor — Himanshi, 5 days) starts as soon as you save.</p>}
+        {!item && missing.length === 0 && <p className="text-[13px] text-slate-500">Filled by you. Step 1 (Final Vendor — {form[`team_${NEW_LAUNCH_TEAM_ROLES[0].key}`] || "Himanshi"}, {steps[0]?.tatDays ?? 5} days) starts as soon as you save.</p>}
         <div className="flex justify-end gap-2 pt-1">
           <button type="button" onClick={onClose} className={btnGhost}>Cancel</button>
           <button type="submit" disabled={busy || missing.length > 0} className={btnPrimary}>{busy ? "Saving…" : item ? "Save" : "Start launch"}</button>
@@ -839,18 +877,22 @@ function StepActionModal({
   );
 }
 
-function ConfigModal({ steps, onClose, onSave }: { steps: NewLaunchStep[]; onClose: () => void; onSave: (c: { step: number; doer: string; tat_days: number }[]) => Promise<void> }) {
-  const [rows, setRows] = useState(() => steps.map((s) => ({ step: s.n, name: s.name, doer: s.doer, tat_days: String(s.tatDays), launch: !!s.launch })));
+function ConfigModal({ steps, users, onClose, onSave }: { steps: NewLaunchStep[]; users: Person[]; onClose: () => void; onSave: (c: { step: number; doer: string; tat_days: number }[]) => Promise<void> }) {
+  const [rows, setRows] = useState(() => steps.map((s) => ({ step: s.n, name: s.name, doer: s.doer, tat_days: String(s.tatDays), launch: !!s.launch, approval: !!s.approval })));
   const [busy, setBusy] = useState(false);
   return (
     <Modal title="Step setup — doer & TAT" onClose={onClose} wide>
       <p className="text-[13px] text-slate-500 mb-3">TAT is in working days (9:30 AM–6:30 PM, Sundays off). Changes apply to the next planned dates.</p>
       <div className="space-y-1.5">
         {rows.map((r, i) => (
-          <div key={r.step} className="grid grid-cols-[2rem_1fr] sm:grid-cols-[2rem_1fr_11rem_6rem] gap-2 items-center">
+          <div key={r.step} className="grid grid-cols-[2rem_1fr] sm:grid-cols-[2rem_1fr_16rem_5rem] gap-2 items-center">
             <span className="text-[13px] text-slate-400">{r.step}</span>
             <span className="text-[13px] text-slate-700 dark:text-slate-200">{r.name}</span>
-            <input value={r.doer} onChange={(e) => setRows((rs) => rs.map((x, j) => (j === i ? { ...x, doer: e.target.value } : x)))} className={`${inputCls} col-start-2 sm:col-start-auto`} />
+            {r.approval ? (
+              <span className="text-[13px] text-amber-700 dark:text-amber-400 col-start-2 sm:col-start-auto">{r.doer} — Admin login approves</span>
+            ) : (
+              <UserSelect users={users} value={r.doer} onChange={(v) => setRows((rs) => rs.map((x, j) => (j === i ? { ...x, doer: v } : x)))} className="col-start-2 sm:col-start-auto" />
+            )}
             {r.launch ? (
               <span className="text-[12px] text-slate-400 col-start-2 sm:col-start-auto">Launch date</span>
             ) : (

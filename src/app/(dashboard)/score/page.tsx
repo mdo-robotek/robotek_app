@@ -604,6 +604,7 @@ const PDFHiddenReport = ({ user, dateRange, userTrendData, isNegativeMode, calcu
                   { label: 'Checklists', stats: user.checklistStats, color: 'text-emerald-500', icon: ClipboardDocumentListIcon },
                   { label: 'O2D FMS Jobs', stats: user.o2dStats, color: 'text-blue-500', icon: ShoppingBagIcon },
                   { label: 'Scot Tracking', stats: user.scotStats, color: 'text-purple-500', icon: PhoneIcon },
+                  ...(user.fmsStats?.total ? [{ label: 'Other FMS', stats: user.fmsStats, color: 'text-teal-500', icon: ShoppingBagIcon }] : []),
                   ...(user.leaveStats ? [{ label: 'Leave', stats: user.leaveStats, color: 'text-violet-500', icon: CalendarDaysIcon, isLeave: true }] : []),
                 ].map((cat: any, i) => (
                   <div key={i} className="flex flex-col items-center gap-1">
@@ -672,6 +673,7 @@ const UserDrilldownContent = ({ user, dateRange, chartGranularity, onGranularity
       ...(user.checklistStats?.items || []),
       ...(user.o2dStats?.items || []),
       ...(user.scotStats?.items || []),
+      ...(user.fmsStats?.items || []),
     ];
   }, [user]);
 
@@ -904,6 +906,17 @@ const UserDrilldownContent = ({ user, dateRange, chartGranularity, onGranularity
                         {user.scotStats?.completed === 0 ? "—" : (isNegativeMode ? user.scotStats?.onTimeRate - 100 : user.scotStats?.onTimeRate || 0) + "%"}
                       </td>
                     </tr>
+                    {user.fmsStats && user.fmsStats.total > 0 && (
+                      <tr>
+                        <td className="py-2.5 flex items-center gap-2 font-semibold text-[13px] sm:text-xs text-gray-900 dark:text-white"><ShoppingBagIcon className="w-5 h-5 text-teal-500 shrink-0"/> Other FMS</td>
+                        <td className={`py-2.5 text-center font-semibold ${user.fmsStats.score >= 80 ? 'text-emerald-500' : 'text-amber-500'}`}>
+                          {(isNegativeMode ? user.fmsStats.score - 100 : user.fmsStats.score || 0) + "%"}
+                        </td>
+                        <td className={`py-2.5 text-center font-semibold ${user.fmsStats.onTimeRate >= 80 ? 'text-emerald-500' : 'text-amber-500'}`}>
+                          {user.fmsStats.completed === 0 ? "—" : (isNegativeMode ? user.fmsStats.onTimeRate - 100 : user.fmsStats.onTimeRate || 0) + "%"}
+                        </td>
+                      </tr>
+                    )}
                     {user.leaveStats && (
                       <tr>
                         <td className="py-2.5 flex items-center gap-2 font-semibold text-[13px] sm:text-xs text-gray-900 dark:text-white">
@@ -1104,6 +1117,15 @@ const UserDrilldownContent = ({ user, dateRange, chartGranularity, onGranularity
               "Scot Tracking History", 
               PhoneIcon, 
               "text-purple-600"
+            )}
+          </div>
+
+          <div data-pdf-section="history-fms">
+            {renderCategoryStatusSections(
+              user.fmsStats?.items || [],
+              "Other FMS Steps History",
+              ShoppingBagIcon,
+              "text-teal-600"
             )}
           </div>
 
@@ -1867,6 +1889,7 @@ function ScorePageContent() {
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 px-4">
         <div>
           <h1 className="text-xl font-semibold text-gray-900 dark:text-white tracking-tight">Performance Score</h1>
+          <a href="/score/why" className="inline-flex items-center gap-1 mt-1 px-3 py-1.5 rounded-lg bg-red-50 text-red-700 border border-red-200 text-[13px] font-semibold hover:bg-red-100 print:hidden">Why did the score drop? →</a>
           <p className="text-[13px] font-bold text-gray-400 mt-0.5">Operational Analytics & Rankings</p>
         </div>
 

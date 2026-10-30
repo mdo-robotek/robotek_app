@@ -136,6 +136,36 @@ export function getNewLaunchStep(n: number): NewLaunchStep | undefined {
   return NEW_LAUNCH_STEPS[n - 1];
 }
 
+// ── People ──────────────────────────────────────────────────────────────────
+// Each non-approval step has a default role from the flowchart (Himanshi,
+// Purchase Head, EA, Designer Team…). Step setup maps a step to a real ERP
+// user; the launch form can then pick a different user per role for that one
+// product ("Team for this launch", stored as 0_team_<role>). Approvals stay
+// with the Admin login.
+
+export function roleKey(defaultDoer: string): string {
+  return defaultDoer.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "");
+}
+
+/** Roles that can be assigned per launch, in flow order. */
+export const NEW_LAUNCH_TEAM_ROLES: { key: string; label: string; steps: number[] }[] = (() => {
+  const map = new Map<string, { key: string; label: string; steps: number[] }>();
+  NEW_LAUNCH_STEPS.forEach((s) => {
+    if (s.approval) return;
+    const key = roleKey(s.doer);
+    if (!map.has(key)) map.set(key, { key, label: s.doer, steps: [] });
+    map.get(key)!.steps.push(s.n);
+  });
+  return Array.from(map.values());
+})();
+
+/** Who does step `step` on this launch: launch team pick → Step setup → flowchart default. */
+export function doerFor(step: NewLaunchStep, fields: Record<string, string>): string {
+  const base = NEW_LAUNCH_STEPS[step.n - 1];
+  if (!base || base.approval) return step.doer;
+  return String(fields[`0_team_${roleKey(base.doer)}`] || "").trim() || step.doer;
+}
+
 /** Admin-editable doer / TAT override for one step (Config tab). */
 export interface NewLaunchStepConfig {
   step: number;

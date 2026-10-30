@@ -1720,7 +1720,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
                         { label: 'Hold', icon: <PauseIcon className="w-3 h-3" />, color: 'bg-amber-50 text-amber-600 border-amber-100 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-900/30', requiresAdmin: true },
                         { label: 'Re-Open', icon: <BoltIcon className="w-3 h-3" />, color: 'bg-violet-50 text-violet-600 border-violet-100 dark:bg-violet-900/20 dark:text-violet-400 dark:border-violet-900/30', requiresAdmin: true },
                       ]
-                      .filter(item => userRole === 'ADMIN' || !item.requiresAdmin)
+                      .filter(item => ['ADMIN', 'EA'].includes(String(userRole || '').toUpperCase()) || !item.requiresAdmin)
                       .map((item) => (
                         <button
                           key={item.label}
